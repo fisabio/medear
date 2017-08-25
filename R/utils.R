@@ -134,6 +134,8 @@ detecta_cambios <- function(datos, years = 2004:2017) {
 #'
 #'   CUIDADO: se sobreescribirá cualquier objeto nombrado como poblacion.
 #'
+#' @details La contraseña no se almacena en el historial.
+#'
 #' @param key Cadena de caracteres con la contraseña.
 #' @return No se devuelve nada.
 #'
@@ -156,6 +158,15 @@ carga_datos <- function(key) {
   poblacion <<- unserialize(
     sodium::data_decrypt(readRDS(poblacion), key)
   )
+  on.exit({
+    ruta <- list.files(getwd(), all.files = T,
+                       pattern = "*\\.Rhistory$", full.names = T)
+    if (length(ruta) > 0) {
+      historial <- readLines(ruta)
+      historial <- historial[!grepl("carga_datos|key", historial)]
+      writeLines(historial, ruta)
+    }
+  })
 }
 
 

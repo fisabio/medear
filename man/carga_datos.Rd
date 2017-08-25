@@ -19,6 +19,9 @@ Algunos datos del proyecto MEDEA3 están encriptados para poder
 
   CUIDADO: se sobreescribirá cualquier objeto nombrado como poblacion.
 }
+\details{
+La contraseña no se almacena en el historial.
+}
 \examples{
 \dontrun{
   carga_datos(key = "contraseña")
