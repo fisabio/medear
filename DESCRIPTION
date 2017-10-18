@@ -13,17 +13,20 @@ Maintainer: Carlos Vergara-Hernández <carlos.vergara@uv.es>
 Description: Descarga, manipulación y extracción de poblaciones desde 2001 a 2017
     por sección censal, de acuerdo con los datos del INE, incluyendo la cartografía
     asociada al año 2011.
-Depends: R (>= 3.4.1)
+Depends: R (>= 3.3.3)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/fisabio/medear
 BugReports: https://github.com/fisabio/medear/issues
 Imports:
+    caRtociudad (>= 0.5.4),
     data.table (>= 1.10.4),
+    devtools (>= 1.13.3),
     readr (>= 1.1.1),
     sf (>= 0.5-3),
     sodium (>= 1.1),
     utils (>= 3.4.1)
+Remotes: carlosvergara/caRtociudad
 RoxygenNote: 6.0.1
 ByteCompile: yes

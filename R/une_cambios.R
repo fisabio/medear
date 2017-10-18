@@ -50,9 +50,9 @@
 #'
 #' \dontrun{
 #'   data(poblacion)
-#'   data(cambios)
+#'   data(cambios_seccion)
 #'   data(cartografia)
-#'   uniones <- une_secciones(cambios, poblacion, cartografia, 2006:2016)
+#'   uniones <- une_secciones(cambios_seccion, poblacion, cartografia, 2006:2016)
 #'
 #'   poblacion   <- uniones$poblacion
 #'   cartografia <- uniones$cartografia
@@ -101,12 +101,12 @@ une_secciones <- function(cambios, poblacion, cartografia,
     match(cartografia$CUSEC, cluster_sc[, sc]),
     id_cluster
   ]
-  cartografia <- sf:::aggregate.sf(
+  cartografia <- aggregate(
     x        = cartografia,
     by       = list(cartografia$cluster),
     FUN      = function(x) x[[1]],
-    do_union = T,
-    simplify = T
+    do_union = TRUE,
+    simplify = TRUE
   )
   cartografia <- sf::st_cast(cartografia, "MULTIPOLYGON")
   cartografia[, c("Group.1", "cluster")] <- NULL

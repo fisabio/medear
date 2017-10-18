@@ -14,8 +14,8 @@ No se devuelve nada.
 }
 \description{
 Algunos datos del proyecto MEDEA3 están encriptados para poder
-  cumplir con la licencia INE. Esta función los desencripta y los adjunta al
-  entorno global.
+  cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
+  los desencripta y los adjunta al entorno global.
 
   CUIDADO: se sobreescribirá cualquier objeto nombrado como poblacion.
 }

@@ -129,8 +129,8 @@ detecta_cambios <- function(datos, years = 2004:2017) {
 #' @title Carga los datos privados de población para el proyecto MEDEA3
 #'
 #' @description Algunos datos del proyecto MEDEA3 están encriptados para poder
-#'   cumplir con la licencia INE. Esta función los desencripta y los adjunta al
-#'   entorno global.
+#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
+#'   los desencripta y los adjunta al entorno global.
 #'
 #'   CUIDADO: se sobreescribirá cualquier objeto nombrado como poblacion.
 #'
@@ -159,8 +159,8 @@ carga_datos <- function(key) {
     sodium::data_decrypt(readRDS(poblacion), key)
   )
   on.exit({
-    ruta <- list.files(getwd(), all.files = T,
-                       pattern = "*\\.Rhistory$", full.names = T)
+    ruta <- list.files(getwd(), all.files = TRUE,
+                       pattern = "*\\.Rhistory$", full.names = TRUE)
     if (length(ruta) > 0) {
       historial <- readLines(ruta)
       historial <- historial[!grepl("carga_datos|key", historial)]
@@ -185,12 +185,14 @@ carga_datos <- function(key) {
 elige_corte <- function(datos, corte) {
   stopifnot(corte %in% c(85, 100))
   res <- copy(datos)
-  if (corte == 100) {
+  if (corte == 100 & "q_85_plus" %in% colnames(res)) {
     res[, q_85_plus := NULL]
   } else {
+    if (!"q_85_plus" %in% colnames(res))
+      res[, q_85_plus := double(.N)]
     res[,
         q_85_plus := sum(
-          q_85_plus, q_85_89, q_90_94, q_95_99, q_100_plus , na.rm = T),
+          q_85_plus, q_85_89, q_90_94, q_95_99, q_100_plus , na.rm = TRUE),
         by = .(seccion, sexo, year)
         ][, c("q_85_89", "q_90_94", "q_95_99", "q_100_plus") := NULL]
   }

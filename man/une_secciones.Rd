@@ -63,9 +63,9 @@ Une los cambios del seccionado del INE en la cartografía INE
 
 \dontrun{
   data(poblacion)
-  data(cambios)
+  data(cambios_seccion)
   data(cartografia)
-  uniones <- une_secciones(cambios, poblacion, cartografia, 2006:2016)
+  uniones <- une_secciones(cambios_seccion, poblacion, cartografia, 2006:2016)
 
   poblacion   <- uniones$poblacion
   cartografia <- uniones$cartografia

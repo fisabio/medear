@@ -74,6 +74,6 @@
 #'
 #' @encoding UTF-8
 #'
-#' @import data.table
+#' @import data.table sf
 #'
 "_PACKAGE"
