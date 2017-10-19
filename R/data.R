@@ -25,9 +25,9 @@
 #' @format Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
 #'   \describe{
-#'     \item{seccion}{Código de la sección censal en el primer año.}
-#'     \item{sexo}{Código de la sección censal en el segundo año.}
-#'     \item{year}{Primer año.}
+#'     \item{seccion}{Código de la sección censal.}
+#'     \item{sexo}{0 equivale a varones, 1 equivale a mujeres.}
+#'     \item{year}{Año.}
 #'   }
 #'   El resto de columnas representan los distintos grupos de edad.
 #'

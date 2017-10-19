@@ -250,7 +250,7 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) > 1 & years %in% 2006:2016)
+  stopifnot(length(years) >= 1 & years %in% 2006:2016)
   stopifnot(is.logical(descarga))
   stopifnot(is.character(ruta) | is.null(ruta))
 
