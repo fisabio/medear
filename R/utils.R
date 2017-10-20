@@ -152,12 +152,16 @@ detecta_cambios <- function(datos, years = 2004:2017) {
 #'
 #' @export
 carga_datos <- function(key) {
-  key       <- sodium::hash(charToRaw(key))
-  poblacion <- system.file("data_encrypted", "poblacion.rds",
+
+  key     <- sodium::sha256(charToRaw(key))
+  cifrado <- system.file("data_encrypted", "poblacion.rds",
                            package = "medear", mustWork = TRUE)
-  poblacion <<- unserialize(
-    sodium::data_decrypt(readRDS(poblacion), key)
+  cifrado <- unserialize(
+    sodium::data_decrypt(readRDS(cifrado), key)
   )
+  utils::data("poblacion")
+  poblacion <- data.table::rbindlist(list(poblacion, cifrado), fill = TRUE)[order(year, sexo, seccion)]
+  return(poblacion)
   on.exit({
     ruta <- list.files(getwd(), all.files = TRUE,
                        pattern = "*\\.Rhistory$", full.names = TRUE)
@@ -205,5 +209,8 @@ utils::globalVariables(
     "CUSEC", "id", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",
     "indice", "new_ein", "new_esn", "old_ein", "old_esn", "old_via",
     paste0("p", 1:5), "sc_new", "sc_old", "year2", "cluster", "id_cluster",
-    "q_100_plus", "q_85_89", "q_85_plus", "q_90_94", "q_95_99", "sc", "sexo")
+    "q_100_plus", "q_85_89", "q_85_plus", "q_90_94", "q_95_99", "sc", "sexo",
+    "geocodificados", "parimp_o", "parimp_c", "codigos_ine", "nombre_provincia",
+    "nombre_municipio", "cod_provincia", "cod_municipio", "tip_via", "portalNumber",
+    "muni", "province", "postalCode")
 )

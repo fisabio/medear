@@ -5,11 +5,12 @@
 \alias{poblacion}
 \title{Datos de población por sección censal para las ciudades MEDEA3}
 \format{Un objeto de clase \code{poblaciones_ine} donde las filas representan
-  las distintas secciones censales. Las tres primeras columnas son:
+  las distintas secciones censales. Las cuatro primeras columnas son:
   \describe{
     \item{seccion}{Código de la sección censal.}
     \item{sexo}{0 equivale a varones, 1 equivale a mujeres.}
     \item{year}{Año.}
+    \item{medea3}{Pertenencia de la sección al proyecto MEDEA3.}
   }
   El resto de columnas representan los distintos grupos de edad.}
 \usage{

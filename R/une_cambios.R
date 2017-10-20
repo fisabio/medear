@@ -101,7 +101,7 @@ une_secciones <- function(cambios, poblacion, cartografia,
     match(cartografia$CUSEC, cluster_sc[, sc]),
     id_cluster
   ]
-  cartografia <- aggregate(
+  cartografia <- stats::aggregate(
     x        = cartografia,
     by       = list(cartografia$cluster),
     FUN      = function(x) x[[1]],
