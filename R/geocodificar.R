@@ -222,6 +222,53 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
     )
   ]
 
+# retira_descripcion <- function(x, descripcion = NULL) {
+#   patron_inicio <- c("\\s", "\\(", "-")
+#   patron_final  <- c("\\s", "\\.")
+#   if (is.null(descripcion)) {
+#     descripcion <- c("urb", "ed", "edif", "edificio", "resid", "residencia", "finca")
+#   }
+#   direccion_completa <- strsplit(x, ",")
+#   direccion <- sapply(direccion_completa, `[`, 1)
+#   direccion <- ifelse(is.na(direccion), "", direccion)
+#   direccion <- gsub("\\sNA$", " ", direccion)
+#   direccion <- gsub("\\s0$", " ", direccion)
+#   n_cambios <- list()
+#   cambios   <- matrix(0, nrow = length(direccion), ncol = 7)
+#   cont <- 1
+#   for (k in seq_along(descripcion)) {
+#     for (i in seq_along(patron_inicio)) {
+#       for (j in seq_along(patron_final)) {
+#         patron    <- paste0("(?<=", patron_inicio[i], descripcion[k],
+#                             patron_final[j], ")(.*)(?=\\s\\d+|\\s$)")
+#         cambios[, cont] <- grepl(patron, direccion, perl = TRUE, ignore.case = TRUE)
+#         direccion <- gsub(patron, "", direccion, perl = TRUE, ignore.case = TRUE)
+#         direccion <- gsub(
+#           pattern     = paste0(patron_inicio[i], descripcion[k], patron_final[j]),
+#           replacement = "",
+#           x           = direccion,
+#           ignore.case = TRUE
+#         )
+#         cont            <- cont + 1
+#       }
+#     }
+#     cambios[, cont] <- rowSums(cambios)
+#     n_cambios[[k]]  <- cambios
+#     cont            <- 1
+#   }
+#   res <- paste0(direccion, ",", sapply(lapply(direccion_completa, `[`, -1),
+#                                        function(x) paste0(x[1], ",", x[2])))
+#
+#   utiles <- data.table(id = which(n_cambios[[k]][, 7] != 0))
+#   utiles <- utiles[, direcciones := res[id]][!grepl("^calle\\s(9999?),|^calle\\s,|^\\s,",
+#                                                     direcciones, ignore.case = T)]
+#
+#
+#   return(res)
+# }
+# retira_descripcion(x)
+
+
 
 
 
