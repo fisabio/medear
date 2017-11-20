@@ -2,12 +2,8 @@ Package: medear
 Title: Poblaciones y cartografía por sección censal INE
 Version: 0.1.0
 Authors@R: c(
-    person("Miguel Ángel", "Martínez-Beneito", email = "martinez_mig@gva.es",  role = "aut"),
-    person("Gonzalo", "García-Donato",         email = "garcia_gon@gva.es",    role = "aut"),
-    person("Paloma", "Botella-Rocamora",       email = "botella_pal@gva.es",   role = "aut"),
-    person("Jordi", "Pérez-Panadés",           email = "perez_jorpan@gva.es",  role = "aut"),
-    person("Francisca", "Corpas-Burgos",       email = "corpas_fra@gva.es",    role = "aut"),
-    person("Carlos", "Vergara-Hernández",      email = "carlos.vergara@uv.es", role = c("aut", "cre"))
+    person("Grupo MEDEA 3",  role = "aut"),
+    person("Carlos", "Vergara-Hernández", email = "carlos.vergara@uv.es", role = c("aut", "cre"))
     )
 Maintainer: Carlos Vergara-Hernández <carlos.vergara@uv.es>
 Description: Descarga, manipulación y extracción de poblaciones desde 2001 a 2017

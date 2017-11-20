@@ -85,17 +85,18 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 
         if (grepl("\\.zip$", file_zip)) {
           utils::unzip(file_down, files = file_zip,
-                       overwrite = TRUE, exdir = dir_dest[i])
+                       overwrite = TRUE, exdir = dir_dest[i], unzip = "unzip")
           file_zip1 <- paste0(dirname(file_down), "/", file_zip)
           file_zip2 <- utils::unzip(zipfile = file_zip1, list = TRUE)[, 1]
           file_zip2 <- file_zip2[grep("TRAM|t$", file_zip2, ignore.case = TRUE)]
           utils::unzip(paste0(dirname(file_down), "/", file_zip),
-                       files = file_zip2, overwrite = TRUE, exdir = dir_dest[i])
+                       files = file_zip2, overwrite = TRUE,
+                       exdir = dir_dest[i], unzip = "unzip")
           file.rename(paste0(dir_dest[i], file_zip2),
                       paste0(dir_dest[i], "year_", substr(years, 3, 4)[j]))
         } else {
           utils::unzip(file_down, files = file_zip,
-                       overwrite = TRUE, exdir = dir_dest[i])
+                       overwrite = TRUE, exdir = dir_dest[i], unzip = "unzip")
           file.rename(paste0(dir_dest[i], file_zip),
                       paste0(dir_dest[i], "year_", substr(years, 3, 4)[j]))
         }
@@ -187,7 +188,8 @@ descarga_cartografia <- function(crs = 4326) {
   )
   utils::unzip(
     zipfile = paste0(dest_dir, "carto_2011.zip"),
-    exdir = dest_dir
+    exdir = dest_dir,
+    unzip = "unzip"
   )
   carto <- sf::read_sf(paste0(dest_dir, "SECC_CPV_E_20111101_01_R_INE.shp"))
   carto <- carto[, -grep("^Shape|^CNUT|CLAU2|^OBJ", colnames(carto))]
