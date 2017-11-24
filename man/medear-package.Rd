@@ -77,11 +77,7 @@ El uso habitual del paquete será la carga de datos o de la
 
 Authors:
 \itemize{
-  \item Miguel Ángel Martínez-Beneito \email{martinez_mig@gva.es}
-  \item Gonzalo García-Donato \email{garcia_gon@gva.es}
-  \item Paloma Botella-Rocamora \email{botella_pal@gva.es}
-  \item Jordi Pérez-Panadés \email{perez_jorpan@gva.es}
-  \item Francisca Corpas-Burgos \email{corpas_fra@gva.es}
+  \item Grupo MEDEA 3
 }
 
 }

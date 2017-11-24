@@ -150,6 +150,8 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 #'   datum WGS84).
 #'
+#' @usage descarga_cartografia(crs = 4326)
+#'
 #' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326.
 #'
 #' @return Un objeto de clase \code{cartografia_ine} y \code{sf}, donde cada
@@ -178,6 +180,8 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' carto_ine_46 <- carto[, "CPRO" == "46"]
 #' plot(st_geometry(carto_ine_valencia))
 #' }
+#'
+#' @encoding UTF-8
 #'
 #' @export
 descarga_cartografia <- function(crs = 4326) {

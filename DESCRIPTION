@@ -1,6 +1,6 @@
 Package: medear
 Title: Poblaciones y cartografía por sección censal INE
-Version: 0.1.0
+Version: 0.1.2
 Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
     person("Carlos", "Vergara-Hernández", email = "carlos.vergara@uv.es", role = c("aut", "cre"))
@@ -16,7 +16,7 @@ LazyData: true
 URL: https://github.com/fisabio/medear
 BugReports: https://github.com/fisabio/medear/issues
 Imports:
-    caRtociudad (>= 0.5.4),
+    caRtociudad (>= 0.5.5),
     data.table (>= 1.10.4),
     devtools (>= 1.13.3),
     readr (>= 1.1.1),

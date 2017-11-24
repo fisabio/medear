@@ -5,13 +5,11 @@
 \alias{une_secciones}
 \title{Une los cambios del seccionado del INE}
 \usage{
-une_secciones(cambios, poblacion, cartografia, years = 2001:2016,
-  corte_edad = 85)
+une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
+  NULL, corte_edad = 85)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
-
-\item{poblacion}{Objeto de clase \code{poblaciones_ine}.}
 
 \item{cartografia}{Objeto de clase \code{cartografia_ine}.}
 
@@ -20,40 +18,40 @@ desee consultar las variaciones de seccionado. El año 2011 debe figurar
 dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
 año).}
 
+\item{poblacion}{Objeto de clase \code{poblaciones_ine}. Argumento opcional a
+proporcionar en caso de querer agregar las poblaciones.}
+
 \item{corte_edad}{Numérico: punto de corte para los grupos de edad (85 o
-100).}
+100). Argumento opcional en caso de proporcionar datos de poblaciones.}
 }
 \value{
-Una lista de longitud igual a dos, donde el primer elemento es un
-  objeto de clase \code{cartografia_ine} y \code{sf}, donde cada fila es una
-  sección censal y que cuenta con 15 columnas:
-  \item{CUSEC}{Cádena de 10 caracteres con el código de sección censal
-    (incluye provincia, municipio y distrito).}
-  \item{CUMUN}{Cádena de 5 caracteres con el código del municipio (incluye
-    provincia).}
-  \item{CSEC}{Cádena de 3 caracteres con el código de sección censal.}
-  \item{CDIS}{Cádena de 2 caracteres con el código de distrito.}
-  \item{CPRO}{Cádena de 3 caracteres con el código de provincia.}
+El resultado devuelto varía en función de si se proporcionan datos de
+  poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
+  \code{cartografia_ine} y \code{sf} con la cartografía, donde cada fila es
+  una sección censal y que cuenta con 15 columnas: \item{CUSEC}{Cádena de 10
+  caracteres con el código de sección censal (incluye provincia, municipio y
+  distrito).} \item{CUMUN}{Cádena de 5 caracteres con el código del municipio
+  (incluye provincia).} \item{CSEC}{Cádena de 3 caracteres con el código de
+  sección censal.} \item{CDIS}{Cádena de 2 caracteres con el código de
+  distrito.} \item{CPRO}{Cádena de 3 caracteres con el código de provincia.}
   \item{CCA}{Cádena de 2 caracteres con el código de comunidad autónoma.}
   \item{CUDIS}{Cádena de 7 caracteres con el código de distrito (incluye
-    provincia y  municipio).}
-  \item{OBS}{Observaciones por parte del proveedor de los datos.}
-  \item{NPRO}{Nombre de la provincia.}
-  \item{NCA}{Nombre de la comunidad autónoma.}
-  \item{NMUN}{Nombre del municipio.}
+  provincia y  municipio).} \item{OBS}{Observaciones por parte del proveedor
+  de los datos.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
+  comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
   \item{geometry}{Columna de tipo lista con la geometría asociada a cada
-    sección censal.}
-  \item{cluster_id}{Código de identificación del cluster de uniones.}
-  \item{sc_unida}{Código de las secciones unidas.}
+  sección censal.} \item{cluster_id}{Código de identificación del cluster de
+  uniones.} \item{sc_unida}{Código de las secciones unidas.}
 
-  El segundo elemento de la lista es un objeto de clase
+  En caso de proporcionan poblaciones, se devuelve una lista de longitud
+  igual a dos, donde el primer elemento es la cartografía descrita
+  anteriormente y el segundo elemento de la lista es un objeto de clase
   \code{poblaciones_ine} donde las filas representan las distintas secciones
-    censales. Las tres primeras columnas son:
-  \item{seccion}{Código de la sección censal en el primer año.}
-  \item{sexo}{Código de la sección censal en el segundo año.}
-  \item{year}{Primer año.}
-  El resto de columnas representan los distintos grupos de edad, tras
-    realizar el corte en los grupos de edad (85 0 100).
+  censales. Las tres primeras columnas son: \item{seccion}{Código de la
+  sección censal en el primer año.} \item{sexo}{Código de la sección censal
+  en el segundo año.} \item{year}{Primer año.} El resto de columnas
+  representan los distintos grupos de edad, tras realizar el corte en los
+  grupos de edad (85 0 100).
 }
 \description{
 Une los cambios del seccionado del INE en la cartografía INE
@@ -62,10 +60,10 @@ Une los cambios del seccionado del INE en la cartografía INE
 \examples{
 
 \dontrun{
-  data(poblacion)
-  data(cambios_seccion)
-  data(cartografia)
-  uniones <- une_secciones(cambios_seccion, poblacion, cartografia, 2006:2016)
+  data("poblacion")
+  data("cambios_seccion")
+  data("cartografia")
+  uniones <- une_secciones(cambios_seccion, cartografia, 2006:2016, poblacion)
 
   poblacion   <- uniones$poblacion
   cartografia <- uniones$cartografia

@@ -1,9 +1,4 @@
 
-#' @title Función auxiliar para detectar cambios en secciones censales
-#'
-#' @description Una función auxiliar para vectorizar el procesado de cambios.
-#'
-#' @param datos objeto de clase \code{tramero_ine}.
 filtrar_ein_esn <- function(datos) {
   col_list    <- datos[indice == FALSE]
   no_col_list <- datos[indice == TRUE]
@@ -60,6 +55,8 @@ filtrar_ein_esn <- function(datos) {
 #' cambios  <- detecta_cambios(datos = trameros)
 #' cambios
 #' }
+#'
+#' @encoding UTF-8
 #'
 #' @export
 detecta_cambios <- function(datos, years = 2004:2017) {
@@ -150,6 +147,8 @@ detecta_cambios <- function(datos, years = 2004:2017) {
 #'   carga_datos(key = "contraseña")
 #' }
 #'
+#' @encoding UTF-8
+#'
 #' @export
 carga_datos <- function(key) {
 
@@ -174,18 +173,6 @@ carga_datos <- function(key) {
 }
 
 
-#' @title Elige el último punto de corte para los grupos de edad
-#'
-#' @description Elige entre 85 y más (disponible hasta 2010) o 100 y más
-#'   (disponible desde 2011).
-#'
-#' @param datos Objeto de clase \code{poblaciones_ine}.
-#' @param corte Numérico: punto de corte (85 o 100).
-#'
-#' @return Objeto de clase \code{poblaciones_ine} sin la columna
-#'   \code{q_85_plus} en caso de elegir como punto de corte los 100 años de
-#'   edad, o sin las columnas \code{q_85_89:q_100_plus} previo agregado de su
-#'   valor a la columna \code{q_85_plus}.
 elige_corte <- function(datos, corte) {
   stopifnot(corte %in% c(85, 100))
   res <- copy(datos)
@@ -204,13 +191,210 @@ elige_corte <- function(datos, corte) {
 }
 
 
+limpia_vias <- function(vias) {
+  tvias <- c("calle", "avenida", "plaza", "partida", "camino", "carretera",
+             "pasaje", "paseo", "vereda", "paraje", "ronda", "travesia",
+             "parque", "grupo")
+
+  vias      <- tolower(vias)
+  vias[is.na(vias)] <- ""
+  vias      <- tolower(vias)
+  vias      <- gsub("\\sna(?=,)", "", vias, perl = TRUE)
+  vias      <- gsub("^na\\s", "", vias)
+  vias      <- gsub("\\sna\\s", "", vias)
+  vias      <- gsub("\\s0(?=,)", "", vias, perl = TRUE)
+  vias      <- gsub("\\s(9999?)", " ", vias)
+  vias      <- gsub("\\d+(?=[a-z])", "", vias, perl = TRUE)
+  vias_list <- strsplit(vias, ",")
+  tvia_nvia <- mapply(function(x, y) x[!x %in% y], vias_list, lapply(vias_list, utils::tail, n = 3))
+  tvia_nvia <- sapply(tvia_nvia, paste, collapse = " ")
+
+  for (i in seq_along(tvias)) {
+    ind_norm    <- grep(paste0("^", tvias[i], "[a-z]"), tvia_nvia)
+    tvia_nvia[ind_norm] <- gsub(tvias[i], paste0(tvias[i], " "), tvia_nvia[ind_norm])
+  }
+  calle     <- "^(ca[^monstbp])\\w+\\b|^(c)\\b|^(cl[^rnia][^b])|^([^bv]lle*)\\w"
+  avenida   <- "^(a.v)[^t]\\w+\\b|^(av)\\w+\\b|^(abg)\\w+\\b|^(vda)\\w+\\b|^a\\b|^av\\b"
+  plaza     <- "^(pz?l?z?[^tsrqopjigedau])\\w+"
+  partida   <- "^(par?t)\\w+|^(pda)\\w+|^(pr?t)\\w+|^pa.*da\\w+|^p.tda\\b"
+  camino    <- "^(cam)[^p]\\w+|^(cm[^p])\\w+"
+  carretera <- "^(ctr)\\w+|^(crt)\\w+"
+  pasaje    <- "^(pa?s[^e]j?)\\w+|^(pas[^e](.*))\\w+|^pje\\b|^psj\\b"
+  paseo     <- "^(pa?s[^a]e?)\\w+"
+  travesia  <- "^(trav)(.*)\\b|^tr?v\\w+"
+  tvia_nvia <- gsub(calle,     "calle",     tvia_nvia)
+  tvia_nvia <- gsub(avenida,   "avenida",   tvia_nvia)
+  tvia_nvia <- gsub(plaza,     "plaza",     tvia_nvia)
+  tvia_nvia <- gsub(partida,   "partida",   tvia_nvia)
+  tvia_nvia <- gsub(camino,    "camino",    tvia_nvia)
+  tvia_nvia <- gsub(carretera, "carretera", tvia_nvia)
+  tvia_nvia <- gsub(pasaje,    "pasaje",    tvia_nvia)
+  tvia_nvia <- gsub(paseo,     "paseo",     tvia_nvia)
+  tvia_nvia <- gsub(travesia,  "travesia",  tvia_nvia)
+  tvia_nvia <- gsub("3a",      "tercera",   tvia_nvia)
+  resto     <- lapply(vias_list, utils::tail, n = 3)
+  resto     <- lapply(resto, gsub, pattern = "\\/(?<=\\/)(.*)", replacement = "", perl = TRUE)
+  resto     <- gsub("\\s,", ",", trimws(sapply(resto, paste0, collapse = ",")))
+  nvia      <- regmatches(tvia_nvia, gregexpr("\\d+", tvia_nvia))
+  nvia      <- sapply(sapply(nvia, utils::tail, n = 1), paste0, collapse = "")
+  nvia      <- gsub("\\D",  "",  nvia)
+  tvia_nvia <- trimws(mapply(function(x, y) gsub(x, "", y), nvia, tvia_nvia, USE.NAMES = FALSE))
+
+  return(list(vias = unname(tvia_nvia), nvia = nvia, resto = resto))
+}
+
+
+filtro <- function(vias, nivel) {
+  tvias     <- vias$vias
+  indice    <- integer()
+  tvia_norm <- c("calle", "avenida", "plaza", "partida", "camino", "carretera",
+                 "pasaje", "paseo", "vereda", "paraje", "ronda", "travesia",
+                 "parque", "grupo")
+  inutiles  <- paste0("^(", paste0(tvia_norm, collapse = "|"),
+                      ")\\s{1,10}\\d+,|^\\s?([a-z]+|\\d+)\\s{0,10},|^,|^\\s,")
+
+  if (nivel == 1) {
+    for (i in seq_along(tvia_norm)) {
+      for (j in seq_along(tvia_norm)) {
+        eliminar <- grep(paste0(tvia_norm[i], "\\s{1,10}", tvia_norm[j]), tvias)
+        indice   <- sort(unique(c(indice, eliminar)))
+        tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
+      }
+    }
+
+  } else if (nivel == 2) {
+    patron_ini  <- c("\\s", "\\(", "-")
+    patron_fin  <- c("\\s", "\\.")
+    descripcion <- c("urb", "urbanizacion", "ed", "edf", "edif", "edificio", "res",
+                     "rsd", "rsden", "resid", "residencia", "geriatric.", "centro",
+                     "grupo", "grup", "polig", "poligono", "finca", "aptos",
+                     "complejo", "cooperativa", "coop")
+    for (k in seq_along(descripcion)) {
+      for (i in seq_along(patron_ini)) {
+        for (j in seq_along(patron_fin)) {
+          patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
+          indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
+          tvias  <- gsub(patron, "", tvias, perl = TRUE)
+          tvias  <- gsub(
+            pattern     = paste0(patron_ini[i], descripcion[k], patron_fin[j]),
+            replacement = "",
+            x           = tvias
+          )
+        }
+      }
+    }
+  } else if (nivel == 3) {
+    indice <- grep("\\b[[:alpha:]]{1,3}\\b\\.?", tvias)
+    tvias  <- gsub("\\b[[:alpha:]]{1,3}\\b\\.?", "", tvias)
+  } else {
+    tvias <- gsub("[[:punct:]]", "", tvias)
+    for (i in seq_along(tvia_norm)) {
+      eliminar <- grep(paste0("^", tvia_norm[i], "\\s{1,10}"), tvias)
+      indice   <- sort(unique(c(indice, eliminar)))
+      tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
+    }
+  }
+  res <- data.table(id = indice)
+  res[, via := paste0(trimws(tvias[id]), " ", vias$nvia[id], ", ", vias$resto[id])]
+  res <- res[!grep(inutiles, via)]
+  return(res)
+}
+
+aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
+                           filtro_geo, cartografia, codigos, intentos = 10) {
+  vias_f        <- lapply(vias, `[`, indice_nogeo)
+  direcciones_f <- datos[indice_nogeo][["direcciones"]]
+
+  if (nivel < 5) {
+    res <- filtro(vias_f, nivel)
+  } else {
+    f1 <- filtro(vias_f, 1)
+    direcciones_f[f1[["id"]]] <- f1[["via"]]
+    vias_f <- limpia_vias(direcciones_f)
+    f2 <- filtro(vias_f, 2)
+    direcciones_f[f2[["id"]]] <- f2[["via"]]
+    vias_f <- limpia_vias(direcciones_f)
+    f3 <- filtro(vias_f, 3)
+    direcciones_f[f3[["id"]]] <- f3[["via"]]
+    vias_f <- limpia_vias(direcciones_f)
+    f4 <- filtro(vias_f, 4)
+    direcciones_f[f4[["id"]]] <- f4[["via"]]
+    res <- data.table(id = sort(unique(c(f1[["id"]], f2[["id"]],
+                                         f3[["id"]], f4[["id"]]))))
+    res[, via := direcciones_f[id]]
+  }
+
+  if (nrow(res) > 0) {
+    message("\nSe ha aplicado el filtro ", nivel,
+            "\nBuscando en CartoCiudad (versi\u00f3n ",
+            ifelse(version_cc == "prev", "previa", "actual"), ")...")
+    geo_res    <- data.table(
+      suppressWarnings(
+        caRtociudad::cartociudad_geocode(
+          full_address = res[["via"]],
+          version      = version_cc,
+          ntries       = intentos
+        )
+      )
+    )
+    if (version_cc == "prev") {
+      indice_aux <- which(geo_res[["state"]] %in% 1:2)
+    } else {
+      indice_aux <- which(geo_res[["state"]] %in% 1:4)
+    }
+    if (length(indice_aux) > 0) {
+      indice_geo <- indice_nogeo[res[["id"]][indice_aux]]
+      datos[indice_geo, `:=`(
+        geocodificados = version_cc,
+        lat            = geo_res[indice_aux][["lat"]],
+        lng            = geo_res[indice_aux][["lng"]],
+        via_modificada = res[["via"]][indice_aux]
+      )]
+      indice_nogeo <- indice_nogeo[!indice_nogeo %in% indice_geo]
+      if (filtro_geo != "ninguno") {
+        geom_aux <- sf::st_as_sf(datos[indice_geo, c("lng", "lat")],
+                                 coords = c("lng", "lat"), na.fail = FALSE, crs = 4258)
+        geom_aux <- sf::st_transform(geom_aux, crs = sf::st_crs(cartografia)$epsg)
+        indice_nogeo <-
+          if (filtro_geo == "nombre_municipio") {
+            suppressMessages(sort(unique(c(indice_geo[which(sapply(
+              sf::st_intersects(
+                geom_aux, cartografia[cartografia$CUMUN %in% codigos[indice_geo], ]
+              ),
+              length) == 0)], indice_nogeo))))
+          } else {
+            suppressMessages(sort(unique(c(indice_geo[which(sapply(
+              sf::st_intersects(
+                geom_aux, cartografia[cartografia$CPRO %in% substr(codigos[indice_geo], 1, 2), ]
+              ),
+              length) == 0)], indice_nogeo))))
+          }
+      }
+      datos[
+        indice_nogeo,
+        `:=`(
+          geocodificados = NA_character_,
+          lat            = NA_real_,
+          lng            = NA_real_,
+          dir_cc_old     = NA_character_,
+          dir_cc_new     = NA_character_,
+          via_modificada = NA_character_
+        )
+        ]
+    }
+    indice_nogeo <- sort(unique(c(indice_nogeo, datos[which(vias$nvia == "")][!is.na(geocodificados)][["id"]])))
+  }
+
+  return(list(datos = datos, indice_nogeo = indice_nogeo))
+}
+
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
     "CUSEC", "id", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",
     "indice", "new_ein", "new_esn", "old_ein", "old_esn", "old_via",
-    paste0("p", 1:5), "sc_new", "sc_old", "year2", "cluster", "id_cluster",
+    paste0("p", 1:5), "sc_new", "sc_old", "year", "year2", "cluster", "id_cluster",
     "q_100_plus", "q_85_89", "q_85_plus", "q_90_94", "q_95_99", "sc", "sexo",
     "geocodificados", "parimp_o", "parimp_c", "codigos_ine", "nombre_provincia",
     "nombre_municipio", "cod_provincia", "cod_municipio", "tip_via", "portalNumber",
-    "muni", "province", "postalCode")
+    "muni", "province", "postalCode", "secciones")
 )

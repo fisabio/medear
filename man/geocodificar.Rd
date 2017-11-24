@@ -6,14 +6,24 @@
 \title{Implementación del algoritmo de geocodificación de direcciones}
 \usage{
 geocodificar(direcciones, codigos = NULL, cartografia = NULL,
-nivel_filtro = c("municipio", "provincia", "ninguno"),
-encoding = c("utf8", "latin1", "ascii"))
+  filtro_geo = c("municipio", "provincia", "ninguno"), limpiar_direcciones =
+  TRUE, intentos = 10)
 }
 \arguments{
 \item{direcciones}{Vector de caracteres con las direcciones a geocodificar.
-Las direcciones deben proporcionarse con el formato "TIPO_DE_VÍA
-NOMBRE_DE_VÍA NÚMERO_DE_VÍA, MUNICIPIO, PROVINCIA, CÓDIGO_POSTAL", donde el
-número de la vía y el código postal son campos opcionales.}
+  Las direcciones deben proporcionarse \strong{OBLIGATORIAMENTE} con el
+  formato "TIPO_DE_VÍA NOMBRE_DE_VÍA NÚMERO_DE_VÍA, MUNICIPIO, PROVINCIA,
+  CÓDIGO_POSTAL". La codificación de caracteres a utilizar debe ser,
+  \strong{OBLIGATORIAMENTE}, ASCII, de forma que no aparezcan caracteres como
+  eñes o tildes. Para transformar la codificación de caracteres al tipo
+  ASCII, se puede emplear la función \code{\link[base]{iconv}} de la
+  siguiente forma:
+
+  \code{iconv(direcciones, from = "CODIFICACION_DE_ORIGEN", to =
+  "ascii//translit")}
+
+  donde \code{CODIFICACION_DE_ORIGEN} tomará calores como "utf8", "latin1" o
+  "Windows-1252", por ejemplo.}
 
 \item{codigos}{Vector de caracteres de longitud igual al vector de
 direcciones. Contiene los códigos INE (5 caracteres por código) de los
@@ -25,7 +35,7 @@ propia dirección.}
 que contenga las geometrías de municipios o provincias a los que hacen
 referencias las direcciones.}
 
-\item{nivel_filtro}{Vector de caracteres de longitud 1 indicando el nivel de
+\item{filtro_geo}{Vector de caracteres de longitud 1 indicando el nivel de
 filtrado cartográfico a efectuar (eliminación de coordenadas devueltas pero
 que no correspondan a su polígono correspondiente). Las tres opciones son
 municipio (las coordenadas están dentro del polígono del municipio al que
@@ -33,26 +43,30 @@ hace referencia el código de la dirección), provincia (las coordenadas
 están dentro del polígono de la provincia al que hace referencia el código
 de la dirección) y ninguno.}
 
-\item{encoding}{Vector de caracteres de longitud 1 indicando el tipo de
-codificación de caracteres empleada. Las posibles opciones son UTF8,
-Latin-1 y ASCII (UTF8 por defecto).}
+\item{limpiar_direcciones}{Valor lógico. ¿Se desea limpiar las cadenas de
+texto tras una primera pasada de georreferenciación? Se recomienda
+activarlo conjuntamente al filtro cartográfico para evitar falsos
+positivos. La función informa del tipo de limpieza aplicada conforme se va
+ejecutando. Hay cinco posibilidades: eliminar duplicidad de tipos de vía
+(1), eliminar descripciones de vía (2), eliminar palabras de 3 o menos
+caracteres (3), eliminar signos de puntuación (4) y todos los anteriores de
+forma secuencial (5).}
+
+\item{intentos}{Valor numérico. Número de intentos de conexión con el
+servidor de CartoCiudad en caso de fallo de la misma. Por defecto 10.}
 }
 \value{
 Un \code{data.frame} con tantas filas como direcciones se
-  proporcionaron y con que cuenta con 10 columnas:
-  \item{id}{Identificación de la dirección (se otorga secuencialmente).}
-  \item{direcciones}{Direcciones originales proporcionadas.}
-  \item{geocodificados}{Resultado de la geocodificación: cc_prev o cc_new si
-    alguna de las dos versiones logra geocodificar o NA si ninguna lo logra.}
-  \item{lat}{Latitud devuelta.}
-  \item{lng}{Longitud devuelta.}
-  \item{dir_cc_old}{Direcciones devueltas por la versión previa de
-    CartoCiudad.}
-  \item{parimp_o}{Numeración par o impar de la dirección original.}
-  \item{parimp_c}{Numeración par o impar de la dirección devuelta por la
-    versión previa de CartoCiudad.}
-  \item{coinciden}{Coincidencia entre las numeraciones par o impar.}
-  \item{dir_cc_new}{Dirección devuelta por la nueva versión de CartoCiudad.}
+  proporcionaron y con entre 7 y 8 columnas (en función de si se limpian las
+  direcciones o no): \item{id}{Identificación de la dirección (se otorga
+  secuencialmente).} \item{direcciones}{Direcciones originales
+  proporcionadas.} \item{geocodificados}{Resultado de la geocodificación:
+  cc_prev o cc_new si alguna de las dos versiones logra geocodificar o NA si
+  ninguna lo logra.} \item{lat}{Latitud devuelta.} \item{lng}{Longitud
+  devuelta.} \item{dir_cc_old}{Direcciones devueltas por la versión previa de
+  CartoCiudad.} \item{dir_cc_new}{Dirección devuelta por la nueva versión de
+  CartoCiudad.} \item{via_modificada}{Dirección devuelta por CartoCiudad tras
+  limpiar la dirección.}
 }
 \description{
 Esta función implementa el algoritmo de geocodificación de
@@ -62,6 +76,20 @@ Esta función implementa el algoritmo de geocodificación de
   devuelven el portal más próximo pero sin respetar la numeración par o impar
   y los que no cumplan con el nivel de filtrado cartográfico indicado) se
   realiza una segunda pasada en la nueva versión de CartoCiudad.
+
+  Tras ello puede aplicarse una serie de filtros sobre las cadenas de
+  caracteres para tratar de georreferenciar direcciones complejas (que
+  incluyan repeticiones del tipo de vía, descripciones sobre el punto, o
+  abreviaturas), y aunque el comportamiento por defecto es hacerlo, se trata
+  de un argumento opcional.
+
+  En todos los casos, y siempre que se desee (aunque la opción viene marcada
+  por defecto), se puede aplicar un filtro cartográfico que deseche aquellas
+  localizaciones que caigan fuera del municipio o la provincia de interés.
+  Para habilitar este filtrado se debe proporcionar una cartografía (como la
+  disponible mediante \code{\link{descarga_cartografia}}) y el código INE del
+  municipio o provincia de interés (disponible en el banco de datos
+  \code{\link{codigos_ine}}).
 }
 \examples{
 
@@ -79,8 +107,8 @@ Esta función implementa el algoritmo de geocodificación de
   codigos <- c(rep("46250", 3), "03014", "12082", "43148", "46250")
   cartografia <- descarga_cartografia()
   geocodificar(direcciones = direcciones, codigos = codigos,
-               cartografia = cartografia, nivel_filtro = "municipio",
-               encoding = "utf8")
+               cartografia = cartografia, filtro_geo = "municipio",
+               limpiar_direcciones = TRUE)
 }
 
 }

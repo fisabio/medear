@@ -164,3 +164,20 @@
 #' @examples
 #' data(cambios_seccion)
 "cambios_seccion"
+
+#' @title Secciones censales únicas por año (1996-2016).
+#'
+#' @description Listado con las secciones censales únicas por año (1996-2016).
+#'
+#' @name secciones
+#'
+#' @docType data
+#'
+#' @format Un objeto de clase \code{data.frame} y \code{data.table}, donde cada
+#'   fila es una sección para un año determinado.
+#'
+#' @keywords datasets
+#'
+#' @examples
+#' data(secciones)
+"secciones"
