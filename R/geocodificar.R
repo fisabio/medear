@@ -134,7 +134,7 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
   direcciones  <- paste0(trimws(vias$vias), " ", vias$nvia, ", ", vias$resto)
   direcciones  <- gsub("\\s(?=,)", "", direcciones, perl = TRUE)
   direcciones  <- gsub("^,\\s$", "", direcciones)
-  datos        <- data.table(id = seq_along(direcciones), direcciones = direcciones)
+  datos        <- data.table(idn = seq_along(direcciones), direcciones = direcciones)
 
   # Geocodificado con CC Viejo
   message("Buscando en CartoCiudad (versi\u00f3n previa)...")
@@ -147,18 +147,22 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
       )
     )
   )
+  geo_old[, c("stateMsg") := NULL]
   indice_geo   <- which(geo_old[["state"]] %in% 1:2)
   indice_nogeo <- which(!geo_old[["state"]] %in% 1:2)
-  datos[indice_geo, `:=`(
-    geocodificados = "prev",
-    lat            = geo_old[indice_geo][["lat"]],
-    lng            = geo_old[indice_geo][["lng"]],
-    dir_cc_old     = geo_old[
-      indice_geo,
-      paste0(tip_via, " ", address, " ", portalNumber, ", ",
-             muni, ", ", province, ", ", postalCode)
-    ]
-  )]
+  datos[
+    indice_geo,
+    `:=`(
+      geocodificados = "prev",
+      lat            = geo_old[indice_geo][["lat"]],
+      lng            = geo_old[indice_geo][["lng"]],
+      dir_cc_old     = geo_old[
+        indice_geo,
+        paste0(tip_via, " ", address, " ", portalNumber, ", ",
+               muni, ", ", province, ", ", postalCode)
+      ]
+    )
+  ]
 
   if (filtro_geo != "ninguno") {
     filtro_geo <- switch(filtro_geo,
@@ -218,7 +222,8 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
         }
     }
   }
-  indice_nogeo <- sort(unique(c(indice_nogeo, datos[which(vias$nvia == "")][!is.na(geocodificados)][["id"]])))
+  indice_nogeo_via <- datos[which(vias$nvia == "")][!is.na(geocodificados)][["idn"]]
+  indice_nogeo_via <- unique(sort(c(indice_nogeo, indice_nogeo_via, which(geo_old[["state"]] == 2))))
   datos[
     indice_nogeo,
     `:=`(
@@ -234,24 +239,27 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
   geo_new     <- data.table(
     suppressWarnings(
       caRtociudad::cartociudad_geocode(
-        full_address = datos[indice_nogeo][["direcciones"]],
+        full_address = datos[indice_nogeo_via][["direcciones"]],
         ntries       = intentos
       )
     )
   )
-  indice_geo2 <- indice_nogeo[which(geo_new[["state"]] %in% 1:4)]
+  indice_geo2 <- indice_nogeo_via[which(geo_new[["state"]] %in% 1:4)]
   if (length(indice_geo2) > 0) {
+
+    indice_aux  <- indice_nogeo_via[indice_nogeo_via %in% indice_geo2] # 1's, 2's y != que new ha localizado. indice sobre geo_new
+    indice_geo2 <- unique(sort(c(indice_geo2, indice_aux)))
     datos[indice_geo2, `:=`(
       geocodificados = "current",
-      lat            = geo_new[which(geo_new[["state"]] %in% 1:4)][["lat"]],
-      lng            = geo_new[which(geo_new[["state"]] %in% 1:4)][["lng"]],
+      lat            = geo_new[indice_aux][["lat"]],
+      lng            = geo_new[indice_aux][["lng"]],
       dir_cc_new     = geo_new[
-        which(geo_new[["state"]] %in% 1:4),
+        indice_aux,
         paste0(tip_via, " ", address, " ", portalNumber, ", ",
                muni, ", ", province, ", ", postalCode)
         ]
     )]
-    indice_nogeo <- indice_nogeo[!indice_nogeo %in% indice_geo2]
+    indice_nogeo <- datos[is.na(geocodificados)][["idn"]]
     if (filtro_geo != "ninguno") {
       geom_new <- sf::st_as_sf(datos[indice_geo2, c("lng", "lat")],
                                coords = c("lng", "lat"), na.fail = FALSE, crs = 4258)
@@ -271,17 +279,17 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
             length) == 0)], indice_nogeo))))
         }
     }
-    datos[
-      indice_nogeo,
-      `:=`(
-        geocodificados = NA_character_,
-        lat            = NA_real_,
-        lng            = NA_real_,
-        dir_cc_old     = NA_character_,
-        dir_cc_new     = NA_character_
-      )
-    ]
   }
+  datos[
+    indice_nogeo,
+    `:=`(
+      geocodificados = NA_character_,
+      lat            = NA_real_,
+      lng            = NA_real_,
+      dir_cc_old     = NA_character_,
+      dir_cc_new     = NA_character_
+    )
+    ]
 
   # Aplicación de filtros a las cadenas de caracteres
   if (limpiar_direcciones) {
@@ -305,8 +313,20 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
                              filtro_geo, cartografia, codigos, intentos)
     f5_new <- aplica_filtros(vias, f5_old$datos, f5_old$indice_nogeo, "current",
                              5, filtro_geo, cartografia, codigos, intentos)
-    datos <- f5_new$datos
+    datos        <- f5_new$datos
+    indice_nogeo <- f5_new$indice_nogeo
   }
+  datos[
+    indice_nogeo,
+    `:=`(
+      geocodificados = NA_character_,
+      lat            = NA_real_,
+      lng            = NA_real_,
+      dir_cc_old     = NA_character_,
+      dir_cc_new     = NA_character_,
+      via_modificada = NA_character_
+    )
+  ]
 
   return(datos)
 }

@@ -237,7 +237,7 @@ limpia_vias <- function(vias) {
   resto     <- gsub("\\s,", ",", trimws(sapply(resto, paste0, collapse = ",")))
   nvia      <- regmatches(tvia_nvia, gregexpr("\\d+", tvia_nvia))
   nvia      <- sapply(sapply(nvia, utils::tail, n = 1), paste0, collapse = "")
-  nvia      <- gsub("\\D",  "",  nvia)
+  nvia      <- unname(gsub("\\D",  "",  nvia))
   tvia_nvia <- trimws(mapply(function(x, y) gsub(x, "", y), nvia, tvia_nvia, USE.NAMES = FALSE))
 
   return(list(vias = unname(tvia_nvia), nvia = nvia, resto = resto))
@@ -294,34 +294,35 @@ filtro <- function(vias, nivel) {
       tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
     }
   }
-  res <- data.table(id = indice)
-  res[, via := paste0(trimws(tvias[id]), " ", vias$nvia[id], ", ", vias$resto[id])]
+  res <- data.table(idn = indice)
+  res[, via := paste0(trimws(tvias[idn]), " ", vias$nvia[idn], ", ", vias$resto[idn])]
   res <- res[!grep(inutiles, via)]
   return(res)
 }
 
 aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
                            filtro_geo, cartografia, codigos, intentos = 10) {
-  vias_f        <- lapply(vias, `[`, indice_nogeo)
-  direcciones_f <- datos[indice_nogeo][["direcciones"]]
+  datos_f <- copy(datos)
+  vias_f  <- lapply(vias, `[`, indice_nogeo)
+  direcciones_f <- datos_f[indice_nogeo][["direcciones"]]
 
   if (nivel < 5) {
     res <- filtro(vias_f, nivel)
   } else {
     f1 <- filtro(vias_f, 1)
-    direcciones_f[f1[["id"]]] <- f1[["via"]]
+    direcciones_f[f1[["idn"]]] <- f1[["via"]]
     vias_f <- limpia_vias(direcciones_f)
     f2 <- filtro(vias_f, 2)
-    direcciones_f[f2[["id"]]] <- f2[["via"]]
+    direcciones_f[f2[["idn"]]] <- f2[["via"]]
     vias_f <- limpia_vias(direcciones_f)
     f3 <- filtro(vias_f, 3)
-    direcciones_f[f3[["id"]]] <- f3[["via"]]
+    direcciones_f[f3[["idn"]]] <- f3[["via"]]
     vias_f <- limpia_vias(direcciones_f)
     f4 <- filtro(vias_f, 4)
-    direcciones_f[f4[["id"]]] <- f4[["via"]]
-    res <- data.table(id = sort(unique(c(f1[["id"]], f2[["id"]],
-                                         f3[["id"]], f4[["id"]]))))
-    res[, via := direcciones_f[id]]
+    direcciones_f[f4[["idn"]]] <- f4[["via"]]
+    res <- data.table(idn = sort(unique(c(f1[["idn"]], f2[["idn"]],
+                                         f3[["idn"]], f4[["idn"]]))))
+    res[, via := direcciones_f[idn]]
   }
 
   if (nrow(res) > 0) {
@@ -338,59 +339,53 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
       )
     )
     if (version_cc == "prev") {
-      indice_aux <- which(geo_res[["state"]] %in% 1:2)
+      indice_aux   <- which(geo_res[["state"]] %in% 1:2)
+      indice_geo_f <- indice_nogeo[res[["idn"]][indice_aux]]
     } else {
-      indice_aux <- which(geo_res[["state"]] %in% 1:4)
+      indice_aux   <- which(geo_res[["state"]] %in% 1:4)
+      indice_geo_f <- indice_nogeo[res[["idn"]][indice_aux]]
     }
-    if (length(indice_aux) > 0) {
-      indice_geo <- indice_nogeo[res[["id"]][indice_aux]]
-      datos[indice_geo, `:=`(
+    if (length(indice_geo_f) > 0) {
+      datos_f[indice_geo_f, `:=`(
         geocodificados = version_cc,
         lat            = geo_res[indice_aux][["lat"]],
         lng            = geo_res[indice_aux][["lng"]],
-        via_modificada = res[["via"]][indice_aux]
+        via_modificada = res[indice_aux][["via"]]
       )]
-      indice_nogeo <- indice_nogeo[!indice_nogeo %in% indice_geo]
+      indice_nogeo <- indice_nogeo[!indice_nogeo %in% indice_geo_f]
       if (filtro_geo != "ninguno") {
-        geom_aux <- sf::st_as_sf(datos[indice_geo, c("lng", "lat")],
+        geom_aux <- sf::st_as_sf(datos_f[indice_geo_f, c("lng", "lat")],
                                  coords = c("lng", "lat"), na.fail = FALSE, crs = 4258)
         geom_aux <- sf::st_transform(geom_aux, crs = sf::st_crs(cartografia)$epsg)
         indice_nogeo <-
           if (filtro_geo == "nombre_municipio") {
-            suppressMessages(sort(unique(c(indice_geo[which(sapply(
+            suppressMessages(sort(unique(c(indice_geo_f[which(sapply(
               sf::st_intersects(
-                geom_aux, cartografia[cartografia$CUMUN %in% codigos[indice_geo], ]
+                geom_aux, cartografia[cartografia$CUMUN %in% codigos[indice_geo_f], ]
               ),
               length) == 0)], indice_nogeo))))
           } else {
-            suppressMessages(sort(unique(c(indice_geo[which(sapply(
+            suppressMessages(sort(unique(c(indice_geo_f[which(sapply(
               sf::st_intersects(
-                geom_aux, cartografia[cartografia$CPRO %in% substr(codigos[indice_geo], 1, 2), ]
+                geom_aux, cartografia[cartografia$CPRO %in% substr(codigos[indice_geo_f], 1, 2), ]
               ),
               length) == 0)], indice_nogeo))))
           }
       }
-      datos[
-        indice_nogeo,
-        `:=`(
-          geocodificados = NA_character_,
-          lat            = NA_real_,
-          lng            = NA_real_,
-          dir_cc_old     = NA_character_,
-          dir_cc_new     = NA_character_,
-          via_modificada = NA_character_
-        )
-        ]
     }
-    indice_nogeo <- sort(unique(c(indice_nogeo, datos[which(vias$nvia == "")][!is.na(geocodificados)][["id"]])))
+    if (version_cc == "prev") {
+      indice_nogeo_via <- datos_f[which(vias$nvia == "")][geocodificados == "prev"][["idn"]]
+      indice_nogeo     <- unique(sort(c(indice_nogeo, indice_nogeo_via, which(geo_res[["state"]] == 2))))
+    }
   }
 
-  return(list(datos = datos, indice_nogeo = indice_nogeo))
+
+  return(list(datos = datos_f, indice_nogeo = indice_nogeo))
 }
 
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
-    "CUSEC", "id", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",
+    "CUSEC", "idn", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",
     "indice", "new_ein", "new_esn", "old_ein", "old_esn", "old_via",
     paste0("p", 1:5), "sc_new", "sc_old", "year", "year2", "cluster", "id_cluster",
     "q_100_plus", "q_85_89", "q_85_plus", "q_90_94", "q_95_99", "sc", "sexo",
