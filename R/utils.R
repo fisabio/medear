@@ -232,7 +232,6 @@ limpia_vias <- function(vias) {
   tvia_nvia <- gsub(pasaje,    "pasaje",    tvia_nvia)
   tvia_nvia <- gsub(paseo,     "paseo",     tvia_nvia)
   tvia_nvia <- gsub(travesia,  "travesia",  tvia_nvia)
-  tvia_nvia <- gsub("3a",      "tercera",   tvia_nvia)
   resto     <- lapply(vias_list, utils::tail, n = 3)
   resto     <- lapply(resto, gsub, pattern = "\\/(?<=\\/)(.*)", replacement = "", perl = TRUE)
   resto     <- gsub("\\s,", ",", trimws(sapply(resto, paste0, collapse = ",")))

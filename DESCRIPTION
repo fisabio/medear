@@ -22,7 +22,7 @@ Imports:
     readr (>= 1.1.1),
     sf (>= 0.5-3),
     sodium (>= 1.1),
-    utils (>= 3.4.1)
+    utils (>= 3.3.3)
 Remotes: carlosvergara/caRtociudad
 RoxygenNote: 6.0.1
 ByteCompile: yes

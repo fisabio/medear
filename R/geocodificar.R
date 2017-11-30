@@ -153,14 +153,19 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
   datos[
     indice_geo,
     `:=`(
-      geocodificados = "prev",
-      lat            = geo_old[indice_geo][["lat"]],
-      lng            = geo_old[indice_geo][["lng"]],
-      dir_cc_old     = geo_old[
-        indice_geo,
-        paste0(tip_via, " ", address, " ", portalNumber, ", ",
-               muni, ", ", province, ", ", postalCode)
-      ]
+      id           = geo_old[indice_geo][["id"]],
+      province     = geo_old[indice_geo][["province"]],
+      muni         = geo_old[indice_geo][["muni"]],
+      tip_via      = geo_old[indice_geo][["tip_via"]],
+      address      = geo_old[indice_geo][["address"]],
+      portalNumber = geo_old[indice_geo][["portalNumber"]],
+      refCatastral = geo_old[indice_geo][["refCatastral"]],
+      postalCode   = geo_old[indice_geo][["postalCode"]],
+      lat          = geo_old[indice_geo][["lat"]],
+      lng          = geo_old[indice_geo][["lng"]],
+      state        = geo_old[indice_geo][["state"]],
+      type         = geo_old[indice_geo][["type"]],
+      version      = geo_old[indice_geo][["version"]]
     )
   ]
 
@@ -222,15 +227,24 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
         }
     }
   }
-  indice_nogeo_via <- datos[which(vias$nvia == "")][!is.na(geocodificados)][["idn"]]
+  indice_nogeo_via <- datos[which(vias$nvia == "")][!is.na(version)][["idn"]]
   indice_nogeo_via <- unique(sort(c(indice_nogeo, indice_nogeo_via, which(geo_old[["state"]] == 2))))
   datos[
     indice_nogeo,
     `:=`(
-      geocodificados = NA_character_,
-      lat            = NA_real_,
-      lng            = NA_real_,
-      dir_cc_old     = NA_character_
+      id           = NA_character_,
+      province     = NA_character_,
+      muni         = NA_character_,
+      tip_via      = NA_character_,
+      address      = NA_character_,
+      portalNumber = NA_character_,
+      refCatastral = NA_character_,
+      postalCode   = NA_character_,
+      lat          = NA_character_,
+      lng          = NA_character_,
+      state        = NA_character_,
+      type         = NA_character_,
+      version      = NA_character_
     )
   ]
 
@@ -332,6 +346,24 @@ geocodificar <- function(direcciones, codigos = NULL, cartografia = NULL,
       )
     ]
   }
+  datos[
+    indice_nogeo,
+    `:=`(
+      id           = NA_character_,
+      province     = NA_character_,
+      muni         = NA_character_,
+      tip_via      = NA_character_,
+      address      = NA_character_,
+      portalNumber = NA_character_,
+      refCatastral = NA_character_,
+      postalCode   = NA_character_,
+      lat          = NA_character_,
+      lng          = NA_character_,
+      state        = NA_character_,
+      type         = NA_character_,
+      version      = NA_character_
+    )
+  ]
 
 
   return(datos)

@@ -6,7 +6,7 @@
 \title{Carga poblaciones del INE por sección censal, sexo, edad y año}
 \usage{
 descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-  2006:2016, descarga = TRUE, ruta = NULL)
+  2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
 }
 \arguments{
 \item{cod_provincia}{Cadena de caracteres de longitud >= 1 con el código de
@@ -21,6 +21,10 @@ desee consultar las variaciones de seccionado.}
 \item{ruta}{Cadena de caracteres indicando la ruta en la que se almacenan los
 archivos tal cual se descargaron desde el INE, en caso de escoger
 \code{descarga = FALSE}.}
+
+\item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
+en el directorio oculto \code{.poblaciones/} dentro del directorio de
+trabajo?}
 }
 \value{
 Un objeto de clase \code{poblaciones_ine} donde las filas representan
