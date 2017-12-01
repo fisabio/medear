@@ -50,6 +50,7 @@ filtrar_ein_esn <- function(datos) {
 #'   \item{year}{Segundo año.}
 #'
 #' @examples
+#'
 #' \dontrun{
 #' trameros <- descarga_trameros(cod_provincia = c("51", "52"))
 #' cambios  <- detecta_cambios(datos = trameros)
@@ -143,6 +144,7 @@ detecta_cambios <- function(datos, years = 2004:2017) {
 #' @keywords datasets
 #'
 #' @examples
+#'
 #' \dontrun{
 #'   carga_datos(key = "contraseña")
 #' }

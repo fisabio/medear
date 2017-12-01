@@ -13,6 +13,10 @@ secciones
 Listado con las secciones censales únicas por año (1996-2016).
 }
 \examples{
+
+\dontrun{
+library(medear)
 data(secciones)
+}
 }
 \keyword{datasets}

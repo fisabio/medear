@@ -41,6 +41,7 @@ Descarga la cartografía ofrecida públicamente por el INE para el
 Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326.
 }
 \examples{
+
 \dontrun{
 library(sf)
 carto_ine    <- descarga_cartografia()

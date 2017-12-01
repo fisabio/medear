@@ -21,7 +21,11 @@ Codificación usada por el INE para las provincias y los
   MEDEA3 o no.
 }
 \examples{
+
+\dontrun{
+library(medear)
 data(codigos_ine)
+}
 }
 \references{
 \url{http://www.ine.es/}{Sitio web del INE}.
