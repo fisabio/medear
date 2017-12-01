@@ -14,6 +14,9 @@
 #' @param ruta Cadena de caracteres indicando la ruta en la que se almacenan los
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
+#' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
+#'   en el directorio oculto \code{.trameros/} dentro del directorio de
+#'   trabajo?
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -25,7 +28,7 @@
 #'   dígitos la sección censal.
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   2004:2017, descarga = TRUE, ruta = NULL)
+#'   2004:2017, descarga = TRUE, ruta = NULL, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
 #'   \item{CPRO}{Código de la provincia.}
@@ -55,23 +58,29 @@
 #'
 #' @export
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
-                              years = 2004:2017, descarga = TRUE, ruta = NULL) {
+                              years = 2004:2017, descarga = TRUE, ruta = NULL,
+                              conservar = TRUE) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) > 1 & years %in% 2001:2017)
+  stopifnot(length(years) > 0 & years %in% 2001:2017)
   stopifnot(is.logical(descarga))
+  stopifnot(is.logical(conservar))
   stopifnot(is.character(ruta) | is.null(ruta))
 
   if (descarga) {
-    dir_dest <- paste0(tempdir(), "/prov_", cod_provincia, "/")
+    dir_dest <- normalizePath(
+      path     = paste0(getwd(), "/.trameros/prov_", cod_provincia),
+      winslash = "/",
+      mustWork = FALSE
+    )
 
     for (i in seq_along(dir_dest)) {
       for (j in seq_along(years)) {
         if (!dir.exists(dir_dest[i]))
           dir.create(dir_dest[i], recursive = TRUE)
 
-        file_down <- paste0(dir_dest[i], substr(years, 3, 4)[j], ".zip")
+        file_down <- paste0(dir_dest[i], "/", substr(years, 3, 4)[j], ".zip")
         utils::download.file(
           url = paste0("http://www.ine.es/prodyser/callejero/caj1",
                        substr(years, 3, 4)[j], "/call_p", cod_provincia[i], "_1",
@@ -85,20 +94,20 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 
         if (grepl("\\.zip$", file_zip)) {
           utils::unzip(file_down, files = file_zip,
-                       overwrite = TRUE, exdir = dir_dest[i], unzip = "unzip")
+                       overwrite = TRUE, exdir = dir_dest[i])
           file_zip1 <- paste0(dirname(file_down), "/", file_zip)
           file_zip2 <- utils::unzip(zipfile = file_zip1, list = TRUE)[, 1]
           file_zip2 <- file_zip2[grep("TRAM|t$", file_zip2, ignore.case = TRUE)]
           utils::unzip(paste0(dirname(file_down), "/", file_zip),
                        files = file_zip2, overwrite = TRUE,
-                       exdir = dir_dest[i], unzip = "unzip")
-          file.rename(paste0(dir_dest[i], file_zip2),
-                      paste0(dir_dest[i], "year_", substr(years, 3, 4)[j]))
+                       exdir = dir_dest[i])
+          file.rename(paste0(dir_dest[i], "/", file_zip2),
+                      paste0(dir_dest[i], "/", "year_", substr(years, 3, 4)[j]))
         } else {
           utils::unzip(file_down, files = file_zip,
-                       overwrite = TRUE, exdir = dir_dest[i], unzip = "unzip")
-          file.rename(paste0(dir_dest[i], file_zip),
-                      paste0(dir_dest[i], "year_", substr(years, 3, 4)[j]))
+                       overwrite = TRUE, exdir = dir_dest[i])
+          file.rename(paste0(dir_dest[i], "/", file_zip),
+                      paste0(dir_dest[i], "/", "year_", substr(years, 3, 4)[j]))
         }
         Sys.sleep(1)
       }
@@ -131,6 +140,9 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       )]
     }
   }
+  if (descarga && !conservar)
+    unlink(dirname(dir_dest), recursive = TRUE)
+
   trameros <- rbindlist(trameros)
   setkey(trameros, via, seccion, year)
   attributes(trameros)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
@@ -149,8 +161,11 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @param crs Vector numérico de longitud uno con el código EPSG del sistema de
 #'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 #'   datum WGS84).
+#' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
+#'   en el directorio oculto \code{cartografia/} dentro del directorio de
+#'   trabajo?
 #'
-#' @usage descarga_cartografia(crs = 4326)
+#' @usage descarga_cartografia(crs = 4326, conservar = TRUE)
 #'
 #' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326.
 #'
@@ -185,18 +200,29 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @encoding UTF-8
 #'
 #' @export
-descarga_cartografia <- function(crs = 4326) {
-  dest_dir <- paste0(tempdir(), "/")
+descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
+  stopifnot(is.logical(conservar))
+  stopifnot(is.numeric(crs))
+  stopifnot(nchar(crs) == 4)
+
+  dir_dest <- normalizePath(
+    path     = paste0(getwd(), "/.cartografia"),
+    winslash = "/",
+    mustWork = FALSE
+  )
+  if (!dir.exists(dir_dest))
+    dir.create(dir_dest, recursive = TRUE)
   utils::download.file(
     url = "http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip",
-    destfile = paste0(dest_dir, "carto_2011.zip"), quiet = TRUE
+    destfile = paste0(dir_dest, "/carto_2011.zip"), quiet = TRUE
   )
   utils::unzip(
-    zipfile = paste0(dest_dir, "carto_2011.zip"),
-    exdir = dest_dir,
-    unzip = "unzip"
+    zipfile = paste0(dir_dest, "/carto_2011.zip"),
+    exdir = dir_dest
   )
-  carto <- sf::read_sf(paste0(dest_dir, "SECC_CPV_E_20111101_01_R_INE.shp"))
+  carto <- sf::read_sf(paste0(dir_dest, "/SECC_CPV_E_20111101_01_R_INE.shp"))
+  if (!conservar)
+    unlink(x = dir_dest, recursive = TRUE, force = TRUE)
   carto <- carto[, -grep("^Shape|^CNUT|CLAU2|^OBJ", colnames(carto))]
   carto <- sf::st_transform(carto, crs = crs)
   attributes(carto)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
@@ -220,6 +246,9 @@ descarga_cartografia <- function(crs = 4326) {
 #' @param ruta Cadena de caracteres indicando la ruta en la que se almacenan los
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
+#' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
+#'   en el directorio oculto \code{.poblaciones/} dentro del directorio de
+#'   trabajo?
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -234,7 +263,7 @@ descarga_cartografia <- function(crs = 4326) {
 #'   mientras que desde el año siguiente llega hasta 100 y más.
 #'
 #' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   2006:2016, descarga = TRUE, ruta = NULL)
+#'   2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
@@ -254,28 +283,34 @@ descarga_cartografia <- function(crs = 4326) {
 #'
 #' @export
 descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
-                                 years = 2006:2016, descarga = TRUE, ruta = NULL) {
+                                 years = 2006:2016, descarga = TRUE, ruta = NULL,
+                                 conservar = TRUE) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
   stopifnot(length(years) >= 1 & years %in% 2006:2016)
   stopifnot(is.logical(descarga))
+  stopifnot(is.logical(conservar))
   stopifnot(is.character(ruta) | is.null(ruta))
 
   file_down <- matrix(ncol = length(years), nrow = length(cod_provincia))
 
   if (descarga) {
-    dir_dest <- paste0(tempdir(), "/prov_", cod_provincia, "/")
+    dir_dest <- normalizePath(
+      path     = paste0(getwd(), "/.poblaciones/prov_", cod_provincia),
+      winslash = "/",
+      mustWork = FALSE
+    )
 
     for (i in seq_along(dir_dest)) {
       for (j in seq_along(years)) {
         if (!dir.exists(dir_dest[i]))
           dir.create(dir_dest[i], recursive = TRUE)
 
-        file_down[i, j] <- paste0(dir_dest[i], years[j], ".csv")
+        file_down[i, j] <- paste0(dir_dest[i], "/", years[j], ".csv")
         utils::download.file(
           url = paste0(
-            "www.ine.es/jaxi/files/_px/es/csv_sc/t20/e245/p07/a",
+            "http://www.ine.es/jaxi/files/_px/es/csv_sc/t20/e245/p07/a",
             years[j],
             if (years[j] < 2011) {
               paste0(
@@ -292,7 +327,7 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
           destfile = file_down[i, j],
           quiet    = TRUE
         )
-        Sys.sleep(5)
+        Sys.sleep(1)
       }
     }
   } else {
@@ -304,7 +339,7 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   for (i in seq_along(dir_dest)) {
     for (j in seq_along(years)) {
 
-      file_down[i, j] <- paste0(dir_dest[i], years[j], ".csv")
+      file_down[i, j] <- paste0(dir_dest[i], "/", years[j], ".csv")
       aux_file <- suppressWarnings(
         readr::read_delim(
           file      = file_down[i, j],
@@ -321,31 +356,19 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       names_df    <- gsub("-", "_", names_df)
       locate_rows <- grep("TOTAL|Nota", aux_file[[1]])
 
-      hombres <- readr::read_delim(
-        file      = file_down[i, j],
-        delim     = ";",
-        col_types = readr::cols(X1 = "c", .default = "d"),
-        skip      = locate_rows[2] + 6,
-        col_names = FALSE,
-        n_max     = locate_rows[3] - locate_rows[2] - 2
-      )
+      hombres <- aux_file[(locate_rows[2] + 1):(locate_rows[3] - 2), ]
       hombres <- as.data.table(hombres)
       hombres[, c(2, ncol(hombres)) := NULL]
+      hombres[, c(2:ncol(hombres)) := lapply(.SD, as.integer), .SDcols = c(2:ncol(hombres))]
       setnames(hombres, names_df)
       hombres[, `:=`(sexo = 0, year = years[j])]
       setcolorder(hombres, c("seccion", "sexo", "year",
                              colnames(hombres)[2:(ncol(hombres) - 2)]))
 
-      mujeres <- readr::read_delim(
-        file      = file_down[i, j],
-        delim     = ";",
-        col_types = readr::cols(X1 = "c", .default = "d"),
-        skip      = locate_rows[3] + 6,
-        col_names = FALSE,
-        n_max     = locate_rows[4] - locate_rows[3] - 1
-      )
+      mujeres <- aux_file[(locate_rows[3] + 1):(locate_rows[4] - 1), ]
       mujeres <- as.data.table(mujeres)
       mujeres[, c(2, ncol(mujeres)) := NULL]
+      mujeres[, c(2:ncol(mujeres)) := lapply(.SD, as.integer), .SDcols = c(2:ncol(mujeres))]
       setnames(mujeres, names_df)
       mujeres[, `:=`(sexo = 1, year = years[j])]
       setcolorder(mujeres, c("seccion", "sexo", "year",
@@ -354,6 +377,9 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       poblaciones[[paste0("p", i, j)]] <- rbindlist(list(hombres, mujeres))
     }
   }
+  if (descarga && !conservar)
+    unlink(dirname(dir_dest), recursive = TRUE)
+
   poblaciones <- rbindlist(poblaciones, fill = TRUE)
   poblaciones[, seccion := trimws(seccion)]
   setkey(poblaciones, seccion, sexo, year)
