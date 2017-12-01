@@ -200,17 +200,15 @@ limpia_vias <- function(vias) {
 
   vias      <- tolower(vias)
   vias[is.na(vias)] <- ""
-  vias      <- tolower(vias)
   vias      <- gsub("\\sna(?=,)", "", vias, perl = TRUE)
   vias      <- gsub("^na\\s", "", vias)
   vias      <- gsub("\\sna\\s", "", vias)
   vias      <- gsub("\\s0(?=,)", "", vias, perl = TRUE)
-  vias      <- gsub("0*(?=\\d+)", "", vias, perl = TRUE)
   vias      <- gsub("\\s(9999?)", " ", vias)
   vias      <- gsub("\\s3a\\s", "tercera", vias)
   vias_list <- strsplit(vias, ",")
   tvia_nvia <- mapply(function(x, y) x[!x %in% y], vias_list, lapply(vias_list, utils::tail, n = 3))
-  tvia_nvia <- sapply(tvia_nvia, paste, collapse = " ")
+  tvia_nvia <- sapply(tvia_nvia, paste, collapse = " ", USE.NAMES = FALSE)
 
   for (i in seq_along(tvias)) {
     ind_norm    <- grep(paste0("^", tvias[i], "[a-z]"), tvia_nvia)
@@ -238,11 +236,12 @@ limpia_vias <- function(vias) {
   resto     <- lapply(resto, gsub, pattern = "\\/(?<=\\/)(.*)", replacement = "", perl = TRUE)
   resto     <- gsub("\\s,", ",", trimws(sapply(resto, paste0, collapse = ",")))
   nvia      <- regmatches(tvia_nvia, gregexpr("\\d+", tvia_nvia))
-  nvia      <- sapply(sapply(nvia, utils::tail, n = 1), paste0, collapse = "")
-  nvia      <- unname(gsub("\\D",  "",  nvia))
+  nvia      <- sapply(sapply(nvia, utils::tail, n = 1), paste0, collapse = "", USE.NAMES = FALSE)
+  nvia      <- gsub("\\D",  "",  nvia)
+  nvia      <- gsub("^0*(?=\\d+)", "", nvia, perl = TRUE)
   tvia_nvia <- trimws(mapply(function(x, y) gsub(x, "", y), nvia, tvia_nvia, USE.NAMES = FALSE))
 
-  return(list(vias = unname(tvia_nvia), nvia = nvia, resto = resto))
+  return(list(vias = tvia_nvia, nvia = nvia, resto = resto))
 }
 
 
@@ -304,9 +303,10 @@ filtro <- function(vias, nivel) {
 
 aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
                            filtro_geo, cartografia, codigos, intentos = 10) {
-  datos_f <- copy(datos)
-  vias_f  <- lapply(vias, `[`, indice_nogeo)
-  direcciones_f <- datos_f[indice_nogeo][["direcciones"]]
+  datos_f        <- copy(datos)
+  indice_nogeo_f <- indice_nogeo
+  vias_f         <- lapply(vias, `[`, indice_nogeo_f)
+  direcciones_f  <- datos_f[indice_nogeo_f][["direcciones"]]
 
   if (nivel < 5) {
     res <- filtro(vias_f, nivel)
@@ -323,7 +323,7 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
     f4 <- filtro(vias_f, 4)
     direcciones_f[f4[["idn"]]] <- f4[["via"]]
     res <- data.table(idn = sort(unique(c(f1[["idn"]], f2[["idn"]],
-                                         f3[["idn"]], f4[["idn"]]))))
+                                          f3[["idn"]], f4[["idn"]]))))
     res[, via := direcciones_f[idn]]
   }
 
@@ -341,48 +341,68 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
       )
     )
     if (version_cc == "prev") {
-      indice_aux   <- which(geo_res[["state"]] %in% 1:2)
-      indice_geo_f <- indice_nogeo[res[["idn"]][indice_aux]]
+      indice_aux_f <- which(geo_res[["state"]] %in% 1:2)
+      indice_geo_f <- indice_nogeo_f[res[["idn"]][indice_aux_f]]
     } else {
-      indice_aux   <- which(geo_res[["state"]] %in% 1:4)
-      indice_geo_f <- indice_nogeo[res[["idn"]][indice_aux]]
+      indice_aux_f <- which(geo_res[["state"]] %in% 1:4)
+      indice_geo_f <- indice_nogeo_f[res[["idn"]][indice_aux_f]]
     }
     if (length(indice_geo_f) > 0) {
-      datos_f[indice_geo_f, `:=`(
-        geocodificados = version_cc,
-        lat            = geo_res[indice_aux][["lat"]],
-        lng            = geo_res[indice_aux][["lng"]],
-        via_modificada = res[indice_aux][["via"]]
-      )]
-      indice_nogeo <- indice_nogeo[!indice_nogeo %in% indice_geo_f]
+      indice_fuera <- integer()
       if (filtro_geo != "ninguno") {
-        geom_aux <- sf::st_as_sf(datos_f[indice_geo_f, c("lng", "lat")],
+        geom_res <- sf::st_as_sf(geo_res[indice_aux_f, c("lng", "lat")],
                                  coords = c("lng", "lat"), na.fail = FALSE, crs = 4258)
-        geom_aux <- sf::st_transform(geom_aux, crs = sf::st_crs(cartografia)$epsg)
-        indice_nogeo <-
+        geom_res <- sf::st_transform(geom_res, crs = sf::st_crs(cartografia)$epsg)
+
+        indice_fuera <-
           if (filtro_geo == "nombre_municipio") {
-            suppressMessages(sort(unique(c(indice_geo_f[which(sapply(
+            suppressMessages(indice_geo_f[which(sapply(
               sf::st_intersects(
-                geom_aux, cartografia[cartografia$CUMUN %in% codigos[indice_geo_f], ]
+                geom_res, cartografia[cartografia$CUMUN %in% codigos[indice_geo_f], ]
               ),
-              length) == 0)], indice_nogeo))))
+              length) == 0)])
           } else {
-            suppressMessages(sort(unique(c(indice_geo_f[which(sapply(
+            suppressMessages(indice_geo_f[which(sapply(
               sf::st_intersects(
-                geom_aux, cartografia[cartografia$CPRO %in% substr(codigos[indice_geo_f], 1, 2), ]
+                geom_res, cartografia[cartografia$CPRO %in% substr(codigos[indice_geo_f], 1, 2), ]
               ),
-              length) == 0)], indice_nogeo))))
+              length) == 0)])
           }
+        if (length(indice_fuera) > 0) {
+          indice_fuera   <- which(indice_geo_f %in% indice_fuera)
+          indice_aux_f   <- indice_aux_f[-indice_fuera]
+          indice_geo_f   <- indice_geo_f[-indice_fuera]
+        }
       }
-    }
-    if (version_cc == "prev") {
-      indice_nogeo_via <- datos_f[which(vias$nvia == "")][geocodificados == "prev"][["idn"]]
-      indice_nogeo     <- unique(sort(c(indice_nogeo, indice_nogeo_via, which(geo_res[["state"]] == 2))))
+      indice_nogeo_f <- sort(unique(c(indice_nogeo_f, indice_fuera)))
+      datos_f[
+        indice_geo_f,
+        `:=`(
+          id           = geo_res[indice_aux_f][["id"]],
+          province     = geo_res[indice_aux_f][["province"]],
+          muni         = geo_res[indice_aux_f][["muni"]],
+          tip_via      = geo_res[indice_aux_f][["tip_via"]],
+          address      = geo_res[indice_aux_f][["address"]],
+          portalNumber = geo_res[indice_aux_f][["portalNumber"]],
+          refCatastral = geo_res[indice_aux_f][["refCatastral"]],
+          postalCode   = geo_res[indice_aux_f][["postalCode"]],
+          lat          = geo_res[indice_aux_f][["lat"]],
+          lng          = geo_res[indice_aux_f][["lng"]],
+          state        = as.character(geo_res[indice_aux_f][["state"]]),
+          type         = as.character(geo_res[indice_aux_f][["type"]]),
+          version      = as.character(geo_res[indice_aux_f][["version"]])
+        )
+      ]
+      if (version_cc == "prev") {
+        indice_old_2_f <- which(datos_f[indice_geo_f][["state"]] == 2)
+        indice_nogeo_f <- unique(sort(c(indice_nogeo_f, indice_old_2_f)))
+      } else {
+        indice_nogeo_f <- which(is.na(datos_f[["state"]]))
+      }
     }
   }
 
-
-  return(list(datos = datos_f, indice_nogeo = indice_nogeo))
+  return(list(datos = datos_f, indice_nogeo = indice_nogeo_f))
 }
 
 utils::globalVariables(

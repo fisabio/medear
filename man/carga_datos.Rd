@@ -26,7 +26,7 @@ La contraseña no se almacena en el historial.
 \examples{
 
 \dontrun{
-  carga_datos(key = "contraseÃ±a")
+  carga_datos(key = "contraseña")
 }
 
 }

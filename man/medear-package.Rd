@@ -73,7 +73,7 @@ El uso habitual del paquete será la carga de datos o de la
   \code{\link{une_secciones}}
 }
 \author{
-\strong{Maintainer}: Carlos Vergara-HernÃ¡ndez \email{carlos.vergara@uv.es}
+\strong{Maintainer}: Carlos Vergara-Hernández \email{carlos.vergara@uv.es}
 
 Authors:
 \itemize{

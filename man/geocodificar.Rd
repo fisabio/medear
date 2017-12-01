@@ -3,11 +3,12 @@
 \encoding{UTF-8}
 \name{geocodificar}
 \alias{geocodificar}
-\title{Implementación de la primera parte del algoritmo de geocodificación de direcciones de MEDEA3 (geocodificado con CartoCiudad)}
+\title{Implementación de la primera parte del algoritmo de geocodificación de
+  direcciones de MEDEA3 (geocodificado con CartoCiudad)}
 \usage{
-geocodificar(direcciones, idn=NULL, codigos = NULL, cartografia = NULL,
-  filtro_geo = c("municipio", "provincia", "ninguno"), limpiar_direcciones =
-  TRUE, intentos = 10)
+geocodificar(direcciones, idn = NULL, codigos = NULL, cartografia =
+  NULL, filtro_geo = c("municipio", "provincia", "ninguno"),
+  limpiar_direcciones = TRUE, intentos = 10)
 }
 \arguments{
 \item{direcciones}{Vector de caracteres con las direcciones a geocodificar.
@@ -25,7 +26,12 @@ geocodificar(direcciones, idn=NULL, codigos = NULL, cartografia = NULL,
   donde \code{CODIFICACION_DE_ORIGEN} tomará valores como "utf8", "latin1" o
   "Windows-1252", por ejemplo.}
 
-\item{idn}{Vector de la misma longitud que \code{direcciones} con un identificador de cada uno de los registros en caso de que se quiera que dicho identificador aparezca en el data.frame (campo \code{idn}) devuelto por esta función. Si no se da ningún valor a este argumento, el campo \code{idn} del data.frame anterior será simplemente un vector secuencial que numera cada uno de los registros.}
+\item{idn}{Vector de la misma longitud que \code{direcciones} con un
+identificador de cada uno de los registros en caso de que se quiera que
+dicho identificador aparezca en el data.frame (campo \code{idn}) devuelto
+por esta función. Si no se da ningún valor a este argumento, el campo
+\code{idn} del data.frame anterior será simplemente un vector secuencial
+que numera cada uno de los registros.}
 
 \item{codigos}{Vector de caracteres de longitud igual al vector de
 direcciones. Contiene los códigos INE (5 caracteres por código) de los
@@ -45,29 +51,70 @@ hace referencia el código de la dirección), provincia (las coordenadas
 están dentro del polígono de la provincia al que hace referencia el código
 de la dirección) y ninguno.}
 
-\item{limpiar_direcciones}{Valor lógico. ¿Se desea considerar las variantes de las cadenas de
-texto de las direcciones que no hayan podido ser geocodificadas? Se recomienda
-activarlo conjuntamente al filtro cartográfico para evitar falsos
-positivos que puedan ser geocodificados fuera de la región de estudio.}
+\item{limpiar_direcciones}{Valor lógico. ¿Se desea considerar las variantes
+de las cadenas de texto de las direcciones que no hayan podido ser
+geocodificadas? Se recomienda activarlo conjuntamente al filtro
+cartográfico para evitar falsos positivos que puedan ser geocodificados
+fuera de la región de estudio.}
 
 \item{intentos}{Valor numérico. Número de intentos de conexión con el
-servidor de CartoCiudad en caso de fallo de la misma, por defecto 10. Este parámetro evita que la geocodificación pare en caso de que haya un error de conexión en el servidor de CartoCiudad en algún momento.}
+servidor de CartoCiudad en caso de fallo de la misma, por defecto 10. Este
+parámetro evita que la geocodificación pare en caso de que haya un error de
+conexión en el servidor de CartoCiudad en algún momento.}
 }
 \value{
-Un \code{data.frame} con tantas filas como la longitud de \code{direcciones} y con entre 7 y 8 columnas (en función de si se limpian las
-  direcciones o no): \item{idn}{Identificar de cada uno de los registros dirección, si no se ha determinado el argumento \code{idn} se rellena de forma secuencial).} \item{direcciones}{Dirección original según aparece en el argumento \code{direcciones}} \item{geocodificados}{Resultado de la geocodificación:
-  cc_prev o cc_new si alguna de las dos versiones logra geocodificar la dirección correspondiente o NA si
-  ninguna lo logra.} \item{lat}{Latitud asignada a la dirección.} \item{lng}{Longitud
-  asignada a la dirección.} \item{dir_cc_old}{Direcciones devueltas por la versión previa de
-  CartoCiudad.} \item{dir_cc_new}{Dirección devuelta por la nueva versión de
-  CartoCiudad.} \item{via_modificada}{Dirección devuelta por CartoCiudad tras
-  limpiar la dirección.}
+Un \code{data.frame} con tantas filas como la longitud de
+  \code{direcciones} y con entre 7 y 8 columnas (en función de si se limpian
+  las direcciones o no): \item{idn}{Identificar de cada uno de los registros
+  dirección, si no se ha determinado el argumento \code{idn} se rellena de
+  forma secuencial).} \item{direcciones}{Dirección original según aparece en
+  el argumento \code{direcciones}} \item{geocodificados}{Resultado de la
+  geocodificación: cc_prev o cc_new si alguna de las dos versiones logra
+  geocodificar la dirección correspondiente o NA si ninguna lo logra.}
+  \item{lat}{Latitud asignada a la dirección.} \item{lng}{Longitud asignada a
+  la dirección.} \item{dir_cc_old}{Direcciones devueltas por la versión
+  previa de CartoCiudad.} \item{dir_cc_new}{Dirección devuelta por la nueva
+  versión de CartoCiudad.} \item{via_modificada}{Dirección devuelta por
+  CartoCiudad tras limpiar la dirección.}
 }
 \description{
-Esta función implementa la primera parte del algoritmo de geocodificación de
-  MEDEA3. En esta parte se intentan geocodificar en primera instancia las direcciones haciendo uso del servicio CartoCiudad en su versión antigua (http://www.cartociudad.es/CartoGeocoder/Geocode). En esta primera parte daremos por válidos todos aquellos direcciones que hayan obtenido estado=1 (se ha encontrado la dirección correspondiente de forma exacta) o estado=2 (dirección asignada al portal más próximo). El resto de individuos no geocodifados por la versión anterior, junto con los individuos geocodificados que no tuvieran portal y los que hayan obtenido status=2 serán intentados geocodificar de nuevo con la nueva versión de CartoCiudad (http://www.cartociudad.es/geocoder/api/geocoder/findJsonp). La geocodificación de las direcciones que no tienen portal resulta menos fiables en la versión antigua de CartoCiudad ya que son situadas en el inicio de su vía, mientras que en la nueva versión se sitúan en el centro, haciendo esta geocodificación más acertada. Por otro lado, la versión antigua de CartoCiudad en ocasiones cambia de acera (numeros pares a impares y viceversa) algunas direcciones mientras que en la versión nueva esto no ocurre. Por ello, intentaremos regeocodificar estas dos situaciones con la nueva versión de CartoCiudad, y en caso de que no encontremos la dirección correspondiente en dicha versión mantendríamos la geocodificación original conseguida por la versión previa.
+Esta función implementa la primera parte del algoritmo de
+  geocodificación de MEDEA3. En esta parte se intentan geocodificar en
+  primera instancia las direcciones haciendo uso del servicio CartoCiudad en
+  su versión antigua (http://www.cartociudad.es/CartoGeocoder/Geocode). En
+  esta primera parte daremos por válidos todos aquellos direcciones que hayan
+  obtenido estado=1 (se ha encontrado la dirección correspondiente de forma
+  exacta) o estado=2 (dirección asignada al portal más próximo). El resto de
+  individuos no geocodifados por la versión anterior, junto con los
+  individuos geocodificados que no tuvieran portal y los que hayan obtenido
+  status=2 serán intentados geocodificar de nuevo con la nueva versión de
+  CartoCiudad (http://www.cartociudad.es/geocoder/api/geocoder/findJsonp). La
+  geocodificación de las direcciones que no tienen portal resulta menos
+  fiables en la versión antigua de CartoCiudad ya que son situadas en el
+  inicio de su vía, mientras que en la nueva versión se sitúan en el centro,
+  haciendo esta geocodificación más acertada. Por otro lado, la versión
+  antigua de CartoCiudad en ocasiones cambia de acera (numeros pares a
+  impares y viceversa) algunas direcciones mientras que en la versión nueva
+  esto no ocurre. Por ello, intentaremos regeocodificar estas dos situaciones
+  con la nueva versión de CartoCiudad, y en caso de que no encontremos la
+  dirección correspondiente en dicha versión mantendríamos la geocodificación
+  original conseguida por la versión previa.
 
-  Tras el proceso descrito, pueden considerarse una serie de variantes de las cadenas de caracteres de las direcciones no geocodificadas. La intención es valorar si esas variaciones podrían producir en alguna ocasión una geocodificación exitosa. En concreto, \code{geocodificar} contempla 5 posibles variantes para las direcciones que no han podido ser geocodificadas: 1.- eliminar duplicidad de tipos de vía (ejemplo: calle camino ...-> camino ...); 2.- eliminar descripciones de vía (ejemplo: Avenida rosa (Edificio azul)->Avenida rosa); 3.- eliminar palabras de 3 o menos caracteres (ejemplo: calle la marina alta-> calle marina alta); 4.- eliminar signos de puntuación (ejemplo: calle gral. pedro.->calle gral pedro); 5.- implementación de todas las variantes anteriores de forma conjunta. \code{geocodificar} contempla todas estas variantes para cualquier dirección que no haya podido ser geocodificada a partir de su dirección original. En cualquier caso el chequeo de estas variantes puede ser deshabilitado si así se prefiere.
+  Tras el proceso descrito, pueden considerarse una serie de variantes de las
+  cadenas de caracteres de las direcciones no geocodificadas. La intención es
+  valorar si esas variaciones podrían producir en alguna ocasión una
+  geocodificación exitosa. En concreto, \code{geocodificar} contempla 5
+  posibles variantes para las direcciones que no han podido ser
+  geocodificadas: 1.- eliminar duplicidad de tipos de vía (ejemplo: calle
+  camino ...-> camino ...); 2.- eliminar descripciones de vía (ejemplo:
+  Avenida rosa (Edificio azul)->Avenida rosa); 3.- eliminar palabras de 3 o
+  menos caracteres (ejemplo: calle la marina alta-> calle marina alta); 4.-
+  eliminar signos de puntuación (ejemplo: calle gral. pedro.->calle gral
+  pedro); 5.- implementación de todas las variantes anteriores de forma
+  conjunta. \code{geocodificar} contempla todas estas variantes para
+  cualquier dirección que no haya podido ser geocodificada a partir de su
+  dirección original. En cualquier caso el chequeo de estas variantes puede
+  ser deshabilitado si así se prefiere.
 
   En todos los casos, y siempre que se desee (aunque la opción viene marcada
   por defecto), se puede aplicar un filtro cartográfico que deseche aquellas
@@ -77,7 +124,9 @@ Esta función implementa la primera parte del algoritmo de geocodificación de
   municipio o provincia de interés (disponible en el banco de datos
   \code{\link{codigos_ine}}).
 
-  La función \code{geocodificar} va informando en la consola de \code{R} del progreso de cada una de las actividades que hemos descrito para que estamos informados en todo momento de en qué situación se encuentra el proceso.
+  La función \code{geocodificar} va informando en la consola de \code{R} del
+  progreso de cada una de las actividades que hemos descrito para que estamos
+  informados en todo momento de en qué situación se encuentra el proceso.
 }
 \examples{
 
@@ -85,12 +134,12 @@ Esta función implementa la primera parte del algoritmo de geocodificación de
   library(medear)
   direcciones <- c(
     "Calle Aben Al Abbar 6, Valencia, Valencia",
-    "Avenida ConstituciÃ³n 900, Valencia, Valencia",
-    "Avenida ConstituciÃ³n 901, Valencia, Valencia",
+    "Avenida Constitución 900, Valencia, Valencia",
+    "Avenida Constitución 901, Valencia, Valencia",
     "Plaza Doctor Balmis 2, Alicante, Alicante",
     "A7 150",
     "A7 3000",
-    "Calle InventadÃ­sima 1, Valencia, Valencia"
+    "Calle Inventadísima 1, Valencia, Valencia"
   )
   codigos <- c(rep("46250", 3), "03014", "12082", "43148", "46250")
   cartografia <- descarga_cartografia()

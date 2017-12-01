@@ -33,9 +33,9 @@ Notar que las poblaciones corresponden al seccionado censal de cada año por lo 
 \dontrun{
 library(medear)
 data(poblacion)
-#InformaciÃ³n de poblaciones de la secciÃ³n censal 01001 de Valencia (cÃ³digo INE 46125)
+#Información de poblaciones de la sección censal 01001 de Valencia (código INE 46125)
 poblacion[poblacion$seccion=="4612501001",]
-#InformaciÃ³n de poblaciones de toda la ciudad de Valencia
+#Información de poblaciones de toda la ciudad de Valencia
 poblacion[substring(poblacion$seccion,1,5)=="46125",]
 }
 }
