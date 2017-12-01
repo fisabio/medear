@@ -7,7 +7,7 @@
 \usage{
 geocodificar(direcciones, codigos = NULL, cartografia = NULL,
   filtro_geo = c("municipio", "provincia", "ninguno"), limpiar_direcciones =
-  TRUE, intentos = 10)
+  TRUE, intentos = 10, identificador = NULL)
 }
 \arguments{
 \item{direcciones}{Vector de caracteres con las direcciones a geocodificar.
@@ -54,6 +54,13 @@ forma secuencial (5).}
 
 \item{intentos}{Valor numérico. Número de intentos de conexión con el
 servidor de CartoCiudad en caso de fallo de la misma. Por defecto 10.}
+
+\item{identificador}{Vector numérico o de caracteres de longitud igual al
+vector de direcciones. Por defecto la función asigna un número correlativo
+a cada dirección que se proporcione para que la salida conserve el mismo
+orden que la entrada de datos. No obstante, si se desea usar otro
+identificador de cada dirección (p. ej., el NID proviniente del boletín
+oficial de defunciones), con esta opción se puede utilizar.}
 }
 \value{
 Un \code{data.frame} con tantas filas como direcciones se
