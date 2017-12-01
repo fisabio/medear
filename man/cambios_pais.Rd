@@ -21,6 +21,10 @@ cambios_pais
 Cambios de seccionado para todo el país.
 }
 \examples{
+
+\dontrun{
+library(medear)
 data(cambios_pais)
+}
 }
 \keyword{datasets}

@@ -32,7 +32,13 @@ Contiene la cartografía por sección censal en formato Simple
   Features tal cual puede ser utilizada por el paquete \code{sf}.
 }
 \examples{
+
+\dontrun{
+library(medear)
 data(cartografia)
+#Representación de los distritos censales de Álava
+plot(cartografia[cartografia$CUMUN=="01059","CDIS"])
+}
 }
 \references{
 \url{http://www.ine.es/}{Sitio web del INE}.

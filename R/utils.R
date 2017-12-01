@@ -50,6 +50,7 @@ filtrar_ein_esn <- function(datos) {
 #'   \item{year}{Segundo año.}
 #'
 #' @examples
+#'
 #' \dontrun{
 #' trameros <- descarga_trameros(cod_provincia = c("51", "52"))
 #' cambios  <- detecta_cambios(datos = trameros)
@@ -143,6 +144,7 @@ detecta_cambios <- function(datos, years = 2004:2017) {
 #' @keywords datasets
 #'
 #' @examples
+#'
 #' \dontrun{
 #'   carga_datos(key = "contraseña")
 #' }
@@ -346,6 +348,7 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
       indice_geo_f <- indice_nogeo_f[res[["idn"]][indice_aux_f]]
     }
     if (length(indice_geo_f) > 0) {
+      indice_fuera <- integer()
       if (filtro_geo != "ninguno") {
         geom_res <- sf::st_as_sf(geo_res[indice_aux_f, c("lng", "lat")],
                                  coords = c("lng", "lat"), na.fail = FALSE, crs = 4258)
@@ -369,10 +372,10 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
           indice_fuera   <- which(indice_geo_f %in% indice_fuera)
           indice_aux_f   <- indice_aux_f[-indice_fuera]
           indice_geo_f   <- indice_geo_f[-indice_fuera]
-          indice_nogeo_f <- sort(unique(c(indice_nogeo_f, indice_fuera)))
         }
       }
-      datos[
+      indice_nogeo_f <- sort(unique(c(indice_nogeo_f, indice_fuera)))
+      datos_f[
         indice_geo_f,
         `:=`(
           id           = geo_res[indice_aux_f][["id"]],
@@ -391,8 +394,10 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
         )
       ]
       if (version_cc == "prev") {
-        indice_old_2_f <- which(datos[indice_geo_f][["state"]] == 2)
+        indice_old_2_f <- which(datos_f[indice_geo_f][["state"]] == 2)
         indice_nogeo_f <- unique(sort(c(indice_nogeo_f, indice_old_2_f)))
+      } else {
+        indice_nogeo_f <- which(is.na(datos_f[["state"]]))
       }
     }
   }

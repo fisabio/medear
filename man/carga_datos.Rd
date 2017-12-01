@@ -24,6 +24,7 @@ Algunos datos del proyecto MEDEA3 están encriptados para poder
 La contraseña no se almacena en el historial.
 }
 \examples{
+
 \dontrun{
   carga_datos(key = "contraseña")
 }

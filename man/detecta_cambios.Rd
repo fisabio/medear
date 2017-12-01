@@ -35,6 +35,7 @@ El tiempo de ejecución de la función varía según el número de
   dígitos hacen referencia a la sección censal.
 }
 \examples{
+
 \dontrun{
 trameros <- descarga_trameros(cod_provincia = c("51", "52"))
 cambios  <- detecta_cambios(datos = trameros)

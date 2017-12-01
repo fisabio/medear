@@ -189,6 +189,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'   sección censal.}
 #'
 #' @examples
+#'
 #' \dontrun{
 #' library(sf)
 #' carto_ine    <- descarga_cartografia()
@@ -272,6 +273,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #'   El resto de columnas representan los distintos grupos de edad.
 #'
 #' @examples
+#'
 #' \dontrun{
 #' poblaciones <- descarga_poblaciones(cod_provincia = "46")
 #' poblaciones

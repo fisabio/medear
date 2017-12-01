@@ -21,6 +21,10 @@ cambios_seccion
 Cambios de seccionado para las ciudades MEDEA3.
 }
 \examples{
+
+\dontrun{
+library(medear)
 data(cambios_seccion)
+}
 }
 \keyword{datasets}

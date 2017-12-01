@@ -52,6 +52,7 @@ El tiempo de ejecución de la función varía según el número de
   mientras que desde el año siguiente llega hasta 100 y más.
 }
 \examples{
+
 \dontrun{
 poblaciones <- descarga_poblaciones(cod_provincia = "46")
 poblaciones
