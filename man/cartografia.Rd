@@ -4,13 +4,12 @@
 \name{cartografia}
 \alias{cartografia}
 \title{Cartografía por sección censal para las ciudades MEDEA3}
-\format{Un objeto de clase \code{cartografia_ine} y \code{sf}, donde cada
+\format{Un objeto de clases \code{cartografia_ine} y \code{sf}, donde cada
   fila es una sección censal y que cuenta con 13 columnas:
   \describe{
     \item{CUSEC}{Cádena de 10 caracteres con el código de sección censal
-    (incluye provincia, municipio y distrito).}
-    \item{CUMUN}{Cádena de 5 caracteres con el código del municipio (incluye
-    provincia).}
+    (incluye provincia, municipio, distrito y sección).}
+    \item{CUMUN}{Cádena de 5 caracteres con el código INE del municipio.}
     \item{CSEC}{Cádena de 3 caracteres con el código de sección censal.}
     \item{CDIS}{Cádena de 2 caracteres con el código de distrito.}
     \item{CPRO}{Cádena de 3 caracteres con el código de provincia.}
