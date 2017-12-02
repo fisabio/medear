@@ -3,7 +3,7 @@
 \docType{data}
 \name{secciones}
 \alias{secciones}
-\title{Secciones censales únicas por año (1996-2016).}
+\title{Secciones censales únicas por año (1996-2016)}
 \format{Un objeto de clase \code{data.frame} y \code{data.table}, donde cada
   fila es una sección para un año determinado.}
 \usage{
@@ -15,8 +15,8 @@ Listado con las secciones censales únicas por año (1996-2016).
 \examples{
 
 \dontrun{
-library(medear)
-data(secciones)
+  library(medear)
+  data("secciones")
 }
 }
 \keyword{datasets}

@@ -65,40 +65,48 @@ conexión en el servidor de CartoCiudad en algún momento.}
 \value{
 Un \code{data.frame} con tantas filas como la longitud de
   \code{direcciones} y con entre 7 y 8 columnas (en función de si se limpian
-  las direcciones o no): \item{idn}{Identificar de cada uno de los registros
-  dirección, si no se ha determinado el argumento \code{idn} se rellena de
-  forma secuencial).} \item{direcciones}{Dirección original según aparece en
-  el argumento \code{direcciones}} \item{geocodificados}{Resultado de la
-  geocodificación: cc_prev o cc_new si alguna de las dos versiones logra
-  geocodificar la dirección correspondiente o NA si ninguna lo logra.}
-  \item{lat}{Latitud asignada a la dirección.} \item{lng}{Longitud asignada a
-  la dirección.} \item{dir_cc_old}{Direcciones devueltas por la versión
-  previa de CartoCiudad.} \item{dir_cc_new}{Dirección devuelta por la nueva
-  versión de CartoCiudad.} \item{via_modificada}{Dirección devuelta por
-  CartoCiudad tras limpiar la dirección.}
+  las direcciones o no): \item{idn}{Identificador de cada uno de los
+  registros de dirección, si no se ha determinado el argumento \code{idn} se
+  rellena de forma secuencial).} \item{direcciones}{Dirección original según
+  aparece en el argumento \code{direcciones}} \item{id}{Identificador
+  catastral de la vía geocodificada.} \item{province}{Provincia de la vía
+  geocodificada.} \item{muni}{Municipio de la vía geocodificada.}
+  \item{tip_via}{Tipo de la vía geocodificada (calle, avenida...).}
+  \item{address}{Nombre de la vía geocodificada.} \item{portalNumber}{Número
+  de la vía geocodificada.} \item{refCatastral}{Referencia catastral del
+  número de la vía geocodificada (solo devuelto por la versión previa de
+  CartoCiudad).} \item{postalCode}{Código postal al que pertenece la vía
+  geocodificada.} \item{lat}{Latitud asignada a la dirección.}
+  \item{lng}{Longitud asignada a la dirección.}  \item{state}{Estado devuelto
+  por los servicios de CartoCiudad (diferente según la versión, ver la ayuda
+  de la función \code{\link[caRtociudad]{cartociudad_geocode}}).}
+  \item{type}{Procedencia de la información relativa a la geocodificación
+  (solo disponible en la versión actual de CartoCiudad).}
+  \item{version}{Versión de CartoCiudad con la que se ha realizado la
+  geocodificación.}
 }
 \description{
 Esta función implementa la primera parte del algoritmo de
   geocodificación de MEDEA3. En esta parte se intentan geocodificar en
   primera instancia las direcciones haciendo uso del servicio CartoCiudad en
-  su versión antigua (http://www.cartociudad.es/CartoGeocoder/Geocode). En
-  esta primera parte daremos por válidos todos aquellos direcciones que hayan
-  obtenido estado=1 (se ha encontrado la dirección correspondiente de forma
-  exacta) o estado=2 (dirección asignada al portal más próximo). El resto de
-  individuos no geocodifados por la versión anterior, junto con los
-  individuos geocodificados que no tuvieran portal y los que hayan obtenido
-  status=2 serán intentados geocodificar de nuevo con la nueva versión de
-  CartoCiudad (http://www.cartociudad.es/geocoder/api/geocoder/findJsonp). La
-  geocodificación de las direcciones que no tienen portal resulta menos
-  fiables en la versión antigua de CartoCiudad ya que son situadas en el
-  inicio de su vía, mientras que en la nueva versión se sitúan en el centro,
-  haciendo esta geocodificación más acertada. Por otro lado, la versión
-  antigua de CartoCiudad en ocasiones cambia de acera (numeros pares a
-  impares y viceversa) algunas direcciones mientras que en la versión nueva
-  esto no ocurre. Por ello, intentaremos regeocodificar estas dos situaciones
-  con la nueva versión de CartoCiudad, y en caso de que no encontremos la
-  dirección correspondiente en dicha versión mantendríamos la geocodificación
-  original conseguida por la versión previa.
+  su \href{http://www.cartociudad.es/CartoGeocoder/Geocode}{versión antigua}.
+  En esta primera parte daremos por válidos todos aquellos direcciones que
+  hayan obtenido estado == 1 (se ha encontrado la dirección correspondiente
+  de forma exacta) o estado == 2 (dirección asignada al portal más próximo).
+  El resto de individuos no geocodifados por la versión anterior, junto con
+  los individuos geocodificados que no tuvieran portal y los que hayan
+  obtenido status == 2 serán intentados geocodificar de nuevo con
+  \href{http://www.cartociudad.es/geocoder/api/geocoder/findJsonp}{la nueva
+  versión de CartoCiudad}. La geocodificación de las direcciones que no
+  tienen portal resulta menos fiable en la versión antigua de CartoCiudad ya
+  que son situadas en el inicio de su vía, mientras que en la nueva versión
+  se sitúan en el centro, haciendo esta geocodificación más acertada. Por
+  otro lado, la versión antigua de CartoCiudad en ocasiones cambia de acera
+  (numeros pares a impares y viceversa) algunas direcciones mientras que en
+  la versión nueva esto no ocurre. Por ello, intentaremos regeocodificar
+  estas dos situaciones con la nueva versión de CartoCiudad, y en caso de que
+  no encontremos la dirección correspondiente en dicha versión mantendríamos
+  la geocodificación original conseguida por la versión previa.
 
   Tras el proceso descrito, pueden considerarse una serie de variantes de las
   cadenas de caracteres de las direcciones no geocodificadas. La intención es

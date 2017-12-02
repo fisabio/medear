@@ -5,25 +5,14 @@
 \alias{cartografia}
 \title{Cartografía por sección censal para las ciudades MEDEA3}
 \format{Un objeto de clase \code{cartografia_ine} y \code{sf}, donde cada
-  fila es una sección censal y que cuenta con 13 columnas:
-  \describe{
-    \item{CUSEC}{Cádena de 10 caracteres con el código de sección censal
-    (incluye provincia, municipio y distrito).}
-    \item{CUMUN}{Cádena de 5 caracteres con el código del municipio (incluye
-    provincia).}
-    \item{CSEC}{Cádena de 3 caracteres con el código de sección censal.}
-    \item{CDIS}{Cádena de 2 caracteres con el código de distrito.}
-    \item{CPRO}{Cádena de 3 caracteres con el código de provincia.}
-    \item{CCA}{Cádena de 2 caracteres con el código de comunidad autónoma.}
-    \item{CUDIS}{Cádena de 7 caracteres con el código de distrito (incluye
-    provincia y  municipio).}
-    \item{OBS}{Observaciones por parte del proveedor de los datos.}
-    \item{NPRO}{Nombre de la provincia.}
-    \item{NCA}{Nombre de la comunidad autónoma.}
-    \item{NMUN}{Nombre del municipio.}
-    \item{geometry}{Columna de tipo lista con la geometría asociada a cada
-    sección censal.}
-  }}
+  fila es una sección censal y que cuenta con 7 columnas: \describe{
+  \item{seccion}{Cadena de 10 caracteres con el código de sección censal
+  (incluye provincia, municipio y distrito).} \item{cumun}{Cadena de 5
+  caracteres con el código del municipio (incluye provincia).}
+  \item{ccaa}{Cadena de 2 caracteres con el código de comunidad autónoma.}
+  \item{npro}{Nombre de la provincia.} \item{nca}{Nombre de la comunidad
+  autónoma.} \item{nmun}{Nombre del municipio.} \item{geometry}{Columna de
+  tipo lista con la geometría asociada a cada sección censal.} }}
 \usage{
 cartografia
 }
@@ -34,14 +23,15 @@ Contiene la cartografía por sección censal en formato Simple
 \examples{
 
 \dontrun{
-library(medear)
-data(cartografia)
-#Representación de los distritos censales de Álava
-plot(cartografia[cartografia$CUMUN=="01059","CDIS"])
+  library(medear)
+  data("cartografia")
+
+  # Representación de las secciones censales de Álava
+  plot(cartografia[cartografia$cumun == "01059", "seccion"])
 }
 }
 \references{
-\url{http://www.ine.es/}{Sitio web del INE}.
-  \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
+\href{http://www.ine.es/}{Sitio web del INE}.
+\href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
 }
 \keyword{datasets}

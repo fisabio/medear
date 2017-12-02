@@ -50,8 +50,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' trameros <- descarga_trameros(cod_provincia = c("51", "52"))
-#' trameros
+#'   library(medear)
+#'   trameros <- descarga_trameros(cod_provincia = c("51", "52"))
+#'   trameros
 #' }
 #'
 #' @encoding UTF-8
@@ -170,18 +171,12 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326.
 #'
 #' @return Un objeto de clase \code{cartografia_ine} y \code{sf}, donde cada
-#'   fila es una sección censal y que cuenta con 13 columnas:
-#'   \item{CUSEC}{Cádena de 10 caracteres con el código de sección censal
+#'   fila es una sección censal y que cuenta con 7 columnas:
+#'   \item{seccion}{Cadena de 10 caracteres con el código de sección censal
 #'   (incluye provincia, municipio y distrito).}
-#'   \item{CUMUN}{Cádena de 5 caracteres con el código del municipio (incluye
+#'   \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
 #'   provincia).}
-#'   \item{CSEC}{Cádena de 3 caracteres con el código de sección censal.}
-#'   \item{CDIS}{Cádena de 2 caracteres con el código de distrito.}
-#'   \item{CPRO}{Cádena de 3 caracteres con el código de provincia.}
-#'   \item{CCA}{Cádena de 2 caracteres con el código de comunidad autónoma.}
-#'   \item{CUDIS}{Cádena de 7 caracteres con el código de distrito (incluye
-#'   provincia y  municipio).}
-#'   \item{OBS}{Observaciones por parte del proveedor de los datos.}
+#'   \item{CCA}{Cadena de 2 caracteres con el código de comunidad autónoma.}
 #'   \item{NPRO}{Nombre de la provincia.}
 #'   \item{NCA}{Nombre de la comunidad autónoma.}
 #'   \item{NMUN}{Nombre del municipio.}
@@ -191,10 +186,11 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @examples
 #'
 #' \dontrun{
-#' library(sf)
-#' carto_ine    <- descarga_cartografia()
-#' carto_ine_46 <- carto[, "CPRO" == "46"]
-#' plot(st_geometry(carto_ine_valencia))
+#'   library(medear)
+#'   library(sf)
+#'   carto_ine    <- descarga_cartografia()
+#'   carto_ine_46 <- carto[substr(carto$seccion, 3, 4) == "46", ]
+#'   plot(st_geometry(carto_ine_valencia))
 #' }
 #'
 #' @encoding UTF-8
@@ -223,7 +219,8 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
   carto <- sf::read_sf(paste0(dir_dest, "/SECC_CPV_E_20111101_01_R_INE.shp"))
   if (!conservar)
     unlink(x = dir_dest, recursive = TRUE, force = TRUE)
-  carto <- carto[, -grep("^Shape|^CNUT|CLAU2|^OBJ", colnames(carto))]
+  carto <- carto[, -grep("^Shape|^CNUT|CLAU2|^OB|^CSEC|^CDIS|^CMUN|^CPRO|^CUDIS", colnames(carto))]
+  names(carto)[names(carto) == "CUSEC"] <- "seccion"
   carto <- sf::st_transform(carto, crs = crs)
   attributes(carto)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   class(carto) <- c("cartografia_ine", class(carto))
@@ -256,7 +253,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #'
 #'   Los códigos de sección censal siguen un orden preestablecido: los primeros
 #'   dos dígitos identifican la provincia, los siguientes tres dígitos el
-#'   municipio, los próximos dos dígitos el distrito y los últimos cuatro
+#'   municipio, los próximos dos dígitos el distrito y los últimos tres
 #'   a la sección censal.
 #'
 #'   Hasta el año 2011 el INE agrupa la última categoría de edad como 85 y más,
@@ -275,8 +272,9 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #' @examples
 #'
 #' \dontrun{
-#' poblaciones <- descarga_poblaciones(cod_provincia = "46")
-#' poblaciones
+#'   library(medear)
+#'   poblaciones <- descarga_poblaciones(cod_provincia = "46")
+#'   poblaciones
 #' }
 #'
 #' @encoding UTF-8

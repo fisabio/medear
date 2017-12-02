@@ -19,18 +19,12 @@ trabajo?}
 }
 \value{
 Un objeto de clase \code{cartografia_ine} y \code{sf}, donde cada
-  fila es una sección censal y que cuenta con 13 columnas:
-  \item{CUSEC}{Cádena de 10 caracteres con el código de sección censal
+  fila es una sección censal y que cuenta con 7 columnas:
+  \item{seccion}{Cadena de 10 caracteres con el código de sección censal
   (incluye provincia, municipio y distrito).}
-  \item{CUMUN}{Cádena de 5 caracteres con el código del municipio (incluye
+  \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
   provincia).}
-  \item{CSEC}{Cádena de 3 caracteres con el código de sección censal.}
-  \item{CDIS}{Cádena de 2 caracteres con el código de distrito.}
-  \item{CPRO}{Cádena de 3 caracteres con el código de provincia.}
-  \item{CCA}{Cádena de 2 caracteres con el código de comunidad autónoma.}
-  \item{CUDIS}{Cádena de 7 caracteres con el código de distrito (incluye
-  provincia y  municipio).}
-  \item{OBS}{Observaciones por parte del proveedor de los datos.}
+  \item{CCA}{Cadena de 2 caracteres con el código de comunidad autónoma.}
   \item{NPRO}{Nombre de la provincia.}
   \item{NCA}{Nombre de la comunidad autónoma.}
   \item{NMUN}{Nombre del municipio.}
@@ -47,10 +41,11 @@ Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326.
 \examples{
 
 \dontrun{
-library(sf)
-carto_ine    <- descarga_cartografia()
-carto_ine_46 <- carto[, "CPRO" == "46"]
-plot(st_geometry(carto_ine_valencia))
+  library(medear)
+  library(sf)
+  carto_ine    <- descarga_cartografia()
+  carto_ine_46 <- carto[substr(carto$seccion, 3, 4) == "46", ]
+  plot(st_geometry(carto_ine_valencia))
 }
 
 }

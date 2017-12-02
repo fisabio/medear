@@ -45,7 +45,7 @@ El tiempo de ejecución de la función varía según el número de
 
   Los códigos de sección censal siguen un orden preestablecido: los primeros
   dos dígitos identifican la provincia, los siguientes tres dígitos el
-  municipio, los próximos dos dígitos el distrito y los últimos cuatro
+  municipio, los próximos dos dígitos el distrito y los últimos tres
   a la sección censal.
 
   Hasta el año 2011 el INE agrupa la última categoría de edad como 85 y más,
@@ -54,8 +54,9 @@ El tiempo de ejecución de la función varía según el número de
 \examples{
 
 \dontrun{
-poblaciones <- descarga_poblaciones(cod_provincia = "46")
-poblaciones
+  library(medear)
+  poblaciones <- descarga_poblaciones(cod_provincia = "46")
+  poblaciones
 }
 
 }

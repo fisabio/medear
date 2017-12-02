@@ -3,28 +3,25 @@
 \docType{data}
 \name{cambios_seccion}
 \alias{cambios_seccion}
-\title{Cambios de seccionado para las ciudades MEDEA3.}
-\format{Un objeto de clase \code{cambios_ine}, donde cada
-  fila es un un cambio de sección y que cuenta con 4 columnas:
-  \describe{
-    \item{sc_old}{Cádena de 10 caracteres con el código de la sección en año
-    == year.}
-    \item{sc_new}{Cádena de 10 caracteres con el código de la sección en año
-    == year2.}
-    \item{year}{Primer año.}
-    \item{year2}{Segundo año.}
-  }}
+\title{Cambios de seccionado en todos los municipios del país}
+\format{Un objeto de clase \code{cambios_ine}, donde cada fila es un un
+  cambio de sección y que cuenta con 5 columnas: \describe{
+  \item{sc_old}{Cadena de 10 caracteres con el código de la sección en año ==
+  year.} \item{sc_new}{Cadena de 10 caracteres con el código de la sección en
+  año == year2.} \item{year}{Primer año.} \item{year2}{Segundo año.}
+  \item{medea3}{Vector lógico: ¿participa en MEDEA3?} }}
 \usage{
 cambios_seccion
 }
 \description{
-Cambios de seccionado para las ciudades MEDEA3.
+Estos datos incluyen los cambios de seccionado para las ciudades
+  MEDEA3.
 }
 \examples{
 
 \dontrun{
-library(medear)
-data(cambios_seccion)
+  library(medear)
+  data("cambios_seccion")
 }
 }
 \keyword{datasets}

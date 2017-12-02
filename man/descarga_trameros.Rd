@@ -61,8 +61,9 @@ El tiempo de ejecución de la función varía según el número de
 }
 \examples{
 \dontrun{
-trameros <- descarga_trameros(cod_provincia = c("51", "52"))
-trameros
+  library(medear)
+  trameros <- descarga_trameros(cod_provincia = c("51", "52"))
+  trameros
 }
 
 }

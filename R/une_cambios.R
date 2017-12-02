@@ -22,17 +22,12 @@
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
 #'   \code{cartografia_ine} y \code{sf} con la cartografía, donde cada fila es
-#'   una sección censal y que cuenta con 15 columnas: \item{CUSEC}{Cádena de 10
+#'   una sección censal y que cuenta con 9 columnas: \item{seccion}{Cadena de 10
 #'   caracteres con el código de sección censal (incluye provincia, municipio y
-#'   distrito).} \item{CUMUN}{Cádena de 5 caracteres con el código del municipio
-#'   (incluye provincia).} \item{CSEC}{Cádena de 3 caracteres con el código de
-#'   sección censal.} \item{CDIS}{Cádena de 2 caracteres con el código de
-#'   distrito.} \item{CPRO}{Cádena de 3 caracteres con el código de provincia.}
-#'   \item{CCA}{Cádena de 2 caracteres con el código de comunidad autónoma.}
-#'   \item{CUDIS}{Cádena de 7 caracteres con el código de distrito (incluye
-#'   provincia y  municipio).} \item{OBS}{Observaciones por parte del proveedor
-#'   de los datos.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
-#'   comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
+#'   distrito).} \item{CUMUN}{Cadena de 5 caracteres con el código del municipio
+#'   (incluye provincia).} \item{CCA}{Cadena de 2 caracteres con el código de
+#'   comunidad autónoma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
+#'   de la comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
 #'   \item{geometry}{Columna de tipo lista con la geometría asociada a cada
 #'   sección censal.} \item{cluster_id}{Código de identificación del cluster de
 #'   uniones.} \item{sc_unida}{Código de las secciones unidas.}
@@ -50,6 +45,7 @@
 #' @examples
 #'
 #' \dontrun{
+#'   library(medear)
 #'   data("poblacion")
 #'   data("cambios_seccion")
 #'   data("cartografia")
@@ -98,7 +94,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   }
 
   cartografia$cluster <- cluster_sc[
-    match(cartografia$CUSEC, cluster_sc[, sc]),
+    match(cartografia$seccion, cluster_sc[, sc]),
     id_cluster
     ]
   cartografia <- stats::aggregate(
