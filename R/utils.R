@@ -52,9 +52,10 @@ filtrar_ein_esn <- function(datos) {
 #' @examples
 #'
 #' \dontrun{
-#' trameros <- descarga_trameros(cod_provincia = c("51", "52"))
-#' cambios  <- detecta_cambios(datos = trameros)
-#' cambios
+#'   library(medear)
+#'   trameros <- descarga_trameros(cod_provincia = c("51", "52"))
+#'   cambios  <- detecta_cambios(datos = trameros)
+#'   cambios
 #' }
 #'
 #' @encoding UTF-8
@@ -130,8 +131,6 @@ detecta_cambios <- function(datos, years = 2004:2017) {
 #'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
 #'   los desencripta y los adjunta al entorno global.
 #'
-#'   CUIDADO: se sobreescribirá cualquier objeto nombrado como poblacion.
-#'
 #' @details La contraseña no se almacena en el historial.
 #'
 #' @param key Cadena de caracteres con la contraseña.
@@ -185,7 +184,7 @@ elige_corte <- function(datos, corte) {
       res[, q_85_plus := double(.N)]
     res[,
         q_85_plus := sum(
-          q_85_plus, q_85_89, q_90_94, q_95_99, q_100_plus , na.rm = TRUE),
+          q_85_89, q_90_94, q_95_99, q_100_plus , na.rm = TRUE),
         by = .(seccion, sexo, year)
         ][, c("q_85_89", "q_90_94", "q_95_99", "q_100_plus") := NULL]
   }
@@ -364,7 +363,7 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
           } else {
             suppressMessages(indice_geo_f[which(sapply(
               sf::st_intersects(
-                geom_res, cartografia[cartografia$CPRO %in% substr(codigos[indice_geo_f], 1, 2), ]
+                geom_res, cartografia[substr(cartografia$seccion, 1, 2) %in% substr(codigos[indice_geo_f], 1, 2), ]
               ),
               length) == 0)])
           }

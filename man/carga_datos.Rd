@@ -17,8 +17,6 @@ No se devuelve nada.
 Algunos datos del proyecto MEDEA3 están encriptados para poder
   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
   los desencripta y los adjunta al entorno global.
-
-  CUIDADO: se sobreescribirá cualquier objeto nombrado como poblacion.
 }
 \details{
 La contraseña no se almacena en el historial.

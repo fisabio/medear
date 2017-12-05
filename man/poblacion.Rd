@@ -3,7 +3,8 @@
 \docType{data}
 \name{poblacion}
 \alias{poblacion}
-\title{Datos de población por sección censal para las ciudades MEDEA3 (periodo 2006-2016)}
+\title{Datos de población por sección censal para las ciudades MEDEA3
+  (periodo 2006-2016)}
 \format{Un objeto de clase \code{poblaciones_ine} donde las filas representan
   la combinación de las distintas secciones censales de MEDEA3, sexos y años del periodo de estudio. Las cuatro primeras columnas son:
   \describe{
@@ -20,23 +21,42 @@ poblacion
 Datos de población por sexo (0=Hombres, 1=Mujeres), edad (grupos quinquenales) y año (periodo 2006-2016) a nivel de sección censal para las ciudades de MEDEA3. Estos datos han sido descargados de la web del INE, que los publica de forma libre, y se pueden obtener usando la función \code{\link{descarga_cartografia}} de este paquete.
 }
 \details{
-Los códigos de sección censal (columna \code{seccion} del data.frame \code{poblacion}) se corresponden con el identificador habitual de secciones censales según el INE, es decir: los primeros dos dígitos identifican la provincia, los siguientes tres dígitos el municipio, los próximos dos dígitos el distrito y los últimos tres la sección censal. Los 5 primeros dígitos de este identificador se corresponden con el código INE del respectivo municipio.
+Los códigos de sección censal (columna \code{seccion} del
+  \code{data.frame} \code{poblacion}) se corresponden con el identificador
+  habitual de secciones censales según el INE, es decir: los primeros dos
+  dígitos identifican la provincia, los siguientes tres dígitos el municipio,
+  los próximos dos dígitos el distrito y los últimos tres la sección censal.
+  Los 5 primeros dígitos de este identificador se corresponden con el código
+  INE del respectivo municipio.
 
-Hasta el año 2010 (inclusive) el INE agrupa la última categoría de edad como 85 y más, mientras que desde el año 2011 llega hasta 100 y más. Los últimas columnas de \code{poblacion} tienen información detallada de los grupos de edad mayores para los años posteriores a 2010, por si ésta pudiera ser de utilidad en algún momento. En cualquier caso, la casilla correspondiente al grupo de edad 85 y más para dichos años también tiene la información agregada para los grupos de edad mayores de 85, de la misma forma que los años anteriores.
+  Hasta el año 2010 (inclusive) el INE agrupa la última categoría de edad
+  como 85 y más, mientras que desde el año 2011 llega hasta 100 y más. Los
+  últimas columnas de \code{poblacion} tienen información detallada de los
+  grupos de edad mayores para los años posteriores a 2010, por si ésta
+  pudiera ser de utilidad en algún momento. En cualquier caso, la casilla
+  correspondiente al grupo de edad 85 y más para dichos años también tiene la
+  información agregada para los grupos de edad mayores de 85, de la misma
+  forma que los años anteriores.
 
 El paquete \code{medear} dispone también de los datos para todo el periodo 1996-2016 pero éstos están encriptados ya que los datos para el periodo 1996-2005 son propiedad del INE, que han sido adquiridos para uso exclusivo del proyecto MEDEA3. Estos datos son accesibles mediante la función \code{\link{carga_datos}} que necesita una contraseña de desencriptación, que se hará disponible a todos los grupos del proyecto MEDEA. La llamada a \code{\link{carga_datos}} produce un data.frame con exactamente el mismo formato que \code{poblacion}, de hecho machaca dicho objeto, pero con la información adicional del periodo 1996-2005.
 
-Notar que las poblaciones corresponden al seccionado censal de cada año por lo que algunas de las secciones censales consideradas pueden no tener información para todo el periodo 2006-2016 si es que dicha sección no ha existido durante todo este periodo. Este comentario también aplica a la función \code{\link{carga_datos}}.
+  Notar que las poblaciones corresponden al seccionado censal de cada año por
+  lo que algunas de las secciones censales consideradas pueden no tener
+  información para todo el periodo 2006-2016 si es que dicha sección no ha
+  existido durante todo este periodo. Este comentario también aplica a la
+  función \code{\link{carga_datos}}.
 }
 \examples{
 
 \dontrun{
-library(medear)
-data(poblacion)
-#InformaciÃ³n de poblaciones de la secciÃ³n censal 01001 de Valencia (cÃ³digo INE 46125)
-poblacion[poblacion$seccion=="4612501001",]
-#InformaciÃ³n de poblaciones de toda la ciudad de Valencia
-poblacion[substring(poblacion$seccion,1,5)=="46125",]
+  library(medear)
+  data("poblacion")
+
+  # Información de poblaciones de la sección censal 01001 de Valencia (código INE 46250)
+  poblacion[poblacion$seccion == "4625001001", ]
+
+  # Información de poblaciones de toda la ciudad de Valencia
+  poblacion[substring(poblacion$seccion, 1, 5) == "46250", ]
 }
 }
 \references{
