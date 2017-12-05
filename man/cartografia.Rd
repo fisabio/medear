@@ -35,7 +35,7 @@ Contiene la cartografía por sección censal en formato Simple
 \dontrun{
 library(medear)
 data(cartografia)
-#Representación de los distritos censales de Álava
+#RepresentaciÃ³n de los distritos censales de Ãlava
 plot(cartografia[cartografia$CUMUN=="01059","CDIS"])
 }
 }

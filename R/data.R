@@ -44,7 +44,6 @@
 #' #Información de poblaciones de toda la ciudad de Valencia
 #' poblacion[substring(poblacion$seccion,1,5)=="46125",]
 #' }
-
 "poblacion"
 
 
@@ -60,16 +59,9 @@
 #' @format Un objeto de clases \code{cartografia_ine} y \code{sf}, donde cada
 #'   fila es una sección censal y que cuenta con 13 columnas:
 #'   \describe{
-#'     \item{CUSEC}{Cádena de 10 caracteres con el código de sección censal
+#'     \item{seccion}{Cádena de 10 caracteres con el código de sección censal
 #'     (incluye provincia, municipio, distrito y sección).}
-#'     \item{CUMUN}{Cádena de 5 caracteres con el código INE del municipio.}
-#'     \item{CSEC}{Cádena de 3 caracteres con el código de sección censal.}
-#'     \item{CDIS}{Cádena de 2 caracteres con el código de distrito.}
-#'     \item{CPRO}{Cádena de 3 caracteres con el código de provincia.}
-#'     \item{CCA}{Cádena de 2 caracteres con el código de comunidad autónoma.}
-#'     \item{CUDIS}{Cádena de 7 caracteres con el código de distrito (incluye
-#'     provincia y  municipio).}
-#'     \item{OBS}{Observaciones por parte del proveedor de los datos.}
+#'     \item{codmuni}{Cádena de 5 caracteres con el código INE del municipio.}
 #'     \item{NPRO}{Nombre de la provincia.}
 #'     \item{NCA}{Nombre de la comunidad autónoma.}
 #'     \item{NMUN}{Nombre del municipio.}
@@ -78,8 +70,9 @@
 #'   }
 #'
 #' @references
-#'   \url{http://www.ine.es/}{Sitio web del INE}.
-#'   \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
+#'   \url{http://www.ine.es/}{ Sitio web del INE}.
+#'
+#'   \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{ Cartografía}.
 #'
 #' @keywords datasets
 #'
@@ -87,16 +80,20 @@
 #'
 #' \dontrun{
 #' library(medear)
+#' library(sf)
 #' data(cartografia)
-#' #Representación de los distritos censales de Álava
-#' plot(cartografia[cartografia$CUMUN=="01059","CDIS"])
+#' #Representación de los secciones censales de Álava
+#' plot(st_geometry(cartografia[substring(cartografia$seccion,1,5)=="01059",]))
+#' #Representación de los secciones censales de Álava, según distritos.
+#' distritos<-substring(cartografia[substring(cartografia$CUSEC,1,5)=="01059",]$CUSEC,6,7)
+#' plot(st_geometry(cartografia[substring(cartografia$CUSEC,1,5)=="01059",]),col=as.numeric(distritos))
 #' }
 "cartografia"
 
 
-#' @title Código de provincias y municipios del INE
+#' @title Nombres de municipios y provincias según terminología oficial del INE
 #'
-#' @description Codificación usada por el INE para las provincias y los
+#' @description Codificación/nombres usados por el INE para las provincias y los
 #'   municipios. También indica si se trata de un municipio participante en
 #'   MEDEA3 o no.
 #'
@@ -105,17 +102,18 @@
 #' @docType data
 #'
 #' @format Un objeto de clase \code{data.frame}, donde cada
-#'   fila es un municipio y que cuenta con 4 columnas:
+#'   fila es un municipio y que cuenta con 7 columnas:
 #'   \describe{
 #'     \item{cod_provincia}{Cádena de 2 caracteres con el código de la provincia.}
 #'     \item{CUMUN}{Cádena de 3 caracteres con el código del municipio.}
 #'     \item{nombre_municipio}{Nombre del municipio.}
-#'     \item{medea3}{Vector lógico: ¿participa en MEDEA3?}
+#'     \item{medea3}{Valor lógico: ¿participa en MEDEA3?}
 #'   }
 #'
 #' @references
-#'   \url{http://www.ine.es/}{Sitio web del INE}.
-#'   \url{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{Codificación INE}.
+#'   \url{http://www.ine.es/}{ Sitio web del INE}.
+#'
+#'   \url{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{ Codificación INE}.
 #'
 #' @keywords datasets
 #'
@@ -127,6 +125,34 @@
 #' }
 "codigos_ine"
 
+#' @title Cambios temporales de seccionado para las ciudades MEDEA3 (periodo 2004-2017).
+#'
+#' @description Relación de secciones censales que interseccionan geográficamente para pares de años consecutivos, según la definición de dicha sección sección censal en ambos años. Este objeto contiene todas las intersecciones entre secciones censales distintas para el periodo 2004-2017. Esta información es costosa de calcular y se necesita para la función XXX por ello se ha considerado conveniente almacenarla precalculada en el paquete \code{medear}.
+#'
+#' @name cambios_seccion
+#'
+#' @docType data
+#'
+#' @format Un objeto de clase \code{cambios_ine}, donde cada
+#'   fila es un un cambio de sección y que cuenta con 4 columnas:
+#'   \describe{
+#'     \item{sc_old}{Cádena de 10 caracteres con el código de la sección en año
+#'     == year.}
+#'     \item{sc_new}{Cádena de 10 caracteres con el código de la sección en año
+#'     == year2.}
+#'     \item{year}{Primer año.}
+#'     \item{year2}{Segundo año.}
+#'   }
+#'
+#' @keywords datasets
+#'
+#' @examples
+#'
+#' \dontrun{
+#' library(medear)
+#' data(cambios_seccion)
+#' }
+"cambios_seccion"
 
 #' @title Cambios de seccionado para todo el país.
 #'
@@ -156,36 +182,6 @@
 #' data(cambios_pais)
 #' }
 "cambios_pais"
-
-
-#' @title Cambios de seccionado para las ciudades MEDEA3.
-#'
-#' @description Cambios de seccionado para las ciudades MEDEA3.
-#'
-#' @name cambios_seccion
-#'
-#' @docType data
-#'
-#' @format Un objeto de clase \code{cambios_ine}, donde cada
-#'   fila es un un cambio de sección y que cuenta con 4 columnas:
-#'   \describe{
-#'     \item{sc_old}{Cádena de 10 caracteres con el código de la sección en año
-#'     == year.}
-#'     \item{sc_new}{Cádena de 10 caracteres con el código de la sección en año
-#'     == year2.}
-#'     \item{year}{Primer año.}
-#'     \item{year2}{Segundo año.}
-#'   }
-#'
-#' @keywords datasets
-#'
-#' @examples
-#'
-#' \dontrun{
-#' library(medear)
-#' data(cambios_seccion)
-#' }
-"cambios_seccion"
 
 #' @title Secciones censales únicas por año (1996-2016).
 #'

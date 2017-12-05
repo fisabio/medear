@@ -134,12 +134,12 @@ Esta función implementa la primera parte del algoritmo de
   library(medear)
   direcciones <- c(
     "Calle Aben Al Abbar 6, Valencia, Valencia",
-    "Avenida Constitución 900, Valencia, Valencia",
-    "Avenida Constitución 901, Valencia, Valencia",
+    "Avenida ConstituciÃ³n 900, Valencia, Valencia",
+    "Avenida ConstituciÃ³n 901, Valencia, Valencia",
     "Plaza Doctor Balmis 2, Alicante, Alicante",
     "A7 150",
     "A7 3000",
-    "Calle Inventadísima 1, Valencia, Valencia"
+    "Calle InventadÃ­sima 1, Valencia, Valencia"
   )
   codigos <- c(rep("46250", 3), "03014", "12082", "43148", "46250")
   cartografia <- descarga_cartografia()
