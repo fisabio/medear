@@ -385,7 +385,7 @@ geocodificar <- function(direcciones, idn = NULL, codigos = NULL, cartografia = 
       type         = NA_character_,
       version      = NA_character_
     )
-  ]
+  ][]
 
 
   return(datos)
