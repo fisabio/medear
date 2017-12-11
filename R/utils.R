@@ -261,7 +261,6 @@ filtro <- function(vias, nivel) {
         tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
       }
     }
-
   } else if (nivel == 2) {
     patron_ini  <- c("\\s", "\\(", "-")
     patron_fin  <- c("\\s", "\\.")
@@ -402,6 +401,166 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
   }
 
   return(list(datos = datos_f, indice_nogeo = indice_nogeo_f))
+}
+
+
+limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
+
+  vias <- list(tvia = tvia, nvia = nvia, npoli = npoli,
+               muni = muni, prov = prov, codpost = codpost)
+  vias <- lapply(vias, tolower)
+
+  # Convertir NA's en 0 caracteres.
+  vias <- lapply(vias, function(x) ifelse(is.na(x), "", x))
+  # Repaso de la conversion previa (no es realmente necesario...).
+  vias <- lapply(vias, gsub, pattern = "^na$", replacement = "")
+
+  # Eliminar ceros a la izquierda en npoli.
+  vias$npoli <- gsub("^0*(?=\\d+)", "", vias$npoli, perl = TRUE)
+
+  # Convertir numeros compuestos por un cero en 0 caracteres.
+  vias$npoli <- gsub("^0$", "", vias$npoli)
+
+  # Convertir numeros 999 o 9999 en cero caracteres
+  vias$npoli <- gsub("9999?", "", vias$npoli)
+
+  # Convertir nombres de vía con 3a en tercera.
+  vias$nvia <- gsub("\\s3a\\s", "tercera", vias$nvia)
+
+  # Convertir nombres de vía no consta en 0 caracteres.
+  vias$nvia <- gsub("no consta", "", vias$nvia)
+
+  # Eliminar comas del nombre de la vía.
+  vias$nvia <- gsub(",", "", vias$nvia)
+
+  # Normalización de los tipos de vía más frecuentes por variantes habituales.
+  calle     <- "^(ca[^monstbp])\\w+\\b|^(c)\\b|^(cl[^rnia][^b])|^([^bv]lle*)\\w"
+  avenida   <- "^(a.v)[^t]\\w+\\b|^(av)\\w+\\b|^(abg)\\w+\\b|^(vda)\\w+\\b|^a\\b|^av\\b"
+  plaza     <- "^(pz?l?z?[^tsrqopjigedau])\\w+"
+  partida   <- "^(par?t)\\w+|^(pda)\\w+|^(pr?t)\\w+|^pa.*da\\w+|^p.tda\\b"
+  camino    <- "^(cam)[^p]\\w+|^(cm[^p])\\w+"
+  carretera <- "^(ctr)\\w+|^(crt)\\w+"
+  pasaje    <- "^(pa?s[^e]j?)\\w+|^(pas[^e](.*))\\w+|^pje\\b|^psj\\b"
+  paseo     <- "^(pa?s[^a]e?)\\w+"
+  travesia  <- "^(trav)(.*)\\b|^tr?v\\w+"
+  vias$tvia <- gsub(calle, "calle", vias$tvia)
+  vias$tvia <- gsub(avenida, "avenida", vias$tvia)
+  vias$tvia <- gsub(plaza, "plaza", vias$tvia)
+  vias$tvia <- gsub(partida, "partida", vias$tvia)
+  vias$tvia <- gsub(camino, "camino", vias$tvia)
+  vias$tvia <- gsub(carretera, "carretera", vias$tvia)
+  vias$tvia <- gsub(pasaje, "pasaje", vias$tvia)
+  vias$tvia <- gsub(paseo, "paseo", vias$tvia)
+  vias$tvia <- gsub(travesia, "travesia", vias$tvia)
+
+  # Eliminar duplicidades (por lengua) en municipios y provincias (divisiones por barra /).
+  vias[c("muni", "prov")] <- lapply(
+    X           = vias[c("muni", "prov")],
+    FUN         = gsub,
+    pattern     = "\\/(?<=\\/)(.*)",
+    replacement = "",
+    perl        = TRUE
+  )
+
+  # Eliminar espacios en ambos extremos de todos los elementos.
+  vias <- lapply(vias, trimws)
+
+  # pegote <- paste0(vias$tvia, " ", vias$nvia, " ", vias$npoli, ", ", vias$muni,
+  #                  ", ", vias$prov, ", ", vias$codpost)
+
+  return(vias)
+}
+
+
+filtra_dir <- function(vias, nivel) {
+  tvias     <- paste(vias$tvia, vias$nvia)
+  indice    <- integer()
+  tvia_norm <- c("calle", "avenida", "plaza", "partida", "camino", "carretera",
+                 "pasaje", "paseo", "vereda", "paraje", "ronda", "travesia",
+                 "parque", "grupo")
+
+  # Patron para detectar direcciones absurdas tras el filtrado (p.ej.,
+  # "calle 1,", "calle ,", ...). Estas se dan por perdidas.
+  inutiles  <- paste0("^(", paste0(tvia_norm, collapse = "|"),
+                      ")\\s{1,10}\\d+,|^\\s?([a-z]+|\\d+)\\s{0,10},|^,|^\\s,")
+  patron_ini  <- c("\\s", "\\(", "-")
+  patron_fin  <- c("\\s", "\\.")
+  descripcion <- c("urb", "urbanizacion", "ed", "edf", "edif", "edificio", "res",
+                   "rsd", "rsden", "resid", "residencia", "geriatric.", "centro",
+                   "grupo", "grup", "polig", "poligono", "finca", "aptos",
+                   "complejo", "cooperativa", "coop")
+
+  if (nivel == 1) {
+    for (i in seq_along(tvia_norm)) {
+      for (j in seq_along(tvia_norm)) {
+        eliminar <- grep(paste0(tvia_norm[i], "\\s{1,10}", tvia_norm[j]), tvias)
+        indice   <- sort(unique(c(indice, eliminar)))
+        tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
+      }
+    }
+  } else if (nivel == 2) {
+    for (k in seq_along(descripcion)) {
+      for (i in seq_along(patron_ini)) {
+        for (j in seq_along(patron_fin)) {
+          patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
+          indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
+          tvias  <- gsub(patron, "", tvias, perl = TRUE)
+          tvias  <- gsub(
+            pattern     = paste0(patron_ini[i], descripcion[k], patron_fin[j]),
+            replacement = "",
+            x           = tvias
+          )
+        }
+      }
+    }
+  } else if (nivel == 3) {
+    indice <- grep("\\b[[:alpha:]]{1,3}\\b\\.?", tvias)
+    tvias  <- gsub("\\b[[:alpha:]]{1,3}\\b\\.?", "", tvias)
+  } else if (nivel == 4) {
+    tvias <- gsub("[[:punct:]]", "", tvias)
+    for (i in seq_along(tvia_norm)) {
+      eliminar <- grep(paste0("^", tvia_norm[i], "\\s{1,10}"), tvias)
+      indice   <- sort(unique(c(indice, eliminar)))
+      tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
+    }
+  } else {
+    for (i in seq_along(tvia_norm)) {
+      for (j in seq_along(tvia_norm)) {
+        eliminar <- grep(paste0(tvia_norm[i], "\\s{1,10}", tvia_norm[j]), tvias)
+        indice   <- sort(unique(c(indice, eliminar)))
+        tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
+      }
+    }
+    for (k in seq_along(descripcion)) {
+      for (i in seq_along(patron_ini)) {
+        for (j in seq_along(patron_fin)) {
+          patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
+          indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
+          tvias  <- gsub(patron, "", tvias, perl = TRUE)
+          tvias  <- gsub(
+            pattern     = paste0(patron_ini[i], descripcion[k], patron_fin[j]),
+            replacement = "",
+            x           = tvias
+          )
+        }
+      }
+    }
+    indice <- sort(unique(c(grep("\\b[[:alpha:]]{1,3}\\b\\.?", tvias), indice)))
+    tvias  <- gsub("\\b[[:alpha:]]{1,3}\\b\\.?", "", tvias)
+    tvias  <- gsub("[[:punct:]]", "", tvias)
+    for (i in seq_along(tvia_norm)) {
+      eliminar <- grep(paste0("^", tvia_norm[i], "\\s{1,10}"), tvias)
+      indice   <- sort(unique(c(indice, eliminar)))
+      tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
+    }
+  }
+
+  pegote <- paste0(tvias[indice], " ", vias$npoli[indice], ", ", vias$muni[indice],
+                   ", ", vias$prov[indice], ", ", vias$codpost[indice])
+
+  res <- data.table(idn = indice, via = pegote)
+  res <- res[!grep(inutiles, via)]
+  return(res)
 }
 
 utils::globalVariables(
