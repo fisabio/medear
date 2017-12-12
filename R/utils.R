@@ -300,9 +300,16 @@ filtro <- function(vias, nivel) {
       tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
     }
   }
-  res <- data.table(idn = indice)
-  res[, via := paste0(trimws(tvias[idn]), " ", vias$nvia[idn], ", ", vias$resto[idn])]
-  res <- res[!grep(inutiles, via)]
+
+  indice <- indice[nchar(tvias) >= 4]
+  if (length(indice) > 0) {
+    res <- data.table(idn = indice)
+    res[, via := paste0(trimws(tvias[idn]), " ", vias$nvia[idn], ", ", vias$resto[idn])]
+    res <- res[!grep(inutiles, via)]
+  } else {
+    res    <- data.table(idn = numeric(), via = character())
+  }
+
   return(res)
 }
 
@@ -569,7 +576,7 @@ filtra_dir <- function(vias, nivel) {
       tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
     }
   }
-
+  indice <- indice[nchar(tvias) >= 4]
   if (length(indice) > 0) {
     pegote <- paste0(tvias[indice], " ", vias$npoli[indice], ", ", vias$muni[indice],
                      ", ", vias$prov[indice], ", ", vias$codpost[indice])
