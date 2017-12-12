@@ -239,8 +239,10 @@ limpia_vias <- function(vias) {
   nvia      <- gsub("\\D",  "",  nvia)
   nvia      <- gsub("^0*(?=\\d+)", "", nvia, perl = TRUE)
   tvia_nvia <- trimws(mapply(function(x, y) gsub(x, "", y), nvia, tvia_nvia, USE.NAMES = FALSE))
+  res <- list(vias = tvia_nvia, nvia = nvia, resto = resto)
+  res <- lapply(res, gsub, pattern = "\\s{2,}", replacement = " ")
 
-  return(list(vias = tvia_nvia, nvia = nvia, resto = resto))
+  return(res)
 }
 
 
@@ -272,6 +274,11 @@ filtro <- function(vias, nivel) {
       for (i in seq_along(patron_ini)) {
         for (j in seq_along(patron_fin)) {
           patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
+          if (i == 2) {
+            patron <- paste0(patron, "\\)|", patron)
+          } else if (i == 3) {
+            patron <- paste0(patron, "-|", patron)
+          }
           indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
           tvias  <- gsub(patron, "", tvias, perl = TRUE)
           tvias  <- gsub(
@@ -464,9 +471,7 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 
   # Eliminar espacios en ambos extremos de todos los elementos.
   vias <- lapply(vias, trimws)
-
-  # pegote <- paste0(vias$tvia, " ", vias$nvia, " ", vias$npoli, ", ", vias$muni,
-  #                  ", ", vias$prov, ", ", vias$codpost)
+  vias <- lapply(vias, gsub, pattern = "\\s{2,}", replacement = " ")
 
   return(vias)
 }
@@ -503,6 +508,11 @@ filtra_dir <- function(vias, nivel) {
       for (i in seq_along(patron_ini)) {
         for (j in seq_along(patron_fin)) {
           patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
+          if (i == 2) {
+            patron <- paste0(patron, "\\)|", patron)
+          } else if (i == 3) {
+            patron <- paste0(patron, "-|", patron)
+          }
           indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
           tvias  <- gsub(patron, "", tvias, perl = TRUE)
           tvias  <- gsub(
@@ -535,6 +545,11 @@ filtra_dir <- function(vias, nivel) {
       for (i in seq_along(patron_ini)) {
         for (j in seq_along(patron_fin)) {
           patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
+          if (i == 2) {
+            patron <- paste0(patron, "\\)|", patron)
+          } else if (i == 3) {
+            patron <- paste0(patron, "-|", patron)
+          }
           indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
           tvias  <- gsub(patron, "", tvias, perl = TRUE)
           tvias  <- gsub(
@@ -558,11 +573,11 @@ filtra_dir <- function(vias, nivel) {
   if (length(indice) > 0) {
     pegote <- paste0(tvias[indice], " ", vias$npoli[indice], ", ", vias$muni[indice],
                      ", ", vias$prov[indice], ", ", vias$codpost[indice])
-
-    res <- data.table(idn = indice, via = pegote)
-    res <- res[!grep(inutiles, via)]
+    pegote <- gsub("\\s{2,}", " ", pegote)
+    res    <- data.table(idn = indice, via = pegote)
+    res    <- res[!grep(inutiles, via)]
   } else {
-    res <- data.table(idn = numeric(), via = character())
+    res    <- data.table(idn = numeric(), via = character())
   }
 
   return(res)
