@@ -555,11 +555,16 @@ filtra_dir <- function(vias, nivel) {
     }
   }
 
-  pegote <- paste0(tvias[indice], " ", vias$npoli[indice], ", ", vias$muni[indice],
-                   ", ", vias$prov[indice], ", ", vias$codpost[indice])
+  if (length(indice) > 0) {
+    pegote <- paste0(tvias[indice], " ", vias$npoli[indice], ", ", vias$muni[indice],
+                     ", ", vias$prov[indice], ", ", vias$codpost[indice])
 
-  res <- data.table(idn = indice, via = pegote)
-  res <- res[!grep(inutiles, via)]
+    res <- data.table(idn = indice, via = pegote)
+    res <- res[!grep(inutiles, via)]
+  } else {
+    res <- data.table(idn = numeric(), via = character())
+  }
+
   return(res)
 }
 
