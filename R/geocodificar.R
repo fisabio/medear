@@ -178,7 +178,7 @@ geocodificar <- function(direcciones, idn = NULL, codigos = NULL, cartografia = 
   vias         <- limpia_vias(direcciones)
   direcciones  <- paste0(trimws(vias$vias), " ", vias$nvia, ", ", vias$resto)
   direcciones  <- gsub("\\s(?=,)", "", direcciones, perl = TRUE)
-  direcciones  <- gsub("^,\\s$", "", direcciones)
+  direcciones  <- gsub("^,(.*)", "", direcciones)
   if (!is.null(idn)) {
     stopifnot(length(direcciones) == length(idn))
   } else {
