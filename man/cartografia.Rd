@@ -4,15 +4,14 @@
 \name{cartografia}
 \alias{cartografia}
 \title{Cartografía por sección censal para las ciudades MEDEA3}
-\format{Un objeto de clase \code{cartografia_ine} y \code{sf}, donde cada
-  fila es una sección censal y que cuenta con 7 columnas: \describe{
-  \item{seccion}{Cadena de 10 caracteres con el código de sección censal
-  (incluye provincia, municipio y distrito).} \item{cumun}{Cadena de 5
-  caracteres con el código del municipio (incluye provincia).}
-  \item{ccaa}{Cadena de 2 caracteres con el código de comunidad autónoma.}
-  \item{npro}{Nombre de la provincia.} \item{nca}{Nombre de la comunidad
-  autónoma.} \item{nmun}{Nombre del municipio.} \item{geometry}{Columna de
-  tipo lista con la geometría asociada a cada sección censal.} }}
+\format{Un objeto de clases \code{cartografia_ine} y \code{sf}, donde cada
+  fila es una sección censal y que cuenta con 13 columnas: \describe{
+  \item{seccion}{Cádena de 10 caracteres con el código de sección censal
+  (incluye provincia, municipio, distrito y sección).} \item{codmuni}{Cádena
+  de 5 caracteres con el código INE del municipio.} \item{NPRO}{Nombre de la
+  provincia.} \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre
+  del municipio.} \item{geometry}{Columna de tipo lista con la geometría
+  asociada a cada sección censal.} }}
 \usage{
 cartografia
 }
@@ -23,15 +22,19 @@ Contiene la cartografía por sección censal en formato Simple
 \examples{
 
 \dontrun{
-  library(medear)
-  data("cartografia")
-
-  # Representación de las secciones censales de Álava
-  plot(cartografia[cartografia$cumun == "01059", "seccion"])
+library(medear)
+library(sf)
+data(cartografia)
+#Representación de los secciones censales de Álava
+plot(st_geometry(cartografia[substring(cartografia$seccion,1,5)=="01059",]))
+#Representación de los secciones censales de Álava, según distritos.
+distritos<-substring(cartografia[substring(cartografia$CUSEC,1,5)=="01059",]$CUSEC,6,7)
+plot(st_geometry(cartografia[substring(cartografia$CUSEC,1,5)=="01059",]),col=as.numeric(distritos))
 }
 }
 \references{
-\href{http://www.ine.es/}{Sitio web del INE}.
-\href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
+\url{http://www.ine.es/}{ Sitio web del INE}.
+
+\url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
 }
 \keyword{datasets}

@@ -3,25 +3,31 @@
 \docType{data}
 \name{cambios_seccion}
 \alias{cambios_seccion}
-\title{Cambios de seccionado en todos los municipios del país}
+\title{Cambios temporales de seccionado para todo el país, incluyendo las
+  ciudades MEDEA3 (periodo 2004-2017).}
 \format{Un objeto de clase \code{cambios_ine}, donde cada fila es un un
   cambio de sección y que cuenta con 5 columnas: \describe{
-  \item{sc_old}{Cadena de 10 caracteres con el código de la sección en año ==
-  year.} \item{sc_new}{Cadena de 10 caracteres con el código de la sección en
+  \item{sc_old}{Cádena de 10 caracteres con el código de la sección en año ==
+  year.} \item{sc_new}{Cádena de 10 caracteres con el código de la sección en
   año == year2.} \item{year}{Primer año.} \item{year2}{Segundo año.}
   \item{medea3}{Vector lógico: ¿participa en MEDEA3?} }}
 \usage{
 cambios_seccion
 }
 \description{
-Estos datos incluyen los cambios de seccionado para las ciudades
-  MEDEA3.
+Relación de secciones censales que interseccionan
+  geográficamente para pares de años consecutivos, según la definición de
+  dicha sección sección censal en ambos años. Este objeto contiene todas las
+  intersecciones entre secciones censales distintas para el periodo
+  2004-2017. Esta información es costosa de calcular y se necesita para la
+  función \code{\link{detecta_cambios}} por ello se ha considerado
+  conveniente almacenar sus resultados dentro del paquete.
 }
 \examples{
 
 \dontrun{
-  library(medear)
-  data("cambios_seccion")
+library(medear)
+data(cambios_seccion)
 }
 }
 \keyword{datasets}

@@ -6,19 +6,22 @@
 \title{Datos de población por sección censal para las ciudades MEDEA3
   (periodo 2006-2016)}
 \format{Un objeto de clase \code{poblaciones_ine} donde las filas representan
-  la combinación de las distintas secciones censales de MEDEA3, sexos y años del periodo de estudio. Las cuatro primeras columnas son:
-  \describe{
-    \item{seccion}{Código de la sección censal.}
-    \item{sexo}{0 hombres; 1 mujeres.}
-    \item{year}{Año.}
-    \item{medea3}{Pertenencia de la sección al proyecto MEDEA3.}
-  }
-  El resto de columnas representan los distintos grupos de edad. Todo objeto de la clase \code{poblaciones_ine} deberá tener este formato.}
+  la combinación de las distintas secciones censales de MEDEA3, sexos y años
+  del periodo de estudio. Las cuatro primeras columnas son: \describe{
+  \item{seccion}{Código de la sección censal.} \item{sexo}{0 hombres; 1
+  mujeres.} \item{year}{Año.} \item{medea3}{Pertenencia de la sección al
+  proyecto MEDEA3.} } El resto de columnas representan los distintos grupos
+  de edad. Todo objeto de la clase \code{poblaciones_ine} deberá tener este
+  formato.}
 \usage{
 poblacion
 }
 \description{
-Datos de población por sexo (0=Hombres, 1=Mujeres), edad (grupos quinquenales) y año (periodo 2006-2016) a nivel de sección censal para las ciudades de MEDEA3. Estos datos han sido descargados de la web del INE, que los publica de forma libre, y se pueden obtener usando la función \code{\link{descarga_cartografia}} de este paquete.
+Datos de población por sexo (0=Hombres, 1=Mujeres), edad (grupos
+  quinquenales) y año (periodo 2006-2016) a nivel de sección censal para las
+  ciudades de MEDEA3. Estos datos han sido descargados de la web del INE, que
+  los publica de forma libre, y se pueden obtener usando la función
+  \code{\link{descarga_cartografia}} de este paquete.
 }
 \details{
 Los códigos de sección censal (columna \code{seccion} del
@@ -38,7 +41,15 @@ Los códigos de sección censal (columna \code{seccion} del
   información agregada para los grupos de edad mayores de 85, de la misma
   forma que los años anteriores.
 
-El paquete \code{medear} dispone también de los datos para todo el periodo 1996-2016 pero éstos están encriptados ya que los datos para el periodo 1996-2005 son propiedad del INE, que han sido adquiridos para uso exclusivo del proyecto MEDEA3. Estos datos son accesibles mediante la función \code{\link{carga_datos}} que necesita una contraseña de desencriptación, que se hará disponible a todos los grupos del proyecto MEDEA. La llamada a \code{\link{carga_datos}} produce un data.frame con exactamente el mismo formato que \code{poblacion}, de hecho machaca dicho objeto, pero con la información adicional del periodo 1996-2005.
+  El paquete \code{medear} dispone también de los datos para todo el periodo
+  1996-2016 pero éstos están encriptados ya que los datos para el periodo
+  1996-2005 son propiedad del INE, que han sido adquiridos para uso exclusivo
+  del proyecto MEDEA3. Estos datos son accesibles mediante la función
+  \code{\link{carga_datos}} que necesita una contraseña de desencriptación,
+  que se hará disponible a todos los grupos del proyecto MEDEA. La llamada a
+  \code{\link{carga_datos}} produce un data.frame con exactamente el mismo
+  formato que \code{poblacion}, de hecho machaca dicho objeto, pero con la
+  información adicional del periodo 1996-2005.
 
   Notar que las poblaciones corresponden al seccionado censal de cada año por
   lo que algunas de las secciones censales consideradas pueden no tener
@@ -62,7 +73,8 @@ El paquete \code{medear} dispone también de los datos para todo el periodo 1996
 \references{
 \url{http://www.ine.es/}{ Sitio web del INE}.
 
-  \url{http://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{ Poblaciones}.
+\url{http://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{
+Poblaciones}.
 }
 \seealso{
 \code{\link{descarga_poblaciones}}, \code{\link{carga_datos}}

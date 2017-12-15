@@ -2,7 +2,11 @@
 #' @title Datos de población por sección censal para las ciudades MEDEA3
 #'   (periodo 2006-2016)
 #'
-#' @description Datos de población por sexo (0=Hombres, 1=Mujeres), edad (grupos quinquenales) y año (periodo 2006-2016) a nivel de sección censal para las ciudades de MEDEA3. Estos datos han sido descargados de la web del INE, que los publica de forma libre, y se pueden obtener usando la función \code{\link{descarga_cartografia}} de este paquete.
+#' @description Datos de población por sexo (0=Hombres, 1=Mujeres), edad (grupos
+#'   quinquenales) y año (periodo 2006-2016) a nivel de sección censal para las
+#'   ciudades de MEDEA3. Estos datos han sido descargados de la web del INE, que
+#'   los publica de forma libre, y se pueden obtener usando la función
+#'   \code{\link{descarga_cartografia}} de este paquete.
 #'
 #' @details Los códigos de sección censal (columna \code{seccion} del
 #'   \code{data.frame} \code{poblacion}) se corresponden con el identificador
@@ -21,7 +25,15 @@
 #'   información agregada para los grupos de edad mayores de 85, de la misma
 #'   forma que los años anteriores.
 #'
-#' El paquete \code{medear} dispone también de los datos para todo el periodo 1996-2016 pero éstos están encriptados ya que los datos para el periodo 1996-2005 son propiedad del INE, que han sido adquiridos para uso exclusivo del proyecto MEDEA3. Estos datos son accesibles mediante la función \code{\link{carga_datos}} que necesita una contraseña de desencriptación, que se hará disponible a todos los grupos del proyecto MEDEA. La llamada a \code{\link{carga_datos}} produce un data.frame con exactamente el mismo formato que \code{poblacion}, de hecho machaca dicho objeto, pero con la información adicional del periodo 1996-2005.
+#'   El paquete \code{medear} dispone también de los datos para todo el periodo
+#'   1996-2016 pero éstos están encriptados ya que los datos para el periodo
+#'   1996-2005 son propiedad del INE, que han sido adquiridos para uso exclusivo
+#'   del proyecto MEDEA3. Estos datos son accesibles mediante la función
+#'   \code{\link{carga_datos}} que necesita una contraseña de desencriptación,
+#'   que se hará disponible a todos los grupos del proyecto MEDEA. La llamada a
+#'   \code{\link{carga_datos}} produce un data.frame con exactamente el mismo
+#'   formato que \code{poblacion}, de hecho machaca dicho objeto, pero con la
+#'   información adicional del periodo 1996-2005.
 #'
 #'   Notar que las poblaciones corresponden al seccionado censal de cada año por
 #'   lo que algunas de las secciones censales consideradas pueden no tener
@@ -34,19 +46,18 @@
 #' @docType data
 #'
 #' @format Un objeto de clase \code{poblaciones_ine} donde las filas representan
-#'   la combinación de las distintas secciones censales de MEDEA3, sexos y años del periodo de estudio. Las cuatro primeras columnas son:
-#'   \describe{
-#'     \item{seccion}{Código de la sección censal.}
-#'     \item{sexo}{0 hombres; 1 mujeres.}
-#'     \item{year}{Año.}
-#'     \item{medea3}{Pertenencia de la sección al proyecto MEDEA3.}
-#'   }
-#'   El resto de columnas representan los distintos grupos de edad. Todo objeto de la clase \code{poblaciones_ine} deberá tener este formato.
+#'   la combinación de las distintas secciones censales de MEDEA3, sexos y años
+#'   del periodo de estudio. Las cuatro primeras columnas son: \describe{
+#'   \item{seccion}{Código de la sección censal.} \item{sexo}{0 hombres; 1
+#'   mujeres.} \item{year}{Año.} \item{medea3}{Pertenencia de la sección al
+#'   proyecto MEDEA3.} } El resto de columnas representan los distintos grupos
+#'   de edad. Todo objeto de la clase \code{poblaciones_ine} deberá tener este
+#'   formato.
 #'
-#' @references
-#'   \url{http://www.ine.es/}{ Sitio web del INE}.
+#' @references \url{http://www.ine.es/}{ Sitio web del INE}.
 #'
-#'   \url{http://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{ Poblaciones}.
+#' \url{http://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{
+#' Poblaciones}.
 #'
 #' @keywords datasets
 #'
@@ -77,22 +88,17 @@
 #' @docType data
 #'
 #' @format Un objeto de clases \code{cartografia_ine} y \code{sf}, donde cada
-#'   fila es una sección censal y que cuenta con 13 columnas:
-#'   \describe{
-#'     \item{seccion}{Cádena de 10 caracteres con el código de sección censal
-#'     (incluye provincia, municipio, distrito y sección).}
-#'     \item{codmuni}{Cádena de 5 caracteres con el código INE del municipio.}
-#'     \item{NPRO}{Nombre de la provincia.}
-#'     \item{NCA}{Nombre de la comunidad autónoma.}
-#'     \item{NMUN}{Nombre del municipio.}
-#'     \item{geometry}{Columna de tipo lista con la geometría asociada a cada
-#'     sección censal.}
-#'   }
+#'   fila es una sección censal y que cuenta con 13 columnas: \describe{
+#'   \item{seccion}{Cádena de 10 caracteres con el código de sección censal
+#'   (incluye provincia, municipio, distrito y sección).} \item{codmuni}{Cádena
+#'   de 5 caracteres con el código INE del municipio.} \item{NPRO}{Nombre de la
+#'   provincia.} \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre
+#'   del municipio.} \item{geometry}{Columna de tipo lista con la geometría
+#'   asociada a cada sección censal.} }
 #'
-#' @references
-#'   \url{http://www.ine.es/}{ Sitio web del INE}.
+#' @references \url{http://www.ine.es/}{ Sitio web del INE}.
 #'
-#'   \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{ Cartografía}.
+#' \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
 #'
 #' @keywords datasets
 #'
@@ -145,24 +151,27 @@
 #' }
 "codigos_ine"
 
-#' @title Cambios temporales de seccionado para las ciudades MEDEA3 (periodo 2004-2017).
+#' @title Cambios temporales de seccionado para todo el país, incluyendo las
+#'   ciudades MEDEA3 (periodo 2004-2017).
 #'
-#' @description Relación de secciones censales que interseccionan geográficamente para pares de años consecutivos, según la definición de dicha sección sección censal en ambos años. Este objeto contiene todas las intersecciones entre secciones censales distintas para el periodo 2004-2017. Esta información es costosa de calcular y se necesita para la función XXX por ello se ha considerado conveniente almacenarla precalculada en el paquete \code{medear}.
+#' @description Relación de secciones censales que interseccionan
+#'   geográficamente para pares de años consecutivos, según la definición de
+#'   dicha sección sección censal en ambos años. Este objeto contiene todas las
+#'   intersecciones entre secciones censales distintas para el periodo
+#'   2004-2017. Esta información es costosa de calcular y se necesita para la
+#'   función \code{\link{detecta_cambios}} por ello se ha considerado
+#'   conveniente almacenar sus resultados dentro del paquete.
 #'
 #' @name cambios_seccion
 #'
 #' @docType data
 #'
-#' @format Un objeto de clase \code{cambios_ine}, donde cada
-#'   fila es un un cambio de sección y que cuenta con 4 columnas:
-#'   \describe{
-#'     \item{sc_old}{Cádena de 10 caracteres con el código de la sección en año
-#'     == year.}
-#'     \item{sc_new}{Cádena de 10 caracteres con el código de la sección en año
-#'     == year2.}
-#'     \item{year}{Primer año.}
-#'     \item{year2}{Segundo año.}
-#'   }
+#' @format Un objeto de clase \code{cambios_ine}, donde cada fila es un un
+#'   cambio de sección y que cuenta con 5 columnas: \describe{
+#'   \item{sc_old}{Cádena de 10 caracteres con el código de la sección en año ==
+#'   year.} \item{sc_new}{Cádena de 10 caracteres con el código de la sección en
+#'   año == year2.} \item{year}{Primer año.} \item{year2}{Segundo año.}
+#'   \item{medea3}{Vector lógico: ¿participa en MEDEA3?} }
 #'
 #' @keywords datasets
 #'
@@ -174,30 +183,6 @@
 #' }
 "cambios_seccion"
 
-#' @title Cambios de seccionado para todo el país.
-#'
-#' @description Cambios de seccionado para todo el país.
-#'
-#' @name cambios_pais
-#'
-#' @docType data
-#'
-#' @format Un objeto de clase \code{cambios_ine}, donde cada fila es un un
-#'   cambio de sección y que cuenta con 5 columnas: \describe{
-#'   \item{sc_old}{Cadena de 10 caracteres con el código de la sección en año ==
-#'   year.} \item{sc_new}{Cadena de 10 caracteres con el código de la sección en
-#'   año == year2.} \item{year}{Primer año.} \item{year2}{Segundo año.}
-#'   \item{medea3}{Vector lógico: ¿participa en MEDEA3?} }
-#'
-#' @keywords datasets
-#'
-#' @examples
-#'
-#' \dontrun{
-#' library(medear)
-#' data(cambios_pais)
-#' }
-"cambios_pais"
 
 #' @title Secciones censales únicas por año (1996-2016)
 #'

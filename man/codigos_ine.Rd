@@ -3,21 +3,20 @@
 \docType{data}
 \name{codigos_ine}
 \alias{codigos_ine}
-\title{Código de provincias y municipios del INE}
-\format{Un objeto de clase \code{data.frame}, donde cada fila es un municipio
-  y que cuenta con 7 columnas: \describe{ \item{cod_ccaa}{Cadena de 2
-  caracteres con el código de la comunidad autónoma.}
-  \item{cod_provincia}{Cadena de 2 caracteres con el código de la provincia.}
-  \item{cod_municipio}{Cadena de 3 caracteres con el código del municipio.}
-  \item{nombre_ccaa}{Nombre de la comunidad autónoma.}
-  \item{nombre_provincia}{Nombre de la provincia}
-  \item{nombre_municipio}{Nombre del municipio.} \item{medea3}{Vector lógico:
-  ¿participa en MEDEA3?} }}
+\title{Nombres de municipios y provincias según terminología oficial del INE}
+\format{Un objeto de clase \code{data.frame}, donde cada
+  fila es un municipio y que cuenta con 7 columnas:
+  \describe{
+    \item{cod_provincia}{Cádena de 2 caracteres con el código de la provincia.}
+    \item{CUMUN}{Cádena de 3 caracteres con el código del municipio.}
+    \item{nombre_municipio}{Nombre del municipio.}
+    \item{medea3}{Valor lógico: ¿participa en MEDEA3?}
+  }}
 \usage{
 codigos_ine
 }
 \description{
-Codificación usada por el INE para las provincias y los
+Codificación/nombres usados por el INE para las provincias y los
   municipios. También indica si se trata de un municipio participante en
   MEDEA3 o no.
 }
@@ -29,7 +28,8 @@ Codificación usada por el INE para las provincias y los
 }
 }
 \references{
-\href{http://www.ine.es/}{Sitio web del INE}.
-\href{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{Codificación INE}.
+\url{http://www.ine.es/}{ Sitio web del INE}.
+
+  \url{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{ Codificación INE}.
 }
 \keyword{datasets}

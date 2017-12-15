@@ -16,7 +16,8 @@ No se devuelve nada.
 \description{
 Algunos datos del proyecto MEDEA3 están encriptados para poder
   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
-  los desencripta y los adjunta al entorno global.
+  los desencripta y añade a los datos públicos (resto de años), adjuntando el
+  resultado al entorno global.
 }
 \details{
 La contraseña no se almacena en el historial.
@@ -24,7 +25,7 @@ La contraseña no se almacena en el historial.
 \examples{
 
 \dontrun{
-  carga_datos(key = "contraseÃ±a")
+  carga_datos(key = "contraseña")
 }
 
 }

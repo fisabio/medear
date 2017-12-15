@@ -32,7 +32,7 @@ filtrar_ein_esn <- function(datos) {
 #' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
 #'
-#' @usage detecta_cambios(datos, years = 2004:2017)
+#' @usage detecta_cambios(datos, years = 1996:2016)
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -61,11 +61,11 @@ filtrar_ein_esn <- function(datos) {
 #' @encoding UTF-8
 #'
 #' @export
-detecta_cambios <- function(datos, years = 2004:2017) {
+detecta_cambios <- function(datos, years = 1996:2016) {
 
   stopifnot("tramero_ine" %in% class(datos))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) > 1 & years %in% 2001:2017)
+  stopifnot(length(years) > 1 & years %in% 1996:2016)
   cambios <- list()
 
   for (i in unique(datos$CPRO)) {
@@ -129,7 +129,8 @@ detecta_cambios <- function(datos, years = 2004:2017) {
 #'
 #' @description Algunos datos del proyecto MEDEA3 están encriptados para poder
 #'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
-#'   los desencripta y los adjunta al entorno global.
+#'   los desencripta y añade a los datos públicos (resto de años), adjuntando el
+#'   resultado al entorno global.
 #'
 #' @details La contraseña no se almacena en el historial.
 #'
@@ -160,7 +161,9 @@ carga_datos <- function(key) {
     sodium::data_decrypt(readRDS(cifrado), key)
   )
   utils::data("poblacion")
-  poblacion <- data.table::rbindlist(list(poblacion, cifrado), fill = TRUE)[order(year, sexo, seccion)]
+  poblacion <- data.table::rbindlist(
+    list(poblacion, cifrado), fill = TRUE
+  )[order(year, sexo, seccion)]
   return(poblacion)
   on.exit({
     ruta <- list.files(getwd(), all.files = TRUE,
@@ -206,7 +209,8 @@ limpia_vias <- function(vias) {
   vias      <- gsub("\\s(9999?)", " ", vias)
   vias      <- gsub("\\s3a\\s", "tercera", vias)
   vias_list <- strsplit(vias, ",")
-  tvia_nvia <- mapply(function(x, y) x[!x %in% y], vias_list, lapply(vias_list, utils::tail, n = 3))
+  tvia_nvia <- mapply(function(x, y) x[!x %in% y], vias_list,
+                      lapply(vias_list, utils::tail, n = 3))
   tvia_nvia <- sapply(tvia_nvia, paste, collapse = " ", USE.NAMES = FALSE)
 
   for (i in seq_along(tvias)) {
@@ -232,13 +236,16 @@ limpia_vias <- function(vias) {
   tvia_nvia <- gsub(paseo,     "paseo",     tvia_nvia)
   tvia_nvia <- gsub(travesia,  "travesia",  tvia_nvia)
   resto     <- lapply(vias_list, utils::tail, n = 3)
-  resto     <- lapply(resto, gsub, pattern = "\\/(?<=\\/)(.*)", replacement = "", perl = TRUE)
+  resto     <- lapply(resto, gsub, pattern = "\\/(?<=\\/)(.*)",
+                      replacement = "", perl = TRUE)
   resto     <- gsub("\\s,", ",", trimws(sapply(resto, paste0, collapse = ",")))
   nvia      <- regmatches(tvia_nvia, gregexpr("\\d+", tvia_nvia))
-  nvia      <- sapply(sapply(nvia, utils::tail, n = 1), paste0, collapse = "", USE.NAMES = FALSE)
+  nvia      <- sapply(sapply(nvia, utils::tail, n = 1),
+                      paste0, collapse = "", USE.NAMES = FALSE)
   nvia      <- gsub("\\D",  "",  nvia)
   nvia      <- gsub("^0*(?=\\d+)", "", nvia, perl = TRUE)
-  tvia_nvia <- trimws(mapply(function(x, y) gsub(x, "", y), nvia, tvia_nvia, USE.NAMES = FALSE))
+  tvia_nvia <- trimws(mapply(function(x, y) gsub(x, "", y),
+                             nvia, tvia_nvia, USE.NAMES = FALSE))
   res <- list(vias = tvia_nvia, nvia = nvia, resto = resto)
   res <- lapply(res, gsub, pattern = "\\s{2,}", replacement = " ")
 
@@ -301,7 +308,7 @@ filtro <- function(vias, nivel) {
     }
   }
   if (length(indice) > 0) {
-    indice <- indice[nchar(tvias) >= 4]
+    indice <- indice[nchar(tvias[indice]) >= 4]
   }
   if (length(indice) > 0) {
     res <- data.table(idn = indice)
@@ -377,7 +384,9 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
           } else {
             suppressMessages(indice_geo_f[which(sapply(
               sf::st_intersects(
-                geom_res, cartografia[substr(cartografia$seccion, 1, 2) %in% substr(codigos[indice_geo_f], 1, 2), ]
+                geom_res,
+                cartografia[substr(cartografia$seccion, 1, 2) %in%
+                              substr(codigos[indice_geo_f], 1, 2), ]
               ),
               length) == 0)])
           }
@@ -578,7 +587,7 @@ filtra_dir <- function(vias, nivel) {
     }
   }
   if (length(indice) > 0) {
-    indice <- indice[nchar(tvias) >= 4]
+    indice <- indice[nchar(tvias[indice]) >= 4]
   }
   if (length(indice) > 0) {
     pegote <- paste0(tvias[indice], " ", vias$npoli[indice], ", ", vias$muni[indice],
