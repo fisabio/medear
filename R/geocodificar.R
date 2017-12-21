@@ -145,7 +145,7 @@
 #'                limpiar_direcciones = TRUE)
 #' }
 #'
-#' @encoding UTF-8
+#' @encoding latin1
 #'
 #' @export
 #'

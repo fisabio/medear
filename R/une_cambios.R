@@ -1,44 +1,43 @@
 
-
 #' @title Une los cambios del seccionado del INE
 #'
-#' @description Une los cambios del seccionado del INE en la cartograf铆a INE
-#'   2011 y en las poblaciones por sexo a帽o y secci贸n censal.
+#' @description Une los cambios del seccionado del INE en la cartograf韆 INE
+#'   2011 y en las poblaciones por sexo a駉 y secci髇 censal.
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
 #' @param cartografia Objeto de clase \code{cartografia_ine}.
-#' @param years Vector num茅rico de longitud >= 1 con los a帽os para los que se
-#'   desee consultar las variaciones de seccionado. El a帽o 2011 debe figurar
-#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de m谩s de un
-#'   a帽o).
+#' @param years Vector num閞ico de longitud >= 1 con los a駉s para los que se
+#'   desee consultar las variaciones de seccionado. El a駉 2011 debe figurar
+#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de m醩 de un
+#'   a駉).
 #' @param poblacion Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 #'   proporcionar en caso de querer agregar las poblaciones.
-#' @param corte_edad Num茅rico: punto de corte para los grupos de edad (85 o
+#' @param corte_edad Num閞ico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
 #'   NULL, corte_edad = 85)
 #'
-#' @return El resultado devuelto var铆a en funci贸n de si se proporcionan datos de
+#' @return El resultado devuelto var韆 en funci髇 de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
-#'   \code{cartografia_ine} y \code{sf} con la cartograf铆a, donde cada fila es
-#'   una secci贸n censal y que cuenta con 9 columnas: \item{seccion}{Cadena de 10
-#'   caracteres con el c贸digo de secci贸n censal (incluye provincia, municipio y
-#'   distrito).} \item{CUMUN}{Cadena de 5 caracteres con el c贸digo del municipio
-#'   (incluye provincia).} \item{CCA}{Cadena de 2 caracteres con el c贸digo de
-#'   comunidad aut贸noma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
-#'   de la comunidad aut贸noma.} \item{NMUN}{Nombre del municipio.}
-#'   \item{geometry}{Columna de tipo lista con la geometr铆a asociada a cada
-#'   secci贸n censal.} \item{cluster_id}{C贸digo de identificaci贸n del cluster de
-#'   uniones.} \item{sc_unida}{C贸digo de las secciones unidas.}
+#'   \code{cartografia_ine} y \code{sf} con la cartograf韆, donde cada fila es
+#'   una secci髇 censal y que cuenta con 9 columnas: \item{seccion}{Cadena de 10
+#'   caracteres con el c骴igo de secci髇 censal (incluye provincia, municipio y
+#'   distrito).} \item{CUMUN}{Cadena de 5 caracteres con el c骴igo del municipio
+#'   (incluye provincia).} \item{CCA}{Cadena de 2 caracteres con el c骴igo de
+#'   comunidad aut髇oma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
+#'   de la comunidad aut髇oma.} \item{NMUN}{Nombre del municipio.}
+#'   \item{geometry}{Columna de tipo lista con la geometr韆 asociada a cada
+#'   secci髇 censal.} \item{cluster_id}{C骴igo de identificaci髇 del cluster de
+#'   uniones.} \item{sc_unida}{C骴igo de las secciones unidas.}
 #'
 #'   En caso de proporcionan poblaciones, se devuelve una lista de longitud
-#'   igual a dos, donde el primer elemento es la cartograf铆a descrita
+#'   igual a dos, donde el primer elemento es la cartograf韆 descrita
 #'   anteriormente y el segundo elemento de la lista es un objeto de clase
 #'   \code{poblaciones_ine} donde las filas representan las distintas secciones
-#'   censales. Las tres primeras columnas son: \item{seccion}{C贸digo de la
-#'   secci贸n censal en el primer a帽o.} \item{sexo}{C贸digo de la secci贸n censal
-#'   en el segundo a帽o.} \item{year}{Primer a帽o.} El resto de columnas
+#'   censales. Las tres primeras columnas son: \item{seccion}{C骴igo de la
+#'   secci髇 censal en el primer a駉.} \item{sexo}{C骴igo de la secci髇 censal
+#'   en el segundo a駉.} \item{year}{Primer a駉.} El resto de columnas
 #'   representan los distintos grupos de edad, tras realizar el corte en los
 #'   grupos de edad (85 0 100).
 #'
@@ -55,7 +54,7 @@
 #'   cartografia <- uniones$cartografia
 #' }
 #'
-#' @encoding UTF-8
+#' @encoding latin1
 #'
 #' @export
 une_secciones <- function(cambios, cartografia, years = 1996:2016,

@@ -1,17 +1,18 @@
 Package: medear
 Title: Poblaciones y cartografia por seccion censal INE
-Version: 0.1.3
+Version: 0.1.4
 Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
-    person("Carlos", "Vergara-HernÃ¡ndez", email = "carlos.vergara@uv.es", role = c("aut", "cre"))
+    person("Carlos", "Vergara-Hernández", email = "carlos.vergara@uv.es", role = c("aut", "cre"))
     )
-Maintainer: Carlos Vergara-HernÃ¡ndez <carlos.vergara@uv.es>
-Description: Descarga, manipulaciÃ³n y extracciÃ³n de poblaciones desde 2001 a 2017
-    por secciÃ³n censal, de acuerdo con los datos del INE, incluyendo la cartografÃ­a
-    asociada al aÃ±o 2011.
+Maintainer: Carlos Vergara-Hernández¡ndez <carlos.vergara@uv.es>
+Description: Descarga, manipulación y extracción de poblaciones desde 1996 a 2016
+    por sección censal, de acuerdo con los datos del INE, incluyendo la cartografía
+    asociada al año 2011. Incluye rutinas de geocodificado, unión de secciones 
+    censales a lo largo del período de estudio, y otras funcionalidades del proyecto.
 Depends: R (>= 3.3.3)
 License: MIT + file LICENSE
-Encoding: UTF-8
+Encoding: latin1
 LazyData: true
 URL: https://github.com/fisabio/medear
 BugReports: https://github.com/fisabio/medear/issues
@@ -20,7 +21,8 @@ Imports:
     data.table (>= 1.10.4),
     devtools (>= 1.13.3),
     readr (>= 1.1.1),
-    sf (>= 0.5-3),
+    rgdal (>= 1.2-16),
+    sp (>= 1.2-5),
     sodium (>= 1.1),
     utils (>= 3.3.3)
 Remotes: carlosvergara/caRtociudad

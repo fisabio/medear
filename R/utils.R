@@ -23,31 +23,31 @@ filtrar_ein_esn <- function(datos) {
 }
 
 
-#' @title Funci贸n para detectar cambios de seccionado en trameros
+#' @title Funci髇 para detectar cambios de seccionado en trameros
 #'
-#' @description Detecta cambios de secci贸n censal para las provincias y el
-#'   per铆odo marcados.
+#' @description Detecta cambios de secci髇 censal para las provincias y el
+#'   per韔do marcados.
 #'
 #' @param datos Objeto de clase \code{tramero_ine}.
-#' @param years Vector num茅rico de longitud >= 2 con los a帽os para los que se
+#' @param years Vector num閞ico de longitud >= 2 con los a駉s para los que se
 #'   desee consultar las variaciones de seccionado.
 #'
 #' @usage detecta_cambios(datos, years = 1996:2016)
 #'
-#' @details El tiempo de ejecuci贸n de la funci贸n var铆a seg煤n el n煤mero de
-#'   provincias y el rango de a帽os. La forma m谩s sencilla de acelerar el proceso
-#'   de computaci贸n es mediante la ejecuci贸n en paralelo de la funci贸n.
+#' @details El tiempo de ejecuci髇 de la funci髇 var韆 seg鷑 el n鷐ero de
+#'   provincias y el rango de a駉s. La forma m醩 sencilla de acelerar el proceso
+#'   de computaci髇 es mediante la ejecuci髇 en paralelo de la funci髇.
 #'
-#'   Los c贸digos de secci贸n censal siguen un orden preestablecido: los primeros
-#'   dos d铆gitos identifican la provincia, los siguientes tres d铆gitos el
-#'   municipio, los pr贸ximos dos d铆gitos el distrito y los 煤ltimos tres
-#'   d铆gitos hacen referencia a la secci贸n censal.
+#'   Los c骴igos de secci髇 censal siguen un orden preestablecido: los primeros
+#'   dos d韌itos identifican la provincia, los siguientes tres d韌itos el
+#'   municipio, los pr髕imos dos d韌itos el distrito y los 鷏timos tres
+#'   d韌itos hacen referencia a la secci髇 censal.
 #'
 #' @return Un objeto de clase \code{cambios_ine} con 4 columnas:
-#'   \item{sc_old}{C贸digo de la secci贸n censal en el primer a帽o.}
-#'   \item{sc_new}{C贸digo de la secci贸n censal en el segundo a帽o.}
-#'   \item{year}{Primer a帽o.}
-#'   \item{year}{Segundo a帽o.}
+#'   \item{sc_old}{C骴igo de la secci髇 censal en el primer a駉.}
+#'   \item{sc_new}{C骴igo de la secci髇 censal en el segundo a駉.}
+#'   \item{year}{Primer a駉.}
+#'   \item{year}{Segundo a駉.}
 #'
 #' @examples
 #'
@@ -58,7 +58,7 @@ filtrar_ein_esn <- function(datos) {
 #'   cambios
 #' }
 #'
-#' @encoding UTF-8
+#' @encoding latin1
 #'
 #' @export
 detecta_cambios <- function(datos, years = 1996:2016) {
@@ -125,16 +125,16 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 }
 
 
-#' @title Carga los datos privados de poblaci贸n para el proyecto MEDEA3
+#' @title Carga los datos privados de poblaci髇 para el proyecto MEDEA3
 #'
-#' @description Algunos datos del proyecto MEDEA3 est谩n encriptados para poder
-#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta funci贸n
-#'   los desencripta y a帽ade a los datos p煤blicos (resto de a帽os), adjuntando el
+#' @description Algunos datos del proyecto MEDEA3 est醤 encriptados para poder
+#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta funci髇
+#'   los desencripta y a馻de a los datos p鷅licos (resto de a駉s), adjuntando el
 #'   resultado al entorno global.
 #'
-#' @details La contrase帽a no se almacena en el historial.
+#' @details La contrase馻 no se almacena en el historial.
 #'
-#' @param key Cadena de caracteres con la contrase帽a.
+#' @param key Cadena de caracteres con la contrase馻.
 #' @return No se devuelve nada.
 #'
 #' @usage carga_datos(key)
@@ -146,10 +146,10 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 #' @examples
 #'
 #' \dontrun{
-#'   carga_datos(key = "contrase帽a")
+#'   carga_datos(key = "contrase馻")
 #' }
 #'
-#' @encoding UTF-8
+#' @encoding latin1
 #'
 #' @export
 carga_datos <- function(key) {
@@ -448,16 +448,16 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
   # Convertir numeros 999 o 9999 en cero caracteres
   vias$npoli <- gsub("9999?", "", vias$npoli)
 
-  # Convertir nombres de v铆a con 3a en tercera.
+  # Convertir nombres de v韆 con 3a en tercera.
   vias$nvia <- gsub("\\s3a\\s", "tercera", vias$nvia)
 
-  # Convertir nombres de v铆a no consta en 0 caracteres.
+  # Convertir nombres de v韆 no consta en 0 caracteres.
   vias$nvia <- gsub("no consta", "", vias$nvia)
 
-  # Eliminar comas del nombre de la v铆a.
+  # Eliminar comas del nombre de la v韆.
   vias$nvia <- gsub(",", "", vias$nvia)
 
-  # Normalizaci贸n de los tipos de v铆a m谩s frecuentes por variantes habituales.
+  # Normalizaci髇 de los tipos de v韆 m醩 frecuentes por variantes habituales.
   calle     <- "^(ca[^monstbp])\\w+\\b|^(c)\\b|^(cl[^rnia][^b])|^([^bv]lle*)\\w"
   avenida   <- "^(a.v)[^t]\\w+\\b|^(av)\\w+\\b|^(abg)\\w+\\b|^(vda)\\w+\\b|^a\\b|^av\\b"
   plaza     <- "^(pz?l?z?[^tsrqopjigedau])\\w+"
