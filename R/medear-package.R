@@ -70,6 +70,6 @@
 #'
 #' @encoding latin1
 #'
-#' @import data.table sp
+#' @import data.table
 #'
 "_PACKAGE"

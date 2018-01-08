@@ -170,7 +170,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'
 #' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326.
 #'
-#' @return Un objeto de clase \code{cartografia_ine} y \code{sf}, donde cada
+#' @return Un objeto de clase \code{SpatialPolygonsDataFrame}, donde cada
 #'   fila es una sección censal y que cuenta con 7 columnas:
 #'   \item{seccion}{Cadena de 10 caracteres con el código de sección censal
 #'   (incluye provincia, municipio y distrito).}
@@ -187,10 +187,10 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'
 #' \dontrun{
 #'   library(medear)
-#'   library(sf)
+#'   library(sp)
 #'   carto_ine    <- descarga_cartografia()
 #'   carto_ine_46 <- carto[substr(carto$seccion, 3, 4) == "46", ]
-#'   plot(st_geometry(carto_ine_valencia))
+#'   plot(carto_ine_valencia)
 #' }
 #'
 #' @encoding latin1
@@ -217,9 +217,6 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
     exdir = dir_dest
   )
 
-
-
-
   carto <- rgdal::readOGR(
     dsn              = paste0(dir_dest, "/SECC_CPV_E_20111101_01_R_INE.shp"),
     verbose          = FALSE,
@@ -227,11 +224,14 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
   )
   if (!conservar)
     unlink(x = dir_dest, recursive = TRUE, force = TRUE)
-  carto <- carto[, -grep("^Shape|^CNUT|CLAU2|^OB|^CSEC|^CDIS|^CMUN|^CPRO|^CUDIS", colnames(carto@data))]
+  carto <- carto[, -grep("^Shape|^CNUT|CLAU2|^OB|^CSEC|^CDIS|^CMUN|^CPRO|^CUDIS",
+                         colnames(carto@data))]
   names(carto)[names(carto) == "CUSEC"] <- "seccion"
   carto <- sp::spTransform(carto, CRSobj = sp::CRS(paste0("+init=epsg:", crs)))
-  attributes(carto)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
-  class(carto) <- c("cartografia_ine", class(carto))
+
+
+  attributes(carto@data)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
+  attributes(carto@data)$class  <- "cartografia_ine"
   return(carto)
 }
 

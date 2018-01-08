@@ -1,392 +1,473 @@
 
-#' @title Implementaci√≥n de la primera parte del algoritmo de geocodificaci√≥n de
-#'   direcciones de MEDEA3 (geocodificado con CartoCiudad)
+#' @title Limpieza de las cadenas con las direcciones a geocodificar
 #'
-#' @description Esta funci√≥n implementa la primera parte del algoritmo de
-#'   geocodificaci√≥n de MEDEA3. En esta parte se intentan geocodificar en
-#'   primera instancia las direcciones haciendo uso del servicio CartoCiudad en
-#'   su \href{http://www.cartociudad.es/CartoGeocoder/Geocode}{versi√≥n antigua}.
-#'   En esta primera parte daremos por v√°lidos todos aquellos direcciones que
-#'   hayan obtenido estado == 1 (se ha encontrado la direcci√≥n correspondiente
-#'   de forma exacta) o estado == 2 (direcci√≥n asignada al portal m√°s pr√≥ximo).
-#'   El resto de individuos no geocodifados por la versi√≥n anterior, junto con
-#'   los individuos geocodificados que no tuvieran portal y los que hayan
-#'   obtenido status == 2 ser√°n intentados geocodificar de nuevo con
-#'   \href{http://www.cartociudad.es/geocoder/api/geocoder/findJsonp}{la nueva
-#'   versi√≥n de CartoCiudad}. La geocodificaci√≥n de las direcciones que no
-#'   tienen portal resulta menos fiable en la versi√≥n antigua de CartoCiudad ya
-#'   que son situadas en el inicio de su v√≠a, mientras que en la nueva versi√≥n
-#'   se sit√∫an en el centro, haciendo esta geocodificaci√≥n m√°s acertada. Por
-#'   otro lado, la versi√≥n antigua de CartoCiudad en ocasiones cambia de acera
-#'   (numeros pares a impares y viceversa) algunas direcciones mientras que en
-#'   la versi√≥n nueva esto no ocurre. Por ello, intentaremos regeocodificar
-#'   estas dos situaciones con la nueva versi√≥n de CartoCiudad, y en caso de que
-#'   no encontremos la direcci√≥n correspondiente en dicha versi√≥n mantendr√≠amos
-#'   la geocodificaci√≥n original conseguida por la versi√≥n previa.
+#' @description Esta funciÛn ejecuta una limpieza genÈrica de las direcciones,
+#'   eliminando datos perdidos, sustituyendo portales igual a cero o ceros a la
+#'   izquierda, normaliza los pincipales tipos de vÌa (calle, avenida, plaza,
+#'   partida, camino, carretera, pasaje, paseo y travesÌa) y elimnina
+#'   duplicidades en el nombre de municipios y provincias (consecuencia del uso
+#'   de varias lenguas).
 #'
-#'   Tras el proceso descrito, pueden considerarse una serie de variantes de las
-#'   cadenas de caracteres de las direcciones no geocodificadas. La intenci√≥n es
-#'   valorar si esas variaciones podr√≠an producir en alguna ocasi√≥n una
-#'   geocodificaci√≥n exitosa. En concreto, \code{geocodificar} contempla 5
-#'   posibles variantes para las direcciones que no han podido ser
-#'   geocodificadas: 1.- eliminar duplicidad de tipos de v√≠a (ejemplo: calle
-#'   camino ...-> camino ...); 2.- eliminar descripciones de v√≠a (ejemplo:
-#'   Avenida rosa (Edificio azul)->Avenida rosa); 3.- eliminar palabras de 3 o
-#'   menos caracteres (ejemplo: calle la marina alta-> calle marina alta); 4.-
-#'   eliminar signos de puntuaci√≥n (ejemplo: calle gral. pedro.->calle gral
-#'   pedro); 5.- implementaci√≥n de todas las variantes anteriores de forma
-#'   conjunta. \code{geocodificar} contempla todas estas variantes para
-#'   cualquier direcci√≥n que no haya podido ser geocodificada a partir de su
-#'   direcci√≥n original. En cualquier caso el chequeo de estas variantes puede
-#'   ser deshabilitado si as√≠ se prefiere.
+#'   La funciÛn espera como entrada los campos habituales del boletÌn de
+#'   defunciones, y ella se ocupa de trabajarlos por separado.
 #'
-#'   En todos los casos, y siempre que se desee (aunque la opci√≥n viene marcada
-#'   por defecto), se puede aplicar un filtro cartogr√°fico que deseche aquellas
-#'   localizaciones que caigan fuera del municipio o la provincia de inter√©s.
-#'   Para habilitar este filtrado se debe proporcionar una cartograf√≠a (como la
-#'   disponible mediante \code{\link{descarga_cartografia}}) y el c√≥digo INE del
-#'   municipio o provincia de inter√©s (disponible en el banco de datos
-#'   \code{\link{codigos_ine}}).
+#' @param tvia Caracter: tipos de vÌas.
+#' @param nvia Caracter: nombres de la vÌas.
+#' @param npoli Caracter: n˙meros de policÌa.
+#' @param muni Caracter: nombres de los municipios.
+#' @param prov Caracter: nombres de las provincias.
+#' @param codpost Caracter: cÛdigos postales.
 #'
-#'   La funci√≥n \code{geocodificar} va informando en la consola de \code{R} del
-#'   progreso de cada una de las actividades que hemos descrito para que estamos
-#'   informados en todo momento de en qu√© situaci√≥n se encuentra el proceso.
+#' @usage limpia_dir(tvia, nvia, npoli, muni, prov, codpost)
 #'
-#'
-#' @usage geocodificar(direcciones, idn = NULL, codigos = NULL, cartografia =
-#'   NULL, filtro_geo = c("municipio", "provincia", "ninguno"),
-#'   limpiar_direcciones = TRUE, intentos = 10)
-#'
-#' @param direcciones Vector de caracteres con las direcciones a geocodificar.
-#'   Las direcciones deben proporcionarse \strong{OBLIGATORIAMENTE} con el
-#'   formato "TIPO_DE_V√çA NOMBRE_DE_V√çA N√öMERO_DE_V√çA, MUNICIPIO, PROVINCIA,
-#'   C√ìDIGO_POSTAL". La codificaci√≥n de caracteres a utilizar debe ser,
-#'   \strong{OBLIGATORIAMENTE}, ASCII, de forma que no aparezcan caracteres como
-#'   e√±es o tildes. Para transformar la codificaci√≥n de caracteres al tipo
-#'   ASCII, se puede emplear la funci√≥n \code{\link[base]{iconv}} de la
-#'   siguiente forma:
-#'
-#'   \code{iconv(direcciones, from = "CODIFICACION_DE_ORIGEN", to =
-#'   "ascii//translit")}
-#'
-#'   donde \code{CODIFICACION_DE_ORIGEN} tomar√° valores como "utf8", "latin1" o
-#'   "Windows-1252", por ejemplo.
-#'
-#' @param idn Vector de la misma longitud que \code{direcciones} con un
-#'   identificador de cada uno de los registros en caso de que se quiera que
-#'   dicho identificador aparezca en el data.frame (campo \code{idn}) devuelto
-#'   por esta funci√≥n. Si no se da ning√∫n valor a este argumento, el campo
-#'   \code{idn} del data.frame anterior ser√° simplemente un vector secuencial
-#'   que numera cada uno de los registros.
-#' @param codigos Vector de caracteres de longitud igual al vector de
-#'   direcciones. Contiene los c√≥digos INE (5 caracteres por c√≥digo) de los
-#'   municipios a los que hacen referencia las direcciones. Si el valor es nulo
-#'   (opci√≥n por defecto), la funci√≥n trata de averiguar el c√≥digo desde la
-#'   propia direcci√≥n.
-#' @param cartografia Objeto de clase \code{cartografia_ine} con la cartograf√≠a
-#'   que contenga las geometr√≠as de municipios o provincias a los que hacen
-#'   referencias las direcciones.
-#' @param filtro_geo Vector de caracteres de longitud 1 indicando el nivel de
-#'   filtrado cartogr√°fico a efectuar (eliminaci√≥n de coordenadas devueltas pero
-#'   que no correspondan a su pol√≠gono correspondiente). Las tres opciones son
-#'   municipio (las coordenadas est√°n dentro del pol√≠gono del municipio al que
-#'   hace referencia el c√≥digo de la direcci√≥n), provincia (las coordenadas
-#'   est√°n dentro del pol√≠gono de la provincia al que hace referencia el c√≥digo
-#'   de la direcci√≥n) y ninguno.
-#' @param limpiar_direcciones Valor l√≥gico. ¬øSe desea considerar las variantes
-#'   de las cadenas de texto de las direcciones que no hayan podido ser
-#'   geocodificadas? Se recomienda activarlo conjuntamente al filtro
-#'   cartogr√°fico para evitar falsos positivos que puedan ser geocodificados
-#'   fuera de la regi√≥n de estudio.
-#' @param intentos Valor num√©rico. N√∫mero de intentos de conexi√≥n con el
-#'   servidor de CartoCiudad en caso de fallo de la misma, por defecto 10. Este
-#'   par√°metro evita que la geocodificaci√≥n pare en caso de que haya un error de
-#'   conexi√≥n en el servidor de CartoCiudad en alg√∫n momento.
-#'
-#' @return Un \code{data.frame} con tantas filas como la longitud de
-#'   \code{direcciones} y con entre 7 y 8 columnas (en funci√≥n de si se limpian
-#'   las direcciones o no): \item{idn}{Identificador de cada uno de los
-#'   registros de direcci√≥n, si no se ha determinado el argumento \code{idn} se
-#'   rellena de forma secuencial).} \item{direcciones}{Direcci√≥n original seg√∫n
-#'   aparece en el argumento \code{direcciones}} \item{id}{Identificador
-#'   catastral de la v√≠a geocodificada.} \item{province}{Provincia de la v√≠a
-#'   geocodificada.} \item{muni}{Municipio de la v√≠a geocodificada.}
-#'   \item{tip_via}{Tipo de la v√≠a geocodificada (calle, avenida...).}
-#'   \item{address}{Nombre de la v√≠a geocodificada.} \item{portalNumber}{N√∫mero
-#'   de la v√≠a geocodificada.} \item{refCatastral}{Referencia catastral del
-#'   n√∫mero de la v√≠a geocodificada (solo devuelto por la versi√≥n previa de
-#'   CartoCiudad).} \item{postalCode}{C√≥digo postal al que pertenece la v√≠a
-#'   geocodificada.} \item{lat}{Latitud asignada a la direcci√≥n.}
-#'   \item{lng}{Longitud asignada a la direcci√≥n.}  \item{state}{Estado devuelto
-#'   por los servicios de CartoCiudad (diferente seg√∫n la versi√≥n, ver la ayuda
-#'   de la funci√≥n \code{\link[caRtociudad]{cartociudad_geocode}}).}
-#'   \item{type}{Procedencia de la informaci√≥n relativa a la geocodificaci√≥n
-#'   (solo disponible en la versi√≥n actual de CartoCiudad).}
-#'   \item{version}{Versi√≥n de CartoCiudad con la que se ha realizado la
-#'   geocodificaci√≥n.}
-#'
-#' @examples
-#'
-#' \dontrun{
-#'   library(medear)
-#'   direcciones <- c(
-#'     "Calle Aben Al Abbar 6, Valencia, Valencia",
-#'     "Avenida Constituci√≥n 900, Valencia, Valencia",
-#'     "Avenida Constituci√≥n 901, Valencia, Valencia",
-#'     "Plaza Doctor Balmis 2, Alicante, Alicante",
-#'     "A7 150",
-#'     "A7 3000",
-#'     "Calle Inventad√≠sima 1, Valencia, Valencia"
-#'   )
-#'   codigos <- c(rep("46250", 3), "03014", "12082", "43148", "46250")
-#'   cartografia <- descarga_cartografia()
-#'   geocodificar(direcciones = direcciones, codigos = codigos,
-#'                cartografia = cartografia, filtro_geo = "municipio",
-#'                limpiar_direcciones = TRUE)
-#' }
+#' @return Se devuelve una lista de 6 elementos, uno para cada campo de entrada.
 #'
 #' @encoding latin1
 #'
 #' @export
 #'
-geocodificar <- function(direcciones, idn = NULL, codigos = NULL, cartografia = NULL,
-                         filtro_geo = c("municipio", "provincia", "ninguno"),
-                         limpiar_direcciones = TRUE, intentos = 10) {
+limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 
-  stopifnot(is.character(direcciones) && length(direcciones) >= 1)
-  stopifnot(is.null(codigos) || is.character(codigos) || length(codigos) != length(direcciones))
-  stopifnot(is.null(cartografia) || all(sf::st_is(cartografia, "MULTIPOLYGON")))
-  stopifnot(is.logical(limpiar_direcciones))
-  if (!"sf" %in% class(cartografia))
-    stop("El objeto 'cartografia' debe ser de clase 'sf'.")
+  vias <- list(tvia = tvia, nvia = nvia, npoli = npoli,
+               muni = muni, prov = prov, codpost = codpost)
+  vias <- lapply(vias, tolower)
 
-  filtro_geo <- match.arg(filtro_geo)
-  if (is.null(codigos) & filtro_geo != "ninguno")
-    warning(
-      "Has escogido realizar un filtrado de geolocalizaciones atendiendo a\n",
-      "la cartograf\u00eda, pero no has proporcionado un vector de caracteres\n",
-      "con los c\u00f3digos INE del nivel del filtro:\n",
-      "la funci\u00f3n intentar\u00e1 extraer el nivel de filtrado de las direcciones,\n",
-      "lo cual puede proporcionar resultados incorrectos si utilizas la\n",
-      "funci\u00f3n en n\u00facleos de poblaci\u00f3n que no pertenezcan al proyecto MEDEA 3.")
-  if (is.null(cartografia) & filtro_geo != "ninguno")
-    stop("Has escogido realizar un filtrado de geolocalizaciones atendiendo a\n",
-         "la cartograf\u00eda, pero no has proporcionado esta \u00faltima:\n",
-         "utiliza la funci\u00f3n `descarga_cartografia()` para obtener la cartografia\n",
-         "de toda Espa\u00f1a, o carga la cartografia MEDEA con `data(cartografia)`.")
+  # Convertir NA's en 0 caracteres.
+  vias <- lapply(vias, function(x) ifelse(is.na(x), "", x))
+  # Repaso de la conversion previa (no es realmente necesario...).
+  vias <- lapply(vias, gsub, pattern = "^na$", replacement = "")
 
-  vias         <- limpia_vias(direcciones)
-  direcciones  <- paste0(trimws(vias$vias), " ", vias$nvia, ", ", vias$resto)
-  direcciones  <- gsub("\\s(?=,)", "", direcciones, perl = TRUE)
-  direcciones  <- gsub("^,(.*)", "", direcciones)
-  if (!is.null(idn)) {
-    stopifnot(length(direcciones) == length(idn))
-  } else {
-    idn <- seq_along(direcciones)
-  }
-  datos <- data.table(idn = idn, direcciones = direcciones)
+  # Eliminar ceros a la izquierda en npoli.
+  vias$npoli <- gsub("^0*(?=\\d+)", "", vias$npoli, perl = TRUE)
 
-  # Geocodificado con CC Viejo
-  message("Buscando en CartoCiudad (versi\u00f3n previa)...")
-  geo_old      <- data.table(
-    suppressWarnings(
-      caRtociudad::cartociudad_geocode(
-        full_address = datos[["direcciones"]],
-        version      = "prev",
-        ntries       = intentos
-      )
-    )
+  # Convertir numeros compuestos por un cero en 0 caracteres.
+  vias$npoli <- gsub("^0$", "", vias$npoli)
+
+  # Convertir numeros 999 o 9999 en cero caracteres
+  vias$npoli <- gsub("9999?", "", vias$npoli)
+
+  # Convertir nombres de vÌa con 3a en tercera.
+  vias$nvia <- gsub("\\s3a\\s", "tercera", vias$nvia)
+
+  # Convertir nombres de vÌa no consta en 0 caracteres.
+  vias$nvia <- gsub("no consta", "", vias$nvia)
+
+  # Eliminar comas del nombre de la vÌa.
+  vias$nvia <- gsub(",", "", vias$nvia)
+
+  # NormalizaciÛn de los tipos de vÌa m·s frecuentes por variantes habituales.
+  calle     <- "^(ca[^monstbp])\\w+\\b|^(c)\\b|^(cl[^rnia][^b])|^([^bv]lle*)\\w"
+  avenida   <- "^(a.v)[^t]\\w+\\b|^(av)\\w+\\b|^(abg)\\w+\\b|^(vda)\\w+\\b|^a\\b|^av\\b"
+  plaza     <- "^(pz?l?z?[^tsrqopjigedau])\\w+"
+  partida   <- "^(par?t)\\w+|^(pda)\\w+|^(pr?t)\\w+|^pa.*da\\w+|^p.tda\\b"
+  camino    <- "^(cam)[^p]\\w+|^(cm[^p])\\w+"
+  carretera <- "^(ctr)\\w+|^(crt)\\w+"
+  pasaje    <- "^(pa?s[^e]j?)\\w+|^(pas[^e](.*))\\w+|^pje\\b|^psj\\b"
+  paseo     <- "^(pa?s[^a]e?)\\w+"
+  travesia  <- "^(trav)(.*)\\b|^tr?v\\w+"
+  vias$tvia <- gsub(calle, "calle", vias$tvia)
+  vias$tvia <- gsub(avenida, "avenida", vias$tvia)
+  vias$tvia <- gsub(plaza, "plaza", vias$tvia)
+  vias$tvia <- gsub(partida, "partida", vias$tvia)
+  vias$tvia <- gsub(camino, "camino", vias$tvia)
+  vias$tvia <- gsub(carretera, "carretera", vias$tvia)
+  vias$tvia <- gsub(pasaje, "pasaje", vias$tvia)
+  vias$tvia <- gsub(paseo, "paseo", vias$tvia)
+  vias$tvia <- gsub(travesia, "travesia", vias$tvia)
+
+  # Eliminar duplicidades (por lengua) en municipios y provincias (divisiones por barra /).
+  vias[c("muni", "prov")] <- lapply(
+    X           = vias[c("muni", "prov")],
+    FUN         = gsub,
+    pattern     = "\\/(?<=\\/)(.*)",
+    replacement = "",
+    perl        = TRUE
   )
-  indice_geo   <- which(geo_old[["state"]] %in% 1:2)
-  indice_nogeo <- which(!geo_old[["state"]] %in% 1:2)
-  if (filtro_geo != "ninguno") {
-    filtro_geo <- switch(filtro_geo,
-                         "municipio" = "nombre_municipio",
-                         "provincia" = "nombre_provincia")
-    if (is.null(codigos)) {
-      muni_provs   <- lapply(
-        lapply(strsplit(datos[["direcciones"]], split = ","), trimws),
-        `[`,
-        2:3
-      )
-      codigos      <- character(length(muni_provs))
-      provs_carto  <- munis_carto <- vector("list", length(muni_provs))
-      utils::data("codigos_ine")
-      for (i in seq_along(codigos)) {
-        provs_carto[[i]] <- grep(
-          paste0("^", muni_provs[[i]][2], "$|^", muni_provs[[i]][2], "\\/"),
-          unique(codigos_ine[["nombre_provincia"]]),
-          ignore.case = TRUE,
-          value       = TRUE
-        )
-        munis_carto[[i]] <- grep(
-          paste0("^", muni_provs[[i]][1], "$|^", muni_provs[[i]][1], "\\/"),
-          codigos_ine[["nombre_municipio"]],
-          ignore.case = TRUE,
-          value       = TRUE
-        )
-        temp <- codigos_ine[
-          nombre_provincia %in% provs_carto[[i]] & nombre_municipio %in% munis_carto[[i]],
-          paste0(cod_provincia, cod_municipio)
-          ]
-        temp <- ifelse(length(temp) == 0, "", temp)
-        codigos[i] <- temp
-        if (codigos[i] == "") {
-          warning("No se ha podido filtrar por cartograf\u00eda en la direcci\u00f3n ", i)
-          codigos[i] <- NA_character_
-        }
-      }
-    }
-    if (length(indice_geo) > 0) {
-      geom_old <- sf::st_as_sf(geo_old[indice_geo, c("lng", "lat")],
-                               coords = c("lng", "lat"), na.fail = FALSE, crs = 4258)
-      geom_old <- sf::st_transform(geom_old, crs = sf::st_crs(cartografia)$epsg)
-      indice_fuera <-
-        if (filtro_geo == "nombre_municipio") {
-          suppressMessages(indice_geo[which(sapply(
-            sf::st_intersects(
-              geom_old, cartografia[cartografia$CUMUN %in% codigos[indice_geo], ]
-            ),
-            length) == 0)])
-        } else {
-          suppressMessages(indice_geo[which(sapply(
-            sf::st_intersects(
-              geom_old, cartografia[substr(cartografia$seccion, 1, 2) %in% substr(codigos[indice_geo], 1, 2), ]
-            ),
-            length) == 0)])
-        }
-      indice_geo   <- indice_geo[!indice_geo %in% indice_fuera]
-      indice_nogeo <- sort(unique(c(indice_nogeo, indice_fuera)))
-    }
-  }
-  datos[
-    indice_geo,
-    `:=`(
-      id           = geo_old[indice_geo][["id"]],
-      province     = geo_old[indice_geo][["province"]],
-      muni         = geo_old[indice_geo][["muni"]],
-      tip_via      = geo_old[indice_geo][["tip_via"]],
-      address      = geo_old[indice_geo][["address"]],
-      portalNumber = geo_old[indice_geo][["portalNumber"]],
-      refCatastral = geo_old[indice_geo][["refCatastral"]],
-      postalCode   = geo_old[indice_geo][["postalCode"]],
-      lat          = geo_old[indice_geo][["lat"]],
-      lng          = geo_old[indice_geo][["lng"]],
-      state        = as.character(geo_old[indice_geo][["state"]]),
-      type         = as.character(geo_old[indice_geo][["type"]]),
-      version      = as.character(geo_old[indice_geo][["version"]])
-    )
-  ]
-  indice_old_2     <- which(datos[["state"]] == 2)
-  indice_nogeo_via <- unique(sort(c(indice_nogeo, indice_old_2)))
 
+  # Eliminar espacios en ambos extremos de todos los elementos.
+  vias <- lapply(vias, trimws)
+  vias <- lapply(vias, gsub, pattern = "\\s{2,}", replacement = " ")
 
-  if (length(indice_nogeo_via > 0)) {
-    # Geocodificado con CC Nuevo
-    message("\nBuscando en CartoCiudad (versi\u00f3n actual)...")
-    geo_new     <- data.table(
-      suppressWarnings(
-        caRtociudad::cartociudad_geocode(
-          full_address = datos[indice_nogeo_via][["direcciones"]],
-          ntries       = intentos
-        )
-      )
-    )
-    indice_aux <- which(geo_new[["state"]] %in% 1:4)
-    if (length(indice_aux) > 0) {
-      indice_geo2 <- indice_nogeo_via[indice_aux]
-      if (filtro_geo != "ninguno") {
-        geom_new <- sf::st_as_sf(geo_new[indice_aux, c("lng", "lat")],
-                                 coords = c("lng", "lat"), na.fail = FALSE, crs = 4258)
-        geom_new <- sf::st_transform(geom_new, crs = sf::st_crs(cartografia)$epsg)
-
-        indice_fuera <-
-          if (filtro_geo == "nombre_municipio") {
-            suppressMessages(indice_geo2[which(sapply(
-              sf::st_intersects(
-                geom_new, cartografia[cartografia$CUMUN %in% codigos[indice_geo2], ]
-              ),
-              length) == 0)])
-          } else {
-            suppressMessages(indice_geo2[which(sapply(
-              sf::st_intersects(
-                geom_new, cartografia[substr(cartografia$seccion, 1, 2) %in% substr(codigos[indice_geo2], 1, 2), ]
-              ),
-              length) == 0)])
-          }
-        if (length(indice_fuera) > 0) {
-          indice_fuera <- which(indice_geo2 %in% indice_fuera )
-          indice_aux   <- indice_aux[-indice_fuera]
-          indice_geo2  <- indice_geo2[-indice_fuera]
-        }
-      }
-      datos[
-        indice_geo2,
-        `:=`(
-          id           = geo_new[indice_aux][["id"]],
-          province     = geo_new[indice_aux][["province"]],
-          muni         = geo_new[indice_aux][["muni"]],
-          tip_via      = geo_new[indice_aux][["tip_via"]],
-          address      = geo_new[indice_aux][["address"]],
-          portalNumber = geo_new[indice_aux][["portalNumber"]],
-          refCatastral = geo_new[indice_aux][["refCatastral"]],
-          postalCode   = geo_new[indice_aux][["postalCode"]],
-          lat          = geo_new[indice_aux][["lat"]],
-          lng          = geo_new[indice_aux][["lng"]],
-          state        = geo_new[indice_aux][["state"]],
-          type         = geo_new[indice_aux][["type"]],
-          version      = geo_new[indice_aux][["version"]]
-        )
-      ]
-      indice_nogeo <- datos[!sort(unique(c(indice_geo, indice_geo2)))][["idn"]]
-    }
-
-
-    # Aplicaci√≥n de filtros a las cadenas de caracteres
-    if (limpiar_direcciones) {
-      f1_old <- aplica_filtros(vias, copy(datos), indice_nogeo, "prev", 1, filtro_geo,
-                               cartografia, codigos, intentos)
-      f1_new <- aplica_filtros(vias, copy(f1_old$datos), f1_old$indice_nogeo, "current",
-                               1, filtro_geo, cartografia, codigos, intentos)
-      f2_old <- aplica_filtros(vias, copy(f1_new$datos), f1_new$indice_nogeo, "prev", 2,
-                               filtro_geo, cartografia, codigos, intentos)
-      f2_new <- aplica_filtros(vias, copy(f2_old$datos), f2_old$indice_nogeo, "current",
-                               2, filtro_geo, cartografia, codigos, intentos)
-      f3_old <- aplica_filtros(vias, copy(f2_new$datos), f2_new$indice_nogeo, "prev", 3,
-                               filtro_geo, cartografia, codigos, intentos)
-      f3_new <- aplica_filtros(vias, copy(f3_old$datos), f3_old$indice_nogeo, "current",
-                               3, filtro_geo, cartografia, codigos, intentos)
-      f4_old <- aplica_filtros(vias, copy(f3_new$datos), f3_new$indice_nogeo, "prev", 4,
-                               filtro_geo, cartografia, codigos, intentos)
-      f4_new <- aplica_filtros(vias, copy(f4_old$datos), f4_old$indice_nogeo, "current",
-                               4, filtro_geo, cartografia, codigos, intentos)
-      f5_old <- aplica_filtros(vias, copy(f4_new$datos), f4_new$indice_nogeo, "prev", 5,
-                               filtro_geo, cartografia, codigos, intentos)
-      f5_new <- aplica_filtros(vias, copy(f5_old$datos), f5_old$indice_nogeo, "current",
-                               5, filtro_geo, cartografia, codigos, intentos)
-      datos        <- copy(f5_new$datos)
-      indice_nogeo <- f5_new$indice_nogeo
-    }
-  }
-  datos[
-    indice_nogeo,
-    `:=`(
-      id           = NA_character_,
-      province     = NA_character_,
-      muni         = NA_character_,
-      tip_via      = NA_character_,
-      address      = NA_character_,
-      portalNumber = NA_character_,
-      refCatastral = NA_character_,
-      postalCode   = NA_character_,
-      lat          = NA_real_,
-      lng          = NA_real_,
-      state        = NA_character_,
-      type         = NA_character_,
-      version      = NA_character_
-    )
-  ][]
-
-
-  return(datos)
+  return(vias)
 }
+
+
+#' @title DetecciÛn y prueba de variantes de direcciones mal escritas
+#'
+#' @description Se considera una serie de variantes de las cadenas de caracteres
+#'   de las direcciones no geocodificadas. La intenciÛn es valorar si esas
+#'   variaciones podrÌan producir en alguna ocasiÛn una geocodificaciÛn exitosa.
+#'   En concreto, \code{\link{filtra_dir}} contempla 5 posibles variantes para
+#'   las direcciones que no han podido ser geocodificadas: 1.- eliminar
+#'   duplicidad de tipos de vÌa (ejemplo: calle camino ...-> camino ...); 2.-
+#'   eliminar descripciones de vÌa (ejemplo: Avenida rosa (Edificio
+#'   azul)->Avenida rosa); 3.- eliminar palabras de 3 o menos caracteres
+#'   (ejemplo: calle la marina alta-> calle marina alta); 4.- eliminar signos de
+#'   puntuaciÛn (ejemplo: calle gral. pedro.->calle gral pedro); 5.-
+#'   implementaciÛn de todas las variantes anteriores de forma conjunta.
+#'   \code{\link{filtra_dir}} contempla todas estas variantes para cualquier
+#'   direcciÛn que no haya podido ser geocodificada a partir de su direcciÛn
+#'   original.
+#'
+#' @param vias Lista de seis elementos devuelta por \code{\link{limpia_dir}}.
+#' @param nivel NumÈrico: filtro a a aplicar.
+#'
+#' @usage filtra_dir(vias, nivel)
+#'
+#' @return Se devuelve un vector de caracteres de igual longitud a la lista de
+#'   entrada, con las direcciones listas para geocodificar (las direcciones en
+#'   las que no se reconozca ning˙n patrÛn son sustituidas por un elemento
+#'   vacÌo).
+#'
+#' @encoding latin1
+#'
+#' @export
+#'
+filtra_dir <- function(vias, nivel) {
+  tvias     <- paste(vias$tvia, vias$nvia)
+  indice    <- integer()
+  tvia_norm <- c("calle", "avenida", "plaza", "partida", "camino", "carretera",
+                 "pasaje", "paseo", "vereda", "paraje", "ronda", "travesia",
+                 "parque", "grupo")
+
+  # Patron para detectar direcciones absurdas tras el filtrado (p.ej.,
+  # "calle 1,", "calle ,", ...). Estas se dan por perdidas.
+  inutiles  <- paste0("^(", paste0(tvia_norm, collapse = "|"),
+                      ")\\s{1,10}\\d+,|^\\s?([a-z]+|\\d+)\\s{0,10},|^,|^\\s,")
+  patron_ini  <- c("\\s", "\\(", "-")
+  patron_fin  <- c("\\s", "\\.")
+  descripcion <- c("urb", "urbanizacion", "ed", "edf", "edif", "edificio", "res",
+                   "rsd", "rsden", "resid", "residencia", "geriatric.", "centro",
+                   "grupo", "grup", "polig", "poligono", "finca", "aptos",
+                   "complejo", "cooperativa", "coop")
+
+  if (nivel == 1) {
+    for (i in seq_along(tvia_norm)) {
+      for (j in seq_along(tvia_norm)) {
+        eliminar <- grep(paste0(tvia_norm[i], "\\s{1,10}", tvia_norm[j]), tvias)
+        indice   <- sort(unique(c(indice, eliminar)))
+        tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
+      }
+    }
+  } else if (nivel == 2) {
+    for (k in seq_along(descripcion)) {
+      for (i in seq_along(patron_ini)) {
+        for (j in seq_along(patron_fin)) {
+          patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
+          if (i == 2) {
+            patron <- paste0(patron, "\\)|", patron)
+          } else if (i == 3) {
+            patron <- paste0(patron, "-|", patron)
+          }
+          indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
+          tvias  <- gsub(patron, "", tvias, perl = TRUE)
+          tvias  <- gsub(
+            pattern     = paste0(patron_ini[i], descripcion[k], patron_fin[j]),
+            replacement = "",
+            x           = tvias
+          )
+        }
+      }
+    }
+  } else if (nivel == 3) {
+    indice <- grep("\\b[[:alpha:]]{1,3}\\b\\.?", tvias)
+    tvias  <- gsub("\\b[[:alpha:]]{1,3}\\b\\.?", "", tvias)
+  } else if (nivel == 4) {
+    tvias <- gsub("[[:punct:]]", "", tvias)
+    for (i in seq_along(tvia_norm)) {
+      eliminar <- grep(paste0("^", tvia_norm[i], "\\s{1,10}"), tvias)
+      indice   <- sort(unique(c(indice, eliminar)))
+      tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
+    }
+  } else {
+    for (i in seq_along(tvia_norm)) {
+      for (j in seq_along(tvia_norm)) {
+        eliminar <- grep(paste0(tvia_norm[i], "\\s{1,10}", tvia_norm[j]), tvias)
+        indice   <- sort(unique(c(indice, eliminar)))
+        tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
+      }
+    }
+    for (k in seq_along(descripcion)) {
+      for (i in seq_along(patron_ini)) {
+        for (j in seq_along(patron_fin)) {
+          patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
+          if (i == 2) {
+            patron <- paste0(patron, "\\)|", patron)
+          } else if (i == 3) {
+            patron <- paste0(patron, "-|", patron)
+          }
+          indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
+          tvias  <- gsub(patron, "", tvias, perl = TRUE)
+          tvias  <- gsub(
+            pattern     = paste0(patron_ini[i], descripcion[k], patron_fin[j]),
+            replacement = "",
+            x           = tvias
+          )
+        }
+      }
+    }
+    indice <- sort(unique(c(grep("\\b[[:alpha:]]{1,3}\\b\\.?", tvias), indice)))
+    tvias  <- gsub("\\b[[:alpha:]]{1,3}\\b\\.?", "", tvias)
+    tvias  <- gsub("[[:punct:]]", "", tvias)
+    for (i in seq_along(tvia_norm)) {
+      eliminar <- grep(paste0("^", tvia_norm[i], "\\s{1,10}"), tvias)
+      indice   <- sort(unique(c(indice, eliminar)))
+      tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
+    }
+  }
+  if (length(indice) > 0) {
+    indice <- indice[nchar(tvias[indice]) >= 4]
+  }
+  res <- character(length(vias[[1]]))
+  if (length(indice) > 0) {
+    pegote <- paste0(tvias[indice], " ", vias$npoli[indice], ", ", vias$muni[indice],
+                     ", ", vias$prov[indice], ", ", vias$codpost[indice])
+    pegote <- gsub("\\s{2,}", " ", pegote)
+    res[indice] <- pegote
+  }
+
+  return(res)
+}
+
+
+#' @title ComprobaciÛn de inclusiÛn de una coordenada dentro de un polÌgono
+#'
+#' @description Con el fin de asegurar que el resultado de la geocodificaciÛn
+#'   sea coherente, esta funciÛn permite identificar parejas de coordenadas que
+#'   no estÈn incluidas en un polÌgono concreto (una secciÛn, un distrito, un
+#'   municipio o una provincia). Para ello es necesario proporcionar un polÌgono
+#'   de referencia para cada par de coordenadas.
+#'
+#' @param punto Un data.frame con dos columnas: lng y lat.
+#' @param poligono Un objeto de clase \code{SpatialPolygonsDataFrame} con el
+#'   polÌgono de referencia sobre el que se desee contrastar la pertenecia de
+#'   las coordenadas.
+#'
+#' @return Valor lÛgico.
+#'
+#' @encoding latin1
+#'
+comprueba_punto_poligono <- function(punto, poligono) {
+
+  CRScarto               <- sp::CRS(proj4string(poligono))
+  punto.lonlat           <- data.frame(punto$lng, punto$lat, stringsAsFactors = FALSE)
+  punto.lonlat[,1]       <- as.numeric(as.character(punto.lonlat[, 1]))
+  punto.lonlat[,2]       <- as.numeric(as.character(punto.lonlat[, 2]))
+  colnames(punto.lonlat) <- c("longitude", "latitude")
+
+  sp::coordinates(punto.lonlat) <- ~ longitude + latitude
+  sp::proj4string(punto.lonlat) <- sp::CRS("+init=epsg:4326")
+  #Transformamos los puntos a la misma proyecciÛn que la cartografÌa
+  puntos.fin <- sp::spTransform(punto.lonlat, CRScarto)
+  auxiliar   <- sp::over(puntos.fin, poligono)$CUMUN
+  devuelve   <- !is.na(auxiliar)
+
+  return(devuelve)
+}
+
+
+#' @title Limpieza de caracteres para Google
+#'
+#' @description EliminaciÛn de caracteres no ascii.
+#'
+#' @param cadena Cadena de caracteres con lsa direcciones a pasar a Google.
+#'
+#' @return Cadena de caracteres de la misma longitud que la proporcionada.
+#'
+#' @encoding latin1
+#'
+limpiadirecGoogle <- function(cadena){
+  cadena <- gsub(cadena, pattern = "Ò",     replacement = "n")
+  cadena <- gsub(cadena, pattern = "·|‡|™", replacement = "a")
+  cadena <- gsub(cadena, pattern = "È|Ë",   replacement = "e")
+  cadena <- gsub(cadena, pattern = "Ì",     replacement = "i")
+  cadena <- gsub(cadena, pattern = "Û|Ú|∫", replacement = "o")
+  cadena <- gsub(cadena, pattern = "˙|¸",   replacement = "u")
+  cadena <- gsub(cadena, pattern = "Á",     replacement = "c")
+  cadena <- gsub(cadena, pattern = "'|`|¥", replacement = " ")
+
+  return(cadena)
+}
+
+
+#' @title ImplementaciÛn del algoritmo de geocodificaciÛn de direcciones de
+#'   MEDEA3 (geocodificado con CartoCiudad y Google)
+#'
+#' @description Esta funciÛn implementa las dos partes del algoritmo de
+#'   geocodificaciÛn de MEDEA3. En la primera parte se intentan geocodificar en
+#'   primera instancia las direcciones haciendo uso del servicio CartoCiudad en
+#'   su \href{http://www.cartociudad.es/CartoGeocoder/Geocode}{versiÛn antigua}.
+#'   En esta primera parte daremos por v·lidos todas aquellos direcciones que
+#'   hayan obtenido estado == 1 (se ha encontrado la direcciÛn correspondiente
+#'   de forma exacta) o estado == 2 (direcciÛn asignada al portal m·s prÛximo).
+#'   Tras esto se intentar· geocodificar con
+#'   \href{http://www.cartociudad.es/geocoder/api/geocoder/findJsonp}{la nueva
+#'   versiÛn de CartoCiudad} al resto de direcciones no geocodifadas por la
+#'   versiÛn anterior, junto con las direcciones geocodificadas que no tuvieran
+#'   portal y las que hayan obtenido status == 2. La geocodificaciÛn de las
+#'   direcciones que no tienen portal resulta menos fiable en la versiÛn antigua
+#'   de CartoCiudad ya que son situadas en el inicio de su vÌa, mientras que en
+#'   la nueva versiÛn se sit˙an en el centro, haciendo esta geocodificaciÛn m·s
+#'   acertada. Por otro lado, la versiÛn antigua de CartoCiudad en ocasiones
+#'   cambia de acera (numeros pares a impares y viceversa) algunas direcciones
+#'   mientras que en la versiÛn nueva esto no ocurre. Por ello, intentaremos
+#'   regeocodificar estas dos situaciones con la nueva versiÛn de CartoCiudad, y
+#'   en caso de que no encontremos la direcciÛn correspondiente en dicha versiÛn
+#'   mantendrÌamos la geocodificaciÛn original conseguida por la versiÛn previa.
+#'
+#'   Tras el proceso descrito, pueden considerarse una serie de variantes de las
+#'   cadenas de caracteres de las direcciones no geocodificadas, empleando la
+#'   funciÛn \code{\link{filtra_dir}}.
+#'
+#'   La funciÛn incorpora un filtro cartogr·fico que deseche aquellas
+#'   localizaciones que caigan fuera de un polÌgono concreto, para lo cual es
+#'   necesario incluirlo como argumento de la funciÛn.
+#'
+#'   Tras la geocodificaciÛn usando CartoCiudad, es el momento de probar el
+#'   motor de Google con las direcciones que no hayan sido geocodificadas
+#'   correctamente.
+#'
+#' @param direc Cadena de caracteres con laa direcciones a georreferenciar.
+#' @param poligono Opcional: objeto de clase \code{SpatialPolygonsDataFrame}.
+#' @param motor Motor de b˙squeda a emplear.
+#'
+#' @return Un data.frame con tantas filas como direcciones se haya proporcionado
+#'   y 14 columnas: id, province, muni, tip_via, address, portalNumber,
+#'   refCatastral, postalCode, lat, lng, stateMsg, state, type y georef.
+#'
+#' @encoding latin1
+#'
+#' @export
+#'
+geocodificar <- function(direc, poligono = NULL, motor = c("cartociudad", "google")) {
+
+  motor             <- match.arg(motor)
+  columnas_elegidas <- c("id", "province", "muni", "tip_via", "address",
+                         "portalNumber", "refCatastral", "postalCode",
+                         "lat", "lng", "stateMsg", "state", "type")
+
+  if (motor == "cartociudad") {
+
+    devuelve <- data.frame(georef = "NO", stringsAsFactors = FALSE)
+
+    # Llamamos a caRtociudad versiÛn previa (OLD)
+    fcarto.old <- caRtociudad::cartociudad_geocode(direc, version = "prev")
+    if (fcarto.old$state %in% 1:2) {
+      devuelve <- fcarto.old[, columnas_elegidas]
+      devuelve$georef <- "caRto.OLD"
+
+      # ComprobaciÛn de si el punto devuelto est· en el polÌgono (municipio)
+      # que corresponde
+      if (!is.null(poligono)) {
+        CRScarto    <- sp::CRS(proj4string(poligono))
+        pto.in.poli <- comprueba_punto_poligono(
+          punto = devuelve[, c("lat", "lng")], poligono = poligono
+        )
+        if (!pto.in.poli) {
+          #si hemos obtenido georeferenciaciÛn pero el punto no est· en
+          # el polÌgono lo indicamos
+          devuelve <- data.frame(georef = "NO punto caRto.OLD", stringsAsFactors = FALSE)
+        }
+      }
+    }
+
+    # Llamamos a caRtociudad versiÛn nueva (NEW)
+    if (substr(devuelve$georef, 1, 2) == "NO" | (devuelve$georef == "caRto.OLD" & fcarto.old$state == "2")) {
+      fcarto.new <- caRtociudad::cartociudad_geocode(direc,version = "current")
+      if (fcarto.new$state %in% 1:4) {
+        devuelve <- fcarto.new[, columnas_elegidas]
+        devuelve$georef <- "caRto.NEW"
+
+        # Compruebo si el punto devuelto est· en el polÌgono que corresponde
+        if (is.null(poligono) == FALSE) {
+          pto.in.poli <- comprueba_punto_poligono(punto = devuelve[, c("lat", "lng")], poligono)
+          if (pto.in.poli == FALSE) {
+            devuelve <- data.frame(georef = "NO punto caRto.NEW", stringsAsFactors = FALSE)
+          }
+        }
+      }
+    }
+  } else {
+
+    direc   <- limpiadirecGoogle(cadena = direc)
+    fgoogle <- ggmap::geocode(direc, output = "all", override_limit = TRUE)
+
+    if (fgoogle$status == "OK") {
+      devuelve <- data.frame(
+        id               = "",
+        province         = "",
+        muni             = "",
+        tip_via          = "",
+        address          = "",
+        portalNumber     = "",
+        refCatastral     = "",
+        postalCode       = "",
+        lat              = NA_real_,
+        lng              = NA_real_,
+        stateMsg         = "",
+        state            = "OK",
+        type             = "",
+        georef           = "google",
+        stringsAsFactors = FALSE
+      )
+
+      resultados_google <- fgoogle$results[[1]]
+
+      # lat y lng
+      devuelve$lat <- resultados_google$geometry$location$lat
+      devuelve$lng <- resultados_google$geometry$location$lng
+
+      # stateMsg
+      devuelve$stateMsg <- resultados_google$geometry$location_type
+
+      # type
+      devuelve$type <- paste(resultados_google$types, collapse = " ")
+
+      if (length(resultados_google$address_components) > 0) {
+        # province
+        ident <- grep("administrative_area_level_2",resultados_google$address_components)
+        if (length(ident) != 0) {
+          devuelve$province <- resultados_google$address_components[[ident[1]]]$long_name
+        }
+
+        # muni
+        ident <- grep("locality", resultados_google$address_components)
+        if (length(ident) != 0) {
+          devuelve$muni <- resultados_google$address_components[[ident[1]]]$long_name
+        }
+
+        # tip_via y address
+        ident <- grep("route", resultados_google$address_components)
+        if (length(ident) != 0) {
+          devuelve$tip_via <- resultados_google$address_components[[ident[1]]]$types
+          devuelve$address <- resultados_google$address_components[[ident[1]]]$long_name
+        }
+
+        # portalNumber
+        ident <- grep("street_number", resultados_google$address_components)
+        if (length(ident) != 0) {
+          devuelve$portalNumber <- resultados_google$address_components[[ident[1]]]$long_name
+        }
+
+        # postalCode
+        ident <- grep("postal_code", resultados_google$address_components)
+        if (length(ident) != 0) {
+          devuelve$postalCode <- resultados_google$address_components[[ident[1]]]$long_name
+        }
+      }
+
+      # Compruebo si el punto devuelto est· en el polÌgono que corresponde
+      if (!is.null(poligono)) {
+        pto.in.poli <- comprueba_punto_poligono(punto = devuelve[, c("lat", "lng")], poligono)
+        if (!pto.in.poli) {
+          devuelve <- data.frame(georef = "NO punto", stringsAsFactors = FALSE)
+        }
+      }
+    } else {
+      devuelve <- data.frame(georef = "NO", state = fgoogle$status, stringsAsFactors = FALSE)
+    }
+  }
+
+  return(devuelve)
+}
+
