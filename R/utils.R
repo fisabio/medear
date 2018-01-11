@@ -195,6 +195,22 @@ elige_corte <- function(datos, corte) {
 }
 
 
+llama_google <- function(direc, tries) {
+  withRestarts(
+    tryCatch(ggmap::geocode(direc, output = "all", override_limit = TRUE),
+             error = function(e) {invokeRestart("retry")}),
+    retry = function() {
+      if (tries <= 0) {
+        return(list(status = "OVERQUERY_LIMIT"))
+      }
+      message("Failing to connect with server: retrying...")
+      Sys.sleep(5)
+      llama_google(direc, tries - 1)
+    }
+  )
+}
+
+
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
     "CUSEC", "idn", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",

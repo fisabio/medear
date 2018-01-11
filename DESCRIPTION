@@ -1,7 +1,10 @@
 Package: medear
 Title: Poblaciones y cartografia por seccion censal INE
-Version: 0.2.0.9000
-Authors@R: person("Grupo MEDEA 3",  role = c("aut", "cre"))
+Version: 0.2.0.9001
+Authors@R: c(
+    person("Grupo MEDEA 3",  role = "aut"),
+    person("Carlos", "Vergara-Hernandez", email = "carlos.vergara@uv.es", role = c("aut", "cre"))
+    )
 Maintainer: Carlos Vergara-Hernández <carlos.vergara@uv.es>
 Description: Descarga, manipulación y extracción de poblaciones desde 1996 a 2016
     por sección censal, de acuerdo con los datos del INE, incluyendo la cartografía
@@ -17,6 +20,7 @@ Imports:
     caRtociudad (>= 0.5.5),
     data.table (>= 1.10.4),
     devtools (>= 1.13.3),
+    ggmap (>= 2.6.1),
     readr (>= 1.1.1),
     rgdal (>= 1.2-16),
     sp (>= 1.2-5),

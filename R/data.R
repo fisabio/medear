@@ -6,7 +6,7 @@
 #'   quinquenales) y año (periodo 2006-2016) a nivel de sección censal para las
 #'   ciudades de MEDEA3. Estos datos han sido descargados de la web del INE, que
 #'   los publica de forma libre, y se pueden obtener usando la función
-#'   \code{\link{descarga_cartografia}} de este paquete.
+#'   \code{\link{descarga_poblaciones}} de este paquete.
 #'
 #' @details Los códigos de sección censal (columna \code{seccion} del
 #'   \code{data.frame} \code{poblacion}) se corresponden con el identificador
@@ -87,19 +87,21 @@
 #'
 #' @docType data
 #'
-#' @format Un objeto de clases \code{cartografia_ine} y
-#'   \code{SpatialPoligonsDataFrame}, donde cada fila es una sección censal y
-#'   que cuenta con 13 columnas: \describe{ \item{seccion}{Cádena de 10
-#'   caracteres con el código de sección censal (incluye provincia, municipio,
-#'   distrito y sección).} \item{codmuni}{Cádena de 5 caracteres con el código
-#'   INE del municipio.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
-#'   de la comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
+#' @format Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
+#'   (\code{cartografia@data}) tienen clase \code{data.frame} y
+#'   \code{cartografia_ine}, donde cada fila es una sección censal y que cuenta
+#'   con 13 columnas: \describe{ \item{seccion}{Cádena de 10 caracteres con el
+#'   código de sección censal (incluye provincia, municipio, distrito y
+#'   sección).} \item{codmuni}{Cádena de 5 caracteres con el código INE del
+#'   municipio.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
+#'   comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
 #'   \item{geometry}{Columna de tipo lista con la geometría asociada a cada
 #'   sección censal.}}
 #'
 #' @references \url{http://www.ine.es/}{ Sitio web del INE}.
 #'
 #'   \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
+#'
 #'
 #'
 #' @keywords datasets

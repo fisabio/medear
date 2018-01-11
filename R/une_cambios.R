@@ -5,7 +5,8 @@
 #'   2011 y en las poblaciones por sexo año y sección censal.
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
-#' @param cartografia Objeto de clase \code{cartografia_ine}.
+#' @param cartografia Objeto de clase \code{SpatialPoligonsDataFrame}, y con
+#'   datos de clase \code{cartografia_ine}.
 #' @param years Vector numérico de longitud >= 1 con los años para los que se
 #'   desee consultar las variaciones de seccionado. El año 2011 debe figurar
 #'   dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
@@ -20,16 +21,17 @@
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
-#'   \code{cartografia_ine} y \code{sf} con la cartografía, donde cada fila es
-#'   una sección censal y que cuenta con 9 columnas: \item{seccion}{Cadena de 10
-#'   caracteres con el código de sección censal (incluye provincia, municipio y
-#'   distrito).} \item{CUMUN}{Cadena de 5 caracteres con el código del municipio
-#'   (incluye provincia).} \item{CCA}{Cadena de 2 caracteres con el código de
-#'   comunidad autónoma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
-#'   de la comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
-#'   \item{geometry}{Columna de tipo lista con la geometría asociada a cada
-#'   sección censal.} \item{cluster_id}{Código de identificación del cluster de
-#'   uniones.} \item{sc_unida}{Código de las secciones unidas.}
+#'   \code{cartografia_ine} y \code{SpatialPoligonsDataFrame} con la
+#'   cartografía, donde cada fila es una sección censal y que cuenta con 9
+#'   columnas: \item{seccion}{Cadena de 10 caracteres con el código de sección
+#'   censal (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
+#'   caracteres con el código del municipio (incluye provincia).}
+#'   \item{CCA}{Cadena de 2 caracteres con el código de comunidad autónoma.}
+#'   \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la comunidad
+#'   autónoma.} \item{NMUN}{Nombre del municipio.} \item{geometry}{Columna de
+#'   tipo lista con la geometría asociada a cada sección censal.}
+#'   \item{cluster_id}{Código de identificación del cluster de uniones.}
+#'   \item{sc_unida}{Código de las secciones unidas.}
 #'
 #'   En caso de proporcionan poblaciones, se devuelve una lista de longitud
 #'   igual a dos, donde el primer elemento es la cartografía descrita
@@ -70,17 +72,26 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     stop("2011 debe estar incluido en el objeto 'years'.")
   if ("SpatialPolygonsDataFrame" != class(cartografia))
     stop("El objeto 'cartografia' debe ser de clase 'SpatialPolygonsDataFrame'.")
+  if (!"cartografia_ine" %in% class(cartografia@data))
+    stop("Los datos del objeto 'cartografia' deben ser de clase 'cartografia_ine'.")
   years <- sort(years)
   if (any(years != min(years):max(years)))
     stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
   stopifnot(corte_edad %in% c(85, 100))
 
-  fuente <- "Fuente: Sitio web del INE: www.ine.es"
   utils::data("secciones")
+  car_class  <- attributes(cartografia@data)$class
+  fuente     <- attributes(cartografia@data)$fuente
 
-  car_class  <- class(cartografia)
   cambios    <- cambios[between(year, years[1], years[length(years)])]
-  sc_unicas  <- sort(unique(secciones[year %in% years, seccion]))
+  sc_unicas  <- sort(
+    unique(
+      secciones[
+        year %in% years & seccion %in% c(cambios$sc_old, cambios$sc_new),
+        seccion
+      ]
+    )
+  )
   cluster_sc <- data.table(sc = sc_unicas, id_cluster = sc_unicas)
 
   for (i in seq_len(nrow(cambios))) {
@@ -91,23 +102,21 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
                          cluster_sc[sc_select, id_cluster])
     cluster_sc[sc_assign, id_cluster := sc_min]
   }
-
-  cartografia$cluster <- cluster_sc[
+  cartografia$cluster_id <- cluster_sc[
     match(cartografia$seccion, cluster_sc[, sc]),
     id_cluster
-    ]
+  ]
+  cartografia$cluster_id[is.na(cartografia$cluster_id)] <-
+    cartografia$seccion[is.na(cartografia$cluster_id)]
   cartografia <- stats::aggregate(
     x        = cartografia,
-    by       = list(cartografia$cluster),
-    FUN      = function(x) x[[1]],
-    do_union = TRUE,
-    simplify = TRUE
+    by       = list(cartografia$cluster_id),
+    FUN      = function(x) x[[1]]
   )
-  cartografia <- sf::st_cast(cartografia, "MULTIPOLYGON")
-  cartografia[, c("Group.1", "cluster")] <- NULL
+  cartografia$Group.1 <- NULL
 
-  class(cartografia)             <- car_class
-  attributes(cartografia)$fuente <- fuente
+  attributes(cartografia@data)$fuente <- fuente
+  attributes(cartografia@data)$class  <- car_class
   res <- cartografia
 
   if (!is.null(poblacion)) {
@@ -127,7 +136,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
                            by      = .(cluster, sexo, year),
                            .SDcols = in_col]
     setnames(poblacion, "cluster", "seccion")
-    poblacion$medea3             <- NULL
     class(poblacion)             <- pob_class
     attributes(poblacion)$fuente <- fuente
     res <- list(cartografia = cartografia, poblacion = poblacion)

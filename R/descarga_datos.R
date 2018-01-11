@@ -152,7 +152,6 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 }
 
 
-
 #' @title Función para descargar la cartografía con el seccionado del INE para
 #'   2011
 #'
@@ -163,25 +162,23 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 #'   datum WGS84).
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
-#'   en el directorio oculto \code{cartografia/} dentro del directorio de
+#'   en el directorio oculto \code{./.cartografia/} dentro del directorio de
 #'   trabajo?
 #'
 #' @usage descarga_cartografia(crs = 4326, conservar = TRUE)
 #'
-#' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326.
+#' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
+#'   como elemento normalizado.
 #'
-#' @return Un objeto de clase \code{SpatialPolygonsDataFrame}, donde cada
-#'   fila es una sección censal y que cuenta con 7 columnas:
-#'   \item{seccion}{Cadena de 10 caracteres con el código de sección censal
-#'   (incluye provincia, municipio y distrito).}
-#'   \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
-#'   provincia).}
-#'   \item{CCA}{Cadena de 2 caracteres con el código de comunidad autónoma.}
-#'   \item{NPRO}{Nombre de la provincia.}
-#'   \item{NCA}{Nombre de la comunidad autónoma.}
-#'   \item{NMUN}{Nombre del municipio.}
-#'   \item{geometry}{Columna de tipo lista con la geometría asociada a cada
-#'   sección censal.}
+#' @return Un objeto de clase \code{SpatialPolygonsDataFrame}, donde cada fila
+#'   es una sección censal y que cuenta con 7 columnas: \item{seccion}{Cadena de
+#'   10 caracteres con el código de sección censal (incluye provincia, municipio
+#'   y distrito).} \item{CUMUN}{Cadena de 5 caracteres con el código del
+#'   municipio (incluye provincia).} \item{CCA}{Cadena de 2 caracteres con el
+#'   código de comunidad autónoma.} \item{NPRO}{Nombre de la provincia.}
+#'   \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre del
+#'   municipio.} \item{geometry}{Columna de tipo lista con la geometría asociada
+#'   a cada sección censal.}
 #'
 #' @examples
 #'
@@ -231,10 +228,9 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 
 
   attributes(carto@data)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
-  attributes(carto@data)$class  <- "cartografia_ine"
+  attributes(carto@data)$class  <-  c(attributes(carto@data)$class, "cartografia_ine")
   return(carto)
 }
-
 
 
 #' @title Carga poblaciones del INE por sección censal, sexo, edad y año

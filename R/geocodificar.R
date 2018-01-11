@@ -46,16 +46,16 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
   # Convertir numeros 999 o 9999 en cero caracteres
   vias$npoli <- gsub("9999?", "", vias$npoli)
 
-  # Convertir nombres de vía con 3a en tercera.
+  # Convertir nombres de via con 3a en tercera.
   vias$nvia <- gsub("\\s3a\\s", "tercera", vias$nvia)
 
-  # Convertir nombres de vía no consta en 0 caracteres.
+  # Convertir nombres de via no consta en 0 caracteres.
   vias$nvia <- gsub("no consta", "", vias$nvia)
 
   # Eliminar comas del nombre de la vía.
   vias$nvia <- gsub(",", "", vias$nvia)
 
-  # Normalización de los tipos de vía más frecuentes por variantes habituales.
+  # Normalización de los tipos de via mas frecuentes por variantes habituales.
   calle     <- "^(ca[^monstbp])\\w+\\b|^(c)\\b|^(cl[^rnia][^b])|^([^bv]lle*)\\w"
   avenida   <- "^(a.v)[^t]\\w+\\b|^(av)\\w+\\b|^(abg)\\w+\\b|^(vda)\\w+\\b|^a\\b|^av\\b"
   plaza     <- "^(pz?l?z?[^tsrqopjigedau])\\w+"
@@ -249,18 +249,21 @@ filtra_dir <- function(vias, nivel) {
 #'
 comprueba_punto_poligono <- function(punto, poligono) {
 
-  CRScarto               <- sp::CRS(proj4string(poligono))
-  punto.lonlat           <- data.frame(punto$lng, punto$lat, stringsAsFactors = FALSE)
-  punto.lonlat[,1]       <- as.numeric(as.character(punto.lonlat[, 1]))
-  punto.lonlat[,2]       <- as.numeric(as.character(punto.lonlat[, 2]))
-  colnames(punto.lonlat) <- c("longitude", "latitude")
+  CRScarto     <- sp::CRS(sp::proj4string(poligono))
+  punto.lonlat <- data.frame(longitude = punto$lng, latitude = punto$lat)
+  punto.lonlat <- as.data.frame(apply(punto.lonlat, 2, function(x) as.numeric(as.character(x))))
 
   sp::coordinates(punto.lonlat) <- ~ longitude + latitude
   sp::proj4string(punto.lonlat) <- sp::CRS("+init=epsg:4326")
-  #Transformamos los puntos a la misma proyección que la cartografía
-  puntos.fin <- sp::spTransform(punto.lonlat, CRScarto)
-  auxiliar   <- sp::over(puntos.fin, poligono)$CUMUN
-  devuelve   <- !is.na(auxiliar)
+
+  # Transformamos los puntos a la misma proyeccion que la cartografia
+  puntos.fin <- try(sp::spTransform(punto.lonlat, CRScarto), silent = TRUE)
+  if (class(puntos.fin) != "try-error") {
+    auxiliar <- sp::over(puntos.fin, poligono)$CUMUN
+  } else {
+    auxiliar <- NA
+  }
+  devuelve <- !is.na(auxiliar)
 
   return(devuelve)
 }
@@ -276,15 +279,25 @@ comprueba_punto_poligono <- function(punto, poligono) {
 #'
 #' @encoding latin1
 #'
+#' @export
+#'
 limpiadirecGoogle <- function(cadena){
-  cadena <- gsub(cadena, pattern = "ñ",     replacement = "n")
-  cadena <- gsub(cadena, pattern = "á|à|ª", replacement = "a")
-  cadena <- gsub(cadena, pattern = "é|è",   replacement = "e")
-  cadena <- gsub(cadena, pattern = "í",     replacement = "i")
-  cadena <- gsub(cadena, pattern = "ó|ò|º", replacement = "o")
-  cadena <- gsub(cadena, pattern = "ú|ü",   replacement = "u")
-  cadena <- gsub(cadena, pattern = "ç",     replacement = "c")
-  cadena <- gsub(cadena, pattern = "'|`|´", replacement = " ")
+  cadena <- gsub(cadena, pattern = "\U00F1|\U00F0|\U00A5",        replacement = "n")
+  cadena <- gsub(cadena, pattern = "\U00E1|\U00E0|\U00AA|\U00E4", replacement = "a")
+  cadena <- gsub(cadena, pattern = "\U00E9|\U00E8|\U00EB",        replacement = "e")
+  cadena <- gsub(cadena, pattern = "\U00ED|\U00EC|\U00EF",        replacement = "i")
+  cadena <- gsub(cadena, pattern = "\U00F3|\U00F2|\U00BA|\U00F6", replacement = "o")
+  cadena <- gsub(cadena, pattern = "\U00FA|\U00F9|\U00FC|\U00FD", replacement = "u")
+  cadena <- gsub(cadena, pattern = "\U00E7",                      replacement = "c")
+  cadena <- gsub(cadena, pattern = "\U0027|\U0060|\U00B4",        replacement = " ")
+
+  #Por si queda algun caracter raro
+  cad_aux <- strsplit(cadena, "")[[1]]
+  elim <- which(!cad_aux %in% c(letters, " ", 1:1000 , ",", "'"))
+  if (length(elim) > 0) {
+    cad_aux <- cad_aux[-elim]
+    cadena <- paste(cad_aux, collapse = "")
+  }
 
   return(cadena)
 }
@@ -329,7 +342,8 @@ limpiadirecGoogle <- function(cadena){
 #'
 #' @param direc Cadena de caracteres con laa direcciones a georreferenciar.
 #' @param poligono Opcional: objeto de clase \code{SpatialPolygonsDataFrame}.
-#' @param motor Motor de búsqueda a emplear.
+#'
+#' @usage geocodificar_cartociudad(direc, poligono = NULL)
 #'
 #' @return Un data.frame con tantas filas como direcciones se haya proporcionado
 #'   y 14 columnas: id, province, muni, tip_via, address, portalNumber,
@@ -339,135 +353,156 @@ limpiadirecGoogle <- function(cadena){
 #'
 #' @export
 #'
-geocodificar <- function(direc, poligono = NULL, motor = c("cartociudad", "google")) {
+geocodificar_cartociudad <- function(direc, poligono = NULL) {
 
-  motor             <- match.arg(motor)
   columnas_elegidas <- c("id", "province", "muni", "tip_via", "address",
                          "portalNumber", "refCatastral", "postalCode",
                          "lat", "lng", "stateMsg", "state", "type")
+  devuelve <- data.frame(georef = "NO", stringsAsFactors = FALSE)
 
-  if (motor == "cartociudad") {
+  # Llamamos a caRtociudad version previa (OLD)
+  fcarto.old <- caRtociudad::cartociudad_geocode(direc, version = "prev")
+  if (fcarto.old$state %in% 1:2) {
+    devuelve <- fcarto.old[, columnas_elegidas]
+    devuelve$georef <- "caRto.OLD"
 
-    devuelve <- data.frame(georef = "NO", stringsAsFactors = FALSE)
-
-    # Llamamos a caRtociudad versión previa (OLD)
-    fcarto.old <- caRtociudad::cartociudad_geocode(direc, version = "prev")
-    if (fcarto.old$state %in% 1:2) {
-      devuelve <- fcarto.old[, columnas_elegidas]
-      devuelve$georef <- "caRto.OLD"
-
-      # Comprobación de si el punto devuelto está en el polígono (municipio)
-      # que corresponde
-      if (!is.null(poligono)) {
-        CRScarto    <- sp::CRS(proj4string(poligono))
-        pto.in.poli <- comprueba_punto_poligono(
-          punto = devuelve[, c("lat", "lng")], poligono = poligono
-        )
-        if (!pto.in.poli) {
-          #si hemos obtenido georeferenciación pero el punto no está en
-          # el polígono lo indicamos
-          devuelve <- data.frame(georef = "NO punto caRto.OLD", stringsAsFactors = FALSE)
-        }
-      }
-    }
-
-    # Llamamos a caRtociudad versión nueva (NEW)
-    if (substr(devuelve$georef, 1, 2) == "NO" | (devuelve$georef == "caRto.OLD" & fcarto.old$state == "2")) {
-      fcarto.new <- caRtociudad::cartociudad_geocode(direc,version = "current")
-      if (fcarto.new$state %in% 1:4) {
-        devuelve <- fcarto.new[, columnas_elegidas]
-        devuelve$georef <- "caRto.NEW"
-
-        # Compruebo si el punto devuelto está en el polígono que corresponde
-        if (is.null(poligono) == FALSE) {
-          pto.in.poli <- comprueba_punto_poligono(punto = devuelve[, c("lat", "lng")], poligono)
-          if (pto.in.poli == FALSE) {
-            devuelve <- data.frame(georef = "NO punto caRto.NEW", stringsAsFactors = FALSE)
-          }
-        }
-      }
-    }
-  } else {
-
-    direc   <- limpiadirecGoogle(cadena = direc)
-    fgoogle <- ggmap::geocode(direc, output = "all", override_limit = TRUE)
-
-    if (fgoogle$status == "OK") {
-      devuelve <- data.frame(
-        id               = "",
-        province         = "",
-        muni             = "",
-        tip_via          = "",
-        address          = "",
-        portalNumber     = "",
-        refCatastral     = "",
-        postalCode       = "",
-        lat              = NA_real_,
-        lng              = NA_real_,
-        stateMsg         = "",
-        state            = "OK",
-        type             = "",
-        georef           = "google",
-        stringsAsFactors = FALSE
+    # Comprobacion de si el punto devuelto esta en el poligono (municipio)
+    # que corresponde
+    if (!is.null(poligono)) {
+      pto.in.poli <- comprueba_punto_poligono(
+        punto = devuelve[, c("lat", "lng")], poligono = poligono
       )
-
-      resultados_google <- fgoogle$results[[1]]
-
-      # lat y lng
-      devuelve$lat <- resultados_google$geometry$location$lat
-      devuelve$lng <- resultados_google$geometry$location$lng
-
-      # stateMsg
-      devuelve$stateMsg <- resultados_google$geometry$location_type
-
-      # type
-      devuelve$type <- paste(resultados_google$types, collapse = " ")
-
-      if (length(resultados_google$address_components) > 0) {
-        # province
-        ident <- grep("administrative_area_level_2",resultados_google$address_components)
-        if (length(ident) != 0) {
-          devuelve$province <- resultados_google$address_components[[ident[1]]]$long_name
-        }
-
-        # muni
-        ident <- grep("locality", resultados_google$address_components)
-        if (length(ident) != 0) {
-          devuelve$muni <- resultados_google$address_components[[ident[1]]]$long_name
-        }
-
-        # tip_via y address
-        ident <- grep("route", resultados_google$address_components)
-        if (length(ident) != 0) {
-          devuelve$tip_via <- resultados_google$address_components[[ident[1]]]$types
-          devuelve$address <- resultados_google$address_components[[ident[1]]]$long_name
-        }
-
-        # portalNumber
-        ident <- grep("street_number", resultados_google$address_components)
-        if (length(ident) != 0) {
-          devuelve$portalNumber <- resultados_google$address_components[[ident[1]]]$long_name
-        }
-
-        # postalCode
-        ident <- grep("postal_code", resultados_google$address_components)
-        if (length(ident) != 0) {
-          devuelve$postalCode <- resultados_google$address_components[[ident[1]]]$long_name
-        }
+      if (!pto.in.poli) {
+        # si hemos obtenido georeferenciacion pero el punto no esta en
+        # el poligono lo indicamos
+        devuelve <- data.frame(georef = "NO punto caRto.OLD", stringsAsFactors = FALSE)
       }
+    }
+  }
 
-      # Compruebo si el punto devuelto está en el polígono que corresponde
+  # Llamamos a caRtociudad version nueva (NEW)
+  if (substr(devuelve$georef, 1, 2) == "NO" | (devuelve$georef == "caRto.OLD" & fcarto.old$state == "2")) {
+    fcarto.new <- caRtociudad::cartociudad_geocode(direc,version = "current")
+    if (fcarto.new$state %in% 1:4) {
+      devuelve <- fcarto.new[, columnas_elegidas]
+      devuelve$georef <- "caRto.NEW"
+
+      # Compruebo si el punto devuelto esta en el poligono que corresponde
       if (!is.null(poligono)) {
         pto.in.poli <- comprueba_punto_poligono(punto = devuelve[, c("lat", "lng")], poligono)
-        if (!pto.in.poli) {
-          devuelve <- data.frame(georef = "NO punto", stringsAsFactors = FALSE)
+        if (pto.in.poli == FALSE) {
+          devuelve <- data.frame(georef = "NO punto caRto.NEW", stringsAsFactors = FALSE)
         }
       }
-    } else {
-      devuelve <- data.frame(georef = "NO", state = fgoogle$status, stringsAsFactors = FALSE)
     }
   }
 
   return(devuelve)
 }
 
+
+#' @title Implementación del algoritmo de geocodificación de direcciones de
+#'   MEDEA3 (geocodificado con Google)
+#'
+#' @description Esta función implementa la segunda parte del algoritmo de
+#'   geocodificación de MEDEA3. En la primera parte se intentó geocodificar las
+#'   direcciones haciendo uso del servicio CartoCiudad
+#'   \code{\link{geocodificar_cartociudad}}. Tras la geocodificación usando
+#'   CartoCiudad, es el momento de probar el motor de Google con las direcciones
+#'   que no hayan sido geocodificadas correctamente.
+#'
+#' @param direc Cadena de caracteres con laa direcciones a georreferenciar.
+#' @param poligono Opcional: objeto de clase \code{SpatialPolygonsDataFrame}.
+#'
+#' @usage geocodificar_google(direc, poligono = NULL)
+#'
+#' @return Un data.frame con tantas filas como direcciones se haya proporcionado
+#'   y 14 columnas: id, province, muni, tip_via, address, portalNumber,
+#'   refCatastral, postalCode, lat, lng, stateMsg, state, type y georef.
+#'
+#' @encoding latin1
+#'
+#' @export
+#'
+geocodificar_google <- function(direc, poligono = NULL) {
+
+  direc   <- limpiadirecGoogle(cadena = direc)
+  fgoogle <- llama_google(direc = direc, tries = 10)
+
+  if (fgoogle$status == "OK") {
+    devuelve <- data.frame(
+      id               = "",
+      province         = "",
+      muni             = "",
+      tip_via          = "",
+      address          = "",
+      portalNumber     = "",
+      refCatastral     = "",
+      postalCode       = "",
+      lat              = NA_real_,
+      lng              = NA_real_,
+      stateMsg         = "",
+      state            = "OK",
+      type             = "",
+      georef           = "google",
+      stringsAsFactors = FALSE
+    )
+
+    resultados <- fgoogle$results[[1]]
+
+    # lat y lng
+    devuelve$lat <- resultados$geometry$location$lat
+    devuelve$lng <- resultados$geometry$location$lng
+
+    # stateMsg
+    devuelve$stateMsg <- resultados$geometry$location_type
+
+    # type
+    devuelve$type <- paste(resultados$types, collapse = " ")
+
+    if (length(resultados$address_components) > 0) {
+      # province
+      ident <- grep("administrative_area_level_2",resultados$address_components)
+      if (length(ident) != 0) {
+        devuelve$province <- resultados$address_components[[ident[1]]]$long_name
+      }
+
+      # muni
+      ident <- grep("locality", resultados$address_components)
+      if (length(ident) != 0) {
+        devuelve$muni <- resultados$address_components[[ident[1]]]$long_name
+      }
+
+      # tip_via y address
+      ident <- grep("route", resultados$address_components)
+      if (length(ident) != 0) {
+        devuelve$tip_via <- resultados$address_components[[ident[1]]]$types
+        devuelve$address <- resultados$address_components[[ident[1]]]$long_name
+      }
+
+      # portalNumber
+      ident <- grep("street_number", resultados$address_components)
+      if (length(ident) != 0) {
+        devuelve$portalNumber <- resultados$address_components[[ident[1]]]$long_name
+      }
+
+      # postalCode
+      ident <- grep("postal_code", resultados$address_components)
+      if (length(ident) != 0) {
+        devuelve$postalCode <- resultados$address_components[[ident[1]]]$long_name
+      }
+    }
+
+    # Compruebo si el punto devuelto esta en el poligono que corresponde
+    if (!is.null(poligono)) {
+      pto.in.poli <- comprueba_punto_poligono(punto = devuelve[, c("lat", "lng")], poligono)
+      if (!pto.in.poli) {
+        devuelve <- data.frame(georef = "NO punto", stringsAsFactors = FALSE)
+      }
+    }
+  } else {
+    devuelve <- data.frame(georef = "NO", state = fgoogle$status, stringsAsFactors = FALSE)
+  }
+
+  return(devuelve)
+}
