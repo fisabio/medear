@@ -56,7 +56,7 @@
 #'   cartografia <- uniones$cartografia
 #' }
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 une_secciones <- function(cambios, cartografia, years = 1996:2016,

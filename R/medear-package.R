@@ -68,7 +68,7 @@
 #'
 #' @keywords package
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @import data.table
 #'

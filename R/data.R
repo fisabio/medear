@@ -59,6 +59,8 @@
 #' \url{http://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{
 #' Poblaciones}.
 #'
+#' @encoding UTF-8
+#'
 #' @keywords datasets
 #'
 #' @seealso \code{\link{descarga_poblaciones}}, \code{\link{carga_datos}}
@@ -102,7 +104,7 @@
 #'
 #'   \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
 #'
-#'
+#' @encoding UTF-8
 #'
 #' @keywords datasets
 #'
@@ -149,6 +151,8 @@
 #'
 #' @keywords datasets
 #'
+#' @encoding UTF-8
+#'
 #' @examples
 #'
 #' \dontrun{
@@ -181,6 +185,8 @@
 #'
 #' @keywords datasets
 #'
+#' @encoding UTF-8
+#'
 #' @examples
 #'
 #' \dontrun{
@@ -202,6 +208,8 @@
 #'   fila es una sección para un año determinado.
 #'
 #' @keywords datasets
+#'
+#' @encoding UTF-8
 #'
 #' @examples
 #'

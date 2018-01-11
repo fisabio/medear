@@ -58,7 +58,7 @@ filtrar_ein_esn <- function(datos) {
 #'   cambios
 #' }
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 detecta_cambios <- function(datos, years = 1996:2016) {
@@ -149,7 +149,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 #'   carga_datos(key = "contraseña")
 #' }
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 carga_datos <- function(key) {

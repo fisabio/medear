@@ -55,7 +55,7 @@
 #'   trameros
 #' }
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
@@ -190,7 +190,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'   plot(carto_ine_valencia)
 #' }
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
@@ -281,7 +281,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #'   poblaciones
 #' }
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),

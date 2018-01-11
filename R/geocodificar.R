@@ -22,7 +22,7 @@
 #'
 #' @return Se devuelve una lista de 6 elementos, uno para cada campo de entrada.
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 #'
@@ -119,7 +119,7 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 #'   las que no se reconozca ningún patrón son sustituidas por un elemento
 #'   vacío).
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 #'
@@ -245,7 +245,7 @@ filtra_dir <- function(vias, nivel) {
 #'
 #' @return Valor lógico.
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 comprueba_punto_poligono <- function(punto, poligono) {
 
@@ -277,7 +277,7 @@ comprueba_punto_poligono <- function(punto, poligono) {
 #'
 #' @return Cadena de caracteres de la misma longitud que la proporcionada.
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 #'
@@ -349,7 +349,7 @@ limpiadirecGoogle <- function(cadena){
 #'   y 14 columnas: id, province, muni, tip_via, address, portalNumber,
 #'   refCatastral, postalCode, lat, lng, stateMsg, state, type y georef.
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 #'
@@ -420,7 +420,7 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 #'   y 14 columnas: id, province, muni, tip_via, address, portalNumber,
 #'   refCatastral, postalCode, lat, lng, stateMsg, state, type y georef.
 #'
-#' @encoding latin1
+#' @encoding UTF-8
 #'
 #' @export
 #'
