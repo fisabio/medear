@@ -14,38 +14,36 @@ referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 datum WGS84).}
 
 \item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
-en el directorio oculto \code{cartografia/} dentro del directorio de
+en el directorio oculto \code{./.cartografia/} dentro del directorio de
 trabajo?}
 }
 \value{
-Un objeto de clase \code{cartografia_ine} y \code{sf}, donde cada
-  fila es una sección censal y que cuenta con 7 columnas:
-  \item{seccion}{Cadena de 10 caracteres con el código de sección censal
-  (incluye provincia, municipio y distrito).}
-  \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
-  provincia).}
-  \item{CCA}{Cadena de 2 caracteres con el código de comunidad autónoma.}
-  \item{NPRO}{Nombre de la provincia.}
-  \item{NCA}{Nombre de la comunidad autónoma.}
-  \item{NMUN}{Nombre del municipio.}
-  \item{geometry}{Columna de tipo lista con la geometría asociada a cada
-  sección censal.}
+Un objeto de clase \code{SpatialPolygonsDataFrame}, donde cada fila
+  es una sección censal y que cuenta con 7 columnas: \item{seccion}{Cadena de
+  10 caracteres con el código de sección censal (incluye provincia, municipio
+  y distrito).} \item{CUMUN}{Cadena de 5 caracteres con el código del
+  municipio (incluye provincia).} \item{CCA}{Cadena de 2 caracteres con el
+  código de comunidad autónoma.} \item{NPRO}{Nombre de la provincia.}
+  \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre del
+  municipio.} \item{geometry}{Columna de tipo lista con la geometría asociada
+  a cada sección censal.}
 }
 \description{
 Descarga la cartografía ofrecida públicamente por el INE para el
   año 2011.
 }
 \details{
-Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326.
+Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
+  como elemento normalizado.
 }
 \examples{
 
 \dontrun{
   library(medear)
-  library(sf)
+  library(sp)
   carto_ine    <- descarga_cartografia()
   carto_ine_46 <- carto[substr(carto$seccion, 3, 4) == "46", ]
-  plot(st_geometry(carto_ine_valencia))
+  plot(carto_ine_valencia)
 }
 
 }
