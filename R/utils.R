@@ -23,31 +23,31 @@ filtrar_ein_esn <- function(datos) {
 }
 
 
-#' @title Funci贸n para detectar cambios de seccionado en trameros
+#' @title Funci髇 para detectar cambios de seccionado en trameros
 #'
-#' @description Detecta cambios de secci贸n censal para las provincias y el
-#'   per铆odo marcados.
+#' @description Detecta cambios de secci髇 censal para las provincias y el
+#'   per韔do marcados.
 #'
 #' @param datos Objeto de clase \code{tramero_ine}.
-#' @param years Vector num茅rico de longitud >= 2 con los a帽os para los que se
+#' @param years Vector num閞ico de longitud >= 2 con los a駉s para los que se
 #'   desee consultar las variaciones de seccionado.
 #'
 #' @usage detecta_cambios(datos, years = 1996:2016)
 #'
-#' @details El tiempo de ejecuci贸n de la funci贸n var铆a seg煤n el n煤mero de
-#'   provincias y el rango de a帽os. La forma m谩s sencilla de acelerar el proceso
-#'   de computaci贸n es mediante la ejecuci贸n en paralelo de la funci贸n.
+#' @details El tiempo de ejecuci髇 de la funci髇 var韆 seg鷑 el n鷐ero de
+#'   provincias y el rango de a駉s. La forma m醩 sencilla de acelerar el proceso
+#'   de computaci髇 es mediante la ejecuci髇 en paralelo de la funci髇.
 #'
-#'   Los c贸digos de secci贸n censal siguen un orden preestablecido: los primeros
-#'   dos d铆gitos identifican la provincia, los siguientes tres d铆gitos el
-#'   municipio, los pr贸ximos dos d铆gitos el distrito y los 煤ltimos tres
-#'   d铆gitos hacen referencia a la secci贸n censal.
+#'   Los c骴igos de secci髇 censal siguen un orden preestablecido: los primeros
+#'   dos d韌itos identifican la provincia, los siguientes tres d韌itos el
+#'   municipio, los pr髕imos dos d韌itos el distrito y los 鷏timos tres
+#'   d韌itos hacen referencia a la secci髇 censal.
 #'
 #' @return Un objeto de clase \code{cambios_ine} con 4 columnas:
-#'   \item{sc_old}{C贸digo de la secci贸n censal en el primer a帽o.}
-#'   \item{sc_new}{C贸digo de la secci贸n censal en el segundo a帽o.}
-#'   \item{year}{Primer a帽o.}
-#'   \item{year}{Segundo a帽o.}
+#'   \item{sc_old}{C骴igo de la secci髇 censal en el primer a駉.}
+#'   \item{sc_new}{C骴igo de la secci髇 censal en el segundo a駉.}
+#'   \item{year}{Primer a駉.}
+#'   \item{year}{Segundo a駉.}
 #'
 #' @examples
 #'
@@ -125,16 +125,16 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 }
 
 
-#' @title Carga los datos privados de poblaci贸n para el proyecto MEDEA3
+#' @title Carga los datos privados de poblaci髇 para el proyecto MEDEA3
 #'
-#' @description Algunos datos del proyecto MEDEA3 est谩n encriptados para poder
-#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta funci贸n
-#'   los desencripta y a帽ade a los datos p煤blicos (resto de a帽os), adjuntando el
+#' @description Algunos datos del proyecto MEDEA3 est醤 encriptados para poder
+#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta funci髇
+#'   los desencripta y a馻de a los datos p鷅licos (resto de a駉s), adjuntando el
 #'   resultado al entorno global.
 #'
-#' @details La contrase帽a no se almacena en el historial.
+#' @details La contrase馻 no se almacena en el historial.
 #'
-#' @param key Cadena de caracteres con la contrase帽a.
+#' @param key Cadena de caracteres con la contrase馻.
 #' @return No se devuelve nada.
 #'
 #' @usage carga_datos(key)
@@ -146,7 +146,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 #' @examples
 #'
 #' \dontrun{
-#'   carga_datos(key = "contrase帽a")
+#'   carga_datos(key = "contrase馻")
 #' }
 #'
 #' @encoding UTF-8
@@ -195,412 +195,27 @@ elige_corte <- function(datos, corte) {
 }
 
 
-limpia_vias <- function(vias) {
-  tvias <- c("calle", "avenida", "plaza", "partida", "camino", "carretera",
-             "pasaje", "paseo", "vereda", "paraje", "ronda", "travesia",
-             "parque", "grupo")
-
-  vias      <- tolower(vias)
-  vias[is.na(vias)] <- ""
-  vias      <- gsub("\\sna(?=,)", "", vias, perl = TRUE)
-  vias      <- gsub("^na\\s", "", vias)
-  vias      <- gsub("\\sna\\s", "", vias)
-  vias      <- gsub("\\s0(?=,)", "", vias, perl = TRUE)
-  vias      <- gsub("\\s(9999?)", " ", vias)
-  vias      <- gsub("\\s3a\\s", "tercera", vias)
-  vias_list <- strsplit(vias, ",")
-  tvia_nvia <- mapply(function(x, y) x[!x %in% y], vias_list,
-                      lapply(vias_list, utils::tail, n = 3))
-  tvia_nvia <- sapply(tvia_nvia, paste, collapse = " ", USE.NAMES = FALSE)
-
-  for (i in seq_along(tvias)) {
-    ind_norm    <- grep(paste0("^", tvias[i], "[a-z]"), tvia_nvia)
-    tvia_nvia[ind_norm] <- gsub(tvias[i], paste0(tvias[i], " "), tvia_nvia[ind_norm])
-  }
-  calle     <- "^(ca[^monstbp])\\w+\\b|^(c)\\b|^(cl[^rnia][^b])|^([^bv]lle*)\\w"
-  avenida   <- "^(a.v)[^t]\\w+\\b|^(av)\\w+\\b|^(abg)\\w+\\b|^(vda)\\w+\\b|^a\\b|^av\\b"
-  plaza     <- "^(pz?l?z?[^tsrqopjigedau])\\w+"
-  partida   <- "^(par?t)\\w+|^(pda)\\w+|^(pr?t)\\w+|^pa.*da\\w+|^p.tda\\b"
-  camino    <- "^(cam)[^p]\\w+|^(cm[^p])\\w+"
-  carretera <- "^(ctr)\\w+|^(crt)\\w+"
-  pasaje    <- "^(pa?s[^e]j?)\\w+|^(pas[^e](.*))\\w+|^pje\\b|^psj\\b"
-  paseo     <- "^(pa?s[^a]e?)\\w+"
-  travesia  <- "^(trav)(.*)\\b|^tr?v\\w+"
-  tvia_nvia <- gsub(calle,     "calle",     tvia_nvia)
-  tvia_nvia <- gsub(avenida,   "avenida",   tvia_nvia)
-  tvia_nvia <- gsub(plaza,     "plaza",     tvia_nvia)
-  tvia_nvia <- gsub(partida,   "partida",   tvia_nvia)
-  tvia_nvia <- gsub(camino,    "camino",    tvia_nvia)
-  tvia_nvia <- gsub(carretera, "carretera", tvia_nvia)
-  tvia_nvia <- gsub(pasaje,    "pasaje",    tvia_nvia)
-  tvia_nvia <- gsub(paseo,     "paseo",     tvia_nvia)
-  tvia_nvia <- gsub(travesia,  "travesia",  tvia_nvia)
-  resto     <- lapply(vias_list, utils::tail, n = 3)
-  resto     <- lapply(resto, gsub, pattern = "\\/(?<=\\/)(.*)",
-                      replacement = "", perl = TRUE)
-  resto     <- gsub("\\s,", ",", trimws(sapply(resto, paste0, collapse = ",")))
-  nvia      <- regmatches(tvia_nvia, gregexpr("\\d+", tvia_nvia))
-  nvia      <- sapply(sapply(nvia, utils::tail, n = 1),
-                      paste0, collapse = "", USE.NAMES = FALSE)
-  nvia      <- gsub("\\D",  "",  nvia)
-  nvia      <- gsub("^0*(?=\\d+)", "", nvia, perl = TRUE)
-  tvia_nvia <- trimws(mapply(function(x, y) gsub(x, "", y),
-                             nvia, tvia_nvia, USE.NAMES = FALSE))
-  res <- list(vias = tvia_nvia, nvia = nvia, resto = resto)
-  res <- lapply(res, gsub, pattern = "\\s{2,}", replacement = " ")
-
-  return(res)
-}
-
-
-filtro <- function(vias, nivel) {
-  tvias     <- vias$vias
-  indice    <- integer()
-  tvia_norm <- c("calle", "avenida", "plaza", "partida", "camino", "carretera",
-                 "pasaje", "paseo", "vereda", "paraje", "ronda", "travesia",
-                 "parque", "grupo")
-  inutiles  <- paste0("^(", paste0(tvia_norm, collapse = "|"),
-                      ")\\s{1,10}\\d+,|^\\s?([a-z]+|\\d+)\\s{0,10},|^,|^\\s,")
-
-  if (nivel == 1) {
-    for (i in seq_along(tvia_norm)) {
-      for (j in seq_along(tvia_norm)) {
-        eliminar <- grep(paste0(tvia_norm[i], "\\s{1,10}", tvia_norm[j]), tvias)
-        indice   <- sort(unique(c(indice, eliminar)))
-        tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
-      }
-    }
-  } else if (nivel == 2) {
-    patron_ini  <- c("\\s", "\\(", "-")
-    patron_fin  <- c("\\s", "\\.")
-    descripcion <- c("urb", "urbanizacion", "ed", "edf", "edif", "edificio", "res",
-                     "rsd", "rsden", "resid", "residencia", "geriatric.", "centro",
-                     "grupo", "grup", "polig", "poligono", "finca", "aptos",
-                     "complejo", "cooperativa", "coop")
-    for (k in seq_along(descripcion)) {
-      for (i in seq_along(patron_ini)) {
-        for (j in seq_along(patron_fin)) {
-          patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
-          if (i == 2) {
-            patron <- paste0(patron, "\\)|", patron)
-          } else if (i == 3) {
-            patron <- paste0(patron, "-|", patron)
-          }
-          indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
-          tvias  <- gsub(patron, "", tvias, perl = TRUE)
-          tvias  <- gsub(
-            pattern     = paste0(patron_ini[i], descripcion[k], patron_fin[j]),
-            replacement = "",
-            x           = tvias
-          )
-        }
-      }
-    }
-  } else if (nivel == 3) {
-    indice <- grep("\\b[[:alpha:]]{1,3}\\b\\.?", tvias)
-    tvias  <- gsub("\\b[[:alpha:]]{1,3}\\b\\.?", "", tvias)
-  } else {
-    tvias <- gsub("[[:punct:]]", "", tvias)
-    for (i in seq_along(tvia_norm)) {
-      eliminar <- grep(paste0("^", tvia_norm[i], "\\s{1,10}"), tvias)
-      indice   <- sort(unique(c(indice, eliminar)))
-      tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
-    }
-  }
-  if (length(indice) > 0) {
-    indice <- indice[nchar(tvias[indice]) >= 4]
-  }
-  if (length(indice) > 0) {
-    res <- data.table(idn = indice)
-    res[, via := paste0(trimws(tvias[idn]), " ", vias$nvia[idn], ", ", vias$resto[idn])]
-    res <- res[!grep(inutiles, via)]
-  } else {
-    res    <- data.table(idn = numeric(), via = character())
-  }
-
-  return(res)
-}
-
-aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
-                           filtro_geo, cartografia, codigos, intentos = 10) {
-  datos_f        <- copy(datos)
-  indice_nogeo_f <- indice_nogeo
-  vias_f         <- lapply(vias, `[`, indice_nogeo_f)
-  direcciones_f  <- datos_f[indice_nogeo_f][["direcciones"]]
-
-  if (nivel < 5) {
-    res <- filtro(vias_f, nivel)
-  } else {
-    f1 <- filtro(vias_f, 1)
-    direcciones_f[f1[["idn"]]] <- f1[["via"]]
-    vias_f <- limpia_vias(direcciones_f)
-    f2 <- filtro(vias_f, 2)
-    direcciones_f[f2[["idn"]]] <- f2[["via"]]
-    vias_f <- limpia_vias(direcciones_f)
-    f3 <- filtro(vias_f, 3)
-    direcciones_f[f3[["idn"]]] <- f3[["via"]]
-    vias_f <- limpia_vias(direcciones_f)
-    f4 <- filtro(vias_f, 4)
-    direcciones_f[f4[["idn"]]] <- f4[["via"]]
-    res <- data.table(idn = sort(unique(c(f1[["idn"]], f2[["idn"]],
-                                          f3[["idn"]], f4[["idn"]]))))
-    res[, via := direcciones_f[idn]]
-  }
-
-  if (nrow(res) > 0) {
-    message("\nSe ha aplicado el filtro ", nivel,
-            "\nBuscando en CartoCiudad (versi\u00f3n ",
-            ifelse(version_cc == "prev", "previa", "actual"), ")...")
-    geo_res    <- data.table(
+llama_google <- function(direc, tries) {
+  withRestarts(
+    tryCatch(
       suppressWarnings(
-        caRtociudad::cartociudad_geocode(
-          full_address = res[["via"]],
-          version      = version_cc,
-          ntries       = intentos
+        suppressMessages(
+          ggmap::geocode(direc, output = "all", override_limit = TRUE)
         )
-      )
-    )
-    if (version_cc == "prev") {
-      indice_aux_f <- which(geo_res[["state"]] %in% 1:2)
-      indice_geo_f <- indice_nogeo_f[res[["idn"]][indice_aux_f]]
-    } else {
-      indice_aux_f <- which(geo_res[["state"]] %in% 1:4)
-      indice_geo_f <- indice_nogeo_f[res[["idn"]][indice_aux_f]]
-    }
-    if (length(indice_geo_f) > 0) {
-      indice_fuera <- integer()
-      if (filtro_geo != "ninguno") {
-        geom_res <- sf::st_as_sf(geo_res[indice_aux_f, c("lng", "lat")],
-                                 coords = c("lng", "lat"), na.fail = FALSE, crs = 4258)
-        geom_res <- sf::st_transform(geom_res, crs = sf::st_crs(cartografia)$epsg)
-
-        indice_fuera <-
-          if (filtro_geo == "nombre_municipio") {
-            suppressMessages(indice_geo_f[which(sapply(
-              sf::st_intersects(
-                geom_res, cartografia[cartografia$CUMUN %in% codigos[indice_geo_f], ]
-              ),
-              length) == 0)])
-          } else {
-            suppressMessages(indice_geo_f[which(sapply(
-              sf::st_intersects(
-                geom_res,
-                cartografia[substr(cartografia$seccion, 1, 2) %in%
-                              substr(codigos[indice_geo_f], 1, 2), ]
-              ),
-              length) == 0)])
-          }
-        if (length(indice_fuera) > 0) {
-          indice_fuera   <- which(indice_geo_f %in% indice_fuera)
-          indice_aux_f   <- indice_aux_f[-indice_fuera]
-          indice_geo_f   <- indice_geo_f[-indice_fuera]
-        }
+      ),
+      error = function(e) {invokeRestart("retry")}
+    ),
+    retry = function() {
+      if (tries <= 0) {
+        return(list(status = "OVERQUERY_LIMIT"))
       }
-      indice_nogeo_f <- sort(unique(c(indice_nogeo_f, indice_fuera)))
-      datos_f[
-        indice_geo_f,
-        `:=`(
-          id           = geo_res[indice_aux_f][["id"]],
-          province     = geo_res[indice_aux_f][["province"]],
-          muni         = geo_res[indice_aux_f][["muni"]],
-          tip_via      = geo_res[indice_aux_f][["tip_via"]],
-          address      = geo_res[indice_aux_f][["address"]],
-          portalNumber = geo_res[indice_aux_f][["portalNumber"]],
-          refCatastral = geo_res[indice_aux_f][["refCatastral"]],
-          postalCode   = geo_res[indice_aux_f][["postalCode"]],
-          lat          = geo_res[indice_aux_f][["lat"]],
-          lng          = geo_res[indice_aux_f][["lng"]],
-          state        = as.character(geo_res[indice_aux_f][["state"]]),
-          type         = as.character(geo_res[indice_aux_f][["type"]]),
-          version      = as.character(geo_res[indice_aux_f][["version"]])
-        )
-      ]
-      if (version_cc == "prev") {
-        indice_old_2_f <- which(datos_f[indice_geo_f][["state"]] == 2)
-        indice_nogeo_f <- unique(sort(c(indice_nogeo_f, indice_old_2_f)))
-      } else {
-        indice_nogeo_f <- which(is.na(datos_f[["state"]]))
-      }
+      message("Failing to connect with server: retrying...")
+      Sys.sleep(5)
+      llama_google(direc, tries - 1)
     }
-  }
-
-  return(list(datos = datos_f, indice_nogeo = indice_nogeo_f))
-}
-
-
-limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
-
-  vias <- list(tvia = tvia, nvia = nvia, npoli = npoli,
-               muni = muni, prov = prov, codpost = codpost)
-  vias <- lapply(vias, tolower)
-
-  # Convertir NA's en 0 caracteres.
-  vias <- lapply(vias, function(x) ifelse(is.na(x), "", x))
-  # Repaso de la conversion previa (no es realmente necesario...).
-  vias <- lapply(vias, gsub, pattern = "^na$", replacement = "")
-
-  # Eliminar ceros a la izquierda en npoli.
-  vias$npoli <- gsub("^0*(?=\\d+)", "", vias$npoli, perl = TRUE)
-
-  # Convertir numeros compuestos por un cero en 0 caracteres.
-  vias$npoli <- gsub("^0$", "", vias$npoli)
-
-  # Convertir numeros 999 o 9999 en cero caracteres
-  vias$npoli <- gsub("9999?", "", vias$npoli)
-
-  # Convertir nombres de v铆a con 3a en tercera.
-  vias$nvia <- gsub("\\s3a\\s", "tercera", vias$nvia)
-
-  # Convertir nombres de v铆a no consta en 0 caracteres.
-  vias$nvia <- gsub("no consta", "", vias$nvia)
-
-  # Eliminar comas del nombre de la v铆a.
-  vias$nvia <- gsub(",", "", vias$nvia)
-
-  # Normalizaci贸n de los tipos de v铆a m谩s frecuentes por variantes habituales.
-  calle     <- "^(ca[^monstbp])\\w+\\b|^(c)\\b|^(cl[^rnia][^b])|^([^bv]lle*)\\w"
-  avenida   <- "^(a.v)[^t]\\w+\\b|^(av)\\w+\\b|^(abg)\\w+\\b|^(vda)\\w+\\b|^a\\b|^av\\b"
-  plaza     <- "^(pz?l?z?[^tsrqopjigedau])\\w+"
-  partida   <- "^(par?t)\\w+|^(pda)\\w+|^(pr?t)\\w+|^pa.*da\\w+|^p.tda\\b"
-  camino    <- "^(cam)[^p]\\w+|^(cm[^p])\\w+"
-  carretera <- "^(ctr)\\w+|^(crt)\\w+"
-  pasaje    <- "^(pa?s[^e]j?)\\w+|^(pas[^e](.*))\\w+|^pje\\b|^psj\\b"
-  paseo     <- "^(pa?s[^a]e?)\\w+"
-  travesia  <- "^(trav)(.*)\\b|^tr?v\\w+"
-  vias$tvia <- gsub(calle, "calle", vias$tvia)
-  vias$tvia <- gsub(avenida, "avenida", vias$tvia)
-  vias$tvia <- gsub(plaza, "plaza", vias$tvia)
-  vias$tvia <- gsub(partida, "partida", vias$tvia)
-  vias$tvia <- gsub(camino, "camino", vias$tvia)
-  vias$tvia <- gsub(carretera, "carretera", vias$tvia)
-  vias$tvia <- gsub(pasaje, "pasaje", vias$tvia)
-  vias$tvia <- gsub(paseo, "paseo", vias$tvia)
-  vias$tvia <- gsub(travesia, "travesia", vias$tvia)
-
-  # Eliminar duplicidades (por lengua) en municipios y provincias (divisiones por barra /).
-  vias[c("muni", "prov")] <- lapply(
-    X           = vias[c("muni", "prov")],
-    FUN         = gsub,
-    pattern     = "\\/(?<=\\/)(.*)",
-    replacement = "",
-    perl        = TRUE
   )
-
-  # Eliminar espacios en ambos extremos de todos los elementos.
-  vias <- lapply(vias, trimws)
-  vias <- lapply(vias, gsub, pattern = "\\s{2,}", replacement = " ")
-
-  return(vias)
 }
 
-
-filtra_dir <- function(vias, nivel) {
-  tvias     <- paste(vias$tvia, vias$nvia)
-  indice    <- integer()
-  tvia_norm <- c("calle", "avenida", "plaza", "partida", "camino", "carretera",
-                 "pasaje", "paseo", "vereda", "paraje", "ronda", "travesia",
-                 "parque", "grupo")
-
-  # Patron para detectar direcciones absurdas tras el filtrado (p.ej.,
-  # "calle 1,", "calle ,", ...). Estas se dan por perdidas.
-  inutiles  <- paste0("^(", paste0(tvia_norm, collapse = "|"),
-                      ")\\s{1,10}\\d+,|^\\s?([a-z]+|\\d+)\\s{0,10},|^,|^\\s,")
-  patron_ini  <- c("\\s", "\\(", "-")
-  patron_fin  <- c("\\s", "\\.")
-  descripcion <- c("urb", "urbanizacion", "ed", "edf", "edif", "edificio", "res",
-                   "rsd", "rsden", "resid", "residencia", "geriatric.", "centro",
-                   "grupo", "grup", "polig", "poligono", "finca", "aptos",
-                   "complejo", "cooperativa", "coop")
-
-  if (nivel == 1) {
-    for (i in seq_along(tvia_norm)) {
-      for (j in seq_along(tvia_norm)) {
-        eliminar <- grep(paste0(tvia_norm[i], "\\s{1,10}", tvia_norm[j]), tvias)
-        indice   <- sort(unique(c(indice, eliminar)))
-        tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
-      }
-    }
-  } else if (nivel == 2) {
-    for (k in seq_along(descripcion)) {
-      for (i in seq_along(patron_ini)) {
-        for (j in seq_along(patron_fin)) {
-          patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
-          if (i == 2) {
-            patron <- paste0(patron, "\\)|", patron)
-          } else if (i == 3) {
-            patron <- paste0(patron, "-|", patron)
-          }
-          indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
-          tvias  <- gsub(patron, "", tvias, perl = TRUE)
-          tvias  <- gsub(
-            pattern     = paste0(patron_ini[i], descripcion[k], patron_fin[j]),
-            replacement = "",
-            x           = tvias
-          )
-        }
-      }
-    }
-  } else if (nivel == 3) {
-    indice <- grep("\\b[[:alpha:]]{1,3}\\b\\.?", tvias)
-    tvias  <- gsub("\\b[[:alpha:]]{1,3}\\b\\.?", "", tvias)
-  } else if (nivel == 4) {
-    tvias <- gsub("[[:punct:]]", "", tvias)
-    for (i in seq_along(tvia_norm)) {
-      eliminar <- grep(paste0("^", tvia_norm[i], "\\s{1,10}"), tvias)
-      indice   <- sort(unique(c(indice, eliminar)))
-      tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
-    }
-  } else {
-    for (i in seq_along(tvia_norm)) {
-      for (j in seq_along(tvia_norm)) {
-        eliminar <- grep(paste0(tvia_norm[i], "\\s{1,10}", tvia_norm[j]), tvias)
-        indice   <- sort(unique(c(indice, eliminar)))
-        tvias[eliminar] <- gsub("^[a-z]+\\s{1,10}", "", tvias[eliminar])
-      }
-    }
-    for (k in seq_along(descripcion)) {
-      for (i in seq_along(patron_ini)) {
-        for (j in seq_along(patron_fin)) {
-          patron <- paste0("(?<=", patron_ini[i], descripcion[k], patron_fin[j], ")(.*)")
-          if (i == 2) {
-            patron <- paste0(patron, "\\)|", patron)
-          } else if (i == 3) {
-            patron <- paste0(patron, "-|", patron)
-          }
-          indice <- sort(unique(c(indice, grep(patron, tvias, perl = TRUE))))
-          tvias  <- gsub(patron, "", tvias, perl = TRUE)
-          tvias  <- gsub(
-            pattern     = paste0(patron_ini[i], descripcion[k], patron_fin[j]),
-            replacement = "",
-            x           = tvias
-          )
-        }
-      }
-    }
-    indice <- sort(unique(c(grep("\\b[[:alpha:]]{1,3}\\b\\.?", tvias), indice)))
-    tvias  <- gsub("\\b[[:alpha:]]{1,3}\\b\\.?", "", tvias)
-    tvias  <- gsub("[[:punct:]]", "", tvias)
-    for (i in seq_along(tvia_norm)) {
-      eliminar <- grep(paste0("^", tvia_norm[i], "\\s{1,10}"), tvias)
-      indice   <- sort(unique(c(indice, eliminar)))
-      tvias[eliminar] <- gsub(paste0("^", tvia_norm[i], "\\s{1,10}"), "", tvias[eliminar])
-    }
-  }
-  if (length(indice) > 0) {
-    indice <- indice[nchar(tvias[indice]) >= 4]
-  }
-  if (length(indice) > 0) {
-    pegote <- paste0(tvias[indice], " ", vias$npoli[indice], ", ", vias$muni[indice],
-                     ", ", vias$prov[indice], ", ", vias$codpost[indice])
-    pegote <- gsub("\\s{2,}", " ", pegote)
-    res    <- data.table(idn = indice, via = pegote)
-    res    <- res[!grep(inutiles, via)]
-  } else {
-    res    <- data.table(idn = numeric(), via = character())
-  }
-
-  return(res)
-}
 
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
