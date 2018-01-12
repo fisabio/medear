@@ -293,7 +293,7 @@ limpiadirecGoogle <- function(cadena){
 
   #Por si queda algun caracter raro
   cad_aux <- strsplit(cadena, "")[[1]]
-  elim <- which(!cad_aux %in% c(letters, " ", 1:1000 , ",", "'"))
+  elim    <- which(!cad_aux %in% c(letters, " ", 0:1000 , ",", "'"))
   if (length(elim) > 0) {
     cad_aux <- cad_aux[-elim]
     cadena <- paste(cad_aux, collapse = "")
