@@ -197,8 +197,14 @@ elige_corte <- function(datos, corte) {
 
 llama_google <- function(direc, tries) {
   withRestarts(
-    tryCatch(ggmap::geocode(direc, output = "all", override_limit = TRUE),
-             error = function(e) {invokeRestart("retry")}),
+    tryCatch(
+      suppressWarnings(
+        suppressMessages(
+          ggmap::geocode(direc, output = "all", override_limit = TRUE)
+        )
+      ),
+      error = function(e) {invokeRestart("retry")}
+    ),
     retry = function() {
       if (tries <= 0) {
         return(list(status = "OVERQUERY_LIMIT"))

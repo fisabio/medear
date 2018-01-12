@@ -247,14 +247,19 @@ filtra_dir <- function(vias, nivel) {
 #'
 #' @encoding UTF-8
 #'
+#' @export
+#'
 comprueba_punto_poligono <- function(punto, poligono) {
 
   CRScarto     <- sp::CRS(sp::proj4string(poligono))
-  punto.lonlat <- data.frame(longitude = punto$lng, latitude = punto$lat)
-  punto.lonlat <- as.data.frame(apply(punto.lonlat, 2, function(x) as.numeric(as.character(x))))
+  poligono     <- sp::spTransform(poligono, CRScarto)
+  punto.lonlat <- data.frame(
+    longitude = as.numeric(as.character(punto$lng)),
+    latitude  = as.numeric(as.character(punto$lat))
+  )
 
   sp::coordinates(punto.lonlat) <- ~ longitude + latitude
-  sp::proj4string(punto.lonlat) <- sp::CRS("+init=epsg:4326")
+  sp::proj4string(punto.lonlat) <- sp::CRS(sp::proj4string(poligono))
 
   # Transformamos los puntos a la misma proyeccion que la cartografia
   puntos.fin <- try(sp::spTransform(punto.lonlat, CRScarto), silent = TRUE)
