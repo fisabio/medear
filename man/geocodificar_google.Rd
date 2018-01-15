@@ -26,3 +26,8 @@ Esta función implementa la segunda parte del algoritmo de
   CartoCiudad, es el momento de probar el motor de Google con las direcciones
   que no hayan sido geocodificadas correctamente.
 }
+\seealso{
+\code{\link{geocodificar_cartociudad}} como paso previo y
+  \code{vignette("protocolo")} para visualizar el protocolo de
+  georreferenciación
+}

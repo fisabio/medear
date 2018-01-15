@@ -26,6 +26,9 @@
 #'
 #' @export
 #'
+#' @seealso \code{\link{geocodificar_cartociudad}} y
+#'   \code{\link{geocodificar_google}}
+#'
 limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 
   vias <- list(tvia = tvia, nvia = nvia, npoli = npoli,
@@ -122,6 +125,8 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @seealso \code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
 #'
 filtra_dir <- function(vias, nivel) {
   tvias     <- paste(vias$tvia, vias$nvia)
@@ -249,6 +254,8 @@ filtra_dir <- function(vias, nivel) {
 #'
 #' @export
 #'
+#' @seealso \code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
+#'
 comprueba_punto_poligono <- function(punto, poligono) {
 
   CRScarto     <- sp::CRS(sp::proj4string(poligono))
@@ -285,6 +292,8 @@ comprueba_punto_poligono <- function(punto, poligono) {
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @seealso \code{\link{geocodificar_google}}
 #'
 limpiadirecGoogle <- function(cadena){
   cadena <- gsub(cadena, pattern = "\U00F1|\U00F0|\U00A5",        replacement = "n")
@@ -358,6 +367,10 @@ limpiadirecGoogle <- function(cadena){
 #'
 #' @export
 #'
+#' @seealso \code{\link{geocodificar_google}} para georreferenciar los
+#'   registros pendientes y \code{vignette("protocolo")} para visualizar el
+#'   protocolo de georreferenciación
+#'
 geocodificar_cartociudad <- function(direc, poligono = NULL) {
 
   columnas_elegidas <- c("id", "province", "muni", "tip_via", "address",
@@ -428,6 +441,10 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @seealso \code{\link{geocodificar_cartociudad}} como paso previo y
+#'   \code{vignette("protocolo")} para visualizar el protocolo de
+#'   georreferenciación
 #'
 geocodificar_google <- function(direc, poligono = NULL) {
 

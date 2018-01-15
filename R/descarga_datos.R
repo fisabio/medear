@@ -58,6 +58,9 @@
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @seealso \code{\link{descarga_cartografia}} y \code{\link{descarga_poblaciones}}
+#'
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
                               years = 2004:2017, descarga = TRUE, ruta = NULL,
                               conservar = TRUE) {
@@ -152,7 +155,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 }
 
 
-#' @title Función para descargar la cartografía con el seccionado del INE para
+#' @title Funcion para descargar la cartografia con el seccionado del INE para
 #'   2011
 #'
 #' @description Descarga la cartografía ofrecida públicamente por el INE para el
@@ -193,6 +196,9 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @seealso \code{\link{descarga_trameros}} y \code{\link{descarga_poblaciones}}
+#'
 descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
   stopifnot(is.logical(conservar))
   stopifnot(is.numeric(crs))
@@ -233,7 +239,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 }
 
 
-#' @title Carga poblaciones del INE por sección censal, sexo, edad y año
+#' @title Carga poblaciones del INE por seccion censal, sexo, edad y periodo
 #'
 #' @description Descarga o carga las poblaciones anuales del INE por sección
 #'   censal, sexo y edad por grupos quinquenales (datos desde 2006).
@@ -284,6 +290,9 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @seealso \code{\link{descarga_trameros}} y \code{\link{descarga_cartografia}}
+#'
 descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
                                  years = 2006:2016, descarga = TRUE, ruta = NULL,
                                  conservar = TRUE) {

@@ -6,7 +6,7 @@ output:
   rmarkdown::html_vignette:
     number_sections: true
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{Protocolo de georreferenciacion MEDEA 3}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
@@ -33,10 +33,10 @@ library(medear)
 
 Al instalar el paquete `medear` se instalan las dependencias, que incluyen a los paquetes `ggmap` y `caRtociudad`. Se ha testado el uso de esto protocolo con las siguientes versiones de los paquetes:
 
-* `devtools`: Versión 1.13.4
-* `medear`: Versión 0.2.1
-* `ggmap`: Versión 2.6.1
-* `caRtociudad`: Versión 0.5.5
+* `devtools`: Versión `r packageVersion("devtools")`
+* `medear`: Versión `r packageVersion("medear")`
+* `ggmap`: Versión `r packageVersion("ggmap")`
+* `caRtociudad`: Versión `r packageVersion("caRtociudad")`
 
 ## Carga y preparación de la cartografía
 

@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{secciones}
 \alias{secciones}
-\title{Secciones censales únicas por año (1996-2016)}
+\title{Secciones censales unicas por periodo (1996-2016)}
 \format{Un objeto de clase \code{data.frame} y \code{data.table}, donde cada
   fila es una sección para un año determinado.}
 \usage{

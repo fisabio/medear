@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{carga_datos}
 \alias{carga_datos}
-\title{Carga los datos privados de población para el proyecto MEDEA3}
+\title{Carga los datos privados de poblacion para el proyecto MEDEA3}
 \usage{
 carga_datos(key)
 }

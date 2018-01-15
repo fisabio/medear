@@ -34,3 +34,6 @@ Se considera una serie de variantes de las cadenas de caracteres
   dirección que no haya podido ser geocodificada a partir de su dirección
   original.
 }
+\seealso{
+\code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
+}

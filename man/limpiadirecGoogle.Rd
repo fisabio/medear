@@ -16,3 +16,6 @@ Cadena de caracteres de la misma longitud que la proporcionada.
 \description{
 Eliminación de caracteres no ascii.
 }
+\seealso{
+\code{\link{geocodificar_google}}
+}

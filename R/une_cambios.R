@@ -59,6 +59,10 @@
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @seealso \code{\link{detecta_cambios}}, \code{\link{descarga_poblaciones}} y
+#'   \code{\link{descarga_cartografia}}
+#'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
                           poblacion = NULL, corte_edad = 85) {
 
