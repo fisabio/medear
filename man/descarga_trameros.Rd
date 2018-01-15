@@ -67,3 +67,6 @@ El tiempo de ejecución de la función varía según el número de
 }
 
 }
+\seealso{
+\code{\link{descarga_cartografia}} y \code{\link{descarga_poblaciones}}
+}

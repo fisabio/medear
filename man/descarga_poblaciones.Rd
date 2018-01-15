@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{descarga_poblaciones}
 \alias{descarga_poblaciones}
-\title{Carga poblaciones del INE por sección censal, sexo, edad y año}
+\title{Carga poblaciones del INE por seccion censal, sexo, edad y periodo}
 \usage{
 descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years =
   2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
@@ -59,4 +59,7 @@ El tiempo de ejecución de la función varía según el número de
   poblaciones
 }
 
+}
+\seealso{
+\code{\link{descarga_trameros}} y \code{\link{descarga_cartografia}}
 }

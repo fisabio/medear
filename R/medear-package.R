@@ -1,5 +1,5 @@
 
-#' @title Poblaciones y cartografía por sección censal del INE (proyecto MEDEA3)
+#' @title Poblaciones y cartografia por seccion censal del INE (proyecto MEDEA3)
 #'
 #' @description Paquete que contiene las funciones y los datos utilizados para
 #'   llevar a cabo el proyecto MEDEA3, incluyendo los datos de población por
@@ -12,9 +12,11 @@
 #' @details El uso habitual del paquete será la carga de datos o de la
 #'   cartografia (\code{\link[utils]{data}}) y su preparación para unir las
 #'   secciones según el rango de años que se desee (función
-#'   \code{\link{une_secciones}}). En todo caso, se ofrece la fecha de la última
-#'   actualización de los datos (siempre que esté disponible) como un atributo
-#'   de los objetos.
+#'   \code{\link{une_secciones}}), o la georreferenciación de la mortalidad
+#'   (\code{\link{geocodificar_cartociudad}} y
+#'   \code{\link{geocodificar_google}}). En todo caso, se ofrece la fecha de la
+#'   última actualización de los datos (siempre que esté disponible) como un
+#'   atributo de los objetos.
 #'
 #'   Un uso potencial puede ser la prepararación de consultas personalizadas
 #'   para ciudades o provincias completas, por lo que el paquete ofrece todas
@@ -34,7 +36,28 @@
 #'   seccionado, se realiza la unión de las secciones en la cartografía y en las
 #'   cifras de población.} }
 #'
-#'   Mantenedor: Carlos Vergara-Hernández \email{vergara_car@@gva.es}
+#'   Por otra parte, el paquete incorpora una serie de funciones para efectuar
+#'   la georreferenciación de la mortalidad, siguiendo el protocolo disponible
+#'   como viñeta dentro del paquete (accesible mediante
+#'   \code{vignette("procolo")}):
+#'
+#'   \describe{\item{\code{\link{geocodificar_cartociudad}}}{Implementación del
+#'   algoritmo de geocodificación de direcciones de MEDEA3 (geocodificado con
+#'   CartoCiudad).} \item{\code{\link{geocodificar_google}}}{Implementación del
+#'   algoritmo de geocodificación de direcciones de MEDEA3 (geocodificado con
+#'   Google).} }
+#'
+#'   En último lugar, el paquete dispone de varios bancos de datos de uso
+#'   frecuente en el proyecto:
+#'
+#'   \describe{\item{\code{\link{cartografia}}}{Cartografia por seccion censal
+#'   para las ciudades MEDEA3.} \item{\code{\link{poblacion}}}{Datos de
+#'   poblacion por seccion censal para las ciudades MEDEA3 (periodo 2006-2016).}
+#'   \item{\code{\link{secciones}}}{Secciones censales unicas por periodo
+#'   (1996-2016).} \item{\code{\link{cambios_seccion}}}{Cambios temporales de
+#'   seccionado para todo el pais, incluyendo las ciudades MEDEA3 (periodo
+#'   2004-2017).} \item{\code{\link{codigos_ine}}}{Nombres de municipios y
+#'   provincias segun terminologia oficial del INE.} }
 #'
 #'   Fuente: Elaboración propia con datos extraídos del \href{www.ine.es}{sitio
 #'   web del INE}.
@@ -50,19 +73,19 @@
 #'
 #' @seealso \code{\link{descarga_cartografia}},
 #'   \code{\link{descarga_poblaciones}}, \code{\link{descarga_trameros}},
-#'   \code{\link{detecta_cambios}}, \code{\link{une_secciones}}
+#'   \code{\link{detecta_cambios}}, \code{\link{une_secciones}},
+#'   \code{\link{geocodificar_cartociudad}}, \code{\link{geocodificar_google}},
+#'   \code{\link{cartografia}}, \code{\link{poblacion}},
+#'   \code{\link{secciones}}, \code{\link{cambios_seccion}},
+#'   \code{\link{codigos_ine}}
 #'
-#' @references \url{www.ine.es/}
-#'   \url{www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}
-#'    \url{www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}
-#'   \url{www.ine.es/ss/Satellite?L=es_ES&c=Page&cid=1254735624326&p=1254735624326&pagename=ProductosYServicios\%2FPYSLayout}
-#'
-#'   \url{www.ine.es/ss/Satellite?L=0&c=Page&cid=1254735849170&p=1254735849170&pagename=Ayuda\%2FINELayout#}
-#'
+#' @references \describe{\item{\href{www.ine.es/}{sitio web del INE}}{}
+#'   \item{\href{www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{Población
+#'    por secciones censales}}{}
+#'   \item{\href{http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip}{Cartografía
+#'    se secciones censales a 1 de noviembre de 2011 en formato SHP.}}{}}
 #'
 #' @name medear-package
-#'
-#' @aliases medear-package medear
 #'
 #' @docType package
 #'
@@ -70,6 +93,6 @@
 #'
 #' @encoding UTF-8
 #'
-#' @import data.table
+#' @import data.table sp
 #'
 "_PACKAGE"

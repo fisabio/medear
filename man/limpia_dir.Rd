@@ -34,3 +34,7 @@ Esta función ejecuta una limpieza genérica de las direcciones,
   La función espera como entrada los campos habituales del boletín de
   defunciones, y ella se ocupa de trabajarlos por separado.
 }
+\seealso{
+\code{\link{geocodificar_cartociudad}} y
+  \code{\link{geocodificar_google}}
+}

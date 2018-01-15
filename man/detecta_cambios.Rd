@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{detecta_cambios}
 \alias{detecta_cambios}
-\title{Función para detectar cambios de seccionado en trameros}
+\title{Funcion para detectar cambios de seccionado en trameros}
 \usage{
 detecta_cambios(datos, years = 1996:2016)
 }
@@ -43,4 +43,7 @@ El tiempo de ejecución de la función varía según el número de
   cambios
 }
 
+}
+\seealso{
+\code{\link{une_secciones}} y \code{\link{descarga_trameros}}
 }

@@ -53,3 +53,8 @@ Esta función implementa las dos partes del algoritmo de
   motor de Google con las direcciones que no hayan sido geocodificadas
   correctamente.
 }
+\seealso{
+\code{\link{geocodificar_google}} para georreferenciar los
+  registros pendientes y \code{vignette("protocolo")} para visualizar el
+  protocolo de georreferenciación
+}

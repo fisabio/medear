@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{descarga_cartografia}
 \alias{descarga_cartografia}
-\title{Función para descargar la cartografía con el seccionado del INE para
+\title{Funcion para descargar la cartografia con el seccionado del INE para
   2011}
 \usage{
 descarga_cartografia(crs = 4326, conservar = TRUE)
@@ -46,4 +46,7 @@ Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
   plot(carto_ine_valencia)
 }
 
+}
+\seealso{
+\code{\link{descarga_trameros}} y \code{\link{descarga_poblaciones}}
 }

@@ -68,3 +68,7 @@ Une los cambios del seccionado del INE en la cartografía INE
 }
 
 }
+\seealso{
+\code{\link{detecta_cambios}}, \code{\link{descarga_poblaciones}} y
+  \code{\link{descarga_cartografia}}
+}

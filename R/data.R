@@ -1,5 +1,5 @@
 
-#' @title Datos de población por sección censal para las ciudades MEDEA3
+#' @title Datos de poblacion por seccion censal para las ciudades MEDEA3
 #'   (periodo 2006-2016)
 #'
 #' @description Datos de población por sexo (0=Hombres, 1=Mujeres), edad (grupos
@@ -80,7 +80,7 @@
 "poblacion"
 
 
-#' @title Cartografía por sección censal para las ciudades MEDEA3
+#' @title Cartografia por seccion censal para las ciudades MEDEA3
 #'
 #' @description Contiene la cartografía por sección censal tal cual puede ser
 #'   utilizada por el paquete \code{sp}.
@@ -125,7 +125,7 @@
 "cartografia"
 
 
-#' @title Nombres de municipios y provincias según terminología oficial del INE
+#' @title Nombres de municipios y provincias segun terminologia oficial del INE
 #'
 #' @description Codificación/nombres usados por el INE para las provincias y los
 #'   municipios. También indica si se trata de un municipio participante en
@@ -161,8 +161,8 @@
 #' }
 "codigos_ine"
 
-#' @title Cambios temporales de seccionado para todo el país, incluyendo las
-#'   ciudades MEDEA3 (periodo 2004-2017).
+#' @title Cambios temporales de seccionado para todo el pais, incluyendo las
+#'   ciudades MEDEA3 (periodo 2004-2017)
 #'
 #' @description Relación de secciones censales que interseccionan
 #'   geográficamente para pares de años consecutivos, según la definición de
@@ -196,7 +196,7 @@
 "cambios_seccion"
 
 
-#' @title Secciones censales únicas por año (1996-2016)
+#' @title Secciones censales unicas por periodo (1996-2016)
 #'
 #' @description Listado con las secciones censales únicas por año (1996-2016).
 #'

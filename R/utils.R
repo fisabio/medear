@@ -23,7 +23,7 @@ filtrar_ein_esn <- function(datos) {
 }
 
 
-#' @title Función para detectar cambios de seccionado en trameros
+#' @title Funcion para detectar cambios de seccionado en trameros
 #'
 #' @description Detecta cambios de sección censal para las provincias y el
 #'   período marcados.
@@ -61,6 +61,9 @@ filtrar_ein_esn <- function(datos) {
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @seealso \code{\link{une_secciones}} y \code{\link{descarga_trameros}}
+#'
 detecta_cambios <- function(datos, years = 1996:2016) {
 
   stopifnot("tramero_ine" %in% class(datos))
@@ -125,7 +128,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 }
 
 
-#' @title Carga los datos privados de población para el proyecto MEDEA3
+#' @title Carga los datos privados de poblacion para el proyecto MEDEA3
 #'
 #' @description Algunos datos del proyecto MEDEA3 están encriptados para poder
 #'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función

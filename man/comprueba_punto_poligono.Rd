@@ -24,3 +24,6 @@ Con el fin de asegurar que el resultado de la geocodificación
   municipio o una provincia). Para ello es necesario proporcionar un polígono
   de referencia para cada par de coordenadas.
 }
+\seealso{
+\code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
+}
