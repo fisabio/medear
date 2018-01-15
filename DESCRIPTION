@@ -10,7 +10,7 @@ Description: Descarga, manipulación y extracción de poblaciones desde 1996 a 201
     por sección censal, de acuerdo con los datos del INE, incluyendo la cartografía
     asociada al año 2011. Incluye rutinas de geocodificado, unión de secciones 
     censales a lo largo del período de estudio, y otras funcionalidades del proyecto.
-Depends: R (>= 3.4.3)
+Depends: R (>= 3.3.0)
 License: MIT + file LICENSE
 Encoding: latin1
 LazyData: true
@@ -24,7 +24,7 @@ Imports:
     readr (>= 1.1.1),
     rgdal (>= 1.2-16),
     sodium (>= 1.1),
-    utils (>= 3.3.3)
+    utils (>= 3.3.0)
 Remotes: carlosvergara/caRtociudad
 RoxygenNote: 6.0.1
 ByteCompile: yes

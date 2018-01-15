@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{filtra_dir}
 \alias{filtra_dir}
-\title{Detección y prueba de variantes de direcciones mal escritas}
+\title{Deteccion y prueba de variantes de direcciones mal escritas}
 \usage{
 filtra_dir(vias, nivel)
 }

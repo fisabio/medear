@@ -95,7 +95,7 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 }
 
 
-#' @title Detección y prueba de variantes de direcciones mal escritas
+#' @title Deteccion y prueba de variantes de direcciones mal escritas
 #'
 #' @description Se considera una serie de variantes de las cadenas de caracteres
 #'   de las direcciones no geocodificadas. La intención es valorar si esas
@@ -235,7 +235,7 @@ filtra_dir <- function(vias, nivel) {
 }
 
 
-#' @title Comprobación de inclusión de una coordenada dentro de un polígono
+#' @title Comprobacion de inclusion de una coordenada dentro de un poligono
 #'
 #' @description Con el fin de asegurar que el resultado de la geocodificación
 #'   sea coherente, esta función permite identificar parejas de coordenadas que
@@ -317,8 +317,8 @@ limpiadirecGoogle <- function(cadena){
 }
 
 
-#' @title Implementación del algoritmo de geocodificación de direcciones de
-#'   MEDEA3 (geocodificado con CartoCiudad y Google)
+#' @title Implementacion del algoritmo de geocodificacion de direcciones de
+#'   MEDEA3 (geocodificado con CartoCiudad)
 #'
 #' @description Esta función implementa las dos partes del algoritmo de
 #'   geocodificación de MEDEA3. En la primera parte se intentan geocodificar en
@@ -419,7 +419,7 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 }
 
 
-#' @title Implementación del algoritmo de geocodificación de direcciones de
+#' @title Implementacion del algoritmo de geocodificacion de direcciones de
 #'   MEDEA3 (geocodificado con Google)
 #'
 #' @description Esta función implementa la segunda parte del algoritmo de
