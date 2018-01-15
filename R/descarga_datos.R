@@ -2,8 +2,8 @@
 
 #' @title Carga los trameros del INE
 #'
-#' @description Detecta cambios de sección censal para las provincias y el
-#'   período marcados.
+#' @description Descarga los trameros que ofrece al público el INE para el año
+#'   2001 y desde 2004 a 2017.
 #'
 #' @param cod_provincia Cadena de caracteres de longitud >= 1 con el código de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
@@ -15,8 +15,7 @@
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
-#'   en el directorio oculto \code{.trameros/} dentro del directorio de
-#'   trabajo?
+#'   en el directorio oculto \code{.trameros/} dentro del directorio de trabajo?
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -28,20 +27,16 @@
 #'   dígitos la sección censal.
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   2004:2017, descarga = TRUE, ruta = NULL, conservar = TRUE)
+#'   c(2001, 2004:2017), descarga = TRUE, ruta = NULL, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
-#'   \item{CPRO}{Código de la provincia.}
-#'   \item{CMUM}{Código del municipio.}
-#'   \item{DIST}{Código del distrito.}
-#'   \item{SECC}{Código de la sección censal reducido.}
-#'   \item{CVIA}{Código de la víareducido.}
-#'   \item{EIN}{Primer portal del tramo de vía.}
-#'   \item{ESN}{Último portal del tramo de vía.}
-#'   \item{NVIAC}{Nombre de la vía.}
-#'   \item{seccion}{Código de la sección censal completo.}
-#'   \item{year}{Año del tramero.}
-#'   \item{via}{Código de la vía completo.}
+#'   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
+#'   \item{DIST}{Código del distrito.} \item{SECC}{Código de la sección censal
+#'   reducido.} \item{CVIA}{Código de la víareducido.} \item{EIN}{Primer portal
+#'   del tramo de vía.} \item{ESN}{Último portal del tramo de vía.}
+#'   \item{NVIAC}{Nombre de la vía.} \item{seccion}{Código de la sección censal
+#'   completo.} \item{year}{Año del tramero.} \item{via}{Código de la vía
+#'   completo.}
 #'
 #'   Cada fila representa un tramo de vía, puediendo repetirse la misma vía en
 #'   varias ocasiones en función de si su recorrido recae en varias secciones
@@ -59,31 +54,56 @@
 #'
 #' @export
 #'
-#' @seealso \code{\link{descarga_cartografia}} y \code{\link{descarga_poblaciones}}
+#' @seealso \code{\link{descarga_cartografia}} y
+#'   \code{\link{descarga_poblaciones}}
 #'
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
-                              years = 2004:2017, descarga = TRUE, ruta = NULL,
+                              years = c(2001, 2004:2017), descarga = TRUE, ruta = NULL,
                               conservar = TRUE) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) > 0 & years %in% 2001:2017)
+  stopifnot(length(years) > 0 & years %in% c(2001, 2004:2017))
   stopifnot(is.logical(descarga))
   stopifnot(is.logical(conservar))
   stopifnot(is.character(ruta) | is.null(ruta))
 
+  trameros <- list()
+  dir_dest <- normalizePath(
+    path     = paste0(getwd(), "/.trameros/prov_", cod_provincia),
+    winslash = "/",
+    mustWork = FALSE
+  )
+  estructura <- readr::fwf_positions(
+    start     = c(1, 3, 6, 8, 21, 49, 54),
+    end       = c(2, 5, 7, 10, 25, 52, 57),
+    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN")
+  )
+  if (2001 %in% years) {
+    y_2001 <- TRUE
+    years  <- years[-(years == 2001)]
+  }
   if (descarga) {
-    dir_dest <- normalizePath(
-      path     = paste0(getwd(), "/.trameros/prov_", cod_provincia),
-      winslash = "/",
-      mustWork = FALSE
-    )
-
+    if (y_2001) {
+      if (!dir.exists(unique(dirname(dir_dest))))
+        dir.create(unique(dirname(dir_dest)), recursive = TRUE)
+      file_down <- paste0(unique(dirname(dir_dest)), "/nacional_2001.zip")
+      utils::download.file(
+        url = "http://www.ine.es/prodyser/callejero/caj_esp/caj_esp_072001.zip",
+        destfile = file_down,
+        quiet    = TRUE
+      )
+      file_zip <- utils::unzip(zipfile = file_down, list = TRUE)
+      file_zip <- file_zip[grep("^TRAM", file_zip[,1]), 1]
+      utils::unzip(file_down, files = file_zip,
+                   overwrite = TRUE, exdir = dirname(file_down))
+      utils::unzip(paste0(dirname(file_down), "/", file_zip),
+                   overwrite = TRUE, exdir = dirname(file_down))
+    }
     for (i in seq_along(dir_dest)) {
       for (j in seq_along(years)) {
         if (!dir.exists(dir_dest[i]))
           dir.create(dir_dest[i], recursive = TRUE)
-
         file_down <- paste0(dir_dest[i], "/", substr(years, 3, 4)[j], ".zip")
         utils::download.file(
           url = paste0("http://www.ine.es/prodyser/callejero/caj1",
@@ -92,7 +112,6 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
           destfile = file_down,
           quiet    = TRUE
         )
-
         file_zip <- utils::unzip(zipfile = file_down, list = TRUE)[, 1]
         file_zip <- file_zip[grep("TRAM|t$", file_zip, ignore.case = TRUE)]
 
@@ -122,14 +141,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     dir_dest <- paste0(ruta, "prov_", cod_provincia)
   }
 
-  estructura <- readr::fwf_positions(
-    start     = c(1, 3, 6, 8, 21, 49, 54),
-    end       = c(2, 5, 7, 10, 25, 52, 57),
-    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN")
-  )
-  trameros <- list()
   ruta_tra <- matrix(NA, nrow = length(cod_provincia), ncol = length(years))
-
   for (i in seq_along(dir_dest)) {
     for (j in seq_along(years)) {
       ruta_tra[i, j] <- paste0(dir_dest[i], "/year_", substr(years[j], 3, 4))
@@ -143,6 +155,21 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
       )]
     }
+  }
+  if (y_2001) {
+    tramero <- readr::read_fwf(
+      file          = list.files(
+        dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
+      ),
+      col_positions = estructura,
+      col_types     = readr::cols(.default = "c"),
+      progress      = FALSE
+    )
+    trameros[["n_2001"]] <- as.data.table(tramero)[, `:=`(
+      year    = 2001,
+      seccion = paste0(CPRO, CMUM, DIST, SECC),
+      via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
+    )][CPRO %in% cod_provincia]
   }
   if (descarga && !conservar)
     unlink(dirname(dir_dest), recursive = TRUE)

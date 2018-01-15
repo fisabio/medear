@@ -8,11 +8,12 @@ output:
 vignette: >
   %\VignetteIndexEntry{Protocolo de georreferenciacion MEDEA 3}
   %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}
 ---
 
 El protocolo según se ha definido consta de 3 partes separadas:
 
-* Importación de las librerias, datos y adaptación de su formato para la geocodificación.
+* Importación de los paquetes, datos y adaptación de su formato para la geocodificación.
 * Geocodificación con `caRtociudad`.
 * Geocodificación de registros restantes con `Google`.
 
@@ -20,9 +21,9 @@ El que el protocolo contemple dos servicios de geocodificación distintos se debe
 
 En consecuencia el protocolo de geocodificación procede de la siguiente manera. En primer lugar todas las direcciones intentan ser geocodificadas mediante el servicio de `Cartociudad` ya que éste parece ser más fiable y no tiene limitación diaria en cuanto al número de direcciones a geocodificar. Una vez terminado ese proceso, en el que nos habremos quitado de encima buena parte de las direcciones que teníamos que geocodificar, intentaremos la geocodificación de las direcciones restantes mediante el servicio de `Google`. En adelante describimos en detalle cada una de estas fases del protocolo.
 
-# Importación de las librerias, datos y adaptación de su formato para la geocodificación
+# Importación de las paquetes, datos y adaptación de su formato para la geocodificación
 
-## Carga de las librerias necesarias para el proceso de geocodificación:
+## Carga de los paquetes necesarios para el proceso de geocodificación:
 
 ```{r, message=FALSE, warning=FALSE, eval = FALSE}
 if (!"devtools" %in% installed.packages()) 
@@ -112,7 +113,7 @@ datosmort$type          <- ""
 Una vez disponemos de la base de datos de mortalidad en el formato adecuado pasamos a intentar geocodificar todas las direcciones utilizando el paquete `caRtociudad`. Para ello haremos un uso intensivo de la función `geocodificar_cartociudad` de `medear`, la cual intenta geocodificar cada dirección atendiendo a las dos versiones de `caRtociudad` disponibles a día de hoy. Para más información del funcionamiento interno de dicha función se puede recurrir a la ayuda específica de la misma (`?geocodificar_cartociudad`). Además, en caso de que una dirección no pueda ser geocodificada se prueba si distintas variantes de la dirección pudieran dar algún resultado positivo. Las variantes contempladas son 2:
 
 * Filtro 1: Comprueba la duplicidadad del tipo de vía y la elimina si existe. Por ejemplo: `"CALLE AVDA" -> "AVDA", "CALLE PLAZA" -> "PLAZA", ...`
-* Filtro 2: Elimina texto o bien contenido entre paréntesis o bien posterior a expresiones que contengan "URBANIZACIÓN xxxxx", "URB xxxxxx", "RESIDENCIA XXXXX", "RESID XXXXX" ¿¿¿¿¿¿¿SOLO ESTO O ALGO MAS, POR MARCAR CON PUNTOS SUSPENSIVOS???
+* Filtro 2: Elimina texto o bien contenido entre paréntesis o bien posterior a expresiones que contengan "URBANIZACIÓN xxxxx", "URB xxxxxx", "RESIDENCIA XXXXX", "RESID XXXXX" ¿¿¿SOLO ESTO O ALGO MAS, POR MARCAR CON PUNTOS SUSPENSIVOS???
 
 El paquete `caRtociudad` manda al servicio de geocodificación las direcciones de las defunciones una a una. En caso de que la geocodificación llevada a cabo sea exitosa, completaremos los campos que hemos añadido a `datosmort` con la información que hayamos obtenido. En caso contrario simplemente actualizaremos el campo `georef` con información que podría ser de interés en relación al motivo por el que dicha defunción no ha podido ser georeferenciada.  
 
@@ -204,7 +205,7 @@ for (i in 1:totno.geo) {
       }
     }
   }
-  #Contador
+  # Contador
   cat(paste(i, "de", totno.geo, "georef", datosmort$georef[cont], "\n"))
 }
 
@@ -264,8 +265,8 @@ for (i in 1:totno.geo) {
   if (aux$georef == "NO punto") {
     datosmort$georef[cont] <- "NO punto google"
   }  
-  if (aux$georef == "NO") {#Cuando NO se ha podido georeferenciar con google 
-    #recogemos el motivo: "ZERO_RESULTS", "OVER_QUERY_LIMIT",...
+  if (aux$georef == "NO") {# Cuando NO se ha podido georeferenciar con google 
+    # recogemos el motivo: "ZERO_RESULTS", "OVER_QUERY_LIMIT", ...
     datosmort$state[cont] <- as.character(aux$state)
   }  
   if(!aux$georef %in% c("NO", "NO punto")) {

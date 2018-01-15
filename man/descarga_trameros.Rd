@@ -6,7 +6,7 @@
 \title{Carga los trameros del INE}
 \usage{
 descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-  2004:2017, descarga = TRUE, ruta = NULL, conservar = TRUE)
+  c(2001, 2004:2017), descarga = TRUE, ruta = NULL, conservar = TRUE)
 }
 \arguments{
 \item{cod_provincia}{Cadena de caracteres de longitud >= 1 con el código de
@@ -23,22 +23,17 @@ archivos tal cual se descargaron desde el INE, en caso de escoger
 \code{descarga = FALSE}.}
 
 \item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
-en el directorio oculto \code{.trameros/} dentro del directorio de
-trabajo?}
+en el directorio oculto \code{.trameros/} dentro del directorio de trabajo?}
 }
 \value{
 Un objeto de clase \code{tramero_ine} con 11 columnas:
-  \item{CPRO}{Código de la provincia.}
-  \item{CMUM}{Código del municipio.}
-  \item{DIST}{Código del distrito.}
-  \item{SECC}{Código de la sección censal reducido.}
-  \item{CVIA}{Código de la víareducido.}
-  \item{EIN}{Primer portal del tramo de vía.}
-  \item{ESN}{Último portal del tramo de vía.}
-  \item{NVIAC}{Nombre de la vía.}
-  \item{seccion}{Código de la sección censal completo.}
-  \item{year}{Año del tramero.}
-  \item{via}{Código de la vía completo.}
+  \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
+  \item{DIST}{Código del distrito.} \item{SECC}{Código de la sección censal
+  reducido.} \item{CVIA}{Código de la víareducido.} \item{EIN}{Primer portal
+  del tramo de vía.} \item{ESN}{Último portal del tramo de vía.}
+  \item{NVIAC}{Nombre de la vía.} \item{seccion}{Código de la sección censal
+  completo.} \item{year}{Año del tramero.} \item{via}{Código de la vía
+  completo.}
 
   Cada fila representa un tramo de vía, puediendo repetirse la misma vía en
   varias ocasiones en función de si su recorrido recae en varias secciones
@@ -46,8 +41,8 @@ Un objeto de clase \code{tramero_ine} con 11 columnas:
   numeración alguna.
 }
 \description{
-Detecta cambios de sección censal para las provincias y el
-  período marcados.
+Descarga los trameros que ofrece al público el INE para el año
+  2001 y desde 2004 a 2017.
 }
 \details{
 El tiempo de ejecución de la función varía según el número de
@@ -68,5 +63,6 @@ El tiempo de ejecución de la función varía según el número de
 
 }
 \seealso{
-\code{\link{descarga_cartografia}} y \code{\link{descarga_poblaciones}}
+\code{\link{descarga_cartografia}} y
+  \code{\link{descarga_poblaciones}}
 }
