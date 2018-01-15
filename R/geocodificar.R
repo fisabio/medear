@@ -366,7 +366,7 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
   devuelve <- data.frame(georef = "NO", stringsAsFactors = FALSE)
 
   # Llamamos a caRtociudad version previa (OLD)
-  fcarto.old <- caRtociudad::cartociudad_geocode(direc, version = "prev")
+  fcarto.old <- suppressWarnings(caRtociudad::cartociudad_geocode(direc, version = "prev"))
   if (fcarto.old$state %in% 1:2) {
     devuelve <- fcarto.old[, columnas_elegidas]
     devuelve$georef <- "caRto.OLD"
@@ -387,7 +387,7 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 
   # Llamamos a caRtociudad version nueva (NEW)
   if (substr(devuelve$georef, 1, 2) == "NO" | (devuelve$georef == "caRto.OLD" & fcarto.old$state == "2")) {
-    fcarto.new <- caRtociudad::cartociudad_geocode(direc,version = "current")
+    fcarto.new <- suppressWarnings(caRtociudad::cartociudad_geocode(direc,version = "current"))
     if (fcarto.new$state %in% 1:4) {
       devuelve <- fcarto.new[, columnas_elegidas]
       devuelve$georef <- "caRto.NEW"
