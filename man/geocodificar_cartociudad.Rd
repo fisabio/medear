@@ -3,8 +3,8 @@
 \encoding{UTF-8}
 \name{geocodificar_cartociudad}
 \alias{geocodificar_cartociudad}
-\title{Implementación del algoritmo de geocodificación de direcciones de
-  MEDEA3 (geocodificado con CartoCiudad y Google)}
+\title{Implementacion del algoritmo de geocodificacion de direcciones de
+  MEDEA3 (geocodificado con CartoCiudad)}
 \usage{
 geocodificar_cartociudad(direc, poligono = NULL)
 }
