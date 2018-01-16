@@ -28,7 +28,7 @@ En consecuencia el protocolo de geocodificación procede de la siguiente manera. 
 ```{r, message=FALSE, warning=FALSE, eval = FALSE}
 if (!"devtools" %in% installed.packages()) 
   install.packages("devtools")
-devtools::install_github("fisabio/medear") # Puede tardar unos minutos...
+devtools::install_github("fisabio/medear", build_vignettes = TRUE) # Puede tardar unos minutos...
 library(medear)
 ```
 
@@ -38,6 +38,8 @@ Al instalar el paquete `medear` se instalan las dependencias, que incluyen a los
 * `medear`: Versión `r packageVersion("medear")`
 * `ggmap`: Versión `r packageVersion("ggmap")`
 * `caRtociudad`: Versión `r packageVersion("caRtociudad")`
+
+Si así se desea, es posible consultar este protocolo desde la ayuda del paquete (útil si estás utilizando una interfaz tipo [RStudio](https://www.rstudio.com/)), pues está incorporado dentro del mismo como una viñeta, siendo accesible con la sentencia `vignette("medear-protocolo")`.
 
 ## Carga y preparación de la cartografía
 
