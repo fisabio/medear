@@ -18,7 +18,7 @@
 #'   última actualización de los datos (siempre que esté disponible) como un
 #'   atributo de los objetos.
 #'
-#'   Un uso potencial puede ser la prepararación de consultas personalizadas
+#'   Un uso potencial puede ser la preparación de consultas personalizadas
 #'   para ciudades o provincias completas, por lo que el paquete ofrece todas
 #'   las funciones necesarias para descargar los datos y la cartografía
 #'   directamente desde el INE y trabajarlos para obtener el producto final. En
@@ -39,7 +39,7 @@
 #'   Por otra parte, el paquete incorpora una serie de funciones para efectuar
 #'   la georreferenciación de la mortalidad, siguiendo el protocolo disponible
 #'   como viñeta dentro del paquete (accesible mediante
-#'   \code{vignette("procolo")}):
+#'   \code{vignette("medear-georreferenciacion")}):
 #'
 #'   \describe{\item{\code{\link{geocodificar_cartociudad}}}{Implementación del
 #'   algoritmo de geocodificación de direcciones de MEDEA3 (geocodificado con
@@ -53,16 +53,16 @@
 #'   \describe{\item{\code{\link{cartografia}}}{Cartografia por seccion censal
 #'   para las ciudades MEDEA3.} \item{\code{\link{poblacion}}}{Datos de
 #'   poblacion por seccion censal para las ciudades MEDEA3 (periodo 2006-2016).}
-#'   \item{\code{\link{secciones}}}{Secciones censales unicas por periodo
+#'   \item{\code{\link{secciones}}}{Secciones censales únicas por período
 #'   (1996-2016).} \item{\code{\link{cambios_seccion}}}{Cambios temporales de
-#'   seccionado para todo el pais, incluyendo las ciudades MEDEA3 (periodo
+#'   seccionado para todo el país, incluyendo las ciudades MEDEA3 (período
 #'   2004-2017).} \item{\code{\link{codigos_ine}}}{Nombres de municipios y
-#'   provincias segun terminologia oficial del INE.} }
+#'   provincias según terminología oficial del INE.} }
 #'
 #'   Fuente: Elaboración propia con datos extraídos del \href{www.ine.es}{sitio
 #'   web del INE}.
 #'
-#'   Licencia: Los datos contenidos en este paquete han sido extraidos desde el
+#'   Licencia: Los datos contenidos en este paquete han sido extraídos desde el
 #'   \href{www.ine.es}{sitio web del INE} y modificados de acuerdo a las
 #'   necesidades del proyecto, quedando sujeto su uso a la
 #'   \href{www.ine.es/ss/Satellite?L=0&c=Page&cid=1254735849170&p=1254735849170&pagename=Ayuda\%2FINELayout#}{licencia
@@ -79,11 +79,11 @@
 #'   \code{\link{secciones}}, \code{\link{cambios_seccion}},
 #'   \code{\link{codigos_ine}}
 #'
-#' @references \describe{\item{\href{www.ine.es/}{sitio web del INE}}{}
+#' @references \describe{\item{\href{www.ine.es/}{Sitio web del INE.}}{}
 #'   \item{\href{www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{Población
-#'    por secciones censales}}{}
+#'    por secciones censales.}}{}
 #'   \item{\href{http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip}{Cartografía
-#'    se secciones censales a 1 de noviembre de 2011 en formato SHP.}}{}}
+#'    de secciones censales a 1 de noviembre de 2011 en formato SHP.}}{}}
 #'
 #' @name medear-package
 #'
