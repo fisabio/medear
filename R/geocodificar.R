@@ -33,6 +33,8 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 
   vias <- list(tvia = tvia, nvia = nvia, npoli = npoli,
                muni = muni, prov = prov, codpost = codpost)
+  stopifnot(all(sapply(vias, is.character)))
+
   vias <- lapply(vias, tolower)
 
   # Convertir NA's en 0 caracteres.
@@ -129,6 +131,11 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 #' @seealso \code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
 #'
 filtra_dir <- function(vias, nivel) {
+
+  stopifnot(is.list(vias))
+  stopifnot(c("tvia", "nvia", "npoli", "muni", "prov", "codpost") %in% names(vias))
+  stopifnot(is.numeric(nivel))
+
   tvias     <- paste(vias$tvia, vias$nvia)
   indice    <- integer()
   tvia_norm <- c("calle", "avenida", "plaza", "partida", "camino", "carretera",
@@ -258,6 +265,10 @@ filtra_dir <- function(vias, nivel) {
 #'
 comprueba_punto_poligono <- function(punto, poligono) {
 
+  stopifnot(is.data.frame(punto))
+  stopifnot(is.numeric(unlist(punto)))
+  stopifnot(class(poligono) == "SpatialPolygonsDataFrame")
+
   CRScarto     <- sp::CRS(sp::proj4string(poligono))
   poligono     <- sp::spTransform(poligono, CRScarto)
   punto.lonlat <- data.frame(
@@ -296,6 +307,8 @@ comprueba_punto_poligono <- function(punto, poligono) {
 #' @seealso \code{\link{geocodificar_google}}
 #'
 limpiadirecGoogle <- function(cadena){
+  stopifnot(is.character(cadena))
+
   cadena <- gsub(cadena, pattern = "\U00F1|\U00F0|\U00A5",        replacement = "n")
   cadena <- gsub(cadena, pattern = "\U00E1|\U00E0|\U00AA|\U00E4", replacement = "a")
   cadena <- gsub(cadena, pattern = "\U00E9|\U00E8|\U00EB",        replacement = "e")
@@ -368,10 +381,14 @@ limpiadirecGoogle <- function(cadena){
 #' @export
 #'
 #' @seealso \code{\link{geocodificar_google}} para georreferenciar los
-#'   registros pendientes y \code{vignette("protocolo")} para visualizar el
+#'   registros pendientes y \code{vignette("medear-georreferenciacion")} para visualizar el
 #'   protocolo de georreferenciación
 #'
 geocodificar_cartociudad <- function(direc, poligono = NULL) {
+
+  stopifnot(is.character(direc))
+  if (!is.null(poligono))
+    stopifnot(class(poligono) == "SpatialPolygonsDataFrame")
 
   columnas_elegidas <- c("id", "province", "muni", "tip_via", "address",
                          "portalNumber", "refCatastral", "postalCode",
@@ -443,10 +460,14 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 #' @export
 #'
 #' @seealso \code{\link{geocodificar_cartociudad}} como paso previo y
-#'   \code{vignette("protocolo")} para visualizar el protocolo de
+#'   \code{vignette("medear-georreferenciacion")} para visualizar el protocolo de
 #'   georreferenciación
 #'
 geocodificar_google <- function(direc, poligono = NULL) {
+
+  stopifnot(is.character(direc))
+  if (!is.null(poligono))
+    stopifnot(class(poligono) == "SpatialPolygonsDataFrame")
 
   direc   <- limpiadirecGoogle(cadena = direc)
   fgoogle <- llama_google(direc = direc, tries = 10)
