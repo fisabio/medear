@@ -79,6 +79,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     end       = c(2, 5, 7, 10, 25, 52, 57),
     col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN")
   )
+  y_2001 <- FALSE
   if (2001 %in% years) {
     y_2001 <- TRUE
     years  <- years[-(years == 2001)]
