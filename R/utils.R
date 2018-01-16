@@ -220,6 +220,32 @@ llama_google <- function(direc, tries) {
 }
 
 
+descarga_segura <- function(x, tries = 10, ...) {
+  withRestarts(
+    tryCatch(
+      suppressWarnings(
+        suppressMessages(
+          utils::download.file(
+            url   = x,
+            quiet = TRUE,
+            ...
+          )
+        )
+      ),
+      error = function(e) {invokeRestart("retry")}
+    ),
+    retry = function() {
+      if (tries <= 0) {
+        stop("Server error: try later")
+      }
+      message("Failing to connect with server: retrying...")
+      Sys.sleep(5)
+      descarga_segura(direc, tries - 1)
+    }
+  )
+}
+
+
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
     "CUSEC", "idn", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",

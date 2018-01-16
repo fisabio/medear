@@ -88,10 +88,9 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       if (!dir.exists(unique(dirname(dir_dest))))
         dir.create(unique(dirname(dir_dest)), recursive = TRUE)
       file_down <- paste0(unique(dirname(dir_dest)), "/nacional_2001.zip")
-      utils::download.file(
-        url = "http://www.ine.es/prodyser/callejero/caj_esp/caj_esp_072001.zip",
-        destfile = file_down,
-        quiet    = TRUE
+      descarga_segura(
+        x        = "http://www.ine.es/prodyser/callejero/caj_esp/caj_esp_072001.zip",
+        destfile = file_down
       )
       file_zip <- utils::unzip(zipfile = file_down, list = TRUE)
       file_zip <- file_zip[grep("^TRAM", file_zip[,1]), 1]
@@ -105,12 +104,11 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         if (!dir.exists(dir_dest[i]))
           dir.create(dir_dest[i], recursive = TRUE)
         file_down <- paste0(dir_dest[i], "/", substr(years, 3, 4)[j], ".zip")
-        utils::download.file(
-          url = paste0("http://www.ine.es/prodyser/callejero/caj1",
-                       substr(years, 3, 4)[j], "/call_p", cod_provincia[i], "_1",
-                       substr(years, 3, 4)[j] ,".zip"),
-          destfile = file_down,
-          quiet    = TRUE
+        descarga_segura(
+          x        = paste0("http://www.ine.es/prodyser/callejero/caj1",
+                            substr(years, 3, 4)[j], "/call_p", cod_provincia[i], "_1",
+                            substr(years, 3, 4)[j] ,".zip"),
+          destfile = file_down
         )
         file_zip <- utils::unzip(zipfile = file_down, list = TRUE)[, 1]
         file_zip <- file_zip[grep("TRAM|t$", file_zip, ignore.case = TRUE)]
@@ -238,15 +236,14 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
   )
   if (!dir.exists(dir_dest))
     dir.create(dir_dest, recursive = TRUE)
-  utils::download.file(
-    url = "http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip",
-    destfile = paste0(dir_dest, "/carto_2011.zip"), quiet = TRUE
+  descarga_segura(
+    x        = "http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip",
+    destfile = paste0(dir_dest, "/carto_2011.zip")
   )
   utils::unzip(
     zipfile = paste0(dir_dest, "/carto_2011.zip"),
     exdir = dir_dest
   )
-
   carto <- rgdal::readOGR(
     dsn              = paste0(dir_dest, "/SECC_CPV_E_20111101_01_R_INE.shp"),
     verbose          = FALSE,
@@ -258,7 +255,6 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
                          colnames(carto@data))]
   names(carto)[names(carto) == "CUSEC"] <- "seccion"
   carto <- sp::spTransform(carto, CRSobj = sp::CRS(paste0("+init=epsg:", crs)))
-
 
   attributes(carto@data)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   attributes(carto@data)$class  <-  c(attributes(carto@data)$class, "cartografia_ine")
@@ -346,8 +342,8 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
           dir.create(dir_dest[i], recursive = TRUE)
 
         file_down[i, j] <- paste0(dir_dest[i], "/", years[j], ".csv")
-        utils::download.file(
-          url = paste0(
+        descarga_segura(
+          x = paste0(
             "http://www.ine.es/jaxi/files/_px/es/csv_sc/t20/e245/p07/a",
             years[j],
             if (years[j] < 2011) {
@@ -362,8 +358,7 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
               paste0("/", cod_provincia[i], "01")
             }, ".csv_sc?nocab=1"
           ),
-          destfile = file_down[i, j],
-          quiet    = TRUE
+          destfile = file_down[i, j]
         )
         Sys.sleep(1)
       }
