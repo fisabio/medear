@@ -240,7 +240,7 @@ descarga_segura <- function(x, tries = 10, ...) {
       }
       message("Failing to connect with server: retrying...")
       Sys.sleep(5)
-      descarga_segura(direc, tries - 1)
+      descarga_segura(x, tries - 1)
     }
   )
 }

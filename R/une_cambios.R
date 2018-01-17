@@ -6,7 +6,7 @@
 #'   sección censal.
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
-#' @param cartografia Objeto de clase \code{\link[sp]{SpatialPoligonsDataFrame}}, y con
+#' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, y con
 #'   datos de clase \code{cartografia_ine}.
 #' @param years Vector numérico de longitud >= 1 con los años para los que se
 #'   desee consultar las variaciones de seccionado. El año 2011 debe figurar
@@ -22,7 +22,7 @@
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
-#'   \code{cartografia_ine} y \code{\link[sp]{SpatialPoligonsDataFrame}} con la
+#'   \code{cartografia_ine} y \code{\link[sp]{SpatialPolygonsDataFrame}} con la
 #'   cartografía, donde cada fila es una sección censal y que cuenta con 9
 #'   columnas: \item{seccion}{Cadena de 10 caracteres con el código de sección
 #'   censal (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
