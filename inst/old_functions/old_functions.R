@@ -258,14 +258,14 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
 #'   la geocodificación original conseguida por la versión previa.
 #'
 #'   Tras el proceso descrito, pueden considerarse una serie de variantes de las
-#'   cadenas de caracteres de las direcciones no geocodificadas. La intención es
+#'   cadenas de carácteres de las direcciones no geocodificadas. La intención es
 #'   valorar si esas variaciones podrían producir en alguna ocasión una
 #'   geocodificación exitosa. En concreto, \code{geocodificar} contempla 5
 #'   posibles variantes para las direcciones que no han podido ser
 #'   geocodificadas: 1.- eliminar duplicidad de tipos de vía (ejemplo: calle
 #'   camino ...-> camino ...); 2.- eliminar descripciones de vía (ejemplo:
 #'   Avenida rosa (Edificio azul)->Avenida rosa); 3.- eliminar palabras de 3 o
-#'   menos caracteres (ejemplo: calle la marina alta-> calle marina alta); 4.-
+#'   menos carácteres (ejemplo: calle la marina alta-> calle marina alta); 4.-
 #'   eliminar signos de puntuación (ejemplo: calle gral. pedro.->calle gral
 #'   pedro); 5.- implementación de todas las variantes anteriores de forma
 #'   conjunta. \code{geocodificar} contempla todas estas variantes para
@@ -290,12 +290,12 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
 #'   NULL, filtro_geo = c("municipio", "provincia", "ninguno"),
 #'   limpiar_direcciones = TRUE, intentos = 10)
 #'
-#' @param direcciones Vector de caracteres con las direcciones a geocodificar.
+#' @param direcciones Vector de carácteres con las direcciones a geocodificar.
 #'   Las direcciones deben proporcionarse \strong{OBLIGATORIAMENTE} con el
 #'   formato "TIPO_DE_VÍA NOMBRE_DE_VÍA NÚMERO_DE_VÍA, MUNICIPIO, PROVINCIA,
-#'   CÓDIGO_POSTAL". La codificación de caracteres a utilizar debe ser,
-#'   \strong{OBLIGATORIAMENTE}, ASCII, de forma que no aparezcan caracteres como
-#'   eÃ±es o tildes. Para transformar la codificación de caracteres al tipo
+#'   CÓDIGO_POSTAL". La codificación de carácteres a utilizar debe ser,
+#'   \strong{OBLIGATORIAMENTE}, ASCII, de forma que no aparezcan carácteres como
+#'   eÃ±es o tildes. Para transformar la codificación de carácteres al tipo
 #'   ASCII, se puede emplear la función \code{\link[base]{iconv}} de la
 #'   siguiente forma:
 #'
@@ -311,15 +311,15 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
 #'   por esta función. Si no se da ningún valor a este argumento, el campo
 #'   \code{idn} del data.frame anterior será simplemente un vector secuencial
 #'   que numera cada uno de los registros.
-#' @param codigos Vector de caracteres de longitud igual al vector de
-#'   direcciones. Contiene los códigos INE (5 caracteres por código) de los
+#' @param codigos Vector de carácteres de longitud igual al vector de
+#'   direcciones. Contiene los códigos INE (5 carácteres por código) de los
 #'   municipios a los que hacen referencia las direcciones. Si el valor es nulo
 #'   (opción por defecto), la función trata de averiguar el código desde la
 #'   propia dirección.
 #' @param cartografia Objeto de clase \code{cartografia_ine} con la cartografía
 #'   que contenga las geometrías de municipios o provincias a los que hacen
 #'   referencias las direcciones.
-#' @param filtro_geo Vector de caracteres de longitud 1 indicando el nivel de
+#' @param filtro_geo Vector de carácteres de longitud 1 indicando el nivel de
 #'   filtrado cartográfico a efectuar (eliminación de coordenadas devueltas pero
 #'   que no correspondan a su polígono correspondiente). Las tres opciones son
 #'   municipio (las coordenadas están dentro del polígono del municipio al que
@@ -395,7 +395,7 @@ geocodificar <- function(direcciones, idn = NULL, codigos = NULL, cartografia = 
   if (is.null(codigos) & filtro_geo != "ninguno")
     warning(
       "Has escogido realizar un filtrado de geolocalizaciones atendiendo a\n",
-      "la cartograf\u00eda, pero no has proporcionado un vector de caracteres\n",
+      "la cartograf\u00eda, pero no has proporcionado un vector de car\u00e1cteres\n",
       "con los c\u00f3digos INE del nivel del filtro:\n",
       "la funci\u00f3n intentar\u00e1 extraer el nivel de filtrado de las direcciones,\n",
       "lo cual puede proporcionar resultados incorrectos si utilizas la\n",
@@ -573,7 +573,7 @@ geocodificar <- function(direcciones, idn = NULL, codigos = NULL, cartografia = 
     }
 
 
-    # Aplicación de filtros a las cadenas de caracteres
+    # Aplicación de filtros a las cadenas de carácteres
     if (limpiar_direcciones) {
       f1_old <- aplica_filtros(vias, copy(datos), indice_nogeo, "prev", 1, filtro_geo,
                                cartografia, codigos, intentos)

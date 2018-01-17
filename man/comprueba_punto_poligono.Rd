@@ -25,5 +25,6 @@ Con el fin de asegurar que el resultado de la geocodificación
   de referencia para cada par de coordenadas.
 }
 \seealso{
-\code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
+\code{\link{geocodificar_cartociudad}} y
+  \code{\link{geocodificar_google}}.
 }

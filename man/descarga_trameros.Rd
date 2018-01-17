@@ -3,13 +3,13 @@
 \encoding{UTF-8}
 \name{descarga_trameros}
 \alias{descarga_trameros}
-\title{Carga los trameros del INE}
+\title{Descarga los trameros del INE}
 \usage{
 descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
   c(2001, 2004:2017), descarga = TRUE, ruta = NULL, conservar = TRUE)
 }
 \arguments{
-\item{cod_provincia}{Cadena de caracteres de longitud >= 1 con el código de
+\item{cod_provincia}{Cadena de carácteres de longitud >= 1 con el código de
 la/s provincia/s en las que se desee obtener el listado de cambios de
 seccionado.}
 
@@ -18,12 +18,12 @@ desee consultar las variaciones de seccionado.}
 
 \item{descarga}{Valor lógico: ¿debe procederse a la descarga de los trameros?}
 
-\item{ruta}{Cadena de caracteres indicando la ruta en la que se almacenan los
+\item{ruta}{Cadena de carácteres indicando la ruta en la que se almacenan los
 archivos tal cual se descargaron desde el INE, en caso de escoger
 \code{descarga = FALSE}.}
 
 \item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
-en el directorio oculto \code{.trameros/} dentro del directorio de trabajo?}
+en el directorio oculto \code{./.trameros/} dentro del directorio de trabajo?}
 }
 \value{
 Un objeto de clase \code{tramero_ine} con 11 columnas:
@@ -64,5 +64,5 @@ El tiempo de ejecución de la función varía según el número de
 }
 \seealso{
 \code{\link{descarga_cartografia}} y
-  \code{\link{descarga_poblaciones}}
+  \code{\link{descarga_poblaciones}}.
 }

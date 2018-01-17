@@ -3,13 +3,13 @@
 \encoding{UTF-8}
 \name{descarga_poblaciones}
 \alias{descarga_poblaciones}
-\title{Carga poblaciones del INE por seccion censal, sexo, edad y periodo}
+\title{Descarga poblaciones del INE por seccion censal, sexo, edad y periodo}
 \usage{
-descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-  2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
+descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
+  = 2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
 }
 \arguments{
-\item{cod_provincia}{Cadena de caracteres de longitud >= 1 con el código de
+\item{cod_provincia}{Cadena de carácteres de longitud >= 1 con el código de
 la/s provincia/s en las que se desee obtener el listado de cambios de
 seccionado.}
 
@@ -18,12 +18,12 @@ desee consultar las variaciones de seccionado.}
 
 \item{descarga}{Valor lógico: ¿debe procederse a la descarga de los datos?}
 
-\item{ruta}{Cadena de caracteres indicando la ruta en la que se almacenan los
+\item{ruta}{Cadena de carácteres indicando la ruta en la que se almacenan los
 archivos tal cual se descargaron desde el INE, en caso de escoger
 \code{descarga = FALSE}.}
 
 \item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
-en el directorio oculto \code{.poblaciones/} dentro del directorio de
+en el directorio oculto \code{./.poblaciones/} dentro del directorio de
 trabajo?}
 }
 \value{
@@ -31,8 +31,8 @@ Un objeto de clase \code{poblaciones_ine} donde las filas representan
   las distintas secciones censales. Las tres primeras columnas son:
   \item{seccion}{Código de la sección censal en el primer año.}
   \item{sexo}{Código de la sección censal en el segundo año.}
-  \item{year}{Primer año.}
-  El resto de columnas representan los distintos grupos de edad.
+  \item{year}{Primer año.} El resto de columnas representan los distintos
+  grupos de edad.
 }
 \description{
 Descarga o carga las poblaciones anuales del INE por sección
@@ -45,11 +45,14 @@ El tiempo de ejecución de la función varía según el número de
 
   Los códigos de sección censal siguen un orden preestablecido: los primeros
   dos dígitos identifican la provincia, los siguientes tres dígitos el
-  municipio, los próximos dos dígitos el distrito y los últimos tres
-  a la sección censal.
+  municipio, los próximos dos dígitos el distrito y los últimos tres a la
+  sección censal.
 
   Hasta el año 2011 el INE agrupa la última categoría de edad como 85 y más,
   mientras que desde el año siguiente llega hasta 100 y más.
+
+  Si se desea acceder a las poblaciones desde 1996 (datos adquiridos al INE),
+  se debe utilizar la función \code{\link{carga_datos}}.
 }
 \examples{
 
@@ -61,5 +64,6 @@ El tiempo de ejecución de la función varía según el número de
 
 }
 \seealso{
-\code{\link{descarga_trameros}} y \code{\link{descarga_cartografia}}
+\code{\link{carga_datos}}, \code{\link{descarga_trameros}} y
+  \code{\link{descarga_cartografia}}.
 }

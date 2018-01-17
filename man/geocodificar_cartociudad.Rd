@@ -3,15 +3,16 @@
 \encoding{UTF-8}
 \name{geocodificar_cartociudad}
 \alias{geocodificar_cartociudad}
-\title{Implementacion del algoritmo de geocodificacion de direcciones de
-  MEDEA3 (geocodificado con CartoCiudad)}
+\title{Implementar la tercera fase del algoritmo de geocodificacion de
+  direcciones de MEDEA3 (geocodificado con CartoCiudad)}
 \usage{
 geocodificar_cartociudad(direc, poligono = NULL)
 }
 \arguments{
-\item{direc}{Cadena de caracteres con laa direcciones a georreferenciar.}
+\item{direc}{Cadena de carácteres con laa direcciones a georreferenciar.}
 
-\item{poligono}{Opcional: objeto de clase \code{SpatialPolygonsDataFrame}.}
+\item{poligono}{Opcional: objeto de clase
+\code{\link[sp]{SpatialPolygonsDataFrame}}.}
 }
 \value{
 Un data.frame con tantas filas como direcciones se haya proporcionado
@@ -19,13 +20,13 @@ Un data.frame con tantas filas como direcciones se haya proporcionado
   refCatastral, postalCode, lat, lng, stateMsg, state, type y georef.
 }
 \description{
-Esta función implementa las dos partes del algoritmo de
-  geocodificación de MEDEA3. En la primera parte se intentan geocodificar en
-  primera instancia las direcciones haciendo uso del servicio CartoCiudad en
-  su \href{http://www.cartociudad.es/CartoGeocoder/Geocode}{versión antigua}.
-  En esta primera parte daremos por válidos todas aquellos direcciones que
-  hayan obtenido estado == 1 (se ha encontrado la dirección correspondiente
-  de forma exacta) o estado == 2 (dirección asignada al portal más próximo).
+Esta función implementa la tercera parte del algoritmo de
+  geocodificación de MEDEA3. En primer lugar se intenta geocodificar las
+  direcciones haciendo uso del servicio CartoCiudad en su
+  \href{http://www.cartociudad.es/CartoGeocoder/Geocode}{versión antigua}. En
+  esta primera parte daremos por válidos todas aquellos direcciones que hayan
+  obtenido estado == 1 (se ha encontrado la dirección correspondiente de
+  forma exacta) o estado == 2 (dirección asignada al portal más próximo).
   Tras esto se intentará geocodificar con
   \href{http://www.cartociudad.es/geocoder/api/geocoder/findJsonp}{la nueva
   versión de CartoCiudad} al resto de direcciones no geocodifadas por la
@@ -33,16 +34,16 @@ Esta función implementa las dos partes del algoritmo de
   portal y las que hayan obtenido status == 2. La geocodificación de las
   direcciones que no tienen portal resulta menos fiable en la versión antigua
   de CartoCiudad ya que son situadas en el inicio de su vía, mientras que en
-  la nueva versión se sitúan en el centro, haciendo esta geocodificación más
-  acertada. Por otro lado, la versión antigua de CartoCiudad en ocasiones
-  cambia de acera (numeros pares a impares y viceversa) algunas direcciones
-  mientras que en la versión nueva esto no ocurre. Por ello, intentaremos
-  regeocodificar estas dos situaciones con la nueva versión de CartoCiudad, y
-  en caso de que no encontremos la dirección correspondiente en dicha versión
-  mantendríamos la geocodificación original conseguida por la versión previa.
+  la nueva versión se sitúan en el centro, siendo este abordaje más acertado.
+  Por otro lado, la versión antigua de CartoCiudad en ocasiones cambia de
+  acera (numeros pares a impares y viceversa) algunas direcciones mientras
+  que en la versión nueva esto no ocurre. Por ello, intentaremos solucionar
+  estas dos situaciones con la nueva versión de CartoCiudad, y en caso de que
+  esta no logre obtener una ubicación satisfactoria mantendríamos la
+  geocodificación original conseguida por la versión previa.
 
   Tras el proceso descrito, pueden considerarse una serie de variantes de las
-  cadenas de caracteres de las direcciones no geocodificadas, empleando la
+  cadenas de carácteres de las direcciones no geocodificadas, empleando la
   función \code{\link{filtra_dir}}.
 
   La función incorpora un filtro cartográfico que deseche aquellas
@@ -54,7 +55,8 @@ Esta función implementa las dos partes del algoritmo de
   correctamente.
 }
 \seealso{
-\code{\link{geocodificar_google}} para georreferenciar los
-  registros pendientes y \code{vignette("protocolo")} para visualizar el
-  protocolo de georreferenciación
+\code{\link{geocodificar_google}} para georreferenciar los registros
+  pendientes (cuarta fase del protocolo) y
+  \code{vignette("medear-georreferenciacion")} para visualizar el protocolo
+  de georreferenciación.
 }

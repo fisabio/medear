@@ -4,9 +4,9 @@
 #' @description Esta función ejecuta una limpieza genérica de las direcciones,
 #'   eliminando datos perdidos, sustituyendo portales igual a cero o ceros a la
 #'   izquierda, normaliza los pincipales tipos de vía (calle, avenida, plaza,
-#'   partida, camino, carretera, pasaje, paseo y travesía) y elimnina
+#'   partida, camino, carretera, pasaje, paseo y travesía) y elimina
 #'   duplicidades en el nombre de municipios y provincias (consecuencia del uso
-#'   de varias lenguas).
+#'   conjunto de varias lenguas).
 #'
 #'   La función espera como entrada los campos habituales del boletín de
 #'   defunciones, y ella se ocupa de trabajarlos por separado.
@@ -27,7 +27,7 @@
 #' @export
 #'
 #' @seealso \code{\link{geocodificar_cartociudad}} y
-#'   \code{\link{geocodificar_google}}
+#'   \code{\link{geocodificar_google}}.
 #'
 limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 
@@ -37,7 +37,7 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 
   vias <- lapply(vias, tolower)
 
-  # Convertir NA's en 0 caracteres.
+  # Convertir NA's en 0 carácteres.
   vias <- lapply(vias, function(x) ifelse(is.na(x), "", x))
   # Repaso de la conversion previa (no es realmente necesario...).
   vias <- lapply(vias, gsub, pattern = "^na$", replacement = "")
@@ -45,16 +45,16 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
   # Eliminar ceros a la izquierda en npoli.
   vias$npoli <- gsub("^0*(?=\\d+)", "", vias$npoli, perl = TRUE)
 
-  # Convertir numeros compuestos por un cero en 0 caracteres.
+  # Convertir numeros compuestos por un cero en 0 carácteres.
   vias$npoli <- gsub("^0$", "", vias$npoli)
 
-  # Convertir numeros 999 o 9999 en cero caracteres
+  # Convertir numeros 999 o 9999 en cero carácteres
   vias$npoli <- gsub("9999?", "", vias$npoli)
 
   # Convertir nombres de via con 3a en tercera.
   vias$nvia <- gsub("\\s3a\\s", "tercera", vias$nvia)
 
-  # Convertir nombres de via no consta en 0 caracteres.
+  # Convertir nombres de via no consta en 0 carácteres.
   vias$nvia <- gsub("no consta", "", vias$nvia)
 
   # Eliminar comas del nombre de la vía.
@@ -99,27 +99,27 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 
 #' @title Deteccion y prueba de variantes de direcciones mal escritas
 #'
-#' @description Se considera una serie de variantes de las cadenas de caracteres
+#' @description Se considera una serie de variantes de las cadenas de carácteres
 #'   de las direcciones no geocodificadas. La intención es valorar si esas
 #'   variaciones podrían producir en alguna ocasión una geocodificación exitosa.
 #'   En concreto, \code{\link{filtra_dir}} contempla 5 posibles variantes para
-#'   las direcciones que no han podido ser geocodificadas: 1.- eliminar
-#'   duplicidad de tipos de vía (ejemplo: calle camino ...-> camino ...); 2.-
-#'   eliminar descripciones de vía (ejemplo: Avenida rosa (Edificio
-#'   azul)->Avenida rosa); 3.- eliminar palabras de 3 o menos caracteres
-#'   (ejemplo: calle la marina alta-> calle marina alta); 4.- eliminar signos de
-#'   puntuación (ejemplo: calle gral. pedro.->calle gral pedro); 5.-
-#'   implementación de todas las variantes anteriores de forma conjunta.
-#'   \code{\link{filtra_dir}} contempla todas estas variantes para cualquier
-#'   dirección que no haya podido ser geocodificada a partir de su dirección
-#'   original.
+#'   las direcciones que no han podido ser geocodificadas:
+#'   \enumerate{\item{eliminar duplicidad de tipos de vía (ejemplo: calle camino
+#'   ...-> camino ...);} \item{eliminar descripciones de vía (ejemplo: Avenida
+#'   rosa (Edificio azul)->Avenida rosa);} \item{eliminar palabras de 3 o menos
+#'   carácteres (ejemplo: calle la marina alta-> calle marina alta);}
+#'   \item{eliminar signos de puntuación (ejemplo: calle gral. pedro.->calle
+#'   gral pedro);} \item{implementación de todas las variantes anteriores de
+#'   forma secuencial.}} \code{\link{filtra_dir}} contempla todas estas
+#'   variantes para cualquier dirección que no haya podido ser geocodificada a
+#'   partir de su dirección original.
 #'
 #' @param vias Lista de seis elementos devuelta por \code{\link{limpia_dir}}.
 #' @param nivel Numérico: filtro a a aplicar.
 #'
 #' @usage filtra_dir(vias, nivel)
 #'
-#' @return Se devuelve un vector de caracteres de igual longitud a la lista de
+#' @return Se devuelve un vector de carácteres de igual longitud a la lista de
 #'   entrada, con las direcciones listas para geocodificar (las direcciones en
 #'   las que no se reconozca ningún patrón son sustituidas por un elemento
 #'   vacío).
@@ -128,7 +128,8 @@ limpia_dir <- function(tvia, nvia, npoli, muni, prov, codpost) {
 #'
 #' @export
 #'
-#' @seealso \code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
+#' @seealso \code{\link{limpia_dir}}, \code{\link{geocodificar_cartociudad}} y
+#'   \code{\link{geocodificar_google}}.
 #'
 filtra_dir <- function(vias, nivel) {
 
@@ -261,7 +262,8 @@ filtra_dir <- function(vias, nivel) {
 #'
 #' @export
 #'
-#' @seealso \code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
+#' @seealso \code{\link{geocodificar_cartociudad}} y
+#'   \code{\link{geocodificar_google}}.
 #'
 comprueba_punto_poligono <- function(punto, poligono) {
 
@@ -294,17 +296,18 @@ comprueba_punto_poligono <- function(punto, poligono) {
 
 #' @title Limpieza de caracteres para Google
 #'
-#' @description Eliminación de caracteres no ascii.
+#' @description Eliminación de carácteres no ASCII para la geocodificación con
+#'   Google.
 #'
-#' @param cadena Cadena de caracteres con lsa direcciones a pasar a Google.
+#' @param cadena Cadena de carácteres con las direcciones a pasar a Google.
 #'
-#' @return Cadena de caracteres de la misma longitud que la proporcionada.
+#' @return Cadena de carácteres de la misma longitud que la proporcionada.
 #'
 #' @encoding UTF-8
 #'
 #' @export
 #'
-#' @seealso \code{\link{geocodificar_google}}
+#' @seealso \code{\link{geocodificar_google}}.
 #'
 limpiadirecGoogle <- function(cadena){
   stopifnot(is.character(cadena))
@@ -330,16 +333,16 @@ limpiadirecGoogle <- function(cadena){
 }
 
 
-#' @title Implementacion del algoritmo de geocodificacion de direcciones de
-#'   MEDEA3 (geocodificado con CartoCiudad)
+#' @title Implementar la tercera fase del algoritmo de geocodificacion de
+#'   direcciones de MEDEA3 (geocodificado con CartoCiudad)
 #'
-#' @description Esta función implementa las dos partes del algoritmo de
-#'   geocodificación de MEDEA3. En la primera parte se intentan geocodificar en
-#'   primera instancia las direcciones haciendo uso del servicio CartoCiudad en
-#'   su \href{http://www.cartociudad.es/CartoGeocoder/Geocode}{versión antigua}.
-#'   En esta primera parte daremos por válidos todas aquellos direcciones que
-#'   hayan obtenido estado == 1 (se ha encontrado la dirección correspondiente
-#'   de forma exacta) o estado == 2 (dirección asignada al portal más próximo).
+#' @description Esta función implementa la tercera parte del algoritmo de
+#'   geocodificación de MEDEA3. En primer lugar se intenta geocodificar las
+#'   direcciones haciendo uso del servicio CartoCiudad en su
+#'   \href{http://www.cartociudad.es/CartoGeocoder/Geocode}{versión antigua}. En
+#'   esta primera parte daremos por válidos todas aquellos direcciones que hayan
+#'   obtenido estado == 1 (se ha encontrado la dirección correspondiente de
+#'   forma exacta) o estado == 2 (dirección asignada al portal más próximo).
 #'   Tras esto se intentará geocodificar con
 #'   \href{http://www.cartociudad.es/geocoder/api/geocoder/findJsonp}{la nueva
 #'   versión de CartoCiudad} al resto de direcciones no geocodifadas por la
@@ -347,16 +350,16 @@ limpiadirecGoogle <- function(cadena){
 #'   portal y las que hayan obtenido status == 2. La geocodificación de las
 #'   direcciones que no tienen portal resulta menos fiable en la versión antigua
 #'   de CartoCiudad ya que son situadas en el inicio de su vía, mientras que en
-#'   la nueva versión se sitúan en el centro, haciendo esta geocodificación más
-#'   acertada. Por otro lado, la versión antigua de CartoCiudad en ocasiones
-#'   cambia de acera (numeros pares a impares y viceversa) algunas direcciones
-#'   mientras que en la versión nueva esto no ocurre. Por ello, intentaremos
-#'   regeocodificar estas dos situaciones con la nueva versión de CartoCiudad, y
-#'   en caso de que no encontremos la dirección correspondiente en dicha versión
-#'   mantendríamos la geocodificación original conseguida por la versión previa.
+#'   la nueva versión se sitúan en el centro, siendo este abordaje más acertado.
+#'   Por otro lado, la versión antigua de CartoCiudad en ocasiones cambia de
+#'   acera (numeros pares a impares y viceversa) algunas direcciones mientras
+#'   que en la versión nueva esto no ocurre. Por ello, intentaremos solucionar
+#'   estas dos situaciones con la nueva versión de CartoCiudad, y en caso de que
+#'   esta no logre obtener una ubicación satisfactoria mantendríamos la
+#'   geocodificación original conseguida por la versión previa.
 #'
 #'   Tras el proceso descrito, pueden considerarse una serie de variantes de las
-#'   cadenas de caracteres de las direcciones no geocodificadas, empleando la
+#'   cadenas de carácteres de las direcciones no geocodificadas, empleando la
 #'   función \code{\link{filtra_dir}}.
 #'
 #'   La función incorpora un filtro cartográfico que deseche aquellas
@@ -367,8 +370,9 @@ limpiadirecGoogle <- function(cadena){
 #'   motor de Google con las direcciones que no hayan sido geocodificadas
 #'   correctamente.
 #'
-#' @param direc Cadena de caracteres con laa direcciones a georreferenciar.
-#' @param poligono Opcional: objeto de clase \code{SpatialPolygonsDataFrame}.
+#' @param direc Cadena de carácteres con laa direcciones a georreferenciar.
+#' @param poligono Opcional: objeto de clase
+#'   \code{\link[sp]{SpatialPolygonsDataFrame}}.
 #'
 #' @usage geocodificar_cartociudad(direc, poligono = NULL)
 #'
@@ -380,9 +384,10 @@ limpiadirecGoogle <- function(cadena){
 #'
 #' @export
 #'
-#' @seealso \code{\link{geocodificar_google}} para georreferenciar los
-#'   registros pendientes y \code{vignette("medear-georreferenciacion")} para visualizar el
-#'   protocolo de georreferenciación
+#' @seealso \code{\link{geocodificar_google}} para georreferenciar los registros
+#'   pendientes (cuarta fase del protocolo) y
+#'   \code{vignette("medear-georreferenciacion")} para visualizar el protocolo
+#'   de georreferenciación.
 #'
 geocodificar_cartociudad <- function(direc, poligono = NULL) {
 
@@ -436,18 +441,19 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 }
 
 
-#' @title Implementacion del algoritmo de geocodificacion de direcciones de
-#'   MEDEA3 (geocodificado con Google)
+#' @title Implementar la cuarta fase del algoritmo de geocodificacion de
+#'   direcciones de MEDEA3 (geocodificado con Google)
 #'
-#' @description Esta función implementa la segunda parte del algoritmo de
-#'   geocodificación de MEDEA3. En la primera parte se intentó geocodificar las
+#' @description Esta función implementa la cuarta fase del algoritmo de
+#'   geocodificación de MEDEA3. En la fase previa se intentó geocodificar las
 #'   direcciones haciendo uso del servicio CartoCiudad
 #'   \code{\link{geocodificar_cartociudad}}. Tras la geocodificación usando
 #'   CartoCiudad, es el momento de probar el motor de Google con las direcciones
 #'   que no hayan sido geocodificadas correctamente.
 #'
-#' @param direc Cadena de caracteres con laa direcciones a georreferenciar.
-#' @param poligono Opcional: objeto de clase \code{SpatialPolygonsDataFrame}.
+#' @param direc Cadena de carácteres con laa direcciones a georreferenciar.
+#' @param poligono Opcional: objeto de clase
+#'   \code{\link[sp]{SpatialPolygonsDataFrame}}.
 #'
 #' @usage geocodificar_google(direc, poligono = NULL)
 #'
@@ -459,9 +465,9 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 #'
 #' @export
 #'
-#' @seealso \code{\link{geocodificar_cartociudad}} como paso previo y
-#'   \code{vignette("medear-georreferenciacion")} para visualizar el protocolo de
-#'   georreferenciación
+#' @seealso \code{\link{geocodificar_cartociudad}} como paso previo (tercera
+#'   fase del protocolo) y \code{vignette("medear-georreferenciacion")} para
+#'   visualizar el protocolo de georreferenciación.
 #'
 geocodificar_google <- function(direc, poligono = NULL) {
 
