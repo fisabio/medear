@@ -1,0 +1,323 @@
+---
+title: "Protocolo de geocodificación"
+author: "Grupo MEDEA"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::pdf_document:
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Protocolo de geocodificacion MEDEA 3}
+  %\usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+Todo el protocolo se vertebra alrededor del uso de herramientas gratuitas y que pueden funcionar en cualquier sistema operativo (de ahí la elección de `R` como software de referencia). Concretamente, y para el proceso de geocodificación, el protocolo se ha estructurado en 4 fases:
+
+1. Instalación y carga de paquetes de `R`.
+2. Importación de datos y adaptación de su formato.
+3. Geocodificación de direcciones con `CartoCiudad`.
+4. Geocodificación de las direcciones restantes con `Google`.
+
+Como puede verse, en el protocolo se contemplan dos servicios de geocodificación distintos: esto se debe a que ambos son completamente independientes, con lo que una dirección que no pueda ser geocodificada por uno de ellos sí podría serlo por el otro. No obstante, en nuestra experiencia el servicio de geocodificación de `CartoCiudad` ha resultado ser más fiable que el de `Google`, y es por ello que se ha propuesto como servicio primario. En este sentido, y según hemos podido comprobar, `Google` parece más aventurado a la hora de asignar unas coordenadas a cada dirección; además, en algunos casos las coordenadas devueltas por `Google` son menos precisas que las que ofrece `CartoCiudad` (lo cual se traduce en un mayor error alrededor del punto que debería haberse asignado, incluyendo la posibilidad de un cambio de sección censal) y, por último, la versión gratuita tiene un límite en el número de consultas por día (lo cual es muy molesto dado el volumen de datos que manejamos). Sin embargo, el servicio de `Google` tiene una gran ventaja respecto al de `CartoCiudad`, y es que es capaz de geocodificar puntos de interés (como residencias de ancianos) además de direcciones, siendo capaz de resolver direcciones del tipo `Residencia Costablanca, Alicante`, lo que aporta un matiz complementario para ubicar esa clase de direcciones que `CartoCiudad` no es capaz de ubicar, justificando su uso.
+
+Así pues, en líneas generales la combinación de servicios funciona de la siguiente manera: en primer lugar se intenta geocodificar todas las direcciones mediante `CartoCiudad` y, una vez terminado ese proceso (en el que nos habremos quitado de encima buena parte de las direcciones que teníamos que geocodificar), se intentará la geocodificación de las direcciones restantes a través de `Google`.
+
+# Instalación y carga de paquetes de `R`
+
+El primer paso es asegurar que se tiene instalado `R`. El protocolo se ha probado con varias versiones de este software, y aunque es posible ejecutarlo con versiones a partir de la 3.1.0, es recomendable utilizar la última, que es la [3.4.3](https://cran.r-project.org/).
+
+Existen varios paquetes de `R` que permiten establecer una conexión con los servicios de geocodificación. Para facilitar este proceso, se ha creado el paquete [`medear`](https://github.com/fisabio/medear), el cual aglutina las funcionalidades de otros paquetes adaptándolas a nuestras necesidades. Para instalar este paquete y sus dependencias basta con ejecutar el siguiente código en la consola de `R`:
+
+```{r, message=FALSE, warning=FALSE, eval = FALSE}
+# El paquete devtools facilita la instalación de medear
+if (!"devtools" %in% installed.packages())
+  install.packages("devtools")
+devtools::install_github("fisabio/medear", build_vignettes = TRUE)
+# Puede tardar unos minutos...
+library(medear) # Carga del paquete medear
+```
+
+Al instalar el paquete `medear` también se instalan todas sus dependencias, que incluyen a los paquetes `ggmap` y `caRtociudad`. Cuando hablamos de `caRtociudad` nos referimos a una [versión propia](https://github.com/carlosvergara/caRtociudad) de este paquete que hemos adaptado de la [versión principal](https://github.com/cjgb/caRtociudad) para este proyecto. Esta versión propia permite, a diferencia de la original, llamar a ambas versiones (antigua y nueva) del servicio de geocodificado de `CartoCiudad`. Las versiones de los paquetes implicados en este protocolo son:
+
+* `devtools`: Versión `r packageVersion("devtools")`.
+* `medear`: Versión `r packageVersion("medear")`.
+* `ggmap`: Versión `r packageVersion("ggmap")`.
+* `caRtociudad`: Versión `r packageVersion("caRtociudad")`.
+
+Si así se desea, es posible consultar este protocolo desde la ayuda del paquete (útil si estás utilizando una interfaz tipo [RStudio](https://www.rstudio.com/)), pues está incorporado dentro del mismo como una viñeta, siendo accesible con la sentencia `vignette("medear-geocodificacion")`.
+
+# Carga o importación de datos y adaptación de su formato
+
+## Carga y preparación de la cartografía
+
+El proceso de geocodificación hace uso de la cartografía de cada municipio con el propósito de asegurar que cada una de las coordenadas obtenidas cae dentro del límite territorial de la ciudad correspondiente. En caso contrario, la geocodificación se desecha por considerarse errónea (la dirección se ha asignado a otro municipio).
+
+Dentro del paquete `medear` se dispone de una cartografía (descargada de la [web del INE](http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip)) a nivel de sección censal para el año 2011 para todas las ciudades del proyecto MEDEA, la cual es accesible tras haber cargado el paquete. Concretamente, para poder acceder a dicha cartografía bastaría con ejecutar `data("cartografia")`, lo cual adjunta al entorno de trabajo un objeto con ese mismo nombre. El `data.frame` asociado a `cartografia` tiene como columnas: `seccion`, `CUMUN` (código INE para cada municipio), `CCA` (código INE para cada comunidad autónoma), y las variables `NPRO`, `NCA`  y `NMUN`, que hacen referencia a los nombres estandarizados de cada provincia, comunidad autónoma y municipio (respectivamente). Por otra parte, también se dispone de una función para descargar la cartografía completa de toda España de la web del INE (si así se quisiera): `descarga_cartografia()`
+
+```{r, eval=FALSE}
+data("cartografia")
+# Si quisiéramos descargar la cartografía completa, usaríamos:
+# cartografia <- descarga_cartografia()
+
+# Filtramos la cartografía, en nuestro caso nos quedamos sólo con las ciudades de la 
+# Comunidad Valenciana, cuyo código INE es "10" (adaptar en caso de otras CCAA)
+carto.munis <- cartografia[cartografia$CCA == "10", ]
+``` 
+
+Dentro del paquete hay un conjunto de datos con los códigos INE de todas las comunidades, provincias y municipios de España, incluyendo una variable que indica si estos últimos participan en MEDEA3. Por ejemplo, podríamos consultar las ciudades participantes en MEDEA3 con
+
+```{r, eval=FALSE}
+data("codigos_ine")
+codigos_ine[codigos_ine$medea3, ]
+```
+
+obteniendo como resultado los códigos que pudieran interesarnos.
+
+**Solo en caso de querer cargar otro archivo de cartografía**
+
+Es posible cargar otra cartografía que no sea la incluida dentro del paquete `medear`. Si la cartografía estuviera en formato *ESRI Shapefile* (archivo con extensión `.shp`) sería necesario que anexo a dicho archivo hubiera otro con la proyección empleada (archivo con extensión `.prj`) con el mismo nombre que el archivo con la cartografía. Como decíamos, el archivo con extensión `.prj` contendrá la información sobre la proyección utilizada para geocodificar la cartografía y por tanto para referenciar sus elementos exactamente dentro del globo terráqueo. Esta información resulta necesaria para ciertas fases del proceso de geocodificación. Para ello, ejecutaríamos las siguientes líneas
+
+```{r, eval=FALSE}
+# No ejecutar este comando a menos que se quiera importar un archivo de cartografía
+# El paquete rgdal se instala como dependencia del paquete medear
+library(rgdal)
+# Cambiar CartografiaDeseada por la ruta hasta el archivo oportuno
+carto.munis <- readOGR(dsn = "CartografiaDeseada.shp", layer = "CapaDeseada")
+```
+
+## Carga y preparación de los datos de mortalidad
+
+En esta sección se cargará y preparará (para su análisis posterior) la información de mortalidad con las direcciones a geocodificar. Los datos de la Comunidad Valenciana se encuentran en una base de datos llamada `datosmort`. El archivo `datosmort` se cargará mediante alguna sentencia del tipo `load("datos/datosmort.RData")` o `read.csv("datos/datosmort.csv")` donde `datos/` hace referencia al directorio en el que tengamos el archivo correspondiente (en el caso de datos en formato CSV, quizá se necesite algún argumento extra). Si deseas ejecutar este protocolo de forma secuencial (sin cambiar nada), es importante que, una vez hayas importado tus datos en `R` uses el mismo nombre que nosotros (`datosmort`). Esto puedes hacerlo con la sentencia:
+
+```{r, eval=FALSE}
+load("datos/datosmort.RData") # Sustituir el entrecomillado por la ruta oportuna
+
+# En caso de que tu base de datos se llamase de otra forma:
+datosmort <- el_nombre_de_tu_base_de_datos_de_mortalidad
+```
+
+
+En el caso de la Comunidad Valenciana el `data.frame` con la mortalidad tiene la siguiente estructura:
+
+```{r, eval=FALSE}
+colnames(datosmort)
+# [1] "NID"        "SEXO"       "ANODEFUN"   "MESDEFUN"   "DIADEFUN"   "ANONAC"    
+# [7] "MESNAC"     "DIANAC"     "TVIA"       "NVIA"       "NPOLI"      "CODMUNIRES"
+# [13]"NMUNIRES"   "NPROVRES"   "CODPST"     "CAUSABASIC"
+```
+
+De esos campos los únicos que vamos a utilizar de aquí en adelante son:
+
+* `TVIA`, tipo de vía. 
+* `NVIA`, nombre de la vía.
+* `NPOLI`, número de policía del domicilio. 
+* `CODMUNIRES`, código INE del municipio. 
+* `NMUNIRES`, nombre del municipio de residencia.
+* `NPROVRES`, nombre de la provincia de residencia. 
+* `CODPST`, código postal (si se tiene, si no contendrá un texto en blanco: "").
+
+Para que el resto de instrucciones contenidas en este protocolo funcionen sin ninguna modificación adicional, tu base de datos con la información de mortalidad deberá tener (al menos) estos campos con **exactamente estos nombres**. Si los nombres de esos campos fueran distintos en tu base de datos, te aconsejamos que los renombres. Respecto al resto de columnas, si faltase o tuvieras alguna de más o con distinto nombre, y dado que no van a necesitarse, no tendrá ninguna importancia para el correcto funcionamiento del protocolo.
+
+Una vez que te hayas asegurado que tu `data.frame` tenga la información que acabamos de comentar y con ese formato exactamente, las siguientes sentencias completan dicho `data.frame`, creando nuevas columnas que serán utilizadas más adelante:
+
+```{r, eval=FALSE}
+datosmort$BOD.direccion <- ""    # Dirección tal cual ha sido intentada geocodificar
+datosmort$georef        <- "NO"  # Status del proceso de geocodificado
+datosmort$id            <- ""
+datosmort$province      <- ""
+datosmort$muni          <- ""
+datosmort$tip_via       <- ""
+datosmort$address       <- ""
+datosmort$portalNumber  <- ""
+datosmort$refCatastral  <- ""
+datosmort$postalCode    <- ""
+datosmort$lat           <- NA_real_
+datosmort$lng           <- NA_real_
+datosmort$stateMsg      <- ""
+datosmort$state         <- ""
+datosmort$type          <- ""
+```
+
+# Geocodificación de direcciones con `CartoCiudad`
+
+Una vez disponemos de la base de datos de mortalidad en el formato adecuado, pasamos a intentar geocodificar todas las direcciones utilizando el paquete `caRtociudad`. Para ello haremos un uso intensivo de la función `geocodificar_cartociudad` de `medear`, la cual intenta geocodificar cada dirección atendiendo a las dos versiones de `caRtociudad` disponibles a día de hoy. Para más información del funcionamiento interno de dicha función se puede recurrir a la ayuda específica de la misma (`?geocodificar_cartociudad`). Además, en caso de que una dirección no pueda ser geocodificada se prueba si distintas variantes de la dirección pudieran dar algún resultado positivo. Las variantes contempladas son 5, aunque en este protocolo solo vamos a aplicar las dos siguientes:
+
+1. eliminar duplicidad de tipos de vía (ejemplo: calle camino ...-> camino ...).
+2. eliminar descripciones de vía (ejemplo: "Avenida rosa (Edificio azul)" -> "Avenida rosa").
+
+La función `geocodificar_cartociudad` manda al servicio de geocodificación las direcciones de las defunciones una a una. Como resultado de estas consultas, se obtendrá una base de datos donde uno de los campos se llama `state`, haciendo referencia a la exactitud de la geocodificación que proporciona `CartoCiudad`. En este sentido, solo se retendrán aquellas coordenadas cuyo campo `state` sea igual a
+
+1. geolocalización exacta,
+2. gelocalización aproximada: el portal par consultado no existe en la base de datos de `CartoCiudad`, se devuelve el par más cercano,
+3. gelocalización aproximada: el portal impar consultado no existe en la base de datos de `CartoCiudad`, se devuelve el impar más cercano,
+4. gelocalización aproximada: el portal o punto kilométrico consultado no existe en la base de datos de `CartoCiudad`, se devuelve el más cercano.
+
+En caso de que la geocodificación llevada a cabo sea exitosa, completaremos los campos que hemos añadido a `datosmort` con la información obtenida. En caso contrario simplemente actualizaremos el campo `georef` con información que podría ser de interés en relación al motivo por el que dicha defunción no ha podido ser geocodificada.  
+
+```{r, eval = FALSE}
+# Seleccionamos individuos a geocodificar, si se quisiera hacer una segunda 
+# ronda de geocodificación (como luego haremos con Google) una sentencia de selección 
+# de este tipo hará que sólo se aplique la nueva geocodificación a los registros 
+# que nos parezca oportuno.
+
+no.geo    <- which(datosmort$georef == "NO")
+totno.geo <- length(no.geo)
+
+# Comenzamos bucle de geocodificación para los registros seleccionados
+for (i in 1:totno.geo) {
+  
+  cont <- no.geo[i]
+  
+  # Preparamos la dirección (normalización y limpieza), gracias a la función limpia_dir
+  aux.direc <- limpia_dir(
+    tvia    = datosmort$TVIA[cont],
+    nvia    = datosmort$NVIA[cont],
+    npoli   = datosmort$NPOLI[cont],
+    muni    = datosmort$NMUNIRES[cont],
+    prov    = datosmort$NPROVRES[cont],
+    codpost = datosmort$CODPST[cont]
+  )
+
+  if (aux.direc$nvia == "") {
+    datosmort$georef[cont] <- "DIREC VACIA"
+  } else {
+    
+    # Guardamos en "BOD.direccion" la dirección normalizada que vamos 
+    # a mandar a CartoCiudad.
+    datosmort$BOD.direccion[cont] <- paste0(
+      aux.direc$tvia, " ",
+      aux.direc$nvia, " ",
+      aux.direc$npoli, ", ",
+      aux.direc$muni, " , ",
+      aux.direc$prov, " , ",
+      aux.direc$codpost
+    )
+    
+    direc <- datosmort$BOD.direccion[cont]
+    
+    # Georreferenciación con caRtociudad con comprobación de que la 
+    # geocodificación que hemos obtenido recae geográficamente dentro del 
+    # límite geográfico correspondiente a la ciudad.
+    aux <- geocodificar_cartociudad(
+      direc    = direc,
+      poligono = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
+    )
+    
+    # En caso de que quisiéramos geocodificar con caRtociudad sin más, 
+    # sin comprobar que el punto que obtenemos está incluido en una región 
+    # geográfica concreta, ejecutaríamos simplemente: 
+    # aux <- geocodificar_cartociudad(direc = direc)
+    
+    columnas_elegidas <- c(
+      "id", "province", "muni", "tip_via", "address", "portalNumber", "refCatastral",
+      "postalCode", "lat", "lng", "stateMsg", "state", "type", "georef"
+    )
+    
+    if (substr(aux$georef, 1, 2) != "NO") {
+      datosmort[cont, columnas_elegidas] <- aux
+    } else {
+      datosmort$georef[cont] <- as.character(aux$georef)
+      # El resultado de la geocodificación puede ser NO.XXX además de un simple NO 
+      # (donde XXX nos puede aportar información adicional), ese es el motivo por 
+      # el que actualizamos el valor de la columna georef del registro correspondiente. 
+      
+      # En caso de que la geocodificación de la dirección no haya tenido éxito,
+      #  probamos la geocodificación de algunas variantes de dicha dirección.
+      for (filtro in 1:2) {
+        if (substr(aux$georef, 1, 2) == "NO") {
+          # Si alguno de los filtros ha funcionado no se reintentaría la geocodificación.
+          # Función que aplica los filtros:
+          aux.direcf <- filtra_dir(vias = aux.direc, filtro) 
+          if (aux.direcf != "") {
+              direcf <- aux.direcf
+              aux    <- geocodificar_cartociudad(
+                direc    = direcf,
+                poligono = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
+              )
+          }
+          if(substr(aux$georef, 1, 2) != "NO") {
+            datosmort[cont, columnas_elegidas] <- aux
+            datosmort$georef[cont] <- paste0(datosmort$georef[cont], filtro)
+          }
+        }
+      }
+    }
+  }
+  # Contador
+  cat(paste(i, "de", totno.geo, "georef", datosmort$georef[cont], "\n"))
+}
+
+# Una vez finalizado el proceso guardamos una copia de los datos geocodificados por 
+# caRtociudad antes de pasar a google
+
+###### Creamos el directorio (en caso de no existir) donde se guardarán los datos
+if (!dir.exists("datos/mortalidad"))
+  dir.create("datos/mortalidad", recursive = TRUE)
+save(datosmort, file = "datos/mortalidad/mortalidad_geocodificada.RData")
+```
+
+# Geocodificación de las direcciones restantes con `Google`
+
+En el apartado anterior se debería haber geocodificado una gran proporción de las direcciones (en nuestras pruebas, la cifra varía entre un 85 y 95 %), y ahora se hará uso del servicio de geocodificación de `Google` para tratar de geocodificar todos los registros que no hayan podido ser geocodificados con `caRtociudad`.
+
+Debido al límite de consultas diarias que impone la versión gratuita del servicio de `Google` (teóricamente de 2500, aunque hemos observado que esta cifra puede variar mucho), es muy probable que tengamos que enviar algunas direcciones varias veces a este servicio, en días distintos, para poder completar el proceso. Para entender mejor el proceso que sigue a continuación, se debe tener en cuenta la respuesta que devuelve el servicio de `Google` al tratar de geocodificar un registro:
+
+* `state` igual a `"OK"` : registro geocodificado.
+* `state` distinto de `"OK"`:
+    - `state` igual a `"ZERO_RESULTS"` indica que el registro no ha podido ser geocodificado por Google.
+    - `state` igual a `"OVER_QUERY_LIMIT"` indica que por algún motivo (puede ser exceso de número de consultas diarias, o fallo de conexión con el servidor de `Google` en un momento determinado, la dirección no ha podido ser geocodificada. Estas direcciones son susceptibles de volver a ser enviadas a `Google` para lograr una geocodificación exitosa.
+
+Por este motivo, cuando no tenemos éxito al geocodificar con `Google` (`state != "OK"`) se guardará, además del campo `georef == "NO"`, el valor del campo `state` con el fin de volver a enviar aquellas direcciones en las que sea necesario una ejecución posterior (en días posteriores) de esta parte del protocolo, seleccionando las direcciones cuyo estado de la variable `georef` sea `"NO"` o `"NO punto..."`, y cualquier estado de `Google` que indique que el individuo no está geocodificado. En este sentido, es importante hacer hincapié en este aspecto y distinguir entre los distintos tipos de direcciones no geocodificadas:
+
+1. Enviados a `Google` con éxito y que no han podido ser geocodificados: estos registros mantendrán un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"ZERO_RESULTS"`. *Estos puntos NO deben volver a ser enviados a `Google` en una nueva ronda de geocodificación*, en caso de volver a ser mandados el resultado será exactamente el mismo.
+2. Enviados a `Google` con éxito, geocodificados, pero con resultado de un punto que no está en el polígono (límite municipal) requerido: estos registros mantendrán un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"NO punto google"`. *Estos puntos NO deben volver a ser enviados a `Google` en una nueva ronda de geocodificación*, en caso de volver a ser mandados el resultado que obtendremos será exactamente el mismo, resultado que no consideramos válido.
+3. Enviados a `Google` sin éxito debido a algún fallo, como por ejemplo que se ha excedido el límite diario de geocodificaciones: estos registros mantendrán un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"OVER_QUERY_LIMIT"` o cualquier otra circunstancia. *Estas direcciones SÍ deben volver a ser enviadas a `Google` en una nueva ronda de geocodificación* ya que en esa nueva ronda podrían ser geocodificadas.
+
+El proceso de geocodificación mediante `Google` se puede llevar a cabo mediante el siguiente código. A partir del momento en que el proceso comience a devolver de forma repetida `"OVER_QUERY_LIMIT"` para, digamos 100 registros, podremos parar el proceso y reanudarlo otro día, ya que habríamos alcanzado el límite máximo diario de geocodificaciones permitidas. En ese caso, no olvides ejecutar la sentencia `save` del final del código para guardar las geocodificaciones efectuadas durante dicha jornada. Al retomar el código durante el día siguiente, las sentencias iniciales seleccionan los registros que quedan por geocodificar o hayan tenido una geocodificación defectuosa previa y solo intenta la geocodificación de las direcciones correspondientes.
+
+```{r, eval=FALSE}
+load(file = "datos/mortalidad/mortalidad_geocodificada.RData")
+columnas_elegidas <- c(
+      "id", "province", "muni", "tip_via", "address", "portalNumber", "refCatastral",
+      "postalCode", "lat", "lng", "stateMsg", "state", "type", "georef"
+    )
+# Seleccionamos aquellos individuos a geocodificar que no lo hayan sido antes 
+# o hayan sido geocodificados por Google de forma defectuosa.
+no.geo <- which(substr(datosmort$georef, 1, 2) == "NO" & 
+                  datosmort$state != "ZERO_RESULTS" & 
+                  datosmort$georef != "NO punto google")  
+totno.geo <- length(no.geo)
+
+for (i in 1:totno.geo) {
+  cont  <- no.geo[i]
+  
+  # Preparación las direcciones, eliminando caracteres extraños que Google no reconoce
+  # gracias a la función limpiadirecGoogle
+  direc <- limpiadirecGoogle(datosmort$BOD.direccion[cont]) 
+
+  # Georreferencia con Google con comprobación de que es asignado al interior del polígono
+  # correspondiente a la ciudad.
+  aux <- geocodificar_google(
+    direc    = direc,
+    poligono = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
+  )
+  
+  # Para geocodificar con Google sin más, si no se quisiera cruzar 
+  # con los límites geográficos de la ciudad haríamos:
+  # aux <- geocodificar_google(direc)
+  
+  if (aux$georef == "NO punto") {
+    datosmort$georef[cont] <- "NO punto google"
+  }  
+  if (aux$georef == "NO") {# Cuando NO se ha podido geocodificar con google 
+    # recogemos el motivo: "ZERO_RESULTS", "OVER_QUERY_LIMIT", ...
+    datosmort$state[cont] <- as.character(aux$state)
+  }  
+  if(!aux$georef %in% c("NO", "NO punto")) {
+    datosmort[cont, columnas_elegidas] <- aux
+  }
+  cat(paste(i, "de", totno.geo, "georef", datosmort$georef[cont], "\n"))
+}
+
+save(datosmort, file = "datos/mortalidad/mortalidad_geocodificada.RData")
+```
