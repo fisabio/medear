@@ -27,14 +27,14 @@ Se devuelve una lista de 6 elementos, uno para cada campo de entrada.
 Esta función ejecuta una limpieza genérica de las direcciones,
   eliminando datos perdidos, sustituyendo portales igual a cero o ceros a la
   izquierda, normaliza los pincipales tipos de vía (calle, avenida, plaza,
-  partida, camino, carretera, pasaje, paseo y travesía) y elimnina
+  partida, camino, carretera, pasaje, paseo y travesía) y elimina
   duplicidades en el nombre de municipios y provincias (consecuencia del uso
-  de varias lenguas).
+  conjunto de varias lenguas).
 
   La función espera como entrada los campos habituales del boletín de
   defunciones, y ella se ocupa de trabajarlos por separado.
 }
 \seealso{
 \code{\link{geocodificar_cartociudad}} y
-  \code{\link{geocodificar_google}}
+  \code{\link{geocodificar_google}}.
 }

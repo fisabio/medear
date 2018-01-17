@@ -11,7 +11,7 @@ une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
 
-\item{cartografia}{Objeto de clase \code{SpatialPoligonsDataFrame}, y con
+\item{cartografia}{Objeto de clase \code{\link[sp]{SpatialPoligonsDataFrame}}, y con
 datos de clase \code{cartografia_ine}.}
 
 \item{years}{Vector numérico de longitud >= 1 con los años para los que se
@@ -28,7 +28,7 @@ proporcionar en caso de querer agregar las poblaciones.}
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de
   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
-  \code{cartografia_ine} y \code{SpatialPoligonsDataFrame} con la
+  \code{cartografia_ine} y \code{\link[sp]{SpatialPoligonsDataFrame}} con la
   cartografía, donde cada fila es una sección censal y que cuenta con 9
   columnas: \item{seccion}{Cadena de 10 caracteres con el código de sección
   censal (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
@@ -51,8 +51,9 @@ El resultado devuelto varía en función de si se proporcionan datos de
   grupos de edad (85 0 100).
 }
 \description{
-Une los cambios del seccionado del INE en la cartografía INE
-  2011 y en las poblaciones por sexo año y sección censal.
+Une los cambios del seccionado del INE (tomando como referencia
+  la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
+  sección censal.
 }
 \examples{
 

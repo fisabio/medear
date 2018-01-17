@@ -13,27 +13,28 @@ filtra_dir(vias, nivel)
 \item{nivel}{Numérico: filtro a a aplicar.}
 }
 \value{
-Se devuelve un vector de caracteres de igual longitud a la lista de
+Se devuelve un vector de carácteres de igual longitud a la lista de
   entrada, con las direcciones listas para geocodificar (las direcciones en
   las que no se reconozca ningún patrón son sustituidas por un elemento
   vacío).
 }
 \description{
-Se considera una serie de variantes de las cadenas de caracteres
+Se considera una serie de variantes de las cadenas de carácteres
   de las direcciones no geocodificadas. La intención es valorar si esas
   variaciones podrían producir en alguna ocasión una geocodificación exitosa.
   En concreto, \code{\link{filtra_dir}} contempla 5 posibles variantes para
-  las direcciones que no han podido ser geocodificadas: 1.- eliminar
-  duplicidad de tipos de vía (ejemplo: calle camino ...-> camino ...); 2.-
-  eliminar descripciones de vía (ejemplo: Avenida rosa (Edificio
-  azul)->Avenida rosa); 3.- eliminar palabras de 3 o menos caracteres
-  (ejemplo: calle la marina alta-> calle marina alta); 4.- eliminar signos de
-  puntuación (ejemplo: calle gral. pedro.->calle gral pedro); 5.-
-  implementación de todas las variantes anteriores de forma conjunta.
-  \code{\link{filtra_dir}} contempla todas estas variantes para cualquier
-  dirección que no haya podido ser geocodificada a partir de su dirección
-  original.
+  las direcciones que no han podido ser geocodificadas:
+  \enumerate{\item{eliminar duplicidad de tipos de vía (ejemplo: calle camino
+  ...-> camino ...);} \item{eliminar descripciones de vía (ejemplo: Avenida
+  rosa (Edificio azul)->Avenida rosa);} \item{eliminar palabras de 3 o menos
+  carácteres (ejemplo: calle la marina alta-> calle marina alta);}
+  \item{eliminar signos de puntuación (ejemplo: calle gral. pedro.->calle
+  gral pedro);} \item{implementación de todas las variantes anteriores de
+  forma secuencial.}} \code{\link{filtra_dir}} contempla todas estas
+  variantes para cualquier dirección que no haya podido ser geocodificada a
+  partir de su dirección original.
 }
 \seealso{
-\code{\link{geocodificar_cartociudad}} y \code{\link{geocodificar_google}}
+\code{\link{limpia_dir}}, \code{\link{geocodificar_cartociudad}} y
+  \code{\link{geocodificar_google}}.
 }

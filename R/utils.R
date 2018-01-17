@@ -28,7 +28,8 @@ filtrar_ein_esn <- function(datos) {
 #' @description Detecta cambios de sección censal para las provincias y el
 #'   período marcados.
 #'
-#' @param datos Objeto de clase \code{tramero_ine}.
+#' @param datos Objeto de clase \code{tramero_ine} (devuelto por la función
+#'   \code{\link{descarga_trameros}}).
 #' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
 #'
@@ -40,14 +41,13 @@ filtrar_ein_esn <- function(datos) {
 #'
 #'   Los códigos de sección censal siguen un orden preestablecido: los primeros
 #'   dos dígitos identifican la provincia, los siguientes tres dígitos el
-#'   municipio, los próximos dos dígitos el distrito y los últimos tres
-#'   dígitos hacen referencia a la sección censal.
+#'   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
+#'   hacen referencia a la sección censal.
 #'
 #' @return Un objeto de clase \code{cambios_ine} con 4 columnas:
 #'   \item{sc_old}{Código de la sección censal en el primer año.}
 #'   \item{sc_new}{Código de la sección censal en el segundo año.}
-#'   \item{year}{Primer año.}
-#'   \item{year}{Segundo año.}
+#'   \item{year}{Primer año.} \item{year}{Segundo año.}
 #'
 #' @examples
 #'
@@ -62,7 +62,7 @@ filtrar_ein_esn <- function(datos) {
 #'
 #' @export
 #'
-#' @seealso \code{\link{une_secciones}} y \code{\link{descarga_trameros}}
+#' @seealso \code{\link{une_secciones}} y \code{\link{descarga_trameros}}.
 #'
 detecta_cambios <- function(datos, years = 1996:2016) {
 

@@ -3,8 +3,7 @@
 \encoding{UTF-8}
 \name{descarga_cartografia}
 \alias{descarga_cartografia}
-\title{Funcion para descargar la cartografia con el seccionado del INE para
-  2011}
+\title{Descarga la cartografia con el seccionado del INE para 2011}
 \usage{
 descarga_cartografia(crs = 4326, conservar = TRUE)
 }
@@ -18,19 +17,18 @@ en el directorio oculto \code{./.cartografia/} dentro del directorio de
 trabajo?}
 }
 \value{
-Un objeto de clase \code{SpatialPolygonsDataFrame}, donde cada fila
+Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, donde cada fila
   es una sección censal y que cuenta con 7 columnas: \item{seccion}{Cadena de
-  10 caracteres con el código de sección censal (incluye provincia, municipio
-  y distrito).} \item{CUMUN}{Cadena de 5 caracteres con el código del
-  municipio (incluye provincia).} \item{CCA}{Cadena de 2 caracteres con el
+  10 carácteres con el código de sección censal (incluye provincia, municipio
+  y distrito).} \item{CUMUN}{Cadena de 5 carácteres con el código del
+  municipio (incluye provincia).} \item{CCA}{Cadena de 2 carácteres con el
   código de comunidad autónoma.} \item{NPRO}{Nombre de la provincia.}
   \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre del
-  municipio.} \item{geometry}{Columna de tipo lista con la geometría asociada
-  a cada sección censal.}
+  municipio.}
 }
 \description{
-Descarga la cartografía ofrecida públicamente por el INE para el
-  año 2011.
+Descarga la cartografía del seccionado censal ofrecida
+  públicamente por el INE para el año 2011.
 }
 \details{
 Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
@@ -48,5 +46,5 @@ Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
 
 }
 \seealso{
-\code{\link{descarga_trameros}} y \code{\link{descarga_poblaciones}}
+\code{\link{descarga_trameros}} y \code{\link{descarga_poblaciones}}.
 }

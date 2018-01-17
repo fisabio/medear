@@ -3,12 +3,14 @@ title: "Protocolo de georreferenciación"
 author: "Grupo MEDEA"
 date: "`r Sys.Date()`"
 output: 
+  pdf_document:
+    number_sections: true
   rmarkdown::html_vignette:
     number_sections: true
 vignette: >
   %\VignetteIndexEntry{Protocolo de georreferenciacion MEDEA 3}
-  %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[utf8]{inputenc}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 Todo el protocolo se vertebra alrededor del uso de herramientas gratuitas y que pueden funcionar en cualquier sistema operativo (de ahí la elección de `R` como software de referencia). Concretamente, y para el proceso de georreferenciación, el protocolo se ha estructurado en 4 fases:

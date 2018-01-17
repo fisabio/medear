@@ -8,14 +8,15 @@
 limpiadirecGoogle(cadena)
 }
 \arguments{
-\item{cadena}{Cadena de caracteres con lsa direcciones a pasar a Google.}
+\item{cadena}{Cadena de carácteres con las direcciones a pasar a Google.}
 }
 \value{
-Cadena de caracteres de la misma longitud que la proporcionada.
+Cadena de carácteres de la misma longitud que la proporcionada.
 }
 \description{
-Eliminación de caracteres no ascii.
+Eliminación de carácteres no ASCII para la geocodificación con
+  Google.
 }
 \seealso{
-\code{\link{geocodificar_google}}
+\code{\link{geocodificar_google}}.
 }

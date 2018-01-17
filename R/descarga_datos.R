@@ -1,21 +1,20 @@
 
-
-#' @title Carga los trameros del INE
+#' @title Descarga los trameros del INE
 #'
 #' @description Descarga los trameros que ofrece al público el INE para el año
 #'   2001 y desde 2004 a 2017.
 #'
-#' @param cod_provincia Cadena de caracteres de longitud >= 1 con el código de
+#' @param cod_provincia Cadena de carácteres de longitud >= 1 con el código de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
 #'   seccionado.
 #' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
 #' @param descarga Valor lógico: ¿debe procederse a la descarga de los trameros?
-#' @param ruta Cadena de caracteres indicando la ruta en la que se almacenan los
+#' @param ruta Cadena de carácteres indicando la ruta en la que se almacenan los
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
-#'   en el directorio oculto \code{.trameros/} dentro del directorio de trabajo?
+#'   en el directorio oculto \code{./.trameros/} dentro del directorio de trabajo?
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -55,7 +54,7 @@
 #' @export
 #'
 #' @seealso \code{\link{descarga_cartografia}} y
-#'   \code{\link{descarga_poblaciones}}
+#'   \code{\link{descarga_poblaciones}}.
 #'
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
                               years = c(2001, 2004:2017), descarga = TRUE, ruta = NULL,
@@ -181,11 +180,10 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 }
 
 
-#' @title Funcion para descargar la cartografia con el seccionado del INE para
-#'   2011
+#' @title Descarga la cartografia con el seccionado del INE para 2011
 #'
-#' @description Descarga la cartografía ofrecida públicamente por el INE para el
-#'   año 2011.
+#' @description Descarga la cartografía del seccionado censal ofrecida
+#'   públicamente por el INE para el año 2011.
 #'
 #' @param crs Vector numérico de longitud uno con el código EPSG del sistema de
 #'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
@@ -199,15 +197,14 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
 #'   como elemento normalizado.
 #'
-#' @return Un objeto de clase \code{SpatialPolygonsDataFrame}, donde cada fila
+#' @return Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, donde cada fila
 #'   es una sección censal y que cuenta con 7 columnas: \item{seccion}{Cadena de
-#'   10 caracteres con el código de sección censal (incluye provincia, municipio
-#'   y distrito).} \item{CUMUN}{Cadena de 5 caracteres con el código del
-#'   municipio (incluye provincia).} \item{CCA}{Cadena de 2 caracteres con el
+#'   10 carácteres con el código de sección censal (incluye provincia, municipio
+#'   y distrito).} \item{CUMUN}{Cadena de 5 carácteres con el código del
+#'   municipio (incluye provincia).} \item{CCA}{Cadena de 2 carácteres con el
 #'   código de comunidad autónoma.} \item{NPRO}{Nombre de la provincia.}
 #'   \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre del
-#'   municipio.} \item{geometry}{Columna de tipo lista con la geometría asociada
-#'   a cada sección censal.}
+#'   municipio.}
 #'
 #' @examples
 #'
@@ -223,7 +220,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'
 #' @export
 #'
-#' @seealso \code{\link{descarga_trameros}} y \code{\link{descarga_poblaciones}}
+#' @seealso \code{\link{descarga_trameros}} y \code{\link{descarga_poblaciones}}.
 #'
 descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
   stopifnot(is.logical(conservar))
@@ -263,22 +260,22 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 }
 
 
-#' @title Carga poblaciones del INE por seccion censal, sexo, edad y periodo
+#' @title Descarga poblaciones del INE por seccion censal, sexo, edad y periodo
 #'
 #' @description Descarga o carga las poblaciones anuales del INE por sección
 #'   censal, sexo y edad por grupos quinquenales (datos desde 2006).
 #'
-#' @param cod_provincia Cadena de caracteres de longitud >= 1 con el código de
+#' @param cod_provincia Cadena de carácteres de longitud >= 1 con el código de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
 #'   seccionado.
 #' @param years Vector numérico de longitud >= 1 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
 #' @param descarga Valor lógico: ¿debe procederse a la descarga de los datos?
-#' @param ruta Cadena de caracteres indicando la ruta en la que se almacenan los
+#' @param ruta Cadena de carácteres indicando la ruta en la que se almacenan los
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
-#'   en el directorio oculto \code{.poblaciones/} dentro del directorio de
+#'   en el directorio oculto \code{./.poblaciones/} dentro del directorio de
 #'   trabajo?
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
@@ -287,21 +284,24 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #'
 #'   Los códigos de sección censal siguen un orden preestablecido: los primeros
 #'   dos dígitos identifican la provincia, los siguientes tres dígitos el
-#'   municipio, los próximos dos dígitos el distrito y los últimos tres
-#'   a la sección censal.
+#'   municipio, los próximos dos dígitos el distrito y los últimos tres a la
+#'   sección censal.
 #'
 #'   Hasta el año 2011 el INE agrupa la última categoría de edad como 85 y más,
 #'   mientras que desde el año siguiente llega hasta 100 y más.
 #'
-#' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
+#'   Si se desea acceder a las poblaciones desde 1996 (datos adquiridos al INE),
+#'   se debe utilizar la función \code{\link{carga_datos}}.
+#'
+#' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
+#'   = 2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
 #'   \item{seccion}{Código de la sección censal en el primer año.}
 #'   \item{sexo}{Código de la sección censal en el segundo año.}
-#'   \item{year}{Primer año.}
-#'   El resto de columnas representan los distintos grupos de edad.
+#'   \item{year}{Primer año.} El resto de columnas representan los distintos
+#'   grupos de edad.
 #'
 #' @examples
 #'
@@ -315,7 +315,8 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #'
 #' @export
 #'
-#' @seealso \code{\link{descarga_trameros}} y \code{\link{descarga_cartografia}}
+#' @seealso \code{\link{carga_datos}}, \code{\link{descarga_trameros}} y
+#'   \code{\link{descarga_cartografia}}.
 #'
 descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
                                  years = 2006:2016, descarga = TRUE, ruta = NULL,
