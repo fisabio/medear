@@ -10,7 +10,7 @@ comprueba_punto_poligono(punto, poligono)
 \arguments{
 \item{punto}{Un data.frame con dos columnas: lng y lat.}
 
-\item{poligono}{Un objeto de clase \code{SpatialPolygonsDataFrame} con el
+\item{poligono}{Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}} con el
 polígono de referencia sobre el que se desee contrastar la pertenecia de
 las coordenadas.}
 }

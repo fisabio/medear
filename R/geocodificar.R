@@ -252,7 +252,7 @@ filtra_dir <- function(vias, nivel) {
 #'   de referencia para cada par de coordenadas.
 #'
 #' @param punto Un data.frame con dos columnas: lng y lat.
-#' @param poligono Un objeto de clase \code{SpatialPolygonsDataFrame} con el
+#' @param poligono Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}} con el
 #'   polígono de referencia sobre el que se desee contrastar la pertenecia de
 #'   las coordenadas.
 #'
