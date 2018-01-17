@@ -12,56 +12,41 @@ knitr::opts_chunk$set(
 
 # medear
 
-El propÃ³sito del paquete `medear` es facilitar el trabajo con los datos utilizados en el proyecto MEDEA3, y  proporcionar las funciones con las que se obtuvieron dichos datos.
+El propósito del paquete `medear` es facilitar el trabajo con los datos utilizados en el proyecto MEDEA3, y  proporcionar las funciones con las que se obtuvieron dichos datos, así como otras que simplifiquen nuestra labor.
 
-Concretamente, se incluyen los datos de poblaciÃ³n por sexo y grupos de edad asÃ­ como la cartografÃ­a para las ciudades implicadas en el proyecto a nivel de secciÃ³n censal. Los datos para algunos aÃ±os estÃ¡n encriptados por tratarse de consultas especÃ­ficas realizadas al INE y solo son accesibles mediante contraseÃ±a. Los datos desde 2006 hasta 2017 son de libre acceso siguiendo la licencia del INE, y se pueden obtener usando las funciones contenidas en este paquete.
+Concretamente, el paquete incluye los datos de población por sexo y grupos de edad a nivel de sección censal para el periodo 1996-2016 así como la cartografía para las ciudades implicadas en el proyecto, también a nivel de sección censal. Los datos para algunos años están encriptados por tratarse de consultas específicas realizadas al INE y solo son accesibles mediante contraseña. Los datos desde 2004 hasta 2016 son de libre acceso siguiendo la licencia del INE, y se pueden obtener usando las funciones contenidas en este paquete.
 
-## InstalaciÃ³n
+El paquete también dispone de una serie de rutinas para geocodificar direcciones, de forma que no es necesario salir de `R` en ningún momento. En el apartado de viñetas del paquete podrás consultar los diversos protocolos que se vayan creando (actualmente ya está disponible el protocolo de geocodificación.)
 
-Se puede instalar `medear` desde GitHub con:
+## Instalación
+
+`medear` se puede instalar desde GitHub con:
 
 ```{r gh-installation, eval = FALSE}
-# install.packages("devtools")
-devtools::install_github("fisabio/medear")
+if (!"devtools" %in% installed.packages())
+  install.packages("devtools")
+devtools::install_github("fisabio/medear", build_vignettes = TRUE)
 ```
 
-## Carga y preparaciÃ³n de los datos
-
-El uso habitual del paquete serÃ¡ la carga de datos y de la cartografia, incluyendo su preparaciÃ³n para unir las secciones segÃºn el rango de aÃ±os que se desee (funciones `une_poblaciones` y `une_cartografia`):
-
-```{r example, eval=FALSE}
-library(medear)
-cartografia <- une_cartografia(cartografia = cartografia, cambios = cambios, years = 2008:2016)
-poblacion   <- une_poblaciones(poblaciones = poblaciones, cambios = cambios, years = 2008:2016)
-```
-
-## Consultas especÃ­ficas
-
-Un uso potencial puede ser la prepararaciÃ³n de consultas personalizadas para ciudades o provincias completas, descargando los datos y la cartografÃ­a directamente desde el INE y trabajarlos para obtener el producto final. Imaginemos que se desease trabajar con las poblaciones desde 2011 hasta 2014 para la provincia de Valencia:
-
-```{r example2, eval=FALSE}
-library(medear)
-carto_valencia <- descarga_cartografia()
-pob_valencia   <- descarga_poblaciones(cod_provincia = "46", years = 2011:2014, descarga = TRUE)
-tram_valencia  <- descarga_trameros(cod_provincia = "46", years = 2011:2014, descarga = TRUE)
-camb_valencia  <- detecta_cambios(datos = tram_valencia, years = 2011:2014)
-resultado      <- une_secciones(camb_valencia, pob_valencia, carto_valencia, 2011:2014, 85)
-opar <- par(mfrow = c(1, 2), oma = c(0, 0, 2, 0))
-plot(sf::st_geometry(cartografia[, "CUSEC"]), main = "SC's sin unir")
-plot(sf::st_geometry(resultado$cartografia[, "CUSEC"]), main = "SC's unidas")
-title(unique(cartografia$NMUN), outer = T)
-df <- data.frame(
-    ciudad  = unique(cartografia$NMUN),
-    antes   = nrow(cartografia),
-    despues = nrow(resultado$cartografia)
+**IMPORTANTE**: si trabajas desde un ordenador conectado a la red a través de un *proxy*, es muy importante que te asegures de que tu conexión esté bien configurada, para lo cual debes ejecutar esta serie de comandos (sustituyendo el texto por los valores apropiados de tu centro: pregunta al servicio de informática):
+```{r proxy, eval = FALSE}
+if (!"httr" %in% installed.packages())
+  install.packages("httr")
+httr::set_config(
+  httr::use_proxy(
+    url      = "xxx.xxx.xxx.xx",
+    port     = 0000,
+    username = "usuario",
+    password = "clave"
   )
-par(opar)
-df$dif <- df$antes - df$despues
-df
+)
 ```
 
-## ParticipaciÃ³n: dudas y consultas
+## Participación: dudas y consultas
 
-Para cualquier comentario, duda o consulta que se desee realizar, se puede abrir un *Issue* en este repositorio de GitHub.
+Para cualquier comentario, duda o consulta que se desee realizar, se puede abrir un [*Issue*](https://github.com/fisabio/medear/issues) en este repositorio de GitHub.
 
-Si deseases aportar algo al proyecto, puedes modificar el cÃ³digo a tu antojo y abrir un *Pull Request*.
+Si deseases aportar algo al proyecto, puedes modificar el código a tu antojo y abrir un [*Pull Request*](https://github.com/fisabio/medear/pulls) en el repositorio.
+
+Por último, y si quieres contactar directamente en caso de tener problemas para instalar el paquete, puedes dirigirte a Carlos Vergara en la dirección de correo <vergara_car@gva.es>: él te orientará acerca de los pasos a seguir.
+
