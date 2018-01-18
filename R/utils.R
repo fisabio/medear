@@ -142,7 +142,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 #'
 #' @usage carga_datos(key)
 #'
-#' @seealso poblacion
+#' @seealso \code{\link{poblacion}} y \code{\link{descarga_poblaciones}}.
 #'
 #' @keywords datasets
 #'
