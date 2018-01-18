@@ -8,7 +8,7 @@
 carga_datos(key)
 }
 \arguments{
-\item{key}{Cadena de caracteres con la contraseña.}
+\item{key}{Cadena de carácteres con la contraseña.}
 }
 \value{
 No se devuelve nada.
