@@ -29,9 +29,9 @@ trabajo?}
 \value{
 Un objeto de clase \code{poblaciones_ine} donde las filas representan
   las distintas secciones censales. Las tres primeras columnas son:
-  \item{seccion}{Código de la sección censal en el primer año.}
-  \item{sexo}{Código de la sección censal en el segundo año.}
-  \item{year}{Primer año.} El resto de columnas representan los distintos
+  \item{seccion}{Código de la sección censal.}
+  \item{sexo}{Codificado como 0 para hombres y 1 para mujeres.}
+  \item{year}{Año al que se hace referencia.} El resto de columnas representan los distintos
   grupos de edad.
 }
 \description{

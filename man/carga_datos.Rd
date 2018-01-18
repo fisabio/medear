@@ -30,6 +30,6 @@ La contraseña no se almacena en el historial.
 
 }
 \seealso{
-poblacion
+\code{\link{poblacion}} y \code{\link{descarga_poblaciones}}.
 }
 \keyword{datasets}
