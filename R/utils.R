@@ -173,8 +173,9 @@ carga_datos <- function(key) {
                        pattern = "*\\.Rhistory$", full.names = TRUE)
     if (length(ruta) > 0) {
       historial <- readLines(ruta)
-      historial <- historial[!grepl("carga_datos|key", historial)]
+      historial <- historial[!grepl("carga_datos|key\\s?=?", historial)]
       writeLines(historial, ruta)
+      utils::loadhistory(file = ruta)
     }
   })
 }
