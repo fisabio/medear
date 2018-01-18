@@ -137,7 +137,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 #'
 #' @details La contraseña no se almacena en el historial.
 #'
-#' @param key Cadena de caracteres con la contraseña.
+#' @param key Cadena de carácteres con la contraseña.
 #' @return No se devuelve nada.
 #'
 #' @usage carga_datos(key)
@@ -159,7 +159,7 @@ carga_datos <- function(key) {
 
   key     <- sodium::sha256(charToRaw(key))
   cifrado <- system.file("data_encrypted", "poblacion.rds",
-                           package = "medear", mustWork = TRUE)
+                         package = "medear", mustWork = TRUE)
   cifrado <- unserialize(
     sodium::data_decrypt(readRDS(cifrado), key)
   )
@@ -168,16 +168,42 @@ carga_datos <- function(key) {
     list(poblacion, cifrado), fill = TRUE
   )[order(year, sexo, seccion)]
   return(poblacion)
-  on.exit({
-    ruta <- list.files(getwd(), all.files = TRUE,
-                       pattern = "*\\.Rhistory$", full.names = TRUE)
-    if (length(ruta) > 0) {
-      historial <- readLines(ruta)
-      historial <- historial[!grepl("carga_datos|key\\s?=?", historial)]
-      writeLines(historial, ruta)
-      utils::loadhistory(file = ruta)
-    }
-  })
+  on.exit(
+    try(expr = {
+      ruta <- list.files(getwd(), all.files = TRUE,
+                         pattern = "*\\.Rhistory$", full.names = TRUE)
+      if (length(ruta) > 0) {
+        historial <- readLines(ruta)
+        historial <- historial[!grepl("carga_datos|key\\s?=?", historial)]
+        unlink(ruta, force = TRUE)
+        writeLines(historial, ruta)
+        utils::loadhistory(file = ruta)
+        if (.Platform$OS.type == "unix") {
+          ruta <- list.files("~/.rstudio-desktop/", all.files = TRUE,
+                             pattern = "history_database", full.names = TRUE)
+          for (i in ruta) {
+            historial <- readLines(i)
+            historial <- historial[!grepl("carga_datos|key\\s?=?", historial)]
+            unlink(i, force = TRUE)
+            writeLines(historial, i)
+          }
+        } else {
+          ruta <- list.files(dirname(dirname(tempdir())),
+                             all.files = TRUE,
+                             pattern = "history_database",
+                             full.names = TRUE,
+                             recursive = TRUE)
+          for (i in ruta) {
+            historial <- readLines(i)
+            historial <- historial[!grepl("carga_datos|key\\s?=?", historial)]
+            unlink(i, force = TRUE)
+            writeLines(historial, i)
+          }
+        }
+      }
+    },
+    silent = TRUE)
+  )
 }
 
 
