@@ -51,7 +51,7 @@ El tiempo de ejecución de la función varía según el número de
 
   Los códigos de sección censal siguen un orden preestablecido: los primero
   dos dígitos identifican la provincia, los siguientes tres dígitos el
-  municipio, los próximos dos dígitos el distrito y los últimos cuatro
+  municipio, los próximos dos dígitos el distrito y los últimos tres
   dígitos la sección censal.
 }
 \examples{

@@ -22,7 +22,7 @@
 #'
 #'   Los códigos de sección censal siguen un orden preestablecido: los primero
 #'   dos dígitos identifican la provincia, los siguientes tres dígitos el
-#'   municipio, los próximos dos dígitos el distrito y los últimos cuatro
+#'   municipio, los próximos dos dígitos el distrito y los últimos tres
 #'   dígitos la sección censal.
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
