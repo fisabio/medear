@@ -1,9 +1,11 @@
 ---
-title: "Protocolo de geocodificación"
+title: "Protocolo de geocodificación (v2.1)"
 author: "Grupo MEDEA"
 date: "`r Sys.Date()`"
 output: 
   rmarkdown::pdf_document:
+    number_sections: true
+  rmarkdown::html_vignette:
     number_sections: true
 vignette: >
   %\VignetteIndexEntry{Protocolo de geocodificacion MEDEA 3}
@@ -118,9 +120,13 @@ De esos campos los únicos que vamos a utilizar de aquí en adelante son:
 
 Para que el resto de instrucciones contenidas en este protocolo funcionen sin ninguna modificación adicional, tu base de datos con la información de mortalidad deberá tener (al menos) estos campos con **exactamente estos nombres**. Si los nombres de esos campos fueran distintos en tu base de datos, te aconsejamos que los renombres. Respecto al resto de columnas, si faltase o tuvieras alguna de más o con distinto nombre, y dado que no van a necesitarse, no tendrá ninguna importancia para el correcto funcionamiento del protocolo.
 
-Una vez que te hayas asegurado que tu `data.frame` tenga la información que acabamos de comentar y con ese formato exactamente, las siguientes sentencias completan dicho `data.frame`, creando nuevas columnas que serán utilizadas más adelante:
+Una vez que te hayas asegurado que tu `data.frame` tenga la información que acabamos de comentar y con ese formato exactamente, las siguientes sentencias completan dicho `data.frame`, creando nuevas columnas que serán utilizadas más adelante. Asimismo, se requiere que los campos que nos interesan sean cadenas de carácteres, y como es probable que durante la importación `R` haya interpretado que algunos de ellos (o todos) son de clase factor, es necesario asegurar que la clase es correcta.
 
 ```{r, eval=FALSE}
+# Asegurar el tratamiento correcto de los datos como cadenas de carácteres
+datosmort <- as.data.frame(sapply(datosmort, as.character), stringsAsFactors = FALSE)
+
+# Crear nuevas columnas
 datosmort$BOD.direccion <- ""    # Dirección tal cual ha sido intentada geocodificar
 datosmort$georef        <- "NO"  # Status del proceso de geocodificado
 datosmort$id            <- ""
