@@ -9,14 +9,14 @@ detecta_cambios(datos, years = 1996:2016)
 }
 \arguments{
 \item{datos}{Objeto de clase \code{tramero_ine} (devuelto por la función
-\code{\link{descarga_trameros}}).}
+\code{\link{descarga_trameros}}), incluyendo obligatoriamente al año 2011.}
 
 \item{years}{Vector numérico de longitud >= 2 con los años para los que se
 desee consultar las variaciones de seccionado.}
 }
 \value{
 Un objeto de clase \code{cambios_ine} con 4 columnas:
-  \item{sc_old}{Código de la sección censal en el primer año.}
+  \item{sc_ref}{Código de la sección censal en el primer año.}
   \item{sc_new}{Código de la sección censal en el segundo año.}
   \item{year}{Primer año.} \item{year}{Segundo año.}
 }

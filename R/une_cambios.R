@@ -92,7 +92,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   sc_unicas  <- sort(
     unique(
       secciones[
-        year %in% years & seccion %in% c(cambios$sc_old, cambios$sc_new),
+        year %in% years & seccion %in% c(cambios$sc_ref, cambios$sc_new),
         seccion
       ]
     )
@@ -101,7 +101,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   for (i in seq_len(nrow(cambios))) {
     sc_select <- which(cluster_sc[, sc] %in%
-                         cambios[i, c(sc_old, sc_new)])
+                         cambios[i, c(sc_ref, sc_new)])
     sc_min    <- min(cluster_sc[sc_select, id_cluster])
     sc_assign <- which(cluster_sc[, id_cluster] %in%
                          cluster_sc[sc_select, id_cluster])
