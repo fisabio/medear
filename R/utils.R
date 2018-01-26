@@ -3,10 +3,10 @@ filtrar_ein_esn <- function(datos) {
   col_list    <- datos[indice == FALSE]
   no_col_list <- datos[indice == TRUE]
   col_list[, `:=`(
-    p1 = mapply(function(x, y) x >= y, old_ein, new_ein, USE.NAMES = FALSE, SIMPLIFY = FALSE),
-    p2 = mapply(function(x, y) x <= y, old_ein, new_esn, USE.NAMES = FALSE, SIMPLIFY = FALSE),
-    p3 = mapply(function(x, y) x >= y, old_esn, new_ein, USE.NAMES = FALSE, SIMPLIFY = FALSE),
-    p4 = mapply(function(x, y) x <= y, old_esn, new_esn, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+    p1 = mapply(function(x, y) x >= y, ref_ein, new_ein, USE.NAMES = FALSE, SIMPLIFY = FALSE),
+    p2 = mapply(function(x, y) x <= y, ref_ein, new_esn, USE.NAMES = FALSE, SIMPLIFY = FALSE),
+    p3 = mapply(function(x, y) x >= y, ref_esn, new_ein, USE.NAMES = FALSE, SIMPLIFY = FALSE),
+    p4 = mapply(function(x, y) x <= y, ref_esn, new_esn, USE.NAMES = FALSE, SIMPLIFY = FALSE)
   )][, `:=`(
     p5 = mapply(function(w, x, y, z) (w & x) | (y & z),
                 p1, p2, p3, p4,
@@ -15,9 +15,9 @@ filtrar_ein_esn <- function(datos) {
     sc_new = mapply(function(x, y) x[y], sc_new, p5, USE.NAMES = FALSE, SIMPLIFY = FALSE)
   )][, paste0("p", 1:5) := NULL]
   datos <- rbindlist(list(col_list, no_col_list))[
-    , c("old_ein", "old_esn", "new_ein", "new_esn", "indice") := NULL
+    , c("ref_ein", "ref_esn", "new_ein", "new_esn", "indice") := NULL
     ]
-  datos <- datos[, unlist(sc_new), by = list(old_via, sc_old, year, year2)]
+  datos <- datos[, unlist(sc_new), by = list(ref_via, sc_ref, year, year2)]
   setnames(datos, "V1", "sc_new")
   return(datos)
 }
@@ -29,7 +29,7 @@ filtrar_ein_esn <- function(datos) {
 #'   período marcados.
 #'
 #' @param datos Objeto de clase \code{tramero_ine} (devuelto por la función
-#'   \code{\link{descarga_trameros}}).
+#'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al año 2011.
 #' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
 #'
@@ -45,7 +45,7 @@ filtrar_ein_esn <- function(datos) {
 #'   hacen referencia a la sección censal.
 #'
 #' @return Un objeto de clase \code{cambios_ine} con 4 columnas:
-#'   \item{sc_old}{Código de la sección censal en el primer año.}
+#'   \item{sc_ref}{Código de la sección censal en el primer año.}
 #'   \item{sc_new}{Código de la sección censal en el segundo año.}
 #'   \item{year}{Primer año.} \item{year}{Segundo año.}
 #'
@@ -68,54 +68,57 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 
   stopifnot("tramero_ine" %in% class(datos))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) > 1 & years %in% 1996:2016)
+  stopifnot(length(years) > 1 & 2011 %in% years)
+  stopifnot(2011 %in% unique(datos$year))
+  stopifnot(years %in% unique(datos$year))
+
   cambios <- list()
 
   for (i in unique(datos$CPRO)) {
     tramero <- datos[CPRO == i]
 
-    for (j in years[-length(years)]) {
-      tram_old <- tramero[year == j]
-      tram_new <- tramero[year == j + 1]
-      muni     <- unique(tram_old[, CMUM])
+    for (j in years[years != 2011]) {
+      tram_ref <- tramero[year == 2011]
+      tram_new <- tramero[year == j]
+      muni     <- unique(tram_ref[, CMUM])
 
       for (k in seq_along(muni)) {
-        muni_old <- tram_old[CMUM == muni[k]]
+        muni_ref <- tram_ref[CMUM == muni[k]]
         muni_new <- tram_new[CMUM == muni[k]]
 
         corres <- data.table(
-          old_via = muni_old[, via],
-          sc_old  = muni_old[, seccion],
-          old_ein = muni_old[, EIN],
-          old_esn = muni_old[, ESN],
-          year    = muni_old[, year],
-          year2   = muni_old[, year] + 1
+          ref_via = muni_ref[, via],
+          sc_ref  = muni_ref[, seccion],
+          ref_ein = muni_ref[, EIN],
+          ref_esn = muni_ref[, ESN],
+          year    = 2011,
+          year2   = j
         )[, `:=`(
-          sc_new  = lapply(old_via, function(x)
+          sc_new  = lapply(ref_via, function(x)
             muni_new[which(muni_new[, via] == x), seccion]),
-          new_ein = lapply(old_via, function(x)
+          new_ein = lapply(ref_via, function(x)
             muni_new[which(muni_new$via == x), EIN]),
-          new_esn = lapply(old_via, function(x)
+          new_esn = lapply(ref_via, function(x)
             muni_new[which(muni_new$via == x), ESN]),
-          indice  = lapply(lapply(old_via, function(x)
+          indice  = lapply(lapply(ref_via, function(x)
             which(muni_new[, via] == x)), length) == 1
         )]
-        corres  <- filtrar_ein_esn(corres)[sc_old != sc_new][sc_new != ""]
+        corres  <- filtrar_ein_esn(corres)[sc_ref != sc_new][sc_new != ""]
         fin_1 <- lapply(
-          corres[, old_via],
+          corres[, ref_via],
           function(x)
-            sort(as.numeric(tram_old[which(tram_old[, via] %in% x), EIN]))
+            sort(as.numeric(tram_ref[which(tram_ref[, via] %in% x), EIN]))
         )
         fin_2 <- lapply(
-          corres[, old_via],
+          corres[, ref_via],
           function(x)
-            sort(as.numeric(tram_old[which(tram_old[, via] %in% x), ESN]))
+            sort(as.numeric(tram_ref[which(tram_ref[, via] %in% x), ESN]))
         )
         indice <- !mapply(function(x, y) any(y[-length(y)] >= x[-1]),
                           fin_1, fin_2, SIMPLIFY = TRUE)
         if (length(indice) != 0)
           corres <- corres[indice]
-        corres <- corres[, old_via := NULL][!duplicated(corres)]
+        corres <- corres[, ref_via := NULL][!duplicated(corres)]
         setcolorder(corres, c(1, 4, 2:3))
         cambios[[paste0("p", i, k, j)]] <- corres
       }
@@ -276,8 +279,8 @@ descarga_segura <- function(x, tries = 10, ...) {
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
     "CUSEC", "idn", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",
-    "indice", "new_ein", "new_esn", "old_ein", "old_esn", "old_via",
-    paste0("p", 1:5), "sc_new", "sc_old", "year", "year2", "cluster", "id_cluster",
+    "indice", "new_ein", "new_esn", "ref_ein", "ref_esn", "ref_via",
+    paste0("p", 1:5), "sc_new", "sc_ref", "year", "year2", "cluster", "id_cluster",
     "q_100_plus", "q_85_89", "q_85_plus", "q_90_94", "q_95_99", "sc", "sexo",
     "geocodificados", "parimp_o", "parimp_c", "codigos_ine", "nombre_provincia",
     "nombre_municipio", "cod_provincia", "cod_municipio", "tip_via", "portalNumber",
