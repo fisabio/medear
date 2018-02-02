@@ -62,7 +62,7 @@
 #'
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
                               years = c(2001, 2004:2016), descarga = TRUE, ruta = NULL,
-                              conservar = TRUE, ...) {
+                              conservar = TRUE) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
