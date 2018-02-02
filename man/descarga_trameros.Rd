@@ -23,7 +23,11 @@ archivos tal cual se descargaron desde el INE, en caso de escoger
 \code{descarga = FALSE}.}
 
 \item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
-en el directorio oculto \code{./.trameros/} dentro del directorio de trabajo?}
+en el directorio oculto \code{./.trameros/} dentro del directorio de
+trabajo?}
+
+\item{...}{Parámetros adicionales en la lectura de datos (no es necesario su
+uso).}
 }
 \value{
 Un objeto de clase \code{tramero_ine} con 11 columnas:
@@ -51,8 +55,8 @@ El tiempo de ejecución de la función varía según el número de
 
   Los códigos de sección censal siguen un orden preestablecido: los primero
   dos dígitos identifican la provincia, los siguientes tres dígitos el
-  municipio, los próximos dos dígitos el distrito y los últimos tres
-  dígitos la sección censal.
+  municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
+  la sección censal.
 }
 \examples{
 \dontrun{

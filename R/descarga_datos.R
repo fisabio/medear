@@ -30,7 +30,7 @@
 #'   uso).
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE, ...)
+#'   c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
 #'   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
