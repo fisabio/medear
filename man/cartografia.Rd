@@ -8,13 +8,14 @@
 \format{Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
   (\code{cartografia@data}) tienen clase \code{data.frame} y
   \code{cartografia_ine}, donde cada fila es una sección censal y que cuenta
-  con 13 columnas: \describe{ \item{seccion}{Cádena de 10 caracteres con el
+  con 7 columnas: \describe{ \item{seccion}{Cádena de 10 caracteres con el
   código de sección censal (incluye provincia, municipio, distrito y
-  sección).} \item{codmuni}{Cádena de 5 caracteres con el código INE del
-  municipio.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
-  comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
-  \item{geometry}{Columna de tipo lista con la geometría asociada a cada
-  sección censal.}}}
+  sección).} \item{CUMUN}{Cádena de 5 caracteres con el código INE del
+  municipio.} \item{CCA}{Cádena de 2 caracteres con el código INE de la
+  comunidad autónoma} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
+  de la comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
+  \item{n_viv}{Número de viviendas por sección censal (datos cruzados con
+  Dirección General de Catastro).}}}
 \usage{
 cartografia
 }
