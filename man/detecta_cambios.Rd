@@ -15,10 +15,13 @@ detecta_cambios(datos, years = 1996:2016)
 desee consultar las variaciones de seccionado.}
 }
 \value{
-Un objeto de clase \code{cambios_ine} con 4 columnas:
+Un objeto de clase \code{cambios_ine} con 5 columnas:
   \item{sc_ref}{Código de la sección censal en el primer año.}
   \item{sc_new}{Código de la sección censal en el segundo año.}
-  \item{year}{Primer año.} \item{year}{Segundo año.}
+  \item{year}{Primer año.} \item{year2}{Segundo año.} \item{vias}{Lista con
+  el código de las vías que provocan el cambio de sección (incorporando un
+  dígito al final de la cadena indicando si se trata de numeración par o
+  impar)}
 }
 \description{
 Detecta cambios de sección censal para las provincias y el
