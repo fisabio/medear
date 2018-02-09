@@ -190,7 +190,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     unlink(dirname(dir_dest), recursive = TRUE)
 
   trameros <- rbindlist(trameros)
-  setkey(trameros, via, seccion, year)
+  setkeyv(trameros, c("via", "seccion", "year", "CMUM"))
   attributes(trameros)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   class(trameros)             <- c(class(trameros), "tramero_ine")
   return(trameros)

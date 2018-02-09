@@ -11,9 +11,8 @@ filtrar_ein_esn <- function(datos) {
     p5 = mapply(function(w, x, y, z) (w & x) | (y & z),
                 p1, p2, p3, p4,
                 USE.NAMES = FALSE, SIMPLIFY = FALSE)
-  )][, `:=`(
-    sc_new = mapply(function(x, y) x[y], sc_new, p5, USE.NAMES = FALSE, SIMPLIFY = FALSE)
-  )][, paste0("p", 1:5) := NULL]
+  )][, sc_new := mapply(function(x, y) x[y], sc_new, p5, USE.NAMES = FALSE, SIMPLIFY = FALSE)
+  ][, paste0("p", 1:5) := NULL]
   datos <- rbindlist(list(col_list, no_col_list))[
     , c("ref_ein", "ref_esn", "new_ein", "new_esn", "indice") := NULL
     ]
@@ -44,10 +43,13 @@ filtrar_ein_esn <- function(datos) {
 #'   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
 #'   hacen referencia a la sección censal.
 #'
-#' @return Un objeto de clase \code{cambios_ine} con 4 columnas:
+#' @return Un objeto de clase \code{cambios_ine} con 5 columnas:
 #'   \item{sc_ref}{Código de la sección censal en el primer año.}
 #'   \item{sc_new}{Código de la sección censal en el segundo año.}
-#'   \item{year}{Primer año.} \item{year}{Segundo año.}
+#'   \item{year}{Primer año.} \item{year2}{Segundo año.} \item{vias}{Lista con
+#'   el código de las vías que provocan el cambio de sección (incorporando un
+#'   dígito al final de la cadena indicando si se trata de numeración par o
+#'   impar)}
 #'
 #' @examples
 #'
@@ -73,24 +75,22 @@ detecta_cambios <- function(datos, years = 1996:2016) {
   stopifnot(years %in% unique(datos$year))
 
   cambios <- list()
-
   for (i in unique(datos$CPRO)) {
-    tramero <- datos[CPRO == i]
+    tramero  <- datos[CPRO == i]
+    tram_ref <- tramero[year == 2011]
+    muni     <- unique(tram_ref$CMUM)
 
     for (j in years[years != 2011]) {
-      tram_ref <- tramero[year == 2011]
       tram_new <- tramero[year == j]
-      muni     <- unique(tram_ref[, CMUM])
 
       for (k in seq_along(muni)) {
-        muni_ref <- tram_ref[CMUM == muni[k]]
         muni_new <- tram_new[CMUM == muni[k]]
 
         corres <- data.table(
-          ref_via = muni_ref[, via],
-          sc_ref  = muni_ref[, seccion],
-          ref_ein = muni_ref[, EIN],
-          ref_esn = muni_ref[, ESN],
+          ref_via = tram_ref[CMUM == muni[k], via],
+          sc_ref  = tram_ref[CMUM == muni[k], seccion],
+          ref_ein = tram_ref[CMUM == muni[k], EIN],
+          ref_esn = tram_ref[CMUM == muni[k], ESN],
           year    = 2011,
           year2   = j
         )[, `:=`(
@@ -105,21 +105,22 @@ detecta_cambios <- function(datos, years = 1996:2016) {
         )]
         corres  <- filtrar_ein_esn(corres)[sc_ref != sc_new][sc_new != ""]
         fin_1 <- lapply(
-          corres[, ref_via],
+          corres$ref_via,
           function(x)
-            sort(as.numeric(tram_ref[which(tram_ref[, via] %in% x), EIN]))
+            sort(as.numeric(tram_ref$EIN[which(tram_ref$via %in% x)]))
         )
         fin_2 <- lapply(
-          corres[, ref_via],
+          corres$ref_via,
           function(x)
-            sort(as.numeric(tram_ref[which(tram_ref[, via] %in% x), ESN]))
+            sort(as.numeric(tram_ref$ESN[which(tram_ref$via %in% x)]))
         )
         indice <- !mapply(function(x, y) any(y[-length(y)] >= x[-1]),
                           fin_1, fin_2, SIMPLIFY = TRUE)
         if (length(indice) != 0)
           corres <- corres[indice]
-        corres <- corres[, ref_via := NULL][!duplicated(corres)]
-        setcolorder(corres, c(1, 4, 2:3))
+
+        corres <- corres[, .(list(ref_via)), by = .(sc_ref, sc_new, year, year2)]
+        setnames(corres, "V1", "vias")
         cambios[[paste0("p", i, k, j)]] <- corres
       }
     }
