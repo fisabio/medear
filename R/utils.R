@@ -171,6 +171,8 @@ carga_datos <- function(key) {
   poblacion <- data.table::rbindlist(
     list(poblacion, cifrado), fill = TRUE
   )[order(year, sexo, seccion)]
+  attributes(poblacion)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
+  class(poblacion) <- c(class(poblacion), "poblaciones_ine")
   return(poblacion)
   on.exit(
     try(expr = {
