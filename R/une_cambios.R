@@ -86,7 +86,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
-  fuente     <- attributes(cartografia@data)$fuente
+  fuente     <- "Fuente: Sitio web del INE: www.ine.es"
 
   cambios    <- cambios[between(year, years[1], years[length(years)])]
   sc_unicas  <- sort(

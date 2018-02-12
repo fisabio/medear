@@ -200,7 +200,8 @@
 
 #' @title Secciones censales unicas por periodo (1996-2016)
 #'
-#' @description Listado con las secciones censales únicas por año (1996-2016).
+#' @description Listado con las secciones censales únicas por año (1996-2016) de
+#'   ciudades MEDEA3.
 #'
 #' @name secciones
 #'
