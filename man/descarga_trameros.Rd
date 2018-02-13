@@ -6,7 +6,7 @@
 \title{Descarga los trameros del INE}
 \usage{
 descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-  c(2001, 2004:2017), descarga = TRUE, ruta = NULL, conservar = TRUE)
+  c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE)
 }
 \arguments{
 \item{cod_provincia}{Cadena de carácteres de longitud >= 1 con el código de
@@ -42,7 +42,7 @@ Un objeto de clase \code{tramero_ine} con 11 columnas:
 }
 \description{
 Descarga los trameros que ofrece al público el INE para el año
-  2001 y desde 2004 a 2017.
+  2001 y desde 2004 a 2016.
 }
 \details{
 El tiempo de ejecución de la función varía según el número de
