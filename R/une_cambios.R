@@ -80,8 +80,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     stop("2011 debe estar incluido en el objeto 'years'.")
   if ("SpatialPolygonsDataFrame" != class(cartografia))
     stop("El objeto 'cartografia' debe ser de clase 'SpatialPolygonsDataFrame'.")
-  if (!"cartografia_ine" %in% class(cartografia@data))
-    stop("Los datos del objeto 'cartografia' deben ser de clase 'cartografia_ine'.")
   years <- sort(years)
   if (any(years != min(years):max(years)))
     stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
@@ -90,14 +88,14 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-  # cambios    <- cambios[
-  #   cambio_ref >= umbral_cambio
-  # ][viviendas != 0]
+  cambios    <- cambios[
+    cambio_ref >= umbral_cambio
+  ][viviendas != 0]
   cambios    <- cambios[between(year, years[1], years[length(years)])]
   sc_unicas  <- sort(
     unique(
       secciones[
-        year %in% years & seccion %in% c(cambios$sc_ref, cambios$sc_new),
+        year2 %in% years & seccion %in% c(cambios$sc_ref, cambios$sc_new),
         seccion
       ]
     )
@@ -108,7 +106,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   for (i in seq_len(nrow(cambios))) {
     sc_select <- which(cluster_sc[, sc] %in% cambios[i, c(sc_ref, sc_new)])
-    sc_min <- min(cluster_sc[sc_select, id_cluster])
+    sc_min    <- min(cluster_sc[sc_select][ref == TRUE]$id_cluster)
     sc_assign <- which(cluster_sc[, id_cluster] %in%
                          cluster_sc[sc_select, id_cluster])
     cluster_sc[sc_assign, id_cluster := sc_min][]
@@ -134,18 +132,22 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     pob_class <- class(poblacion)
     poblacion <- poblacion[between(year, years[1], years[length(years)])]
     poblacion <- elige_corte(poblacion, corte_edad)
-    poblacion[,
-              cluster := cluster_sc[
-                match(poblacion$seccion, cluster_sc[, sc]),
-                id_cluster
-                ]]
+    poblacion[
+      ,
+      cluster := cluster_sc[
+        match(poblacion$seccion, cluster_sc[, sc]),
+        id_cluster
+      ]
+    ]
     in_col <- names(poblacion)[
       !names(poblacion) %in% c("seccion", "sexo", "year", "cluster")
-      ]
-    poblacion <- poblacion[,
-                           lapply(.SD, sum),
-                           by      = .(cluster, sexo, year),
-                           .SDcols = in_col]
+    ]
+    poblacion <- poblacion[
+      ,
+      lapply(.SD, sum),
+      by      = .(cluster, sexo, year),
+      .SDcols = in_col
+    ]
     setnames(poblacion, "cluster", "seccion")
     class(poblacion)             <- pob_class
     attributes(poblacion)$fuente <- fuente
