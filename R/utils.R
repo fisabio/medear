@@ -74,9 +74,9 @@ detecta_cambios <- function(datos, years = 1996:2016) {
   for (i in unique(datos$CPRO)) {
     tramero <- datos[CPRO == i]
 
-    for (j in years[-length(years)]) {
-      tram_old <- tramero[year == j]
-      tram_new <- tramero[year == j + 1]
+    for (j in seq_along(years[-length(years)])) {
+      tram_old <- tramero[year == years[j]]
+      tram_new <- tramero[year == years[j + 1]]
       muni     <- unique(tram_old[, CMUM])
 
       for (k in seq_along(muni)) {
@@ -89,7 +89,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
           old_ein = muni_old[, EIN],
           old_esn = muni_old[, ESN],
           year    = muni_old[, year],
-          year2   = muni_old[, year] + 1
+          year2   = years[j + 1]
         )[, `:=`(
           sc_new  = lapply(old_via, function(x)
             muni_new[which(muni_new[, via] == x), seccion]),

@@ -88,7 +88,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   car_class  <- attributes(cartografia@data)$class
   fuente     <- attributes(cartografia@data)$fuente
 
-  cambios    <- cambios[between(year, years[1], years[length(years)])]
+  cambios    <- cambios[between(year, min(years), max(years))]
   sc_unicas  <- sort(
     unique(
       secciones[
@@ -100,17 +100,14 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   cluster_sc <- data.table(sc = sc_unicas, id_cluster = sc_unicas)
 
   for (i in seq_len(nrow(cambios))) {
-    sc_select <- which(cluster_sc[, sc] %in%
+    sc_select <- which(cluster_sc$sc %in%
                          cambios[i, c(sc_old, sc_new)])
-    sc_min    <- min(cluster_sc[sc_select, id_cluster])
-    sc_assign <- which(cluster_sc[, id_cluster] %in%
-                         cluster_sc[sc_select, id_cluster])
+    sc_min    <- min(cluster_sc$id_cluster[sc_select])
+    sc_assign <- which(cluster_sc$id_cluster %in%
+                         cluster_sc$id_cluster[sc_select])
     cluster_sc[sc_assign, id_cluster := sc_min]
   }
-  cartografia$cluster_id <- cluster_sc[
-    match(cartografia$seccion, cluster_sc[, sc]),
-    id_cluster
-  ]
+  cartografia$cluster_id <- cluster_sc$id_cluster[match(cartografia$seccion, cluster_sc$sc)]
   cartografia$cluster_id[is.na(cartografia$cluster_id)] <-
     cartografia$seccion[is.na(cartografia$cluster_id)]
   cartografia <- stats::aggregate(
@@ -126,13 +123,14 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   if (!is.null(poblacion)) {
     pob_class <- class(poblacion)
-    poblacion <- poblacion[between(year, years[1], years[length(years)])]
+    poblacion <- poblacion[between(year, min(years), max(years))]
     poblacion <- elige_corte(poblacion, corte_edad)
     poblacion[,
               cluster := cluster_sc[
-                match(poblacion$seccion, cluster_sc[, sc]),
+                match(poblacion$seccion, cluster_sc$sc),
                 id_cluster
                 ]]
+    poblacion[is.na(cluster), cluster := seccion]
     in_col <- names(poblacion)[
       !names(poblacion) %in% c("seccion", "sexo", "year", "cluster")
       ]
