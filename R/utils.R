@@ -72,7 +72,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
   stopifnot(is.numeric(years))
   stopifnot(length(years) > 1 & 2011 %in% years)
   stopifnot(2011 %in% unique(datos$year))
-  stopifnot(years %in% unique(datos$year))
+  stopifnot(unique(datos$year) %in% years)
 
   cambios <- list()
   for (i in unique(datos$CPRO)) {
