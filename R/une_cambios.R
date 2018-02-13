@@ -6,8 +6,9 @@
 #'   sección censal.
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
-#' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, y con
-#'   datos de clase \code{cartografia_ine}.
+#' @param cartografia Objeto de clase
+#'   \code{\link[sp]{SpatialPolygonsDataFrame}}, y con datos de clase
+#'   \code{cartografia_ine}.
 #' @param years Vector numérico de longitud >= 1 con los años para los que se
 #'   desee consultar las variaciones de seccionado. El año 2011 debe figurar
 #'   dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
@@ -16,9 +17,11 @@
 #'   proporcionar en caso de querer agregar las poblaciones.
 #' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
+#' @param umbral_cambio Numérico: porcentaje de viviendas afectadas en el cambio
+#'   de sección.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-#'   NULL, corte_edad = 85)
+#'   NULL, corte_edad = 85, umbral_cambio = 5)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
@@ -65,7 +68,7 @@
 #'   \code{\link{descarga_cartografia}}
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
-                          poblacion = NULL, corte_edad = 85) {
+                          poblacion = NULL, corte_edad = 85, umbral_cambio = 5) {
 
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
@@ -87,7 +90,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-
+  cambios    <- cambios[
+    cambio_ref >= umbral_cambio
+  ][viviendas != 0]
   cambios    <- cambios[between(year, years[1], years[length(years)])]
   sc_unicas  <- sort(
     unique(
@@ -97,15 +102,16 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       ]
     )
   )
-  cluster_sc <- data.table(sc = sc_unicas, id_cluster = sc_unicas)
+  cluster_sc     <- data.table(sc = sc_unicas, id_cluster = sc_unicas, ref = NA)
+  cluster_sc$ref <- ifelse(cluster_sc$sc %in% secciones[year == 2011][[2]], TRUE, FALSE)
+
 
   for (i in seq_len(nrow(cambios))) {
-    sc_select <- which(cluster_sc[, sc] %in%
-                         cambios[i, c(sc_ref, sc_new)])
-    sc_min    <- min(cluster_sc[sc_select, id_cluster])
+    sc_select <- which(cluster_sc[, sc] %in% cambios[i, c(sc_ref, sc_new)])
+    sc_min <- min(cluster_sc[sc_select][ref == TRUE]$id_cluster)
     sc_assign <- which(cluster_sc[, id_cluster] %in%
                          cluster_sc[sc_select, id_cluster])
-    cluster_sc[sc_assign, id_cluster := sc_min]
+    cluster_sc[sc_assign, id_cluster := sc_min][]
   }
   cartografia$cluster_id <- cluster_sc[
     match(cartografia$seccion, cluster_sc[, sc]),
