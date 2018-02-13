@@ -68,7 +68,7 @@
 #'   \code{\link{descarga_cartografia}}
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
-                          poblacion = NULL, corte_edad = 85, umbral_cambio = 5) {
+                          poblacion = NULL, corte_edad = 85, umbral_cambio = 0) {
 
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
@@ -90,9 +90,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-  cambios    <- cambios[
-    cambio_ref >= umbral_cambio
-  ][viviendas != 0]
+  # cambios    <- cambios[
+  #   cambio_ref >= umbral_cambio
+  # ][viviendas != 0]
   cambios    <- cambios[between(year, years[1], years[length(years)])]
   sc_unicas  <- sort(
     unique(
@@ -108,7 +108,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   for (i in seq_len(nrow(cambios))) {
     sc_select <- which(cluster_sc[, sc] %in% cambios[i, c(sc_ref, sc_new)])
-    sc_min <- min(cluster_sc[sc_select][ref == TRUE]$id_cluster)
+    sc_min <- min(cluster_sc[sc_select, id_cluster])
     sc_assign <- which(cluster_sc[, id_cluster] %in%
                          cluster_sc[sc_select, id_cluster])
     cluster_sc[sc_assign, id_cluster := sc_min][]
