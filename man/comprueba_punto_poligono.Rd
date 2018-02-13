@@ -10,9 +10,9 @@ comprueba_punto_poligono(punto, poligono)
 \arguments{
 \item{punto}{Un data.frame con dos columnas: lng y lat.}
 
-\item{poligono}{Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}} con el
-polígono de referencia sobre el que se desee contrastar la pertenecia de
-las coordenadas.}
+\item{poligono}{Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}
+con el polígono de referencia sobre el que se desee contrastar la
+pertenecia de las coordenadas.}
 }
 \value{
 Valor lógico.
@@ -22,7 +22,14 @@ Con el fin de asegurar que el resultado de la geocodificación
   sea coherente, esta función permite identificar parejas de coordenadas que
   no estén incluidas en un polígono concreto (una sección, un distrito, un
   municipio o una provincia). Para ello es necesario proporcionar un polígono
-  de referencia para cada par de coordenadas.
+  de referencia para cada par de coordenadas, en las cuales se utiliza el CRS
+  ETRS89 (código EPSG 4258), que es el empleado el sistema de referencia de
+  CartoCiudad (si se desea utilizar esta función para coordenadas no
+  recuperadas con las funciones de este paquete
+  (\code{\link{geocodificar_cartociudad}}, \code{\link{geocodificar_google}})
+  o tras llamar directamente a
+  \code{\link[caRtociudad]{cartociudad_geocode}}, habrá que transformar la
+  proyección a ETRS89).
 }
 \seealso{
 \code{\link{geocodificar_cartociudad}} y

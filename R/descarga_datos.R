@@ -2,7 +2,7 @@
 #' @title Descarga los trameros del INE
 #'
 #' @description Descarga los trameros que ofrece al público el INE para el año
-#'   2001 y desde 2004 a 2017.
+#'   2001 y desde 2004 a 2016.
 #'
 #' @param cod_provincia Cadena de carácteres de longitud >= 1 con el código de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
@@ -26,7 +26,7 @@
 #'   dígitos la sección censal.
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   c(2001, 2004:2017), descarga = TRUE, ruta = NULL, conservar = TRUE)
+#'   c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
 #'   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
@@ -57,12 +57,12 @@
 #'   \code{\link{descarga_poblaciones}}.
 #'
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
-                              years = c(2001, 2004:2017), descarga = TRUE, ruta = NULL,
+                              years = c(2001, 2004:2016), descarga = TRUE, ruta = NULL,
                               conservar = TRUE) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) > 0 & years %in% c(2001, 2004:2017))
+  stopifnot(length(years) > 0 & years %in% c(2001, 2004:2016))
   stopifnot(is.logical(descarga))
   stopifnot(is.logical(conservar))
   stopifnot(is.character(ruta) | is.null(ruta))
@@ -74,16 +74,16 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     mustWork = FALSE
   )
   estructura <- readr::fwf_positions(
-    start     = c(1, 3, 6, 8, 21, 49, 54),
-    end       = c(2, 5, 7, 10, 25, 52, 57),
-    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN")
+    start     = c(1, 3, 6, 8, 21, 49, 54, 166),
+    end       = c(2, 5, 7, 10, 25, 52, 57, 190),
+    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "NVIAC")
   )
   y_2001 <- FALSE
   if (2001 %in% years) {
     y_2001 <- TRUE
     years  <- years[-(years == 2001)]
   }
-  if (descarga) {
+  if (descarga & is.null(ruta)) {
     if (y_2001) {
       if (!dir.exists(unique(dirname(dir_dest))))
         dir.create(unique(dirname(dir_dest)), recursive = TRUE)
@@ -143,6 +143,9 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   for (i in seq_along(dir_dest)) {
     for (j in seq_along(years)) {
       ruta_tra[i, j] <- paste0(dir_dest[i], "/year_", substr(years[j], 3, 4))
+      if (!file.exists(ruta_tra[i, j])) {
+        stop("No existe el archivo ", ruta_tra[i, j])
+      }
       tramero <- readr::read_fwf(file          = ruta_tra[i, j],
                                  col_positions = estructura,
                                  col_types     = readr::cols(.default = "c"),
@@ -155,6 +158,12 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     }
   }
   if (y_2001) {
+    ruta_2001 <- list.files(
+      dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
+    )
+    if (length(ruta_2001) == 0) {
+      stop("No existe el tramero de 2001 en el directorio indicado (", ruta, ")")
+    }
     tramero <- readr::read_fwf(
       file          = list.files(
         dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
@@ -331,7 +340,7 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 
   file_down <- matrix(ncol = length(years), nrow = length(cod_provincia))
 
-  if (descarga) {
+  if (descarga & is.null(ruta)) {
     dir_dest <- normalizePath(
       path     = paste0(getwd(), "/.poblaciones/prov_", cod_provincia),
       winslash = "/",
