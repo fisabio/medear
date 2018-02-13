@@ -6,13 +6,14 @@
 \title{Une los cambios del seccionado del INE}
 \usage{
 une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-  NULL, corte_edad = 85)
+  NULL, corte_edad = 85, umbral_cambio = 5)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
 
-\item{cartografia}{Objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, y con
-datos de clase \code{cartografia_ine}.}
+\item{cartografia}{Objeto de clase
+\code{\link[sp]{SpatialPolygonsDataFrame}}, y con datos de clase
+\code{cartografia_ine}.}
 
 \item{years}{Vector numérico de longitud >= 1 con los años para los que se
 desee consultar las variaciones de seccionado. El año 2011 debe figurar
@@ -24,6 +25,9 @@ proporcionar en caso de querer agregar las poblaciones.}
 
 \item{corte_edad}{Numérico: punto de corte para los grupos de edad (85 o
 100). Argumento opcional en caso de proporcionar datos de poblaciones.}
+
+\item{umbral_cambio}{Numérico: porcentaje de viviendas afectadas en el cambio
+de sección.}
 }
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de

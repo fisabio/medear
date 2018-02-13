@@ -48,8 +48,8 @@ filtrar_ein_esn <- function(datos) {
 #'   \item{sc_new}{Código de la sección censal en el segundo año.}
 #'   \item{year}{Primer año.} \item{year2}{Segundo año.} \item{vias}{Lista con
 #'   el código de las vías que provocan el cambio de sección (incorporando un
-#'   dígito al final de la cadena indicando si se trata de numeración par o
-#'   impar)}
+#'   dígito al final de la cadena indicando si se trata de numeración par (0) o
+#'   impar(1))}
 #'
 #' @examples
 #'

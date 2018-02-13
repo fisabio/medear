@@ -11,7 +11,8 @@
 secciones
 }
 \description{
-Listado con las secciones censales únicas por año (1996-2016).
+Listado con las secciones censales únicas por año (1996-2016) de
+  ciudades MEDEA3.
 }
 \examples{
 
