@@ -88,25 +88,21 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-  cambios    <- cambios[
-    cambio_ref >= umbral_cambio
-  ][viviendas != 0]
-  cambios    <- cambios[between(year, years[1], years[length(years)])]
+  cambios    <- cambios[between(year2, years[1], years[length(years)])]
   sc_unicas  <- sort(
     unique(
       secciones[
-        year2 %in% years & seccion %in% c(cambios$sc_ref, cambios$sc_new),
+        year %in% years & seccion %in% c(cambios$sc_ref, cambios$sc_new),
         seccion
       ]
     )
   )
-  cluster_sc     <- data.table(sc = sc_unicas, id_cluster = sc_unicas, ref = NA)
-  cluster_sc$ref <- ifelse(cluster_sc$sc %in% secciones[year == 2011][[2]], TRUE, FALSE)
+  cluster_sc     <- data.table(sc = sc_unicas, id_cluster = sc_unicas)
 
 
   for (i in seq_len(nrow(cambios))) {
     sc_select <- which(cluster_sc[, sc] %in% cambios[i, c(sc_ref, sc_new)])
-    sc_min    <- min(cluster_sc[sc_select][ref == TRUE]$id_cluster)
+    sc_min    <- min(cluster_sc[sc_select, id_cluster])
     sc_assign <- which(cluster_sc[, id_cluster] %in%
                          cluster_sc[sc_select, id_cluster])
     cluster_sc[sc_assign, id_cluster := sc_min][]
