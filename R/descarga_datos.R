@@ -87,7 +87,11 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     y_2001 <- TRUE
     years  <- years[-(years == 2001)]
   }
-  if (descarga & is.null(ruta)) {
+  if (!is.null(ruta)) {
+    descarga  <- FALSE
+    conservar <- TRUE
+  }
+  if (descarga) {
     if (y_2001) {
       if (!dir.exists(unique(dirname(dir_dest))))
         dir.create(unique(dirname(dir_dest)), recursive = TRUE)
@@ -150,12 +154,14 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       if (!file.exists(ruta_tra[i, j])) {
         stop("No existe el archivo ", ruta_tra[i, j])
       }
-      tramero <- readr::read_fwf(
-        file          = ruta_tra[i, j],
-        col_positions = estructura,
-        col_types     = readr::cols(.default = "c"),
-        progress      = FALSE,
-        locale        = readr::locale(encoding = "latin1")
+      tramero <- suppressWarnings(
+        readr::read_fwf(
+          file          = ruta_tra[i, j],
+          col_positions = estructura,
+          col_types     = readr::cols(.default = "c"),
+          progress      = FALSE,
+          locale        = readr::locale(encoding = "latin1")
+        )
       )
       trameros[[paste0("p", i, j)]] <- as.data.table(tramero)[, `:=`(
         year    = years[j],
@@ -171,14 +177,16 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     if (length(ruta_2001) == 0) {
       stop("No existe el tramero de 2001 en el directorio indicado (", ruta, ")")
     }
-    tramero <- readr::read_fwf(
-      file          = list.files(
-        dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
-      ),
-      col_positions = estructura,
-      col_types     = readr::cols(.default = "c"),
-      progress      = FALSE,
-      locale        = readr::locale(encoding = "latin1")
+    tramero <- suppressWarnings(
+      readr::read_fwf(
+        file          = list.files(
+          dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
+        ),
+        col_positions = estructura,
+        col_types     = readr::cols(.default = "c"),
+        progress      = FALSE,
+        locale        = readr::locale(encoding = "latin1")
+      )
     )
     trameros[["n_2001"]] <- as.data.table(tramero)[, `:=`(
       year    = 2001,
@@ -186,7 +194,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
     )][CPRO %in% cod_provincia]
   }
-  if (descarga && !conservar)
+  if (!conservar)
     unlink(dirname(dir_dest), recursive = TRUE)
 
   trameros <- rbindlist(trameros)
