@@ -2,48 +2,48 @@
 #' @title Une los cambios del seccionado del INE
 #'
 #' @description Une los cambios del seccionado del INE (tomando como referencia
-#'   la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
-#'   sección censal.
+#'   la cartografï¿½a INE 2011), adaptando a su vez las poblaciones por sexo aï¿½o y
+#'   secciï¿½n censal.
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
 #' @param cartografia Objeto de clase
 #'   \code{\link[sp]{SpatialPolygonsDataFrame}}, y con datos de clase
 #'   \code{cartografia_ine}.
-#' @param years Vector numérico de longitud >= 1 con los años para los que se
-#'   desee consultar las variaciones de seccionado. El año 2011 debe figurar
-#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
-#'   año).
+#' @param years Vector numï¿½rico de longitud >= 1 con los aï¿½os para los que se
+#'   desee consultar las variaciones de seccionado. El aï¿½o 2011 debe figurar
+#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de mï¿½s de un
+#'   aï¿½o).
 #' @param poblacion Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 #'   proporcionar en caso de querer agregar las poblaciones.
-#' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
+#' @param corte_edad Numï¿½rico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
-#' @param umbral_cambio Numérico: porcentaje de viviendas afectadas en el cambio
-#'   de sección.
+#' @param umbral_cambio Numï¿½rico: porcentaje de viviendas afectadas en el cambio
+#'   de secciï¿½n.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
 #'   NULL, corte_edad = 85, umbral_cambio = 5)
 #'
-#' @return El resultado devuelto varía en función de si se proporcionan datos de
+#' @return El resultado devuelto varï¿½a en funciï¿½n de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
 #'   \code{cartografia_ine} y \code{\link[sp]{SpatialPolygonsDataFrame}} con la
-#'   cartografía, donde cada fila es una sección censal y que cuenta con 9
-#'   columnas: \item{seccion}{Cadena de 10 caracteres con el código de sección
+#'   cartografï¿½a, donde cada fila es una secciï¿½n censal y que cuenta con 9
+#'   columnas: \item{seccion}{Cadena de 10 caracteres con el cï¿½digo de secciï¿½n
 #'   censal (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
-#'   caracteres con el código del municipio (incluye provincia).}
-#'   \item{CCA}{Cadena de 2 caracteres con el código de comunidad autónoma.}
+#'   caracteres con el cï¿½digo del municipio (incluye provincia).}
+#'   \item{CCA}{Cadena de 2 caracteres con el cï¿½digo de comunidad autï¿½noma.}
 #'   \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la comunidad
-#'   autónoma.} \item{NMUN}{Nombre del municipio.} \item{geometry}{Columna de
-#'   tipo lista con la geometría asociada a cada sección censal.}
-#'   \item{cluster_id}{Código de identificación del cluster de uniones.}
-#'   \item{sc_unida}{Código de las secciones unidas.}
+#'   autï¿½noma.} \item{NMUN}{Nombre del municipio.} \item{geometry}{Columna de
+#'   tipo lista con la geometrï¿½a asociada a cada secciï¿½n censal.}
+#'   \item{cluster_id}{Cï¿½digo de identificaciï¿½n del cluster de uniones.}
+#'   \item{sc_unida}{Cï¿½digo de las secciones unidas.}
 #'
 #'   En caso de proporcionan poblaciones, se devuelve una lista de longitud
-#'   igual a dos, donde el primer elemento es la cartografía descrita
+#'   igual a dos, donde el primer elemento es la cartografï¿½a descrita
 #'   anteriormente y el segundo elemento de la lista es un objeto de clase
 #'   \code{poblaciones_ine} donde las filas representan las distintas secciones
-#'   censales. Las tres primeras columnas son: \item{seccion}{Código de la
-#'   sección censal en el primer año.} \item{sexo}{Código de la sección censal
-#'   en el segundo año.} \item{year}{Primer año.} El resto de columnas
+#'   censales. Las tres primeras columnas son: \item{seccion}{Cï¿½digo de la
+#'   secciï¿½n censal en el primer aï¿½o.} \item{sexo}{Cï¿½digo de la secciï¿½n censal
+#'   en el segundo aï¿½o.} \item{year}{Primer aï¿½o.} El resto de columnas
 #'   representan los distintos grupos de edad, tras realizar el corte en los
 #'   grupos de edad (85 0 100).
 #'
@@ -107,10 +107,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
                          cluster_sc[sc_select, id_cluster])
     cluster_sc[sc_assign, id_cluster := sc_min][]
   }
-  cartografia$cluster_id <- cluster_sc[
-    match(cartografia$seccion, cluster_sc[, sc]),
-    id_cluster
-  ]
+  cartografia$cluster_id <- cluster_sc$id_cluster[match(cartografia$seccion, cluster_sc$sc)]
   cartografia$cluster_id[is.na(cartografia$cluster_id)] <-
     cartografia$seccion[is.na(cartografia$cluster_id)]
   cartografia <- stats::aggregate(
@@ -126,15 +123,14 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   if (!is.null(poblacion)) {
     pob_class <- class(poblacion)
-    poblacion <- poblacion[between(year, years[1], years[length(years)])]
+    poblacion <- poblacion[between(year, min(years), max(years))]
     poblacion <- elige_corte(poblacion, corte_edad)
-    poblacion[
-      ,
-      cluster := cluster_sc[
-        match(poblacion$seccion, cluster_sc[, sc]),
-        id_cluster
-      ]
-    ]
+    poblacion[,
+              cluster := cluster_sc[
+                match(seccion, sc),
+                id_cluster
+                ]]
+    poblacion[is.na(cluster), cluster := seccion]
     in_col <- names(poblacion)[
       !names(poblacion) %in% c("seccion", "sexo", "year", "cluster")
     ]

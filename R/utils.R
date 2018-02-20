@@ -24,31 +24,31 @@ filtrar_ein_esn <- function(datos) {
 
 #' @title Funcion para detectar cambios de seccionado en trameros
 #'
-#' @description Detecta cambios de sección censal para las provincias y el
-#'   período marcados.
+#' @description Detecta cambios de secciï¿½n censal para las provincias y el
+#'   perï¿½odo marcados.
 #'
-#' @param datos Objeto de clase \code{tramero_ine} (devuelto por la función
-#'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al año 2011.
-#' @param years Vector numérico de longitud >= 2 con los años para los que se
+#' @param datos Objeto de clase \code{tramero_ine} (devuelto por la funciï¿½n
+#'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al aï¿½o 2011.
+#' @param years Vector numï¿½rico de longitud >= 2 con los aï¿½os para los que se
 #'   desee consultar las variaciones de seccionado.
 #'
 #' @usage detecta_cambios(datos, years = 1996:2016)
 #'
-#' @details El tiempo de ejecución de la función varía según el número de
-#'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
-#'   de computación es mediante la ejecución en paralelo de la función.
+#' @details El tiempo de ejecuciï¿½n de la funciï¿½n varï¿½a segï¿½n el nï¿½mero de
+#'   provincias y el rango de aï¿½os. La forma mï¿½s sencilla de acelerar el proceso
+#'   de computaciï¿½n es mediante la ejecuciï¿½n en paralelo de la funciï¿½n.
 #'
-#'   Los códigos de sección censal siguen un orden preestablecido: los primeros
-#'   dos dígitos identifican la provincia, los siguientes tres dígitos el
-#'   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
-#'   hacen referencia a la sección censal.
+#'   Los cï¿½digos de secciï¿½n censal siguen un orden preestablecido: los primeros
+#'   dos dï¿½gitos identifican la provincia, los siguientes tres dï¿½gitos el
+#'   municipio, los prï¿½ximos dos dï¿½gitos el distrito y los ï¿½ltimos tres dï¿½gitos
+#'   hacen referencia a la secciï¿½n censal.
 #'
 #' @return Un objeto de clase \code{cambios_ine} con 5 columnas:
-#'   \item{sc_ref}{Código de la sección censal en el primer año.}
-#'   \item{sc_new}{Código de la sección censal en el segundo año.}
-#'   \item{year}{Primer año.} \item{year2}{Segundo año.} \item{vias}{Lista con
-#'   el código de las vías que provocan el cambio de sección (incorporando un
-#'   dígito al final de la cadena indicando si se trata de numeración par (0) o
+#'   \item{sc_ref}{Cï¿½digo de la secciï¿½n censal en el primer aï¿½o.}
+#'   \item{sc_new}{Cï¿½digo de la secciï¿½n censal en el segundo aï¿½o.}
+#'   \item{year}{Primer aï¿½o.} \item{year2}{Segundo aï¿½o.} \item{vias}{Lista con
+#'   el cï¿½digo de las vï¿½as que provocan el cambio de secciï¿½n (incorporando un
+#'   dï¿½gito al final de la cadena indicando si se trata de numeraciï¿½n par (0) o
 #'   impar(1))}
 #'
 #' @examples
@@ -134,14 +134,14 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 
 #' @title Carga los datos privados de poblacion para el proyecto MEDEA3
 #'
-#' @description Algunos datos del proyecto MEDEA3 están encriptados para poder
-#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
-#'   los desencripta y añade a los datos públicos (resto de años), adjuntando el
+#' @description Algunos datos del proyecto MEDEA3 estï¿½n encriptados para poder
+#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta funciï¿½n
+#'   los desencripta y aï¿½ade a los datos pï¿½blicos (resto de aï¿½os), adjuntando el
 #'   resultado al entorno global.
 #'
-#' @details La contraseña no se almacena en el historial.
+#' @details La contraseï¿½a no se almacena en el historial.
 #'
-#' @param key Cadena de carácteres con la contraseña.
+#' @param key Cadena de carï¿½cteres con la contraseï¿½a.
 #' @return No se devuelve nada.
 #'
 #' @usage carga_datos(key)
@@ -153,7 +153,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
 #' @examples
 #'
 #' \dontrun{
-#'   carga_datos(key = "contraseña")
+#'   carga_datos(key = "contraseï¿½a")
 #' }
 #'
 #' @encoding UTF-8
