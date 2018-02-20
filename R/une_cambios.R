@@ -84,11 +84,12 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   if (any(years != min(years):max(years)))
     stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
   stopifnot(corte_edad %in% c(85, 100))
+  stopifnot(is.numeric(umbral_cambio))
 
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-  cambios    <- cambios[between(year2, years[1], years[length(years)])]
+  cambios    <- cambios[between(year2, years[1], years[length(years)]) & cambio_ref >= umbral_cambio]
   sc_unicas  <- sort(
     unique(
       secciones[
