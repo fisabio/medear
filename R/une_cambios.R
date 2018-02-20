@@ -115,7 +115,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     by       = list(cartografia$cluster_id),
     FUN      = function(x) x[[1]]
   )
-  cartografia$Group.1 <- NULL
+  cartografia$seccion    <- cartografia$cluster_id
+  cartografia$Group.1    <- NULL
+  cartografia$cluster_id <- NULL
 
   attributes(cartografia@data)$fuente <- fuente
   attributes(cartografia@data)$class  <- car_class
