@@ -69,6 +69,7 @@ detecta_cambios <- function(datos, years = 1996:2016) {
   stopifnot("tramero_ine" %in% class(datos))
   stopifnot(is.numeric(years))
   stopifnot(length(years) > 1 & years %in% 1996:2016)
+  years <- years[years %in% datos$year]
   cambios <- list()
 
   for (i in unique(datos$CPRO)) {
