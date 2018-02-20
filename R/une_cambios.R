@@ -127,7 +127,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     poblacion <- elige_corte(poblacion, corte_edad)
     poblacion[,
               cluster := cluster_sc[
-                match(poblacion$seccion, cluster_sc$sc),
+                match(seccion, sc),
                 id_cluster
                 ]]
     poblacion[is.na(cluster), cluster := seccion]
