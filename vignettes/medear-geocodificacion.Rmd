@@ -3,8 +3,6 @@ title: "Protocolo de geocodificación (v2.1)"
 author: "Grupo MEDEA"
 date: "`r Sys.Date()`"
 output: 
-  rmarkdown::pdf_document:
-    number_sections: true
   rmarkdown::html_vignette:
     number_sections: true
 vignette: >
