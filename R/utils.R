@@ -32,7 +32,7 @@ filtrar_ein_esn <- function(datos) {
 #' @param years Vector num�rico de longitud >= 2 con los a�os para los que se
 #'   desee consultar las variaciones de seccionado.
 #'
-#' @usage detecta_cambios(datos, years = 1996:2016)
+#' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2016))
 #'
 #' @details El tiempo de ejecuci�n de la funci�n var�a seg�n el n�mero de
 #'   provincias y el rango de a�os. La forma m�s sencilla de acelerar el proceso
@@ -66,22 +66,31 @@ filtrar_ein_esn <- function(datos) {
 #'
 #' @seealso \code{\link{une_secciones}} y \code{\link{descarga_trameros}}.
 #'
-detecta_cambios <- function(datos, years = 1996:2016) {
+detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016)) {
 
   stopifnot("tramero_ine" %in% class(datos))
   stopifnot(is.numeric(years))
   stopifnot(length(years) > 1 & 2011 %in% years)
   stopifnot(2011 %in% unique(datos$year))
-  stopifnot(unique(datos$year) %in% years)
+  stopifnot(years %in% unique(datos$year))
 
   cambios <- list()
   for (i in unique(datos$CPRO)) {
     tramero  <- datos[CPRO == i]
-    tram_ref <- tramero[year == 2011]
-    muni     <- unique(tram_ref$CMUM)
 
     for (j in years[years != 2011]) {
-      tram_new <- tramero[year == j]
+      if (j < 2011) {
+        tram_ref <- tramero[year == j]
+        tram_new <- tramero[year == 2011]
+        year_ref <- j
+        year_com <- 2011
+      } else {
+        tram_ref <- tramero[year == 2011]
+        tram_new <- tramero[year == j]
+        year_ref <- 2011
+        year_com <- j
+      }
+      muni     <- unique(tram_ref$CMUM)
 
       for (k in seq_along(muni)) {
         muni_new <- tram_new[CMUM == muni[k]]
@@ -91,8 +100,8 @@ detecta_cambios <- function(datos, years = 1996:2016) {
           sc_ref  = tram_ref[CMUM == muni[k], seccion],
           ref_ein = tram_ref[CMUM == muni[k], EIN],
           ref_esn = tram_ref[CMUM == muni[k], ESN],
-          year    = 2011,
-          year2   = j
+          year    = year_ref,
+          year2   = year_com
         )[, `:=`(
           sc_new  = lapply(ref_via, function(x)
             muni_new[which(muni_new[, via] == x), seccion]),
