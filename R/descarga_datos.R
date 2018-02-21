@@ -1,50 +1,50 @@
 
 #' @title Descarga los trameros del INE
 #'
-#' @description Descarga los trameros que ofrece al pï¿½blico el INE para el aï¿½o
+#' @description Descarga los trameros que ofrece al público el INE para el año
 #'   2001 y desde 2004 a 2016.
 #'
-#' @param cod_provincia Cadena de carï¿½cteres de longitud >= 1 con el cï¿½digo de
+#' @param cod_provincia Cadena de carácteres de longitud >= 1 con el código de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
 #'   seccionado.
-#' @param years Vector numï¿½rico de longitud >= 2 con los aï¿½os para los que se
+#' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param descarga Valor lï¿½gico: ï¿½debe procederse a la descarga de los trameros?
-#' @param ruta Cadena de carï¿½cteres indicando la ruta en la que se almacenan los
+#' @param descarga Valor lógico: ¿debe procederse a la descarga de los trameros?
+#' @param ruta Cadena de carácteres indicando la ruta en la que se almacenan los
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
-#' @param conservar Valor lï¿½gico: ï¿½se desea conservar los archivos descargados
+#' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.trameros/} dentro del directorio de
 #'   trabajo?
 #'
-#' @details El tiempo de ejecuciï¿½n de la funciï¿½n varï¿½a segï¿½n el nï¿½mero de
-#'   provincias y el rango de aï¿½os. La forma mï¿½s sencilla de acelerar el proceso
-#'   de computaciï¿½n es mediante la ejecuciï¿½n en paralelo de la funciï¿½n.
+#' @details El tiempo de ejecución de la función varía según el número de
+#'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
+#'   de computación es mediante la ejecución en paralelo de la función.
 #'
-#'   Los cï¿½digos de secciï¿½n censal siguen un orden preestablecido: los primero
-#'   dos dï¿½gitos identifican la provincia, los siguientes tres dï¿½gitos el
-#'   municipio, los prï¿½ximos dos dï¿½gitos el distrito y los ï¿½ltimos tres dï¿½gitos
-#'   la secciï¿½n censal.
+#'   Los códigos de sección censal siguen un orden preestablecido: los primero
+#'   dos dígitos identifican la provincia, los siguientes tres dígitos el
+#'   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
+#'   la sección censal.
 #'
-#' @param ... Parï¿½metros adicionales en la lectura de datos (no es necesario su
+#' @param ... Parámetros adicionales en la lectura de datos (no es necesario su
 #'   uso).
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
 #'   c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
-#'   \item{CPRO}{Cï¿½digo de la provincia.} \item{CMUM}{Cï¿½digo del municipio.}
-#'   \item{DIST}{Cï¿½digo del distrito.} \item{SECC}{Cï¿½digo de la secciï¿½n censal
-#'   reducido.} \item{CVIA}{Cï¿½digo de la vï¿½areducido.} \item{EIN}{Primer portal
-#'   del tramo de vï¿½a.} \item{ESN}{ï¿½ltimo portal del tramo de vï¿½a.}
-#'   \item{NVIAC}{Nombre de la vï¿½a.} \item{seccion}{Cï¿½digo de la secciï¿½n censal
-#'   completo.} \item{year}{Aï¿½o del tramero.} \item{via}{Cï¿½digo de la vï¿½a
+#'   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
+#'   \item{DIST}{Código del distrito.} \item{SECC}{Código de la sección censal
+#'   reducido.} \item{CVIA}{Código de la vía reducido.} \item{EIN}{Primer portal
+#'   del tramo de vía.} \item{ESN}{Último portal del tramo de vía.}
+#'   \item{NVIAC}{Nombre de la vía.} \item{seccion}{Código de la sección censal
+#'   completo.} \item{year}{Año del tramero.} \item{via}{Código de la vía
 #'   completo.}
 #'
-#'   Cada fila representa un tramo de vï¿½a, puediendo repetirse la misma vï¿½a en
-#'   varias ocasiones en funciï¿½n de si su recorrido recae en varias secciones
-#'   censales, o si se trata de tramos de la vï¿½a con numeraciï¿½n par, impar o sin
-#'   numeraciï¿½n alguna.
+#'   Cada fila representa un tramo de vía, puediendo repetirse la misma vía en
+#'   varias ocasiones en función de si su recorrido recae en varias secciones
+#'   censales, o si se trata de tramos de la vía con numeración par, impar o sin
+#'   numeración alguna.
 #'
 #' @examples
 #' \dontrun{
@@ -207,13 +207,13 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 
 #' @title Descarga la cartografia con el seccionado del INE para 2011
 #'
-#' @description Descarga la cartografï¿½a del seccionado censal ofrecida
-#'   pï¿½blicamente por el INE para el aï¿½o 2011.
+#' @description Descarga la cartografía del seccionado censal ofrecida
+#'   públicamente por el INE para el año 2011.
 #'
-#' @param crs Vector numï¿½rico de longitud uno con el cï¿½digo EPSG del sistema de
+#' @param crs Vector numérico de longitud uno con el código EPSG del sistema de
 #'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 #'   datum WGS84).
-#' @param conservar Valor lï¿½gico: ï¿½se desea conservar los archivos descargados
+#' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.cartografia/} dentro del directorio de
 #'   trabajo?
 #'
@@ -223,12 +223,12 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'   como elemento normalizado.
 #'
 #' @return Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, donde cada fila
-#'   es una secciï¿½n censal y que cuenta con 7 columnas: \item{seccion}{Cadena de
-#'   10 carï¿½cteres con el cï¿½digo de secciï¿½n censal (incluye provincia, municipio
-#'   y distrito).} \item{CUMUN}{Cadena de 5 carï¿½cteres con el cï¿½digo del
-#'   municipio (incluye provincia).} \item{CCA}{Cadena de 2 carï¿½cteres con el
-#'   cï¿½digo de comunidad autï¿½noma.} \item{NPRO}{Nombre de la provincia.}
-#'   \item{NCA}{Nombre de la comunidad autï¿½noma.} \item{NMUN}{Nombre del
+#'   es una sección censal y que cuenta con 7 columnas: \item{seccion}{Cadena de
+#'   10 carácteres con el código de sección censal (incluye provincia, municipio
+#'   y distrito).} \item{CUMUN}{Cadena de 5 carácteres con el código del
+#'   municipio (incluye provincia).} \item{CCA}{Cadena de 2 carácteres con el
+#'   código de comunidad autónoma.} \item{NPRO}{Nombre de la provincia.}
+#'   \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre del
 #'   municipio.}
 #'
 #' @examples
@@ -287,45 +287,45 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 
 #' @title Descarga poblaciones del INE por seccion censal, sexo, edad y periodo
 #'
-#' @description Descarga o carga las poblaciones anuales del INE por secciï¿½n
+#' @description Descarga o carga las poblaciones anuales del INE por sección
 #'   censal, sexo y edad por grupos quinquenales (datos desde 2006).
 #'
-#' @param cod_provincia Cadena de carï¿½cteres de longitud >= 1 con el cï¿½digo de
+#' @param cod_provincia Cadena de carácteres de longitud >= 1 con el código de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
 #'   seccionado.
-#' @param years Vector numï¿½rico de longitud >= 1 con los aï¿½os para los que se
+#' @param years Vector numérico de longitud >= 1 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param descarga Valor lï¿½gico: ï¿½debe procederse a la descarga de los datos?
-#' @param ruta Cadena de carï¿½cteres indicando la ruta en la que se almacenan los
+#' @param descarga Valor lógico: ¿debe procederse a la descarga de los datos?
+#' @param ruta Cadena de carácteres indicando la ruta en la que se almacenan los
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
-#' @param conservar Valor lï¿½gico: ï¿½se desea conservar los archivos descargados
+#' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.poblaciones/} dentro del directorio de
 #'   trabajo?
 #'
-#' @details El tiempo de ejecuciï¿½n de la funciï¿½n varï¿½a segï¿½n el nï¿½mero de
-#'   provincias y el rango de aï¿½os. La forma mï¿½s sencilla de acelerar el proceso
-#'   de computaciï¿½n es mediante la ejecuciï¿½n en paralelo de la funciï¿½n.
+#' @details El tiempo de ejecución de la función varía según el número de
+#'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
+#'   de computación es mediante la ejecución en paralelo de la función.
 #'
-#'   Los cï¿½digos de secciï¿½n censal siguen un orden preestablecido: los primeros
-#'   dos dï¿½gitos identifican la provincia, los siguientes tres dï¿½gitos el
-#'   municipio, los prï¿½ximos dos dï¿½gitos el distrito y los ï¿½ltimos tres a la
-#'   secciï¿½n censal.
+#'   Los códigos de sección censal siguen un orden preestablecido: los primeros
+#'   dos dígitos identifican la provincia, los siguientes tres dígitos el
+#'   municipio, los próximos dos dígitos el distrito y los últimos tres a la
+#'   sección censal.
 #'
-#'   Hasta el aï¿½o 2011 el INE agrupa la ï¿½ltima categorï¿½a de edad como 85 y mï¿½s,
-#'   mientras que desde el aï¿½o siguiente llega hasta 100 y mï¿½s.
+#'   Hasta el año 2011 el INE agrupa la última categoría de edad como 85 y más,
+#'   mientras que desde el año siguiente llega hasta 100 y más.
 #'
 #'   Si se desea acceder a las poblaciones desde 1996 (datos adquiridos al INE),
-#'   se debe utilizar la funciï¿½n \code{\link{carga_datos}}.
+#'   se debe utilizar la función \code{\link{carga_datos}}.
 #'
 #' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
 #'   = 2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
-#'   \item{seccion}{Cï¿½digo de la secciï¿½n censal.}
+#'   \item{seccion}{Código de la sección censal.}
 #'   \item{sexo}{Codificado como 0 para hombres y 1 para mujeres.}
-#'   \item{year}{Aï¿½o al que se hace referencia.} El resto de columnas representan los distintos
+#'   \item{year}{Año al que se hace referencia.} El resto de columnas representan los distintos
 #'   grupos de edad.
 #'
 #' @examples

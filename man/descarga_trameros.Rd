@@ -33,7 +33,7 @@ uso).}
 Un objeto de clase \code{tramero_ine} con 11 columnas:
   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
   \item{DIST}{Código del distrito.} \item{SECC}{Código de la sección censal
-  reducido.} \item{CVIA}{Código de la víareducido.} \item{EIN}{Primer portal
+  reducido.} \item{CVIA}{Código de la vía reducido.} \item{EIN}{Primer portal
   del tramo de vía.} \item{ESN}{Último portal del tramo de vía.}
   \item{NVIAC}{Nombre de la vía.} \item{seccion}{Código de la sección censal
   completo.} \item{year}{Año del tramero.} \item{via}{Código de la vía
