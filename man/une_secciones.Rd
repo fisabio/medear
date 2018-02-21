@@ -6,7 +6,7 @@
 \title{Une los cambios del seccionado del INE}
 \usage{
 une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-  NULL, corte_edad = 85, umbral_cambio = 5)
+  NULL, corte_edad = 85, umbral_cambio = 0)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}

@@ -5,7 +5,7 @@
 \alias{detecta_cambios}
 \title{Funcion para detectar cambios de seccionado en trameros}
 \usage{
-detecta_cambios(datos, years = 1996:2016)
+detecta_cambios(datos, years = c(1996, 2001, 2004:2016))
 }
 \arguments{
 \item{datos}{Objeto de clase \code{tramero_ine} (devuelto por la función
