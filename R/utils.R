@@ -217,9 +217,9 @@ elige_corte <- function(datos, corte) {
       res[, q_85_plus := double(.N)]
     res[,
         q_85_plus := sum(
-          q_85_89, q_90_94, q_95_99, q_100_plus , na.rm = TRUE),
+          q_85_plus, q_85_89, q_90_94, q_95_99, q_100_plus , na.rm = TRUE),
         by = .(seccion, sexo, year)
-        ][, c("q_85_89", "q_90_94", "q_95_99", "q_100_plus") := NULL]
+        ][, c("q_85_89", "q_90_94", "q_95_99", "q_100_plus") := NULL][]
   }
   return(res)
 }
