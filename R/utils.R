@@ -135,6 +135,9 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016)) {
     }
   }
 
+  cambios <- lapply(cambios, function(x)
+    rbindlist(list(x[year == 2011], x[year != 2011, c(2, 1, 4, 3, 5)]))
+  )
   cambios <- rbindlist(cambios)
   class(cambios) <- c(class(cambios), "cambios_ine")
   return(cambios)
@@ -232,9 +235,9 @@ elige_corte <- function(datos, corte) {
       res[, q_85_plus := double(.N)]
     res[,
         q_85_plus := sum(
-          q_85_89, q_90_94, q_95_99, q_100_plus , na.rm = TRUE),
+          q_85_plus, q_85_89, q_90_94, q_95_99, q_100_plus , na.rm = TRUE),
         by = .(seccion, sexo, year)
-        ][, c("q_85_89", "q_90_94", "q_95_99", "q_100_plus") := NULL]
+        ][, c("q_85_89", "q_90_94", "q_95_99", "q_100_plus") := NULL][]
   }
   return(res)
 }
