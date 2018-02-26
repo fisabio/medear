@@ -6,7 +6,7 @@
 \title{Une los cambios del seccionado del INE}
 \usage{
 une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-  NULL, corte_edad = 85, umbral_cambio = 0)
+  NULL, corte_edad = 85, umbral_cambio = 0, distancia_max = 100)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
@@ -28,6 +28,9 @@ proporcionar en caso de querer agregar las poblaciones.}
 
 \item{umbral_cambio}{Numérico: porcentaje de viviendas afectadas en el cambio
 de sección.}
+
+\item{distancia_max}{Numérico: máxima distancia (en metros) a la que pueden
+estar dos secciones para ser unidas.}
 }
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de

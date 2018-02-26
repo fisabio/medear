@@ -299,5 +299,6 @@ utils::globalVariables(
     "q_100_plus", "q_85_89", "q_85_plus", "q_90_94", "q_95_99", "sc", "sexo",
     "geocodificados", "parimp_o", "parimp_c", "codigos_ine", "nombre_provincia",
     "nombre_municipio", "cod_provincia", "cod_municipio", "tip_via", "portalNumber",
-    "muni", "province", "postalCode", "secciones", "cambio_ref")
+    "muni", "province", "postalCode", "secciones", "cambio_ref", "camb_distrito",
+    "n_viv", "viv_ref", "viviendas", "no_11", "colin")
 )
