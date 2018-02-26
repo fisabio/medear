@@ -19,9 +19,11 @@
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
 #' @param umbral_cambio Numérico: porcentaje de viviendas afectadas en el cambio
 #'   de sección.
+#' @param distancia_max Numérico: máxima distancia (en metros) a la que pueden
+#'   estar dos secciones para ser unidas.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-#'   NULL, corte_edad = 85, umbral_cambio = 0)
+#'   NULL, corte_edad = 85, umbral_cambio = 0, distancia_max = 100)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
@@ -68,7 +70,8 @@
 #'   \code{\link{descarga_cartografia}}
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
-                          poblacion = NULL, corte_edad = 85, umbral_cambio = 0) {
+                          poblacion = NULL, corte_edad = 85,
+                          umbral_cambio = 0, distancia_max = 100) {
 
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
@@ -89,8 +92,61 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-  cambios    <- cambios[between(year2, years[1], years[length(years)]) & cambio_ref >= umbral_cambio]
-  sc_unicas  <- sort(
+
+  cartografia    <- cartografia[cartografia$CUMUN == "46250", ]
+  secciones_2011 <- as.data.table(cartografia@data[, c("seccion", "n_viv")])
+
+  for (i in seq_len(nrow(cambios))) {
+    var_year <- ifelse(cambios$year[i] == 2011, "sc_ref", "sc_new")
+    viv_r    <- secciones_2011[seccion == cambios[[var_year]][i], n_viv]
+    cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
+    cambios[i, cambio_ref := round(viviendas / viv_ref * 100)]
+  }
+
+  carto_metro <- sp::spTransform(cartografia, sp::CRS("+proj=utm +zone=28 +datum=WGS84"))
+  cambios$no_11 <- FALSE
+  cambios$colin <- NA
+  cambios$dista <- NA_real_
+  for (i in seq_len(nrow(cambios))) {
+    carto1 <- carto_metro[carto_metro$seccion == cambios$sc_ref[i], ]
+    carto2 <- carto_metro[carto_metro$seccion == cambios$sc_new[i], ]
+    if (all(nrow(carto1) > 0, nrow(carto2) > 0)) {
+      cambios$colin[i] <- rgeos::gIntersects(carto1, carto2)
+      cambios$dista[i] <- rgeos::gDistance(carto1, carto2)
+    } else {
+      cambios$no_11[i] <- TRUE
+    }
+  }
+
+  cambios[, camb_distrito := substr(sc_ref, 6, 7) != substr(sc_new, 6, 7)]
+  part <- cambios[camb_distrito == TRUE & no_11 == TRUE]
+  tmp  <- fsetdiff(cambios, part)
+  for (i in seq_len(nrow(part))) {
+    sc_inv <- fsetdiff(cambios, part[i])[sc_new == part[i, sc_new],
+                                             c(sc_ref, sc_new)
+                                             ]
+    sc_inv <- unique(sc_inv[sc_inv != part[i, sc_new]])
+    dista  <- numeric()
+
+    for (j in seq_along(sc_inv)) {
+      carto1 <- carto_metro[carto_metro$seccion == part[i, sc_ref], ]
+      carto2 <- carto_metro[carto_metro$seccion == sc_inv[j], ]
+      if (all(nrow(carto1) > 0, nrow(carto2) > 0)) {
+        dista[j] <- rgeos::gDistance(carto1, carto2)
+      }
+    }
+    if (length(dista) > 0)
+      part$dista[i] <- dista[which.max(dista)]
+  }
+  part      <- part[dista < distancia_max]
+  cambios   <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
+  filtrado  <- cambios[
+    (colin == TRUE | is.na(colin)) & (dista < 100 | is.na(dista)) &
+      cambio_ref >= umbral_cambio
+  ]
+  cambios   <- unique(rbindlist(list(filtrado, cambios[!sc_new %in% secciones_2011$seccion])))
+  cambios   <- cambios[between(year2, years[1], years[length(years)])]
+  sc_unicas <- sort(
     unique(
       secciones[
         year %in% years & seccion %in% c(cambios$sc_ref, cambios$sc_new),
@@ -116,7 +172,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     by       = list(cartografia$cluster_id),
     FUN      = function(x) x[[1]]
   )
-  cartografia$Group.1 <- NULL
+  cartografia$seccion    <- cartografia$cluster_id
+  cartografia$cluster_id <- NULL
+  cartografia$Group.1    <- NULL
 
   attributes(cartografia@data)$fuente <- fuente
   attributes(cartografia@data)$class  <- car_class
