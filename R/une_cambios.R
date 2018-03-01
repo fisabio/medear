@@ -94,12 +94,13 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
 
   secciones_2011 <- as.data.table(cartografia@data[, c("seccion", "n_viv")])
+  cambios        <- cambios[between(year2, years[1], years[length(years)])]
 
   for (i in seq_len(nrow(cambios))) {
     var_year <- ifelse(cambios$year[i] == 2011, "sc_ref", "sc_new")
     viv_r    <- secciones_2011[seccion == cambios[[var_year]][i], n_viv]
     cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
-    cambios[i, cambio_ref := round(viviendas / viv_ref * 100)]
+    cambios[i, cambio_ref := viviendas / viv_ref * 100]
   }
 
   carto_metro <- sp::spTransform(cartografia, sp::CRS("+proj=utm +zone=28 +datum=WGS84"))
@@ -137,14 +138,14 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     if (length(dista) > 0)
       part$dista[i] <- dista[which.max(dista)]
   }
-  part      <- part[dista < distancia_max]
-  cambios   <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
-  filtrado  <- cambios[
+  part     <- part[dista < distancia_max]
+  cambios  <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
+  filtrado <- cambios[
     (colin == TRUE | is.na(colin)) & (dista < distancia_max | is.na(dista)) &
       cambio_ref >= umbral_cambio
   ]
-  cambios   <- unique(rbindlist(list(filtrado, cambios[!sc_new %in% secciones_2011$seccion])))
-  cambios   <- cambios[between(year2, years[1], years[length(years)])]
+  cambios  <- unique(rbindlist(list(filtrado, cambios[!sc_new %in% secciones_2011$seccion])))
+
   sc_unicas <- sort(
     unique(
       secciones[
@@ -154,7 +155,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     )
   )
   cluster_sc     <- data.table(sc = sc_unicas, id_cluster = sc_unicas)
-
 
   for (i in seq_len(nrow(cambios))) {
     sc_select <- which(cluster_sc[, sc] %in% cambios[i, c(sc_ref, sc_new)])
@@ -199,6 +199,23 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       .SDcols = in_col
     ]
     setnames(poblacion, "cluster", "seccion")
+    sc_11 <- unique(poblacion[year == 2011, seccion])
+    years2 <- years[years != 2011]
+    for (i in seq_along(years2)) {
+      if (!all(sc_11 %in% poblacion[year == years2[i], seccion])) {
+        sc_not_11 <- sc_11[which(!sc_11 %in% poblacion[year == years2[i], seccion])]
+        for (j in seq_along(sc_not_11)) {
+          pob1 <- poblacion[year == years2[i]][1:2]
+          pob1[, `:=`(
+            seccion = sc_not_11[j],
+            sexo    = 0:1
+          )][]
+          for (col in names(pob1)[-c(1:3)])
+            set(pob1, j = col, value = 1)
+          poblacion <- rbindlist(list(poblacion, pob1))[order(seccion, sexo, year)]
+        }
+      }
+    }
     class(poblacion)             <- pob_class
     attributes(poblacion)$fuente <- fuente
     res <- list(cartografia = cartografia, poblacion = poblacion)
