@@ -78,9 +78,9 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     mustWork = FALSE
   )
   estructura <- readr::fwf_positions(
-    start     = c(1, 3, 6, 8, 21, 49, 54, 166),
-    end       = c(2, 5, 7, 10, 25, 52, 57, 190),
-    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "NVIAC")
+    start     = c(1, 3, 6, 8, 21, 43, 49, 54, 166),
+    end       = c(2, 5, 7, 10, 25, 47, 52, 57, 190),
+    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "CPOS", "EIN", "ESN", "NVIAC")
   )
   y_2001 <- FALSE
   if (2001 %in% years) {
@@ -166,7 +166,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       trameros[[paste0("p", i, j)]] <- as.data.table(tramero)[, `:=`(
         year    = years[j],
         seccion = paste0(CPRO, CMUM, DIST, SECC),
-        via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
+        via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2, CPOS)
       )]
     }
   }
@@ -191,14 +191,14 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     trameros[["n_2001"]] <- as.data.table(tramero)[, `:=`(
       year    = 2001,
       seccion = paste0(CPRO, CMUM, DIST, SECC),
-      via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
+      via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2, CPOS)
     )][CPRO %in% cod_provincia]
   }
   if (!conservar)
     unlink(dirname(dir_dest), recursive = TRUE)
 
-  trameros <- rbindlist(trameros)
-  setkeyv(trameros, c("via", "seccion", "year", "CMUM"))
+  trameros <- rbindlist(trameros)[order(year, seccion)]
+  setkeyv(trameros, c("via", "CPOS", "seccion", "year", "CMUM"))
   attributes(trameros)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   class(trameros)             <- c(class(trameros), "tramero_ine")
   return(trameros)
