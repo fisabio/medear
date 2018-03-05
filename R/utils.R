@@ -265,6 +265,176 @@ llama_google <- function(direc, tries) {
 }
 
 
+filtra_tramero    <- function(tramero, cambios) {
+
+  tramero_copia   <- copy(tramero)
+  cambios_tramero <- copy(cambios)
+  res             <- vector("list", nrow(cambios_tramero))
+  pb              <- utils::txtProgressBar(min = 0, max = length(res), style = 3)
+
+  for (fila in seq_len(nrow(cambios_tramero))) {
+    # Filtrar tramero por secciones de interes (referencia)
+    tram1 <- tramero_copia[
+      via %in% unlist(cambios_tramero[fila, vias]) &
+        year == cambios_tramero[fila, year] &
+        seccion == cambios_tramero[fila, sc_ref]
+      ][,
+        `:=`(
+          sc_ref   = seccion,
+          year_ref = year,
+          old_ein  = as.numeric(EIN),
+          old_esn  = as.numeric(ESN),
+          sc_new   = NA_character_,
+          year_new = NA_real_,
+          new_ein  = NA_real_,
+          new_esn  = NA_real_
+        )][, c("year", "seccion", "EIN", "ESN", "DIST", "SECC", "CVIA") := NULL][]
+
+    # Filtrar tramero por secciones de interes (comparacion)
+    tram2 <- tramero_copia[
+      via %in% unlist(cambios_tramero[fila, vias]) &
+        year == cambios_tramero[fila, year2] &
+        seccion == cambios_tramero[fila, sc_new]
+      ][,`:=`(
+        sc_new   = seccion,
+        year_new = year,
+        new_ein  = as.numeric(EIN),
+        new_esn  = as.numeric(ESN),
+        sc_ref   = NA_character_,
+        year_ref = NA_real_,
+        old_ein  = NA_real_,
+        old_esn  = NA_real_
+      )][, c("year", "seccion", "EIN", "ESN", "DIST", "SECC", "CVIA") := NULL][]
+
+    setcolorder(tram2, colnames(tram1))
+
+    for (i in seq_len(nrow(tram1))) {
+      for (j in seq_len(nrow(tram2))) {
+        if ((tram2$new_ein[j] %in% seq(tram1$old_ein[i], tram1$old_esn[i], by = 2)) |
+            (tram2$new_esn[j] %in% seq(tram1$old_ein[i], tram1$old_esn[i], by = 2))) {
+          tram1[i, `:=`(
+            sc_new   = tram2[j, sc_new],
+            year_new = tram2[j, year_new],
+            new_ein  = tram2[j, new_ein],
+            new_esn  = tram2[j, new_esn]
+          )]
+        }
+      }
+    }
+    for (i in seq_len(nrow(tram2))) {
+      for (j in seq_len(nrow(tram1))) {
+
+        if ((tram1$old_ein[j] %in% seq(tram2$new_ein[i], tram2$new_esn[i], by = 2)) |
+            (tram1$old_esn[j] %in% seq(tram2$new_ein[i], tram2$new_esn[i], by = 2))) {
+          tram2[i, `:=`(
+            sc_ref   = tram1[j, sc_ref],
+            year_ref = tram1[j, year_ref],
+            old_ein  = tram1[j, old_ein],
+            old_esn  = tram1[j, old_esn]
+          )]
+        }
+      }
+    }
+
+    # Union de los dos trameros
+    res[[fila]] <- unique(rbind(tram1, tram2))[
+      !is.na(old_ein) & !is.na(new_ein)
+      ][(old_ein >= new_esn | new_ein <= old_esn) &
+          (new_ein >= old_esn | old_ein <= new_esn)][]
+    utils::setTxtProgressBar(pb, fila)
+  }
+
+  return(res)
+}
+
+
+calcula_viviendas <- function(tramero_cambios, catastro_finca) {
+
+  fincas  <- copy(catastro_finca)
+  pb      <- utils::txtProgressBar(min = 0, max = length(tramero_cambios), style = 3)
+  n_viv   <- vector("list", length(tramero_cambios))
+  fincas[, nvia2 := lapply(nvia, function(x) trimws(gsub("\\b\\w{1,3}\\b\\s?|\\(|\\)", "", gsub("[[:punct:]]", "", x))))]
+
+  for (cambio in seq_along(tramero_cambios)) {
+    tramero <- copy(tramero_cambios[[cambio]])
+
+    if (nrow(tramero) != 0) {
+      # Union de los inicios y finales de tramo
+      tramero[, `:=`(xx = list(), yy = list(), zz = list())]
+      tramero[
+        old_ein != new_ein,
+        xx := .(list(unique(unlist(as.vector(mapply(function(w, x, y, z) seq(max(c(w, x)), min(c(y, z)), by = 2), old_ein, new_ein, old_esn, new_esn)))))),
+        by = via
+        ]
+
+      tramero[
+        old_esn != new_esn,
+        yy := .(list(unique(unlist(as.vector(mapply(function(w, x, y, z) seq(max(c(w, x)), min(c(y, z)), by = 2), old_ein, new_ein, old_esn, new_esn)))))),
+        by = via
+        ]
+      tramero[
+        old_ein == new_ein & old_esn == new_esn,
+        zz := .(list(unique(unlist(as.vector(mapply(function(x, y) seq(x, y, by = 2), old_ein, old_esn)))))),
+        by = via
+        ]
+
+      npks_list <- c(mapply(c, tramero$xx, tramero$yy, tramero$zz))
+      if (is.list(npks_list)) {
+        npks_list <- lapply(npks_list, function(x) x[x != 0])
+        tramero[, npk := npks_list]
+      } else {
+        tramero[, npk := .(list(npks_list))]
+      }
+      tramero <- tramero[, .(list(npk)), by = .(NVIAC, sc_ref)][
+        ,
+        lapply(V1, function(x) list(sort(unlist(x)))), by = .(NVIAC, sc_ref)
+        ][]
+      tramero[, V1 := .(lapply(V1, unique))]
+
+      # Conservar las vias con portales asociados
+      tramero <- tramero[which(sapply(V1, length) != 0)]
+
+      # Retirar palabras de tres o menos caracteres
+      tramero[, NVIAC2 := trimws(gsub("\\b\\w{1,3}\\b\\s?", "", gsub("[[:punct:]]", "", NVIAC)))]
+
+      # Numero de viviendas en cada tramo de via afectado por el cambio de SC
+      n_viv[[cambio]] <- vector("integer", nrow(tramero))
+      for (i in seq_along(tramero$NVIAC2)) {
+        n_viv[[cambio]][i] <- tryCatch({
+          indice_cat <- which(
+            sapply(lapply(fincas$nvia2, grep, pattern = paste0("^", tramero$NVIAC2[i], "$")), length) != 0
+          )
+          indice_poli <- lapply(fincas$nvia2[indice_cat], grep, pattern = paste0("^", tramero$NVIAC2[i], "$"))
+          fincas[
+            indice_cat,
+            sum(
+              sapply(
+                mapply(
+                  function(x, y, z) x[y] %in% z,
+                  npoli,
+                  indice_poli,
+                  tramero[i]$V1
+                ),
+                sum
+              )
+            )
+            ][]
+        },
+        error = function(e) 0
+        )
+      }
+      n_viv[[cambio]] <- sum(n_viv[[cambio]])
+    } else {
+      n_viv[[cambio]] <- 0
+    }
+    utils::setTxtProgressBar(pb, cambio)
+  }
+  n_viv <- unlist(n_viv)
+
+  return(n_viv)
+}
+
+
 descarga_segura <- function(x, tries = 10, ...) {
   withRestarts(
     tryCatch(
@@ -300,5 +470,7 @@ utils::globalVariables(
     "geocodificados", "parimp_o", "parimp_c", "codigos_ine", "nombre_provincia",
     "nombre_municipio", "cod_provincia", "cod_municipio", "tip_via", "portalNumber",
     "muni", "province", "postalCode", "secciones", "cambio_ref", "camb_distrito",
-    "n_viv", "viv_ref", "viviendas", "no_11", "colin")
+    "n_viv", "viv_ref", "viviendas", "no_11", "colin", "NVIAC", "NVIAC2", "V1",
+    "npk", "npoli", "nvia", "nvia2", "old_ein", "old_esn", "vias", "xx",
+    "year_new", "year_ref", "yy", "zz")
 )
