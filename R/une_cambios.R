@@ -97,7 +97,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
 
   for (i in seq_len(nrow(cambios))) {
-    cambios[i, viv_ref := secciones_2011[seccion == cambios[["sc_ref"]][i], n_viv]]
+    viv_r    <- secciones_2011[seccion == cambios[["sc_ref"]][i], n_viv]
+    cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
     cambios[i, cambio_ref := (viviendas / viv_ref * 100) + tramo_por]
   }
 
