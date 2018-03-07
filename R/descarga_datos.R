@@ -16,6 +16,7 @@
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.trameros/} dentro del directorio de
 #'   trabajo?
+#' @param ntries Valor numérico: número de intentos en caso de mala conexión.
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -30,7 +31,8 @@
 #'   uso).
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE)
+#'   c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
+#'   = 10)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
 #'   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
@@ -62,7 +64,7 @@
 #'
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
                               years = c(2001, 2004:2016), descarga = TRUE, ruta = NULL,
-                              conservar = TRUE) {
+                              conservar = TRUE, ntries = 10) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
@@ -98,7 +100,8 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       file_down <- paste0(unique(dirname(dir_dest)), "/nacional_2001.zip")
       descarga_segura(
         x        = "http://www.ine.es/prodyser/callejero/caj_esp/caj_esp_072001.zip",
-        destfile = file_down
+        destfile = file_down,
+        tries    = ntries
       )
       file_zip <- utils::unzip(zipfile = file_down, list = TRUE)
       file_zip <- file_zip[grep("^TRAM", file_zip[,1]), 1]
@@ -116,7 +119,8 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
           x        = paste0("http://www.ine.es/prodyser/callejero/caj1",
                             substr(years, 3, 4)[j], "/call_p", cod_provincia[i], "_1",
                             substr(years, 3, 4)[j] ,".zip"),
-          destfile = file_down
+          destfile = file_down,
+          tries    = ntries
         )
         file_zip <- utils::unzip(zipfile = file_down, list = TRUE)[, 1]
         file_zip <- file_zip[grep("TRAM|t$", file_zip, ignore.case = TRUE)]
@@ -166,7 +170,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       trameros[[paste0("p", i, j)]] <- as.data.table(tramero)[, `:=`(
         year    = years[j],
         seccion = paste0(CPRO, CMUM, DIST, SECC),
-        via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
+        via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2, CPOS)
       )]
     }
   }
@@ -191,13 +195,14 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     trameros[["n_2001"]] <- as.data.table(tramero)[, `:=`(
       year    = 2001,
       seccion = paste0(CPRO, CMUM, DIST, SECC),
-      via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
+      via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2, CPOS)
     )][CPRO %in% cod_provincia]
   }
   if (!conservar)
     unlink(dirname(dir_dest), recursive = TRUE)
 
-  trameros <- rbindlist(trameros)
+
+  trameros <- rbindlist(trameros)[order(year, seccion)]
   setkeyv(trameros, c("via", "CPOS", "seccion", "year", "CMUM"))
   attributes(trameros)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   class(trameros)             <- c(class(trameros), "tramero_ine")
@@ -216,20 +221,21 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.cartografia/} dentro del directorio de
 #'   trabajo?
+#' @param ntries Valor numérico: número de intentos en caso de mala conexión.
 #'
-#' @usage descarga_cartografia(crs = 4326, conservar = TRUE)
+#' @usage descarga_cartografia(crs = 4326, conservar = TRUE, ntries = 10)
 #'
 #' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
 #'   como elemento normalizado.
 #'
-#' @return Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, donde cada fila
-#'   es una sección censal y que cuenta con 7 columnas: \item{seccion}{Cadena de
-#'   10 carácteres con el código de sección censal (incluye provincia, municipio
-#'   y distrito).} \item{CUMUN}{Cadena de 5 carácteres con el código del
-#'   municipio (incluye provincia).} \item{CCA}{Cadena de 2 carácteres con el
-#'   código de comunidad autónoma.} \item{NPRO}{Nombre de la provincia.}
-#'   \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre del
-#'   municipio.}
+#' @return Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, donde
+#'   cada fila es una sección censal y que cuenta con 7 columnas:
+#'   \item{seccion}{Cadena de 10 carácteres con el código de sección censal
+#'   (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
+#'   carácteres con el código del municipio (incluye provincia).}
+#'   \item{CCA}{Cadena de 2 carácteres con el código de comunidad autónoma.}
+#'   \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la comunidad
+#'   autónoma.} \item{NMUN}{Nombre del municipio.}
 #'
 #' @examples
 #'
@@ -245,9 +251,10 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'
 #' @export
 #'
-#' @seealso \code{\link{descarga_trameros}} y \code{\link{descarga_poblaciones}}.
+#' @seealso \code{\link{descarga_trameros}} y
+#'   \code{\link{descarga_poblaciones}}.
 #'
-descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
+descarga_cartografia <- function(crs = 4326, conservar = TRUE, ntries = 10) {
   stopifnot(is.logical(conservar))
   stopifnot(is.numeric(crs))
   stopifnot(nchar(crs) == 4)
@@ -261,7 +268,8 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
     dir.create(dir_dest, recursive = TRUE)
   descarga_segura(
     x        = "http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip",
-    destfile = paste0(dir_dest, "/carto_2011.zip")
+    destfile = paste0(dir_dest, "/carto_2011.zip"),
+    tries    = ntries
   )
   utils::unzip(
     zipfile = paste0(dir_dest, "/carto_2011.zip"),
@@ -302,6 +310,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.poblaciones/} dentro del directorio de
 #'   trabajo?
+#' @param ntries Valor numérico: número de intentos en caso de mala conexión.
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -319,14 +328,13 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #'   se debe utilizar la función \code{\link{carga_datos}}.
 #'
 #' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
-#'   = 2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE)
+#'   = 2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries)
 #'
 #' @return Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
-#'   \item{seccion}{Código de la sección censal.}
-#'   \item{sexo}{Codificado como 0 para hombres y 1 para mujeres.}
-#'   \item{year}{Año al que se hace referencia.} El resto de columnas representan los distintos
-#'   grupos de edad.
+#'   \item{seccion}{Código de la sección censal.} \item{sexo}{Codificado como 0
+#'   para hombres y 1 para mujeres.} \item{year}{Año al que se hace referencia.}
+#'   El resto de columnas representan los distintos grupos de edad.
 #'
 #' @examples
 #'
@@ -345,7 +353,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE) {
 #'
 descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
                                  years = 2006:2016, descarga = TRUE, ruta = NULL,
-                                 conservar = TRUE) {
+                                 conservar = TRUE, ntries = 10) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
@@ -385,13 +393,16 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
               paste0("/", cod_provincia[i], "01")
             }, ".csv_sc?nocab=1"
           ),
-          destfile = file_down[i, j]
+          destfile = file_down[i, j],
+          tries    = ntries
         )
         Sys.sleep(1)
       }
     }
   } else {
-    dir_dest <- paste0(ruta, "/prov_", cod_provincia, "/")
+    if (!grepl("/$", ruta))
+      ruta <- paste0(ruta, "/")
+    dir_dest <- paste0(ruta, "prov_", cod_provincia)
   }
 
   poblaciones <- list()
