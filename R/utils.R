@@ -113,12 +113,12 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
 
     catastro_finca  <- lee_catastro(catastro)
 
-    stopifnot(unique(catastro_finca[prov_ine]) %in% datos$CPRO)
-    stopifnot(unique(catastro_finca[muni_ine]) %in% datos$CMUM)
+    stopifnot(unique(catastro_finca$prov_ine) %in% datos$CPRO)
+    stopifnot(unique(catastro_finca$muni_ine) %in% datos$CMUM)
 
     datos <- datos[
-      CPRO == unique(catastro_finca[prov_ine]) &
-        CMUM == unique(catastro_finca[muni_ine])
+      CPRO == unique(catastro_finca$prov_ine) &
+        CMUM == unique(catastro_finca$muni_ine)
     ]
   }
 
@@ -198,7 +198,7 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
     )
     cambios <- cambios[, -5]
     cambios[, viviendas := viviendas_def[[1]]]
-    cambios[, tramo_por := tramos_cat]
+    cambios <- cambios[, tramo_por := tramos_cat][]
   }
 
   return(cambios)
@@ -339,7 +339,8 @@ lee_catastro <- function(archivo) {
     file          = archivo,
     col_positions = estructura_finca,
     col_types     = readr::cols(.default = "c"),
-    locale        = readr::locale(encoding = "latin1")
+    locale        = readr::locale(encoding = "latin1"),
+    progress      = FALSE
   )
 
   catastro_finca <- as.data.table(catastro_finca)[tipo_reg == "11"][, tipo_reg := NULL][]
@@ -354,7 +355,8 @@ lee_catastro <- function(archivo) {
       file          = archivo,
       col_positions = estructura_vivienda,
       col_types     = readr::cols(.default = "c"),
-      locale        = readr::locale(encoding = "latin1")
+      locale        = readr::locale(encoding = "latin1"),
+      progress      = FALSE
     )
   )[tipo_reg == "15" & clave == "V"][, c("tipo_reg", "clave") := NULL][order(ref_cat)]
 
@@ -387,7 +389,8 @@ filtra_tramero <- function(tramero, cambios) {
   tramero_copia   <- copy(tramero)
   cambios_tramero <- copy(cambios)
   res             <- vector("list", nrow(cambios_tramero))
-  pb              <- utils::txtProgressBar(min = 0, max = length(res), style = 3)
+  message("Filtrando el tramero...\n")
+  pb1             <- utils::txtProgressBar(min = 0, max = length(res), style = 3)
 
   for (fila in seq_len(nrow(cambios_tramero))) {
     # Filtrar tramero por secciones de interes (referencia)
@@ -458,7 +461,7 @@ filtra_tramero <- function(tramero, cambios) {
       !is.na(old_ein) & !is.na(new_ein)
       ][(old_ein >= new_esn | new_ein <= old_esn) &
           (new_ein >= old_esn | old_ein <= new_esn)][]
-    utils::setTxtProgressBar(pb, fila)
+    utils::setTxtProgressBar(pb1, fila)
   }
 
   return(res)
@@ -470,6 +473,7 @@ calcula_viviendas <- function(tramero_cambios, catastro_finca) {
   stopifnot(is.list(tramero_cambios))
 
   fincas  <- copy(catastro_finca)
+  message("\nCalculando las viviendas afectadas en cada cambio...\n")
   pb      <- utils::txtProgressBar(min = 0, max = length(tramero_cambios), style = 3)
   n_viv   <- vector("list", length(tramero_cambios))
   n_na    <- vector("list", length(tramero_cambios))
@@ -593,5 +597,6 @@ utils::globalVariables(
     "muni", "province", "postalCode", "secciones", "cambio_ref", "camb_distrito",
     "n_viv", "viv_ref", "viviendas", "no_11", "colin", "NVIAC", "NVIAC2", "V1",
     "npk", "npoli", "nvia", "nvia2", "old_ein", "old_esn", "vias", "xx",
-    "year_new", "year_ref", "yy", "zz")
+    "year_new", "year_ref", "yy", "zz", "CPOS", "clave", "npolis", "ref_cat",
+    "tipo_reg", "tramo_por", "tvias")
 )
