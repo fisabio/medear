@@ -5,7 +5,8 @@
 \alias{detecta_cambios}
 \title{Funcion para detectar cambios de seccionado en trameros}
 \usage{
-detecta_cambios(datos, years = c(1996, 2001, 2004:2016))
+detecta_cambios(datos, years = c(1996, 2001, 2004:2016), catastro =
+  NULL)
 }
 \arguments{
 \item{datos}{Objeto de clase \code{tramero_ine} (devuelto por la función
@@ -13,15 +14,26 @@ detecta_cambios(datos, years = c(1996, 2001, 2004:2016))
 
 \item{years}{Vector numérico de longitud >= 2 con los años para los que se
 desee consultar las variaciones de seccionado.}
+
+\item{catastro}{Carácter. Argumento opcional (nulo por defecto): ruta hasta
+el archivo alfanumérico con la información catastral completa de un
+municipio.}
 }
 \value{
-Un objeto de clase \code{cambios_ine} con 5 columnas:
+Si no se proporciona un fichero con información catastral, la funcion
+  devuelve un objeto de clase \code{cambios_ine} con 5 columnas:
   \item{sc_ref}{Código de la sección censal en el primer año.}
   \item{sc_new}{Código de la sección censal en el segundo año.}
   \item{year}{Primer año.} \item{year2}{Segundo año.} \item{vias}{Lista con
   el código de las vías que provocan el cambio de sección (incorporando un
   dígito al final de la cadena indicando si se trata de numeración par (0) o
-  impar(1))}
+  impar(1))}.
+
+  Si se proporciona un archivo con información catastral de un municipio, la
+  función solo calcula los cambios para ese municipio y devuelve, ademas de
+  los cuatro primeros cambios que en el anterior supuesto, el número de
+  viviendas afectadas por cada cambio y el porcentaje de tramos identificados
+  en el archivo catastral.
 }
 \description{
 Detecta cambios de sección censal para las provincias y el
@@ -36,13 +48,36 @@ El tiempo de ejecución de la función varía según el número de
   dos dígitos identifican la provincia, los siguientes tres dígitos el
   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
   hacen referencia a la sección censal.
+
+  Si se proporciona un archivo alfanumérico con la información catastral de
+  un municipio, la función solo calcula y devuelve los cambios de ese
+  municipio, incorporando el número de viviendas y tramos detectados en la
+  información catastral.
+
+  El archivo de catastro se debe descargar de la
+  \href{https://www.sedecatastro.gob.es/OVCFrames.aspx?TIPO=TIT&a=masiv}{sede
+  electronica del catastro} (apartado denominado "Descarga de información
+  alfanumérica (formato CAT)"), paso que requiere de un certificado digital.
+
+  En cualquier caso, y como la finalidad de esta función es servir en la
+  unión de secciones (función \code{\link{une_secciones}}), aunque se trata
+  de un argumento opcional es muy recomendable aportar la información
+  catastral, pues resulta imprescindible a la hora de decidir si ha de
+  realizarse la unión de dos o más secciones.
 }
 \examples{
 
 \dontrun{
   library(medear)
   trameros <- descarga_trameros(cod_provincia = c("51", "52"))
+  # Sin información catastral
   cambios  <- detecta_cambios(datos = trameros)
+  cambios
+
+  # Con información catastral para la ciudad de Castellón de la Plana
+  # (el nombre del archivo puede variar)
+  trameros <- descarga_trameros(cod_provincia = "12")
+  cambios  <- detecta_cambios(datos = trameros, catastro = "12_900_U_2018-01-19.CAT")
   cambios
 }
 
