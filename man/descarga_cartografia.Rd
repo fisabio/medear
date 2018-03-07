@@ -5,7 +5,7 @@
 \alias{descarga_cartografia}
 \title{Descarga la cartografia con el seccionado del INE para 2011}
 \usage{
-descarga_cartografia(crs = 4326, conservar = TRUE)
+descarga_cartografia(crs = 4326, conservar = TRUE, ntries = 10)
 }
 \arguments{
 \item{crs}{Vector numérico de longitud uno con el código EPSG del sistema de
@@ -15,16 +15,18 @@ datum WGS84).}
 \item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
 en el directorio oculto \code{./.cartografia/} dentro del directorio de
 trabajo?}
+
+\item{ntries}{Valor numérico: número de intentos en caso de mala conexión.}
 }
 \value{
-Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, donde cada fila
-  es una sección censal y que cuenta con 7 columnas: \item{seccion}{Cadena de
-  10 carácteres con el código de sección censal (incluye provincia, municipio
-  y distrito).} \item{CUMUN}{Cadena de 5 carácteres con el código del
-  municipio (incluye provincia).} \item{CCA}{Cadena de 2 carácteres con el
-  código de comunidad autónoma.} \item{NPRO}{Nombre de la provincia.}
-  \item{NCA}{Nombre de la comunidad autónoma.} \item{NMUN}{Nombre del
-  municipio.}
+Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, donde
+  cada fila es una sección censal y que cuenta con 7 columnas:
+  \item{seccion}{Cadena de 10 carácteres con el código de sección censal
+  (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
+  carácteres con el código del municipio (incluye provincia).}
+  \item{CCA}{Cadena de 2 carácteres con el código de comunidad autónoma.}
+  \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la comunidad
+  autónoma.} \item{NMUN}{Nombre del municipio.}
 }
 \description{
 Descarga la cartografía del seccionado censal ofrecida
@@ -46,5 +48,6 @@ Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
 
 }
 \seealso{
-\code{\link{descarga_trameros}} y \code{\link{descarga_poblaciones}}.
+\code{\link{descarga_trameros}} y
+  \code{\link{descarga_poblaciones}}.
 }
