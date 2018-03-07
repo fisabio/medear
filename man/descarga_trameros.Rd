@@ -6,7 +6,8 @@
 \title{Descarga los trameros del INE}
 \usage{
 descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-  c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE)
+  c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
+  = 10)
 }
 \arguments{
 \item{cod_provincia}{Cadena de carácteres de longitud >= 1 con el código de
@@ -25,6 +26,8 @@ archivos tal cual se descargaron desde el INE, en caso de escoger
 \item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
 en el directorio oculto \code{./.trameros/} dentro del directorio de
 trabajo?}
+
+\item{ntries}{Valor numérico: número de intentos en caso de mala conexión.}
 
 \item{...}{Parámetros adicionales en la lectura de datos (no es necesario su
 uso).}
