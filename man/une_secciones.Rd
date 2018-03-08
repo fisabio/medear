@@ -6,7 +6,8 @@
 \title{Une los cambios del seccionado del INE}
 \usage{
 une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-  NULL, corte_edad = 85, umbral_cambio = 0, distancia_max = 100)
+  NULL, corte_edad = 85, catastro = FALSE, umbral_cambio = 10, distancia_max
+  = 100)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
@@ -26,11 +27,15 @@ proporcionar en caso de querer agregar las poblaciones.}
 \item{corte_edad}{Numérico: punto de corte para los grupos de edad (85 o
 100). Argumento opcional en caso de proporcionar datos de poblaciones.}
 
+\item{catastro}{Lógico: ¿El archivo de cambios incorpora datos sobre el
+catastro? Por defecto \code{catastro = FALSE}.}
+
 \item{umbral_cambio}{Numérico: porcentaje de viviendas afectadas en el cambio
-de sección.}
+de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto se fija
+al 10 %.}
 
 \item{distancia_max}{Numérico: máxima distancia (en metros) a la que pueden
-estar dos secciones para ser unidas.}
+estar dos secciones para ser unidas. Por defecto se fija a 100 m.}
 }
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de
@@ -60,7 +65,10 @@ El resultado devuelto varía en función de si se proporcionan datos de
 \description{
 Une los cambios del seccionado del INE (tomando como referencia
   la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
-  sección censal.
+  sección censal. Si el archivo de cambios incorpora información catastral
+  (número de viviendas afectada por cada cambio de sección), se puede fijar
+  un umbral de cambio (%) para rechazar aquellos cambios que involucren a muy
+  pocas viviendas.
 }
 \examples{
 
@@ -69,7 +77,14 @@ Une los cambios del seccionado del INE (tomando como referencia
   data("poblacion")
   data("cambios_seccion")
   data("cartografia")
-  uniones <- une_secciones(cambios_seccion, cartografia, 2006:2016, poblacion)
+  uniones <- une_secciones(
+    cambios       = cambios_seccion,
+    cartografia   = cartografia,
+    years         = 2006:2016,
+    poblacion     = poblacion,
+    catastro      = TRUE,
+    umbral_cambio = 10
+  )
 
   poblacion   <- uniones$poblacion
   cartografia <- uniones$cartografia
