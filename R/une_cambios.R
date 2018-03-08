@@ -3,7 +3,10 @@
 #'
 #' @description Une los cambios del seccionado del INE (tomando como referencia
 #'   la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
-#'   sección censal.
+#'   sección censal. Si el archivo de cambios incorpora información catastral
+#'   (número de viviendas afectada por cada cambio de sección), se puede fijar
+#'   un umbral de cambio (%) para rechazar aquellos cambios que involucren a muy
+#'   pocas viviendas.
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
 #' @param cartografia Objeto de clase
@@ -17,13 +20,17 @@
 #'   proporcionar en caso de querer agregar las poblaciones.
 #' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
+#' @param catastro Lógico: ¿El archivo de cambios incorpora datos sobre el
+#'   catastro? Por defecto \code{catastro = FALSE}.
 #' @param umbral_cambio Numérico: porcentaje de viviendas afectadas en el cambio
-#'   de sección.
+#'   de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto se fija
+#'   al 10 %.
 #' @param distancia_max Numérico: máxima distancia (en metros) a la que pueden
-#'   estar dos secciones para ser unidas.
+#'   estar dos secciones para ser unidas. Por defecto se fija a 100 m.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-#'   NULL, corte_edad = 85, umbral_cambio = 0, distancia_max = 100)
+#'   NULL, corte_edad = 85, catastro = FALSE, umbral_cambio = 10, distancia_max
+#'   = 100)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
@@ -56,7 +63,14 @@
 #'   data("poblacion")
 #'   data("cambios_seccion")
 #'   data("cartografia")
-#'   uniones <- une_secciones(cambios_seccion, cartografia, 2006:2016, poblacion)
+#'   uniones <- une_secciones(
+#'     cambios       = cambios_seccion,
+#'     cartografia   = cartografia,
+#'     years         = 2006:2016,
+#'     poblacion     = poblacion,
+#'     catastro      = TRUE,
+#'     umbral_cambio = 10
+#'   )
 #'
 #'   poblacion   <- uniones$poblacion
 #'   cartografia <- uniones$cartografia
@@ -70,8 +84,8 @@
 #'   \code{\link{descarga_cartografia}}
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
-                          poblacion = NULL, corte_edad = 85,
-                          umbral_cambio = 0, distancia_max = 100) {
+                          poblacion = NULL, corte_edad = 85, catastro = FALSE,
+                          umbral_cambio = 10, distancia_max = 100) {
 
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
@@ -88,6 +102,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
   stopifnot(corte_edad %in% c(85, 100))
   stopifnot(is.numeric(umbral_cambio))
+  stopifnot(is.logical(catastro))
 
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
@@ -96,13 +111,10 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   secciones_2011 <- as.data.table(cartografia@data[, c("seccion", "n_viv")])
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
 
-  for (i in seq_len(nrow(cambios))) {
-    viv_r    <- secciones_2011[seccion == cambios[["sc_ref"]][i], n_viv]
-    cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
-    cambios[i, cambio_ref := (viviendas / viv_ref * 100) + tramo_por]
-  }
-
-  carto_metro <- sp::spTransform(cartografia, sp::CRS("+proj=utm +zone=28 +datum=WGS84"))
+  carto_metro   <- sp::spTransform(
+    cartografia,
+    sp::CRS("+proj=utm +zone=28 +datum=WGS84")
+  )
   cambios$no_11 <- FALSE
   cambios$colin <- NA
   cambios$dista <- NA_real_
@@ -116,14 +128,13 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       cambios$no_11[i] <- TRUE
     }
   }
-
   cambios[, camb_distrito := substr(sc_ref, 6, 7) != substr(sc_new, 6, 7)]
   part <- cambios[camb_distrito == TRUE & no_11 == TRUE]
   tmp  <- fsetdiff(cambios, part)
   for (i in seq_len(nrow(part))) {
-    sc_inv <- fsetdiff(cambios, part[i])[sc_new == part[i, sc_new],
-                                             c(sc_ref, sc_new)
-                                             ]
+    sc_inv <- fsetdiff(cambios, part[i])[
+      sc_new == part[i, sc_new], c(sc_ref, sc_new)
+    ]
     sc_inv <- unique(sc_inv[sc_inv != part[i, sc_new]])
     dista  <- numeric()
 
@@ -137,14 +148,26 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     if (length(dista) > 0)
       part$dista[i] <- dista[which.max(dista)]
   }
-  part     <- part[dista < distancia_max]
-  cambios  <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
-  filtrado <- cambios[
-    (colin == TRUE | is.na(colin)) & (dista < distancia_max | is.na(dista)) &
-      cambio_ref >= umbral_cambio
-  ]
-  cambios  <- unique(rbindlist(list(filtrado, cambios[!sc_new %in% secciones_2011$seccion])))
+  part    <- part[dista < distancia_max]
+  cambios <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
 
+  if (catastro) {
+    for (i in seq_len(nrow(cambios))) {
+      viv_r    <- secciones_2011[seccion == cambios[["sc_ref"]][i], n_viv]
+      cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
+      cambios[i, cambio_ref := (viviendas / viv_ref * 100) + tramo_por]
+    }
+    filtrado <- cambios[
+      (colin == TRUE | is.na(colin)) & (dista < distancia_max | is.na(dista)) &
+        cambio_ref >= umbral_cambio
+      ]
+  } else {
+    filtrado <- cambios[
+      (colin == TRUE | is.na(colin)) & (dista < distancia_max | is.na(dista))
+    ]
+  }
+
+  cambios   <- unique(rbindlist(list(filtrado, cambios[!sc_new %in% secciones_2011$seccion])))
   sc_unicas <- sort(
     unique(
       secciones[
@@ -162,6 +185,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
                          cluster_sc[sc_select, id_cluster])
     cluster_sc[sc_assign, id_cluster := sc_min][]
   }
+
   cartografia$cluster_id <- cluster_sc$id_cluster[match(cartografia$seccion, cluster_sc$sc)]
   cartografia$cluster_id[is.na(cartografia$cluster_id)] <-
     cartografia$seccion[is.na(cartografia$cluster_id)]
@@ -182,11 +206,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     pob_class <- class(poblacion)
     poblacion <- poblacion[between(year, min(years), max(years))]
     poblacion <- elige_corte(poblacion, corte_edad)
-    poblacion[,
-              cluster := cluster_sc[
-                match(seccion, sc),
-                id_cluster
-                ]]
+    poblacion[, cluster := cluster_sc[match(seccion, sc), id_cluster]]
     poblacion[is.na(cluster), cluster := seccion]
     in_col <- names(poblacion)[
       !names(poblacion) %in% c("seccion", "sexo", "year", "cluster")
