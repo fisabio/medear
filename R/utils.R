@@ -31,8 +31,8 @@ filtrar_ein_esn <- function(datos) {
 #'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al año 2011.
 #' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param catastro Caracter. Argumento opcional (nulo por defecto): ruta hasta
-#'   el archivo alfanumerico con la informacion catastral completa de un
+#' @param catastro Carácter. Argumento opcional (nulo por defecto): ruta hasta
+#'   el archivo alfanumérico con la información catastral completa de un
 #'   municipio.
 #'
 #' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2016), catastro =
@@ -47,23 +47,23 @@ filtrar_ein_esn <- function(datos) {
 #'   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
 #'   hacen referencia a la sección censal.
 #'
-#'   Si se proporciona un archivo alfanumerico con la informacion catastral de
-#'   un municipio, la funcion solo calcula y devuelve los cambios de ese
-#'   municipio, incorporando el numero de viviendas y tramos detectados en la
-#'   informacion catastral.
+#'   Si se proporciona un archivo alfanumérico con la información catastral de
+#'   un municipio, la función solo calcula y devuelve los cambios de ese
+#'   municipio, incorporando el número de viviendas y tramos detectados en la
+#'   información catastral.
 #'
 #'   El archivo de catastro se debe descargar de la
 #'   \href{https://www.sedecatastro.gob.es/OVCFrames.aspx?TIPO=TIT&a=masiv}{sede
-#'   electronica del catastro} (apartado denominado "Descarga de informacion
-#'   alfanumerica (formato CAT)"), paso que requiere de un certificado digital.
+#'   electronica del catastro} (apartado denominado "Descarga de información
+#'   alfanumérica (formato CAT)"), paso que requiere de un certificado digital.
 #'
-#'   En cualquier caso, y como la finalidad de esta funcion es servir en la
-#'   union de secciones (funcion \code{\link{une_secciones}}), aunque se trata
-#'   de un argumento opcional es muy recomendable aportar la informacion
+#'   En cualquier caso, y como la finalidad de esta función es servir en la
+#'   unión de secciones (función \code{\link{une_secciones}}), aunque se trata
+#'   de un argumento opcional es muy recomendable aportar la información
 #'   catastral, pues resulta imprescindible a la hora de decidir si ha de
-#'   realizarse la union de dos o mas secciones.
+#'   realizarse la unión de dos o más secciones.
 #'
-#' @return Si no se proporciona un fichero con informacion catastral, la funcion
+#' @return Si no se proporciona un fichero con información catastral, la funcion
 #'   devuelve un objeto de clase \code{cambios_ine} con 5 columnas:
 #'   \item{sc_ref}{Código de la sección censal en el primer año.}
 #'   \item{sc_new}{Código de la sección censal en el segundo año.}
@@ -72,9 +72,9 @@ filtrar_ein_esn <- function(datos) {
 #'   dígito al final de la cadena indicando si se trata de numeración par (0) o
 #'   impar(1))}.
 #'
-#'   Si se proporciona un archivo con informacion catastral de un municipio, la
-#'   funcion solo calcula los cambios para ese municipio y devuelve, ademas de
-#'   los cuatro primeros cambios que en el anterior supuesto, el numero de
+#'   Si se proporciona un archivo con información catastral de un municipio, la
+#'   función solo calcula los cambios para ese municipio y devuelve, ademas de
+#'   los cuatro primeros cambios que en el anterior supuesto, el número de
 #'   viviendas afectadas por cada cambio y el porcentaje de tramos identificados
 #'   en el archivo catastral.
 #'
@@ -84,11 +84,12 @@ filtrar_ein_esn <- function(datos) {
 #' \dontrun{
 #'   library(medear)
 #'   trameros <- descarga_trameros(cod_provincia = c("51", "52"))
-#'   # Sin informacion catastral
+#'   # Sin información catastral
 #'   cambios  <- detecta_cambios(datos = trameros)
 #'   cambios
 #'
-#'   # Con informacion catastral para la ciudad de Castellon de la Plana (el nombre del archivo varia)
+#'   # Con información catastral para la ciudad de Castellón de la Plana
+#'   # (el nombre del archivo puede variar)
 #'   trameros <- descarga_trameros(cod_provincia = "12")
 #'   cambios  <- detecta_cambios(datos = trameros, catastro = "12_900_U_2018-01-19.CAT")
 #'   cambios
@@ -112,12 +113,12 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
 
     catastro_finca  <- lee_catastro(catastro)
 
-    stopifnot(unique(catastro_finca[prov_ine]) %in% datos$CPRO)
-    stopifnot(unique(catastro_finca[muni_ine]) %in% datos$CMUM)
+    stopifnot(unique(catastro_finca$prov_ine) %in% datos$CPRO)
+    stopifnot(unique(catastro_finca$muni_ine) %in% datos$CMUM)
 
     datos <- datos[
-      CPRO == unique(catastro_finca[prov_ine]) &
-        CMUM == unique(catastro_finca[muni_ine])
+      CPRO == unique(catastro_finca$prov_ine) &
+        CMUM == unique(catastro_finca$muni_ine)
     ]
   }
 
@@ -197,7 +198,7 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
     )
     cambios <- cambios[, -5]
     cambios[, viviendas := viviendas_def[[1]]]
-    cambios[, tramo_por := tramos_cat]
+    cambios <- cambios[, tramo_por := tramos_cat][]
   }
 
   return(cambios)
@@ -338,7 +339,8 @@ lee_catastro <- function(archivo) {
     file          = archivo,
     col_positions = estructura_finca,
     col_types     = readr::cols(.default = "c"),
-    locale        = readr::locale(encoding = "latin1")
+    locale        = readr::locale(encoding = "latin1"),
+    progress      = FALSE
   )
 
   catastro_finca <- as.data.table(catastro_finca)[tipo_reg == "11"][, tipo_reg := NULL][]
@@ -353,7 +355,8 @@ lee_catastro <- function(archivo) {
       file          = archivo,
       col_positions = estructura_vivienda,
       col_types     = readr::cols(.default = "c"),
-      locale        = readr::locale(encoding = "latin1")
+      locale        = readr::locale(encoding = "latin1"),
+      progress      = FALSE
     )
   )[tipo_reg == "15" & clave == "V"][, c("tipo_reg", "clave") := NULL][order(ref_cat)]
 
@@ -386,7 +389,8 @@ filtra_tramero <- function(tramero, cambios) {
   tramero_copia   <- copy(tramero)
   cambios_tramero <- copy(cambios)
   res             <- vector("list", nrow(cambios_tramero))
-  pb              <- utils::txtProgressBar(min = 0, max = length(res), style = 3)
+  message("Filtrando el tramero...\n")
+  pb1             <- utils::txtProgressBar(min = 0, max = length(res), style = 3)
 
   for (fila in seq_len(nrow(cambios_tramero))) {
     # Filtrar tramero por secciones de interes (referencia)
@@ -457,7 +461,7 @@ filtra_tramero <- function(tramero, cambios) {
       !is.na(old_ein) & !is.na(new_ein)
       ][(old_ein >= new_esn | new_ein <= old_esn) &
           (new_ein >= old_esn | old_ein <= new_esn)][]
-    utils::setTxtProgressBar(pb, fila)
+    utils::setTxtProgressBar(pb1, fila)
   }
 
   return(res)
@@ -469,6 +473,7 @@ calcula_viviendas <- function(tramero_cambios, catastro_finca) {
   stopifnot(is.list(tramero_cambios))
 
   fincas  <- copy(catastro_finca)
+  message("\nCalculando las viviendas afectadas en cada cambio...\n")
   pb      <- utils::txtProgressBar(min = 0, max = length(tramero_cambios), style = 3)
   n_viv   <- vector("list", length(tramero_cambios))
   n_na    <- vector("list", length(tramero_cambios))
@@ -592,5 +597,6 @@ utils::globalVariables(
     "muni", "province", "postalCode", "secciones", "cambio_ref", "camb_distrito",
     "n_viv", "viv_ref", "viviendas", "no_11", "colin", "NVIAC", "NVIAC2", "V1",
     "npk", "npoli", "nvia", "nvia2", "old_ein", "old_esn", "vias", "xx",
-    "year_new", "year_ref", "yy", "zz")
+    "year_new", "year_ref", "yy", "zz", "CPOS", "clave", "npolis", "ref_cat",
+    "tipo_reg", "tramo_por", "tvias")
 )
