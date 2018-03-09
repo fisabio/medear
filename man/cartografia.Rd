@@ -28,14 +28,14 @@ Contiene la cartografía por sección censal tal cual puede ser
 \dontrun{
   library(medear)
   library(sp)
-  data(cartografia)
+  data("cartografia")
 
   # Representación de los secciones censales de Álava
-  plot(cartografia[substring(cartografia$seccion, 1, 5) == "01059", ])
+  plot(cartografia[substr(cartografia$seccion, 1, 5) == "01059", ])
 
   # Representación de los secciones censales de Álava, según distritos.
-  distritos <- substring(cartografia[substring(cartografia$CUSEC, 1, 5) == "01059", ]$CUSEC, 6, 7)
-  plot(cartografia[substring(cartografia$CUSEC, 1, 5) == "01059", ], col = as.numeric(distritos))
+  distritos <- substr(cartografia[substr(cartografia$CUSEC, 1, 5) == "01059", "CUSEC"], 6, 7)
+  plot(cartografia[substr(cartografia$CUSEC, 1, 5) == "01059", ], col = as.numeric(distritos))
 }
 }
 \references{
