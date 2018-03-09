@@ -5,7 +5,7 @@
 #'   la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
 #'   sección censal. Si el archivo de cambios incorpora información catastral
 #'   (número de viviendas afectada por cada cambio de sección), se puede fijar
-#'   un umbral de cambio (%) para rechazar aquellos cambios que involucren a muy
+#'   un umbral de cambio (\%) para rechazar aquellos cambios que involucren a muy
 #'   pocas viviendas.
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
@@ -22,37 +22,39 @@
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
 #' @param catastro Lógico: ¿El archivo de cambios incorpora datos sobre el
 #'   catastro? Por defecto \code{catastro = FALSE}.
-#' @param umbral_cambio Numérico: porcentaje de viviendas afectadas en el cambio
-#'   de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto se fija
-#'   al 10 %.
-#' @param distancia_max Numérico: máxima distancia (en metros) a la que pueden
-#'   estar dos secciones para ser unidas. Por defecto se fija a 100 m.
+#' @param umbral_vivienda Numérico: porcentaje de viviendas afectadas en el
+#'   cambio de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto
+#'   se fija al 5 \%.
+#' @param umbral_tramo Numérico: porcentaje de tramos afectados por la unión de
+#'   secciones respecto al total de tramos contenidos en la sección de
+#'   referencia (2011). Solo se utiliza si \code{catastro = TRUE}. Por defecto
+#'   se fija a 10 \%.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-#'   NULL, corte_edad = 85, catastro = FALSE, umbral_cambio = 10, distancia_max
-#'   = 100)
+#'   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, umbral_tramo
+#'   = 10)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
 #'   \code{cartografia_ine} y \code{\link[sp]{SpatialPolygonsDataFrame}} con la
 #'   cartografía, donde cada fila es una sección censal y que cuenta con 9
-#'   columnas: \item{seccion}{Cadena de 10 caracteres con el código de sección
-#'   censal (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
-#'   caracteres con el código del municipio (incluye provincia).}
-#'   \item{CCA}{Cadena de 2 caracteres con el código de comunidad autónoma.}
-#'   \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la comunidad
-#'   autónoma.} \item{NMUN}{Nombre del municipio.} \item{geometry}{Columna de
-#'   tipo lista con la geometría asociada a cada sección censal.}
-#'   \item{cluster_id}{Código de identificación del cluster de uniones.}
-#'   \item{sc_unida}{Código de las secciones unidas.}
+#'   columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el código de
+#'   sección censal (incluye provincia, municipio y distrito).}
+#'   \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
+#'   provincia).} \item{CCA}{Cadena de 2 caracteres con el código de comunidad
+#'   autónoma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
+#'   comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
+#'   \item{geometry}{Columna de tipo lista con la geometría asociada a cada
+#'   sección censal.} \item{cluster_id}{Código de identificación del cluster de
+#'   uniones.} \item{sc_unida}{Código de las secciones unidas.}}
 #'
 #'   En caso de proporcionan poblaciones, se devuelve una lista de longitud
 #'   igual a dos, donde el primer elemento es la cartografía descrita
 #'   anteriormente y el segundo elemento de la lista es un objeto de clase
 #'   \code{poblaciones_ine} donde las filas representan las distintas secciones
-#'   censales. Las tres primeras columnas son: \item{seccion}{Código de la
-#'   sección censal en el primer año.} \item{sexo}{Código de la sección censal
-#'   en el segundo año.} \item{year}{Primer año.} El resto de columnas
+#'   censales. Las tres primeras columnas son: \describe{\item{seccion}{Código
+#'   de la sección censal.} \item{sexo}{Sexo de la población (0 = masculino; 1 =
+#'   femenino).} \item{year}{Año de referencia.}} El resto de columnas
 #'   representan los distintos grupos de edad, tras realizar el corte en los
 #'   grupos de edad (85 0 100).
 #'
@@ -64,12 +66,13 @@
 #'   data("cambios_seccion")
 #'   data("cartografia")
 #'   uniones <- une_secciones(
-#'     cambios       = cambios_seccion,
-#'     cartografia   = cartografia,
-#'     years         = 2006:2016,
-#'     poblacion     = poblacion,
-#'     catastro      = TRUE,
-#'     umbral_cambio = 10
+#'     cambios         = cambios_seccion,
+#'     cartografia     = cartografia,
+#'     years           = 2006:2016,
+#'     poblacion       = poblacion,
+#'     catastro        = TRUE,
+#'     umbral_vivienda = 5,
+#'     umbral_tramo    = 10
 #'   )
 #'
 #'   poblacion   <- uniones$poblacion
@@ -85,7 +88,7 @@
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
                           poblacion = NULL, corte_edad = 85, catastro = FALSE,
-                          umbral_cambio = 10, distancia_max = 100) {
+                          umbral_vivienda = 5, umbral_tramo = 10) {
 
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
@@ -101,9 +104,14 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   if (any(years != min(years):max(years)))
     stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
   stopifnot(corte_edad %in% c(85, 100))
-  stopifnot(is.numeric(umbral_cambio))
+  stopifnot(is.numeric(umbral_vivienda))
+  stopifnot(is.numeric(umbral_tramo))
   stopifnot(is.logical(catastro))
 
+
+  if (!catastro) {
+    cambios[, vias := NULL]
+  }
   utils::data("secciones")
   car_class  <- attributes(cartografia@data)$class
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
@@ -148,7 +156,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     if (length(dista) > 0)
       part$dista[i] <- dista[which.max(dista)]
   }
-  part    <- part[dista < distancia_max]
+  part    <- part[dista < 100]
   cambios <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
 
   if (catastro) {
@@ -158,12 +166,12 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       cambios[i, cambio_ref := (viviendas / viv_ref * 100) + tramo_por]
     }
     filtrado <- cambios[
-      (colin == TRUE | is.na(colin)) & (dista < distancia_max | is.na(dista)) &
-        cambio_ref >= umbral_cambio
+      (colin == TRUE | is.na(colin)) & (dista < 100 | is.na(dista)) &
+        cambio_ref >= umbral_vivienda & tramo_por <= umbral_tramo
       ]
   } else {
     filtrado <- cambios[
-      (colin == TRUE | is.na(colin)) & (dista < distancia_max | is.na(dista))
+      (colin == TRUE | is.na(colin)) & (dista < 100 | is.na(dista))
     ]
   }
 
