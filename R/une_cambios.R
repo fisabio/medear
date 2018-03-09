@@ -109,7 +109,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   stopifnot(is.logical(catastro))
 
 
-  if (!catastro) {
+  if ("vias" %in% names(cambios)) {
     cambios[, vias := NULL]
   }
   utils::data("secciones")
