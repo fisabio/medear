@@ -2,9 +2,9 @@
 #' @title Une los cambios del seccionado del INE
 #'
 #' @description Une los cambios del seccionado del INE (tomando como referencia
-#'   la cartograf韆 INE 2011), adaptando a su vez las poblaciones por sexo a駉 y
-#'   secci髇 censal. Si el archivo de cambios incorpora informaci髇 catastral
-#'   (n鷐ero de viviendas afectada por cada cambio de secci髇), se puede fijar
+#'   la cartograf铆a INE 2011), adaptando a su vez las poblaciones por sexo a帽o y
+#'   secci贸n censal. Si el archivo de cambios incorpora informaci贸n catastral
+#'   (n煤mero de viviendas afectada por cada cambio de secci贸n), se puede fijar
 #'   un umbral de cambio (\%) para rechazar aquellos cambios que involucren a muy
 #'   pocas viviendas.
 #'
@@ -12,21 +12,21 @@
 #' @param cartografia Objeto de clase
 #'   \code{\link[sp]{SpatialPolygonsDataFrame}}, y con datos de clase
 #'   \code{cartografia_ine}.
-#' @param years Vector num閞ico de longitud >= 1 con los a駉s para los que se
-#'   desee consultar las variaciones de seccionado. El a駉 2011 debe figurar
-#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de m醩 de un
-#'   a駉).
+#' @param years Vector num茅rico de longitud >= 1 con los a帽os para los que se
+#'   desee consultar las variaciones de seccionado. El a帽o 2011 debe figurar
+#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de m谩s de un
+#'   a帽o).
 #' @param poblacion Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 #'   proporcionar en caso de querer agregar las poblaciones.
-#' @param corte_edad Num閞ico: punto de corte para los grupos de edad (85 o
+#' @param corte_edad Num茅rico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
-#' @param catastro L骻ico: 縀l archivo de cambios incorpora datos sobre el
+#' @param catastro L贸gico: 驴El archivo de cambios incorpora datos sobre el
 #'   catastro? Por defecto \code{catastro = FALSE}.
-#' @param umbral_vivienda Num閞ico: porcentaje de viviendas afectadas en el
-#'   cambio de secci髇. Solo se utiliza si \code{catastro = TRUE}. Por defecto
+#' @param umbral_vivienda Num茅rico: porcentaje de viviendas afectadas en el
+#'   cambio de secci贸n. Solo se utiliza si \code{catastro = TRUE}. Por defecto
 #'   se fija al 5 \%.
-#' @param umbral_tramo Num閞ico: porcentaje de tramos afectados por la uni髇 de
-#'   secciones respecto al total de tramos contenidos en la secci髇 de
+#' @param umbral_tramo Num茅rico: porcentaje de tramos afectados por la uni贸n de
+#'   secciones respecto al total de tramos contenidos en la secci贸n de
 #'   referencia (2011). Solo se utiliza si \code{catastro = TRUE}. Por defecto
 #'   se fija a 10 \%.
 #'
@@ -34,27 +34,27 @@
 #'   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, umbral_tramo
 #'   = 10)
 #'
-#' @return El resultado devuelto var韆 en funci髇 de si se proporcionan datos de
+#' @return El resultado devuelto var铆a en funci贸n de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
 #'   \code{cartografia_ine} y \code{\link[sp]{SpatialPolygonsDataFrame}} con la
-#'   cartograf韆, donde cada fila es una secci髇 censal y que cuenta con 9
-#'   columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el c骴igo de
-#'   secci髇 censal (incluye provincia, municipio y distrito).}
-#'   \item{CUMUN}{Cadena de 5 caracteres con el c骴igo del municipio (incluye
-#'   provincia).} \item{CCA}{Cadena de 2 caracteres con el c骴igo de comunidad
-#'   aut髇oma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
-#'   comunidad aut髇oma.} \item{NMUN}{Nombre del municipio.}
-#'   \item{geometry}{Columna de tipo lista con la geometr韆 asociada a cada
-#'   secci髇 censal.} \item{cluster_id}{C骴igo de identificaci髇 del cluster de
-#'   uniones.} \item{sc_unida}{C骴igo de las secciones unidas.}}
+#'   cartograf铆a, donde cada fila es una secci贸n censal y que cuenta con 9
+#'   columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el c贸digo de
+#'   secci贸n censal (incluye provincia, municipio y distrito).}
+#'   \item{CUMUN}{Cadena de 5 caracteres con el c贸digo del municipio (incluye
+#'   provincia).} \item{CCA}{Cadena de 2 caracteres con el c贸digo de comunidad
+#'   aut贸noma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
+#'   comunidad aut贸noma.} \item{NMUN}{Nombre del municipio.}
+#'   \item{geometry}{Columna de tipo lista con la geometr铆a asociada a cada
+#'   secci贸n censal.} \item{cluster_id}{C贸digo de identificaci贸n del cluster de
+#'   uniones.} \item{sc_unida}{C贸digo de las secciones unidas.}}
 #'
 #'   En caso de proporcionan poblaciones, se devuelve una lista de longitud
-#'   igual a dos, donde el primer elemento es la cartograf韆 descrita
+#'   igual a dos, donde el primer elemento es la cartograf铆a descrita
 #'   anteriormente y el segundo elemento de la lista es un objeto de clase
 #'   \code{poblaciones_ine} donde las filas representan las distintas secciones
-#'   censales. Las tres primeras columnas son: \describe{\item{seccion}{C骴igo
-#'   de la secci髇 censal.} \item{sexo}{Sexo de la poblaci髇 (0 = masculino; 1 =
-#'   femenino).} \item{year}{A駉 de referencia.}} El resto de columnas
+#'   censales. Las tres primeras columnas son: \describe{\item{seccion}{C贸digo
+#'   de la secci贸n censal.} \item{sexo}{Sexo de la poblaci贸n (0 = masculino; 1 =
+#'   femenino).} \item{year}{A帽o de referencia.}} El resto de columnas
 #'   representan los distintos grupos de edad, tras realizar el corte en los
 #'   grupos de edad (85 0 100).
 #'
@@ -163,7 +163,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     for (i in seq_len(nrow(cambios))) {
       viv_r    <- secciones_2011[seccion == cambios[["sc_ref"]][i], n_viv]
       cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
-      cambios[i, cambio_ref := (viviendas / viv_ref * 100) + tramo_por]
+      cambios[i, cambio_ref := (viviendas / viv_ref * 100)]
     }
     filtrado <- cambios[
       (colin == TRUE | is.na(colin)) & (dista < 100 | is.na(dista)) &
