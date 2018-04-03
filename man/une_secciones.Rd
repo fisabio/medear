@@ -13,7 +13,7 @@ une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
 
 \item{cartografia}{Objeto de clase
-\code{\link[sp]{SpatialPolygonsDataFrame}}, y con datos de clase
+\code{\link[sp]{SpatialPolygons}}, y con datos de clase
 \code{cartografia_ine}.}
 
 \item{years}{Vector numérico de longitud >= 1 con los años para los que se
@@ -75,15 +75,16 @@ Une los cambios del seccionado del INE (tomando como referencia
 \examples{
 
 \dontrun{
+  # Unión de secciones en la ciudad de Alicante (código ine: 03014)
   library(medear)
   data("poblacion")
   data("cambios_seccion")
   data("cartografia")
   uniones <- une_secciones(
-    cambios         = cambios_seccion,
-    cartografia     = cartografia,
+    cambios         = cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "03014", ],
+    cartografia     = cartografia[cartografia$CUMUN == "03014", ],
     years           = 2006:2016,
-    poblacion       = poblacion,
+    poblacion       = poblacion[substr(poblacion$seccion, 1, 5) == "03014", ],
     catastro        = TRUE,
     umbral_vivienda = 5,
     umbral_tramo    = 10
