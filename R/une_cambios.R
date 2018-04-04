@@ -5,13 +5,32 @@
 #'   la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
 #'   sección censal. Si el archivo de cambios incorpora información catastral
 #'   (número de viviendas afectada por cada cambio de sección), se puede fijar
-#'   un umbral de cambio (\%) para rechazar aquellos cambios que involucren a muy
-#'   pocas viviendas.
+#'   un umbral de cambio (\%) para rechazar aquellos cambios que involucren a
+#'   muy pocas viviendas.
+#'
+#' @details Cuando se quiera unir cambios no solo en la cartografía sino también
+#'   en los datos de población, puede aparecer un comportamiento inestable de la
+#'   función. Esto es debido divergencias existentes en la información contenida
+#'   en los datos de población y en los trameros (que es desde donde se crea el listado
+#'   de cambios de sección), a pesar de que en ambos casos la fuente de
+#'   información es el propio INE.
+#'
+#'   Lo anterior se traduce en que, para determinadas consultas, el número de
+#'   secciones contenidas en los datos de cartografía y poblaciones no será el
+#'   mismo, siendo lo más habitual que esto ocurra con los datos de población.
+#'   Cuando esto pase (si pasa) la función devolverá un aviso, indicando qué
+#'   secciones se ven afectadas y en qué años, de forma que el usuario pueda
+#'   tratar de solucionarlo por su cuenta, aunque no hay una solución perfecta.
+#'
+#'   La solución más efectiva que se ha encontrado es modificar los criterios
+#'   temporales de la consulta, ampliando o reduciendo el marco temporal (p.
+#'   ej., pasar de un período 2001:2015 a 1996:2015 o 2002:2014). No obstante,
+#'   esta es solución una \emph{ad hoc}, y recae en el usuario encontrar el período
+#'   más apropiado para su consulta concreta.
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
-#' @param cartografia Objeto de clase
-#'   \code{\link[sp]{SpatialPolygons}}, y con datos de clase
-#'   \code{cartografia_ine}.
+#' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}}, y con
+#'   datos de clase \code{cartografia_ine}.
 #' @param years Vector numérico de longitud >= 1 con los años para los que se
 #'   desee consultar las variaciones de seccionado. El año 2011 debe figurar
 #'   dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
@@ -242,6 +261,32 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       }
     }
     attributes(poblacion)$fuente <- fuente
+
+    if (!identical(sort(cartografia$seccion), sort(unique(poblacion$seccion)))) {
+      not_in_pobla <- cartografia$seccion[!cartografia$seccion %in% unique(poblacion$seccion)]
+      not_in_carto <- unique(poblacion$seccion)[!unique(poblacion$seccion) %in% cartografia$seccion]
+      if (length(not_in_pobla) > 0) {
+        warning(
+          "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
+          paste0(not_in_pobla, collapse = "', '"),
+          "') aparecen en la cartograf\u00eda pero no en los datos de poblaci\u00f3n.\n",
+          "Por favor, consulte la ayuda de la funci\u00f3n para tratar de solucionarlo.",
+          call. = FALSE
+        )
+      }
+      if (length(not_in_carto) > 0) {
+        not_in_years <- unique(poblacion[seccion %in% not_in_carto, year])
+        warning(
+          "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
+          paste0(not_in_carto, collapse = "', '"),
+          "') aparecen en los datos de poblaci\u00f3n pero no en la cartograf\u00eda,",
+           " para los a\u00f1os c(", paste0(not_in_years, collapse = ", "), ").\n",
+          "Por favor, consulte la ayuda de la funci\u00f3n para tratar de solucionarlo.",
+          call. = FALSE
+        )
+      }
+    }
+
     res <- list(cartografia = cartografia, poblacion = poblacion)
   }
 
