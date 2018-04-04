@@ -75,8 +75,8 @@ Une los cambios del seccionado del INE (tomando como referencia
 Cuando se quiera unir cambios no solo en la cartografía sino también
   en los datos de población, puede aparecer un comportamiento inestable de la
   función. Esto es debido divergencias existentes en la información contenida
-  en los datos de población y en los trameros (que es desde donde se crea el listado
-  de cambios de sección), a pesar de que en ambos casos la fuente de
+  en los datos de población y en los trameros (que es desde donde se crea el
+  listado de cambios de sección), a pesar de que en ambos casos la fuente de
   información es el propio INE.
 
   Lo anterior se traduce en que, para determinadas consultas, el número de
@@ -86,11 +86,20 @@ Cuando se quiera unir cambios no solo en la cartografía sino también
   secciones se ven afectadas y en qué años, de forma que el usuario pueda
   tratar de solucionarlo por su cuenta, aunque no hay una solución perfecta.
 
-  La solución más efectiva que se ha encontrado es modificar los criterios
-  temporales de la consulta, ampliando o reduciendo el marco temporal (p.
-  ej., pasar de un período 2001:2015 a 1996:2015 o 2002:2014). No obstante,
-  esta es solución una \emph{ad hoc}, y recae en el usuario encontrar el período
-  más apropiado para su consulta concreta.
+  Las dos soluciones más efectivas (aunque son soluciones \emph{ad hoc} y
+  recae en el usuario encontrar la más apropiada para su consulta concreta)
+  que se han encontrado son:
+
+  \enumerate{ \item modificar los criterios temporales de la consulta,
+  ampliando o reduciendo el marco temporal (p. ej., pasar de un período
+  2001:2015 a 1996:2015 o 2002:2014); \item consultar las secciones
+  problemáticas (accesibles mediante la consulta \code{attr(yy,
+  "sc_not_in_cartografia")}) en los datos de población y, en base al archivo
+  de cambios de sección, decidir con qué sección se debería realizar la
+  unión.}
+
+  En el ejemplo se desarrollan ambos abordajes, con un tratamiento más
+  extensivo en la viñeta de unión de seccionado (XXXXXXXXX).
 }
 \examples{
 
