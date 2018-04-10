@@ -104,20 +104,65 @@ Cuando se quiera unir cambios no solo en la cartografía sino también
 \examples{
 
 \dontrun{
-  # Unión de secciones en la ciudad de Alicante (código ine: 03014)
+  # En este ejemplo se trabaja con la ciudad de Palma de Mallorca (código ine: 07040)
+  # en los años 2004-2015
+
   library(medear)
   data("poblacion")
   data("cambios_seccion")
   data("cartografia")
-  uniones <- une_secciones(
-    cambios         = cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "03014", ],
-    cartografia     = cartografia[cartografia$CUMUN == "03014", ],
-    years           = 2006:2016,
-    poblacion       = poblacion[substr(poblacion$seccion, 1, 5) == "03014", ],
+  cambios_pm     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "07040", ]
+  cartografia_pm <- cartografia[cartografia$CUMUN == "07040", ]
+  poblacion_pm   <- poblacion[substr(poblacion$seccion, 1, 5) == "07040", ]
+
+  ##########################################################################
+  ## Ejemplo sin utilizar el filtro de catastro                           ##
+  ##########################################################################
+
+  union_sin_cat <- une_secciones(
+    cambios         = cambios_pm,
+    cartografia     = cartografia_pm,
+    years           = 2004:2015,
+    poblacion       = poblacion_pm,
+    catastro        = FALSE
+  )
+
+  nrow(union_sin_cat$cartografia) # 197 secciones
+  length(unique(union_sin_cat$poblacion$seccion)) # 197 secciones
+  round(nrow(union_sin_cat$cartografia) / nrow(cartografia_ali), 2) # Conserva el 78 \\\% de secciones
+  # No salta ningún aviso sobre divergencia en seccionado entre cartografía y poblaciones,
+  # pero se puede comprobar manualmente:
+  unique(union_sin_cat$poblacion$seccion)[!unique(union_sin_cat$poblacion$seccion) \%in\% union_sin_cat$cartografia$seccion]
+  union_sin_cat$cartografia$seccion[!union_sin_cat$cartografia$seccion \%in\% unique(union_sin_cat$poblacion$seccion)]
+  # No hay ninguna sección problemática.
+
+
+  ##########################################################################
+  ## Ejemplo utilizando el filtro de catastro                             ##
+  ##########################################################################
+
+  union_con_cat <- une_secciones(
+    cambios         = cambios_pm,
+    cartografia     = cartografia_pm,
+    years           = 2004:2016,
+    poblacion       = poblacion_pm,
     catastro        = TRUE,
     umbral_vivienda = 5,
     umbral_tramo    = 10
   )
+
+  nrow(union_con_cat$cartografia) # 197 secciones
+  length(unique(union_con_cat$poblacion$seccion)) # 197 secciones
+  round(nrow(union_con_cat$cartografia) / nrow(cartografia_ali), 2) # Conserva el 78 \\\% de secciones
+  # No salta ningún aviso sobre divergencia en seccionado entre cartografía y poblaciones,
+  # pero se puede comprobar manualmente:
+  unique(union_con_cat$poblacion$seccion)[!unique(union_con_cat$poblacion$seccion) \%in\% union_con_cat$cartografia$seccion]
+  union_con_cat$cartografia$seccion[!union_con_cat$cartografia$seccion \%in\% unique(union_con_cat$poblacion$seccion)]
+  # No hay ninguna sección problemática.
+
+
+
+
 
   poblacion   <- uniones$poblacion
   cartografia <- uniones$cartografia

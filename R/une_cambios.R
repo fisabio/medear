@@ -230,7 +230,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       if (length(dista) > 0)
         part$dista[i] <- dista[which.max(dista)]
     }
-    part    <- part[dista < 500 | is.na(dista)]
     cambios <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
     # Hasta aqui
 
@@ -240,10 +239,13 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
         cambios[i, cambio_ref := (viviendas / viv_ref * 100)]
       }
+      # Conservar cambios cuya seccion de comparacion no exista en 2011
+      # Conservar cambios que impliquen cambio >= umbral_vivienda y dista < 500 m, o
+      # cambios que, con cambio < umbral_vivienda, tienen tramo_por != 0 y dista < 500 m
       cambios <- cambios[
         no_11 == TRUE |
-          (cambio_ref >= umbral_vivienda & (dista < 500 | is.na(dista)) |
-             (tramo_por >= umbral_tramo & (dista < 500 | is.na(dista))))
+          ((cambio_ref >= umbral_vivienda | (cambio_ref < umbral_vivienda & tramo_por >= umbral_tramo)) &
+             (dista < 500 | is.na(dista)))
       ]
     } else {
       cambios <- cambios[no_11 == TRUE | (dista < 500 | is.na(dista))]
@@ -325,8 +327,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
               seccion = sc_not_11[j],
               sexo    = 0:1
             )][]
-            for (col in names(pob1)[-c(1:3)])
-              set(pob1, j = col, value = 1)
+            set(pob1, j = names(pob1)[-c(1:3)], value = 1)
             poblacion <- rbindlist(list(poblacion, pob1))[order(seccion, sexo, year)]
           }
         }
@@ -365,8 +366,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
           "Por favor, consulte la ayuda de la funci\u00f3n para tratar de solucionarlo.",
           call. = FALSE
         )
-        attr(res, "sc_not_in_cartografia") <- not_in_carto
-        attr(attr(res, "sc_not_in_cartografia"), "years") <- not_in_years
+        attr(res$poblacion, "sc_not_in_cartografia") <- not_in_carto
+        attr(attr(res$poblacion, "sc_not_in_cartografia"), "years") <- not_in_years
       }
     }
 
@@ -380,7 +381,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         "Por favor, consulte la ayuda de la funci\u00f3n para explorar este aspecto.",
         call. = FALSE
       )
-      attr(res, "pob_igual_uno") <- unique(poblacion[uno_vect, seccion])
+      attr(res$poblacion, "pob_igual_uno") <- unique(poblacion[uno_vect, seccion])
     }
   }
 

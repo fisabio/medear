@@ -31,9 +31,8 @@ Si no se proporciona un fichero con información catastral, la funcion
 
   Si se proporciona un archivo con información catastral de un municipio, la
   función solo calcula los cambios para ese municipio y devuelve, ademas de
-  los cuatro primeros cambios que en el anterior supuesto, el número de
-  viviendas afectadas por cada cambio y el porcentaje de tramos identificados
-  en el archivo catastral.
+  los campos del anterior supuesto, el número de viviendas afectadas por cada
+  cambio y el porcentaje de tramos identificados en el archivo catastral.
 }
 \description{
 Detecta cambios de sección censal para las provincias y el
