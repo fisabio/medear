@@ -74,9 +74,8 @@ filtrar_ein_esn <- function(datos) {
 #'
 #'   Si se proporciona un archivo con información catastral de un municipio, la
 #'   función solo calcula los cambios para ese municipio y devuelve, ademas de
-#'   los cuatro primeros cambios que en el anterior supuesto, el número de
-#'   viviendas afectadas por cada cambio y el porcentaje de tramos identificados
-#'   en el archivo catastral.
+#'   los campos del anterior supuesto, el número de viviendas afectadas por cada
+#'   cambio y el porcentaje de tramos identificados en el archivo catastral.
 #'
 #'
 #' @examples
@@ -190,14 +189,14 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
   class(cambios) <- c(class(cambios), "cambios_ine")
 
   if (!is.null(catastro)) {
-    tramero_cambios <- filtra_tramero(tramero, cambios)
+    tramero_cambios <- filtra_tramero(datos, cambios)
     viviendas_def   <- calcula_viviendas(tramero_cambios, catastro_finca)
     tramos_cat <- mapply(
-      function(x, y) x / nrow(tramero[seccion == y & year == 2011]) * 100,
-      viviendas_def[[2]], cambios$sc_ref
+      function(x, y) x / nrow(datos[seccion == y & year == 2011]) * 100,
+      viviendas_def$n_na, cambios$sc_ref
     )
     cambios <- cambios[, -5]
-    cambios[, viviendas := viviendas_def[[1]]]
+    cambios[, viviendas := viviendas_def$n_viv]
     cambios <- cambios[, tramo_por := tramos_cat][]
   }
 
