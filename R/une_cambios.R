@@ -171,7 +171,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
   stopifnot(corte_edad %in% c(85, 100))
   stopifnot(is.numeric(umbral_vivienda))
-  stopifnot(is.numeric(umbral_tramo))
   stopifnot(is.logical(catastro))
 
 
