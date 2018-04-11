@@ -17,9 +17,8 @@
 #'
 #'   Lo anterior se traduce en que, para determinadas consultas, el número de
 #'   secciones contenidas en los datos de cartografía y poblaciones no será el
-#'   mismo, siendo lo más habitual que esto ocurra con los datos de población.
-#'   Cuando esto pase (si pasa) la función devolverá un aviso, indicando qué
-#'   secciones se ven afectadas y en qué años, de forma que el usuario pueda
+#'   mismo. Cuando esto pase (si pasa) la función devolverá un aviso, indicando
+#'   qué secciones se ven afectadas y en qué años, de forma que el usuario pueda
 #'   tratar de solucionarlo por su cuenta, aunque no hay una solución perfecta.
 #'
 #'   Las dos soluciones más efectivas (aunque son soluciones \emph{ad hoc} y
@@ -29,13 +28,17 @@
 #'   \enumerate{ \item modificar los criterios temporales de la consulta,
 #'   ampliando o reduciendo el marco temporal (p. ej., pasar de un período
 #'   2001:2015 a 1996:2015 o 2002:2014); \item consultar las secciones
-#'   problemáticas (accesibles mediante la consulta \code{attr(yy,
+#'   problemáticas (accesibles mediante la consulta \code{attr(objeto_devuelto,
 #'   "sc_not_in_cartografia")}) en los datos de población y, en base al archivo
 #'   de cambios de sección, decidir con qué sección se debería realizar la
 #'   unión.}
 #'
-#'   En el ejemplo se desarrollan ambos abordajes, con un tratamiento más
-#'   extensivo en la viñeta de unión de seccionado (XXXXXXXXX).
+#'   Por otra parte, es posible encontrar secciones que aparecen literalmente
+#'   "de la nada", especialmente en barrios de nueva creación.
+#'
+#'   En el ejemplo se desarrollarán los abordajes a estos problemas, con un
+#'   tratamiento más extensivo en la viñeta de unión de seccionado (aún por
+#'   elaborar).
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
 #' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}}, y con
@@ -53,14 +56,9 @@
 #' @param umbral_vivienda Numérico: porcentaje de viviendas afectadas en el
 #'   cambio de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto
 #'   se fija al 5 \%.
-#' @param umbral_tramo Numérico: porcentaje de tramos afectados por la unión de
-#'   secciones respecto al total de tramos contenidos en la sección de
-#'   referencia (2011). Solo se utiliza si \code{catastro = TRUE}. Por defecto
-#'   se fija a 10 \%.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-#'   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, umbral_tramo
-#'   = 10)
+#'   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
@@ -89,37 +87,41 @@
 #' @examples
 #'
 #' \dontrun{
-#'   # En este ejemplo se trabaja con la ciudad de Palma de Mallorca (código ine: 07040)
+#'   # En este ejemplo se trabaja con la ciudad de Sevilla (código ine: 41091)
 #'   # en los años 2004-2015
 #'
 #'   library(medear)
 #'   data("poblacion")
 #'   data("cambios_seccion")
 #'   data("cartografia")
-#'   cambios_pm     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "07040", ]
-#'   cartografia_pm <- cartografia[cartografia$CUMUN == "07040", ]
-#'   poblacion_pm   <- poblacion[substr(poblacion$seccion, 1, 5) == "07040", ]
+#'   cambios_se     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "41091", ]
+#'   cartografia_se <- cartografia[cartografia$CUMUN == "41091", ]
+#'   poblacion_se   <- poblacion[substr(poblacion$seccion, 1, 5) == "41091", ]
 #'
 #'   ##########################################################################
 #'   ## Ejemplo sin utilizar el filtro de catastro                           ##
 #'   ##########################################################################
 #'
 #'   union_sin_cat <- une_secciones(
-#'     cambios         = cambios_pm,
-#'     cartografia     = cartografia_pm,
+#'     cambios         = cambios_se,
+#'     cartografia     = cartografia_se,
 #'     years           = 2004:2015,
-#'     poblacion       = poblacion_pm,
+#'     poblacion       = poblacion_se,
 #'     catastro        = FALSE
 #'   )
 #'
-#'   nrow(union_sin_cat$cartografia) # 197 secciones
-#'   length(unique(union_sin_cat$poblacion$seccion)) # 197 secciones
-#'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_ali), 2) # Conserva el 78 \% de secciones
-#'   # No salta ningún aviso sobre divergencia en seccionado entre cartografía y poblaciones,
-#'   # pero se puede comprobar manualmente:
-#'   unique(union_sin_cat$poblacion$seccion)[!unique(union_sin_cat$poblacion$seccion) %in% union_sin_cat$cartografia$seccion]
-#'   union_sin_cat$cartografia$seccion[!union_sin_cat$cartografia$seccion %in% unique(union_sin_cat$poblacion$seccion)]
-#'   # No hay ninguna sección problemática.
+#'   nrow(union_sin_cat$cartografia) # 402 secciones
+#'   length(unique(union_sin_cat$poblacion$seccion)) # 408 secciones
+#'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_se) * 100) # Conserva el 76 \% de secciones
+#'
+#'   # La función avisa acerca de divergencias en el seccionado entre cartografía y el archivo de poblaciones.
+#'   # Las secciones afectadas son accesibles mediante la siguiente consulta:
+#'   attributes(union_con_cat)$sc_not_in_cartografia # 12 SC problemáticas
+#'
+#'   # En este caso, se resolverá la primera incidencia (SC 4109102089).
+#'   sc_problematica <- attributes(union_con_cat)$sc_not_in_cartografia[1]
+#'
+#'   ## POR COMPLETAR ##
 #'
 #'
 #'   ##########################################################################
@@ -127,30 +129,20 @@
 #'   ##########################################################################
 #'
 #'   union_con_cat <- une_secciones(
-#'     cambios         = cambios_pm,
-#'     cartografia     = cartografia_pm,
-#'     years           = 2004:2016,
-#'     poblacion       = poblacion_pm,
+#'     cambios         = cambios_se,
+#'     cartografia     = cartografia_se,
+#'     years           = 2004:2015,
+#'     poblacion       = poblacion_se,
 #'     catastro        = TRUE,
-#'     umbral_vivienda = 5,
-#'     umbral_tramo    = 10
+#'     umbral_vivienda = 5
 #'   )
 #'
-#'   nrow(union_con_cat$cartografia) # 197 secciones
-#'   length(unique(union_con_cat$poblacion$seccion)) # 197 secciones
-#'   round(nrow(union_con_cat$cartografia) / nrow(cartografia_ali), 2) # Conserva el 78 \% de secciones
-#'   # No salta ningún aviso sobre divergencia en seccionado entre cartografía y poblaciones,
-#'   # pero se puede comprobar manualmente:
-#'   unique(union_con_cat$poblacion$seccion)[!unique(union_con_cat$poblacion$seccion) %in% union_con_cat$cartografia$seccion]
-#'   union_con_cat$cartografia$seccion[!union_con_cat$cartografia$seccion %in% unique(union_con_cat$poblacion$seccion)]
-#'   # No hay ninguna sección problemática.
+#'   nrow(union_con_cat$cartografia) # 466 secciones
+#'   length(unique(union_con_cat$poblacion$seccion)) # 478 secciones
+#'   round(nrow(union_con_cat$cartografia) / nrow(cartografia_se) * 100) # Conserva el 88 \% de secciones
 #'
+#'   ## POR COMPLETAR ##
 #'
-#'
-#'
-#'
-#'   poblacion   <- uniones$poblacion
-#'   cartografia <- uniones$cartografia
 #' }
 #'
 #' @encoding UTF-8
@@ -162,7 +154,7 @@
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
                           poblacion = NULL, corte_edad = 85, catastro = FALSE,
-                          umbral_vivienda = 5, umbral_tramo = 10) {
+                          umbral_vivienda = 5) {
 
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
@@ -210,7 +202,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       }
     }
 
-    # Quiza se podria pasar esta parte tras una primera union de secciones con cambios[no_11 == FALSE]...
     part <- cambios[no_11 == TRUE]
     tmp  <- fsetdiff(cambios, part)
     for (i in seq_len(nrow(part))) {
@@ -231,7 +222,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         part$dista[i] <- dista[which.max(dista)]
     }
     cambios <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
-    # Hasta aqui
 
     if (catastro) {
       for (i in seq_len(nrow(cambios))) {
@@ -239,16 +229,15 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
         cambios[i, cambio_ref := (viviendas / viv_ref * 100)]
       }
-      # Conservar cambios cuya seccion de comparacion no exista en 2011
-      # Conservar cambios que impliquen cambio >= umbral_vivienda y dista < 500 m, o
-      # cambios que, con cambio < umbral_vivienda, tienen tramo_por != 0 y dista < 500 m
+      cambios[, umbral := cambio_ref + tramo_por]
       cambios <- cambios[
-        no_11 == TRUE |
-          ((cambio_ref >= umbral_vivienda | (cambio_ref < umbral_vivienda & tramo_por >= umbral_tramo)) &
-             (dista < 500 | is.na(dista)))
+        (no_11 == TRUE & (umbral >= umbral_vivienda & (dista < 500 | is.na(dista)))) |
+          (no_11 != TRUE & (umbral >= umbral_vivienda & (dista < 500 | is.na(dista))))
       ]
     } else {
-      cambios <- cambios[no_11 == TRUE | (dista < 500 | is.na(dista))]
+      cambios <- cambios[
+        no_11 == TRUE | (dista < 500 | is.na(dista))
+      ]
     }
 
     sc_unicas <- sort(
@@ -296,7 +285,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
             "se devuelve la misma cartograf\u00eda.")
   }
   attributes(cartografia@data)$fuente  <- fuente
-  attributes(cartografia@data)$cluster <- cluster_sc
   res <- cartografia
 
 
@@ -341,7 +329,10 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     }
 
     attributes(poblacion)$fuente <- fuente
-    res <- list(cartografia = cartografia, poblacion = poblacion)
+    res                          <- list(
+      cartografia = cartografia, poblacion = poblacion
+    )
+    attributes(res)$fuente       <- fuente
 
     if (!identical(sort(cartografia$seccion), sort(unique(poblacion$seccion)))) {
       not_in_pobla <- cartografia$seccion[!cartografia$seccion %in% unique(poblacion$seccion)]
@@ -366,8 +357,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
           "Por favor, consulte la ayuda de la funci\u00f3n para tratar de solucionarlo.",
           call. = FALSE
         )
-        attr(res$poblacion, "sc_not_in_cartografia") <- not_in_carto
-        attr(attr(res$poblacion, "sc_not_in_cartografia"), "years") <- not_in_years
+        attr(res, "sc_not_in_cartografia") <- not_in_carto
+        attr(attr(res, "sc_not_in_cartografia"), "years") <- not_in_years
       }
     }
 
@@ -381,7 +372,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         "Por favor, consulte la ayuda de la funci\u00f3n para explorar este aspecto.",
         call. = FALSE
       )
-      attr(res$poblacion, "pob_igual_uno") <- unique(poblacion[uno_vect, seccion])
+      attr(res, "pob_igual_uno") <- unique(poblacion[uno_vect, seccion])
     }
   }
 
