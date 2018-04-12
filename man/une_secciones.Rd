@@ -25,8 +25,8 @@ proporcionar en caso de querer agregar las poblaciones.}
 \item{corte_edad}{Numérico: punto de corte para los grupos de edad (85 o
 100). Argumento opcional en caso de proporcionar datos de poblaciones.}
 
-\item{catastro}{Lógico: ¿El archivo de cambios incorpora datos sobre el
-catastro? Por defecto \code{catastro = FALSE}.}
+\item{catastro}{Lógico: ¿Debe aplicarse el filtro de información catastral?
+Por defecto \code{catastro = FALSE}.}
 
 \item{umbral_vivienda}{Numérico: porcentaje de viviendas afectadas en el
 cambio de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto
@@ -66,12 +66,38 @@ Une los cambios del seccionado del INE (tomando como referencia
   muy pocas viviendas.
 }
 \details{
-Cuando se quiera unir cambios no solo en la cartografía sino también
-  en los datos de población, puede aparecer un comportamiento inestable de la
-  función. Esto es debido divergencias existentes en la información contenida
-  en los datos de población y en los trameros (que es desde donde se crea el
-  listado de cambios de sección), a pesar de que en ambos casos la fuente de
-  información es el propio INE.
+La función trabaja con la siguiente dinámica:
+
+  \itemize{ \item Filtrado del archivo de cambios según el rango de años
+  escogido. \item Para cada cambio, si ambas secciones existen en la
+  cartografía proporcionada se calculan las distancias (en metros) entre
+  ellas. \item Si se ha decidido utilizar el filtro de catastro, se calcula
+  el porcentaje de viviendas implicadas en cada cambio (opción no disponible
+  para Euskadi y Navarra), y se procede al filtrado del archivo de cambios
+  según el umbral escogido en la llamada a la función, asegurando siempre la
+  presencia de aquellos cambios que implequen a secciones que no existan en
+  la cartografía proporcionada, y restringiendo el filtrado a secciones que
+  disten menos de 100 metros entre sí. \item  En caso de no utilizar el
+  filtro de catastro, se filtra el archivo de cambios asegurando siempre la
+  presencia de aquellos cambios que implequen a secciones que no existan en
+  la cartografía proporcionada, y restringiendo el filtrado a secciones que
+  disten menos de 100 metros entre sí. \item Una vez que se dispone del
+  archivo de cambios definitivo, se crean las agrupaciones de secciones, y se
+  realiza la unión de las mismas en la cartografía. \item Si se proporciona
+  un archivo de poblaciones, se agrega la población empleando las mismas
+  agrupaciones de secciones del punto previo.}
+
+  No obstante, y dado que la función asume que el callejero, el archivo de
+  poblaciones y la cartografía están libres de errores. Como puede
+  imaginarse, esto no es así, de modo que la función puede comportarse de
+  forma inestable en dos supuestos:
+
+  \enumerate{ \item Cuando se quiera unir cambios no solo en la cartografía
+  sino también en los datos de población, puede aparecer un comportamiento
+  inestable de la funció, debido a divergencias existentes en la información
+  contenida en los datos de población y en los trameros (que es desde donde
+  se crea el listado de cambios de sección), a pesar de que en ambos casos la
+  fuente de información es el propio INE.
 
   Lo anterior se traduce en que, para determinadas consultas, el número de
   secciones contenidas en los datos de cartografía y poblaciones no será el
@@ -83,7 +109,7 @@ Cuando se quiera unir cambios no solo en la cartografía sino también
   recae en el usuario encontrar la más apropiada para su consulta concreta)
   que se han encontrado son:
 
-  \enumerate{ \item modificar los criterios temporales de la consulta,
+  \itemize{ \item modificar los criterios temporales de la consulta,
   ampliando o reduciendo el marco temporal (p. ej., pasar de un período
   2001:2015 a 1996:2015 o 2002:2014); \item consultar las secciones
   problemáticas (accesibles mediante la consulta \code{attr(objeto_devuelto,
@@ -91,12 +117,33 @@ Cuando se quiera unir cambios no solo en la cartografía sino también
   de cambios de sección, decidir con qué sección se debería realizar la
   unión.}
 
-  Por otra parte, es posible encontrar secciones que aparecen literalmente
-  "de la nada", especialmente en barrios de nueva creación.
+  \item Por otra parte, es posible encontrar vías que aparecen literalmente
+  "de la nada", especialmente en barrios de nueva creación o gran expansión.
+  El proceso de detección de cambios de sección (función
+  \code{\link{detecta_cambios}}) compara las secciones a las que se asigna
+  cada tramo del callejero de 2011, con las secciones a las que se asignan
+  esos mismos tramos (u otros pero contengan portales asociados a los tramos
+  previos) en los callejeros del resto de años.
 
-  En el ejemplo se desarrollarán los abordajes a estos problemas, con un
-  tratamiento más extensivo en la viñeta de unión de seccionado (aún por
-  elaborar).
+  No obstante, esto plantea un problema en la detección de cambios al
+  considerar la aparición de vías completamente nuevas, puesto que la
+  comparación 2011-otros años no es posible. En esos casos, y siempre que no
+  haya uniones adicionales que resuelvan el problema por sí solo, el archivo
+  de poblaciones tras la unión contendrá valores iguales a uno en todas las
+  categorías de edad para los años anteriores a la creación de la vía.
+  Nuevamente, cuando esto pase (si pasa) la función devolverá un aviso,
+  indicando qué secciones se ven afectadas y en qué años, de forma que el
+  usuario pueda tratar de solucionarlo por su cuenta.
+
+  La solución a este problema es similar al lo anteriormente expuesto: por un
+  lado se puede variar el rango de años, y por otro tratar de solucionarlo
+  manualmente consultando el archivo de cambios de sección y el de
+  poblaciones, buscando las secciones que devuelva la consulta
+  \code{attr(resultado, "pob_igual_uno")}.}
+
+  En el apartado de ejemplos se desarrollarán los abordajes a estos
+  problemas, con un tratamiento más extenso en la viñeta de unión de
+  seccionado (aún por elaborar).
 }
 \examples{
 
@@ -126,10 +173,12 @@ Cuando se quiera unir cambios no solo en la cartografía sino también
 
   nrow(union_sin_cat$cartografia) # 402 secciones
   length(unique(union_sin_cat$poblacion$seccion)) # 408 secciones
-  round(nrow(union_sin_cat$cartografia) / nrow(cartografia_se) * 100) # Conserva el 76 \\\% de secciones
+  round(nrow(union_sin_cat$cartografia) / nrow(cartografia_se) * 100) #
+  Conserva el 76 \\\% de secciones
 
-  # La función avisa acerca de divergencias en el seccionado entre cartografía y el archivo de poblaciones.
-  # Las secciones afectadas son accesibles mediante la siguiente consulta:
+  # La función avisa acerca de divergencias en el seccionado entre
+  cartografía y el archivo de poblaciones. # Las secciones afectadas son
+  accesibles mediante la siguiente consulta:
   attributes(union_con_cat)$sc_not_in_cartografia # 12 SC problemáticas
 
   # En este caso, se resolverá la primera incidencia (SC 4109102089).

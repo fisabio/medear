@@ -8,12 +8,38 @@
 #'   un umbral de cambio (\%) para rechazar aquellos cambios que involucren a
 #'   muy pocas viviendas.
 #'
-#' @details Cuando se quiera unir cambios no solo en la cartografía sino también
-#'   en los datos de población, puede aparecer un comportamiento inestable de la
-#'   función. Esto es debido divergencias existentes en la información contenida
-#'   en los datos de población y en los trameros (que es desde donde se crea el
-#'   listado de cambios de sección), a pesar de que en ambos casos la fuente de
-#'   información es el propio INE.
+#' @details La función trabaja con la siguiente dinámica:
+#'
+#'   \itemize{ \item Filtrado del archivo de cambios según el rango de años
+#'   escogido. \item Para cada cambio, si ambas secciones existen en la
+#'   cartografía proporcionada se calculan las distancias (en metros) entre
+#'   ellas. \item Si se ha decidido utilizar el filtro de catastro, se calcula
+#'   el porcentaje de viviendas implicadas en cada cambio (opción no disponible
+#'   para Euskadi y Navarra), y se procede al filtrado del archivo de cambios
+#'   según el umbral escogido en la llamada a la función, asegurando siempre la
+#'   presencia de aquellos cambios que implequen a secciones que no existan en
+#'   la cartografía proporcionada, y restringiendo el filtrado a secciones que
+#'   disten menos de 100 metros entre sí. \item  En caso de no utilizar el
+#'   filtro de catastro, se filtra el archivo de cambios asegurando siempre la
+#'   presencia de aquellos cambios que implequen a secciones que no existan en
+#'   la cartografía proporcionada, y restringiendo el filtrado a secciones que
+#'   disten menos de 100 metros entre sí. \item Una vez que se dispone del
+#'   archivo de cambios definitivo, se crean las agrupaciones de secciones, y se
+#'   realiza la unión de las mismas en la cartografía. \item Si se proporciona
+#'   un archivo de poblaciones, se agrega la población empleando las mismas
+#'   agrupaciones de secciones del punto previo.}
+#'
+#'   No obstante, y dado que la función asume que el callejero, el archivo de
+#'   poblaciones y la cartografía están libres de errores. Como puede
+#'   imaginarse, esto no es así, de modo que la función puede comportarse de
+#'   forma inestable en dos supuestos:
+#'
+#'   \enumerate{ \item Cuando se quiera unir cambios no solo en la cartografía
+#'   sino también en los datos de población, puede aparecer un comportamiento
+#'   inestable de la funció, debido a divergencias existentes en la información
+#'   contenida en los datos de población y en los trameros (que es desde donde
+#'   se crea el listado de cambios de sección), a pesar de que en ambos casos la
+#'   fuente de información es el propio INE.
 #'
 #'   Lo anterior se traduce en que, para determinadas consultas, el número de
 #'   secciones contenidas en los datos de cartografía y poblaciones no será el
@@ -25,7 +51,7 @@
 #'   recae en el usuario encontrar la más apropiada para su consulta concreta)
 #'   que se han encontrado son:
 #'
-#'   \enumerate{ \item modificar los criterios temporales de la consulta,
+#'   \itemize{ \item modificar los criterios temporales de la consulta,
 #'   ampliando o reduciendo el marco temporal (p. ej., pasar de un período
 #'   2001:2015 a 1996:2015 o 2002:2014); \item consultar las secciones
 #'   problemáticas (accesibles mediante la consulta \code{attr(objeto_devuelto,
@@ -33,12 +59,33 @@
 #'   de cambios de sección, decidir con qué sección se debería realizar la
 #'   unión.}
 #'
-#'   Por otra parte, es posible encontrar secciones que aparecen literalmente
-#'   "de la nada", especialmente en barrios de nueva creación.
+#'   \item Por otra parte, es posible encontrar vías que aparecen literalmente
+#'   "de la nada", especialmente en barrios de nueva creación o gran expansión.
+#'   El proceso de detección de cambios de sección (función
+#'   \code{\link{detecta_cambios}}) compara las secciones a las que se asigna
+#'   cada tramo del callejero de 2011, con las secciones a las que se asignan
+#'   esos mismos tramos (u otros pero contengan portales asociados a los tramos
+#'   previos) en los callejeros del resto de años.
 #'
-#'   En el ejemplo se desarrollarán los abordajes a estos problemas, con un
-#'   tratamiento más extensivo en la viñeta de unión de seccionado (aún por
-#'   elaborar).
+#'   No obstante, esto plantea un problema en la detección de cambios al
+#'   considerar la aparición de vías completamente nuevas, puesto que la
+#'   comparación 2011-otros años no es posible. En esos casos, y siempre que no
+#'   haya uniones adicionales que resuelvan el problema por sí solo, el archivo
+#'   de poblaciones tras la unión contendrá valores iguales a uno en todas las
+#'   categorías de edad para los años anteriores a la creación de la vía.
+#'   Nuevamente, cuando esto pase (si pasa) la función devolverá un aviso,
+#'   indicando qué secciones se ven afectadas y en qué años, de forma que el
+#'   usuario pueda tratar de solucionarlo por su cuenta.
+#'
+#'   La solución a este problema es similar al lo anteriormente expuesto: por un
+#'   lado se puede variar el rango de años, y por otro tratar de solucionarlo
+#'   manualmente consultando el archivo de cambios de sección y el de
+#'   poblaciones, buscando las secciones que devuelva la consulta
+#'   \code{attr(resultado, "pob_igual_uno")}.}
+#'
+#'   En el apartado de ejemplos se desarrollarán los abordajes a estos
+#'   problemas, con un tratamiento más extenso en la viñeta de unión de
+#'   seccionado (aún por elaborar).
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
 #' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}}, y con
@@ -51,8 +98,8 @@
 #'   proporcionar en caso de querer agregar las poblaciones.
 #' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
-#' @param catastro Lógico: ¿El archivo de cambios incorpora datos sobre el
-#'   catastro? Por defecto \code{catastro = FALSE}.
+#' @param catastro Lógico: ¿Debe aplicarse el filtro de información catastral?
+#'   Por defecto \code{catastro = FALSE}.
 #' @param umbral_vivienda Numérico: porcentaje de viviendas afectadas en el
 #'   cambio de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto
 #'   se fija al 5 \%.
@@ -112,10 +159,12 @@
 #'
 #'   nrow(union_sin_cat$cartografia) # 402 secciones
 #'   length(unique(union_sin_cat$poblacion$seccion)) # 408 secciones
-#'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_se) * 100) # Conserva el 76 \% de secciones
+#'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_se) * 100) #
+#'   Conserva el 76 \% de secciones
 #'
-#'   # La función avisa acerca de divergencias en el seccionado entre cartografía y el archivo de poblaciones.
-#'   # Las secciones afectadas son accesibles mediante la siguiente consulta:
+#'   # La función avisa acerca de divergencias en el seccionado entre
+#'   cartografía y el archivo de poblaciones. # Las secciones afectadas son
+#'   accesibles mediante la siguiente consulta:
 #'   attributes(union_con_cat)$sc_not_in_cartografia # 12 SC problemáticas
 #'
 #'   # En este caso, se resolverá la primera incidencia (SC 4109102089).
@@ -172,7 +221,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   stopifnot(corte_edad %in% c(85, 100))
   stopifnot(is.numeric(umbral_vivienda))
   stopifnot(is.logical(catastro))
-
+  stopifnot(any(cambios$sc_ref %in% cartografia$seccion))
+  stopifnot(!is.null(poblacion) && any(cambios$sc_ref %in% poblacion$seccion))
 
   if ("vias" %in% names(cambios)) {
     cambios[, vias := NULL]
@@ -185,7 +235,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
   if (nrow(cambios) > 0) {
-    carto_metro    <- sp::spTransform(
+    islas_2011    <- sapply(cartografia@polygons, function(x) length(x@Polygons))
+    sc_islas_2011 <- cartografia@data[which(islas_2011 != 1), "seccion"]
+    carto_metro   <- sp::spTransform(
       cartografia,
       sp::CRS("+proj=utm +zone=28 +datum=WGS84")
     )
@@ -200,27 +252,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         cambios$no_11[i] <- TRUE
       }
     }
-
-    part <- cambios[no_11 == TRUE]
-    tmp  <- fsetdiff(cambios, part)
-    for (i in seq_len(nrow(part))) {
-      sc_inv <- fsetdiff(cambios, part[i])[
-        sc_new == part[i, sc_new], c(sc_ref, sc_new)
-      ]
-      sc_inv <- unique(sc_inv[sc_inv != part[i, sc_new]])
-      dista  <- numeric()
-
-      for (j in seq_along(sc_inv)) {
-        carto1 <- carto_metro[carto_metro$seccion == part[i, sc_ref], ]
-        carto2 <- carto_metro[carto_metro$seccion == sc_inv[j], ]
-        if (all(nrow(carto1) > 0, nrow(carto2) > 0)) {
-          dista[j] <- rgeos::gDistance(carto1, carto2)
-        }
-      }
-      if (length(dista) > 0)
-        part$dista[i] <- dista[which.max(dista)]
-    }
-    cambios <- rbindlist(list(tmp, part))[order(sc_ref, sc_new)]
+    cambios[, distan_T := (dista < 100 | is.na(dista))]
 
     if (catastro) {
       for (i in seq_len(nrow(cambios))) {
@@ -229,14 +261,14 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         cambios[i, cambio_ref := (viviendas / viv_ref * 100)]
       }
       cambios[, umbral := cambio_ref + tramo_por]
-      cambios <- cambios[
-        (no_11 == TRUE & (umbral >= umbral_vivienda & (dista < 500 | is.na(dista)))) |
-          (no_11 != TRUE & (umbral >= umbral_vivienda & (dista < 500 | is.na(dista))))
-      ]
+      cambios[, umbral_T := umbral >= umbral_vivienda]
+      cambios[, incluido := no_11 == TRUE | (umbral_T & distan_T)]
+      cambios_copy <- copy(cambios)
+      cambios <- cambios[incluido == TRUE]
     } else {
-      cambios <- cambios[
-        no_11 == TRUE | (dista < 500 | is.na(dista))
-      ]
+      cambios[, incluido := no_11 == TRUE | distan_T]
+      cambios_copy <- copy(cambios)
+      cambios <- cambios[incluido == TRUE]
     }
 
     sc_unicas <- sort(
@@ -279,8 +311,22 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       cartografia$cluster_id[cartografia$seccion == sc_ini[i]] <- id_cluster[i]
     }
     cartografia$Group.1   <- NULL
+    islas_union           <- sapply(cartografia@polygons, function(x) length(x@Polygons))
+    sc_islas_union        <- cartografia@data[which(islas_union != 1), "seccion"]
+
+    if (length(sc_islas_union) > length(sc_islas_2011) |
+        any(!c("", sc_islas_union) %in% c("", sc_islas_2011))) {
+      cartografia$revision_manual[cartografia$seccion %in% sc_islas_union] <- "Revisar manualmente"
+      warning(
+        "Las secciones de la cartograf\u00eda: c('", paste(sc_islas_union, collapse = "-"), "'),",
+        " est\u00e1n conformadas por varios pol\u00edgonos que no son colindantes.\n",
+        "Por favor, rev\u00edselas manualmente (consulte la ayuda de la funci\u00f3n).",
+        call. = FALSE
+      )
+    }
   } else if (is.null(poblacion)) {
-    message("En el per\u00edodo establecido no se ha detectado ning\u00fan cambio:\n",
+    attributes(cartografia@data)$cambios <- cambios_copy
+    message("En el per\u00edodo establecido no se ha detectado ning\u00fan cambio: ",
             "se devuelve la misma cartograf\u00eda.")
   }
   attributes(cartografia@data)$fuente  <- fuente
@@ -321,9 +367,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       }
     } else {
       message(
-        "En el per\u00edodo establecido no se ha detectado ning\u00fan cambio:\n",
-        "se devuelve la misma cartograf\u00eda y poblaci\u00f3n para ese per\u00edodo,",
-        "\najustando esta \u00faltima al corte de edad marcado."
+        "En el per\u00edodo establecido no se ha detectado ning\u00fan cambio: ",
+        "se devuelve la misma cartograf\u00eda y poblaci\u00f3n para ese per\u00edodo, ",
+        "ajustando esta \u00faltima al corte de edad marcado."
       )
     }
 
@@ -332,15 +378,19 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       cartografia = cartografia, poblacion = poblacion
     )
     attributes(res)$fuente       <- fuente
+    if (exists("cluster_sc")) {
+      attributes(res)$cluster    <- cluster_sc
+      attributes(res)$cambios    <- cambios_copy
+    }
 
     if (!identical(sort(cartografia$seccion), sort(unique(poblacion$seccion)))) {
       not_in_pobla <- cartografia$seccion[!cartografia$seccion %in% unique(poblacion$seccion)]
       not_in_carto <- unique(poblacion$seccion)[!unique(poblacion$seccion) %in% cartografia$seccion]
       if (length(not_in_pobla) > 0) {
         warning(
-          "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones \nc('",
+          "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
           paste0(not_in_pobla, collapse = "', '"),
-          "')\naparecen en la cartograf\u00eda pero no en los datos de poblaci\u00f3n.\n",
+          "') aparecen en la cartograf\u00eda pero no en los datos de poblaci\u00f3n.\n",
           "Por favor, consulte la ayuda de la funci\u00f3n para tratar de solucionarlo.",
           call. = FALSE
         )
@@ -349,9 +399,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       if (length(not_in_carto) > 0) {
         not_in_years <- unique(poblacion[seccion %in% not_in_carto, year])
         warning(
-          "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones\n c('",
+          "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
           paste0(not_in_carto, collapse = "', '"),
-          "')\naparecen en los datos de poblaci\u00f3n pero no en la cartograf\u00eda,\n",
+          "') aparecen en los datos de poblaci\u00f3n pero no en la cartograf\u00eda, ",
            " para los a\u00f1os c(", paste0(not_in_years, collapse = ", "), ").\n",
           "Por favor, consulte la ayuda de la funci\u00f3n para tratar de solucionarlo.",
           call. = FALSE
@@ -365,8 +415,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
     if (any(uno_vect)) {
       warning(
-        "En el per\u00edodo seleccionado algunas secciones no sufrieron cambios pero \n",
-        "aparecieron m\u00e1s tarde que el a\u00f1o de inicio elegido. Se asigna el valor 1 como \n",
+        "En el per\u00edodo seleccionado algunas secciones no sufrieron cambios pero ",
+        "aparecieron m\u00e1s tarde que el a\u00f1o de inicio elegido. Se asigna el valor 1 como ",
         "poblaci\u00f3n a dichas secciones para los a\u00f1os previos (hasta el a\u00f1o de inicio fijado).\n",
         "Por favor, consulte la ayuda de la funci\u00f3n para explorar este aspecto.",
         call. = FALSE
