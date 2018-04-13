@@ -6,7 +6,8 @@
 \title{Une los cambios del seccionado del INE}
 \usage{
 une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-  NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5)
+  NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia =
+  100)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
@@ -31,6 +32,12 @@ Por defecto \code{catastro = FALSE}.}
 \item{umbral_vivienda}{Numérico: porcentaje de viviendas afectadas en el
 cambio de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto
 se fija al 5 \%.}
+
+\item{distancia}{Numérico: Máxima distancia (en metros) de separación entre
+secciones. Por defecto se fija en 100 metros. En algunos casos
+(principalmente en ciudades donde no haya problemas con pedanías que
+compartan nombres de vía con el núcleo urbano principal) puede ser
+conveniente aumentar este parámetro.}
 }
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de
@@ -168,7 +175,8 @@ La función trabaja con la siguiente dinámica:
     cartografia     = cartografia_se,
     years           = 2004:2015,
     poblacion       = poblacion_se,
-    catastro        = FALSE
+    catastro        = FALSE,
+    distancia       = 100
   )
 
   nrow(union_sin_cat$cartografia) # 402 secciones
@@ -197,7 +205,8 @@ La función trabaja con la siguiente dinámica:
     years           = 2004:2015,
     poblacion       = poblacion_se,
     catastro        = TRUE,
-    umbral_vivienda = 5
+    umbral_vivienda = 5,
+    distancia       = 100
   )
 
   nrow(union_con_cat$cartografia) # 466 secciones
