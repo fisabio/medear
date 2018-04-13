@@ -103,9 +103,15 @@
 #' @param umbral_vivienda Numérico: porcentaje de viviendas afectadas en el
 #'   cambio de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto
 #'   se fija al 5 \%.
+#' @param distancia Numérico: Máxima distancia (en metros) de separación entre
+#'   secciones. Por defecto se fija en 100 metros. En algunos casos
+#'   (principalmente en ciudades donde no haya problemas con pedanías que
+#'   compartan nombres de vía con el núcleo urbano principal) puede ser
+#'   conveniente aumentar este parámetro.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-#'   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5)
+#'   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia =
+#'   100)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
@@ -154,7 +160,8 @@
 #'     cartografia     = cartografia_se,
 #'     years           = 2004:2015,
 #'     poblacion       = poblacion_se,
-#'     catastro        = FALSE
+#'     catastro        = FALSE,
+#'     distancia       = 100
 #'   )
 #'
 #'   nrow(union_sin_cat$cartografia) # 402 secciones
@@ -183,7 +190,8 @@
 #'     years           = 2004:2015,
 #'     poblacion       = poblacion_se,
 #'     catastro        = TRUE,
-#'     umbral_vivienda = 5
+#'     umbral_vivienda = 5,
+#'     distancia       = 100
 #'   )
 #'
 #'   nrow(union_con_cat$cartografia) # 466 secciones
@@ -203,7 +211,7 @@
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
                           poblacion = NULL, corte_edad = 85, catastro = FALSE,
-                          umbral_vivienda = 5) {
+                          umbral_vivienda = 5, distancia = 100) {
 
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
@@ -220,6 +228,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
   stopifnot(corte_edad %in% c(85, 100))
   stopifnot(is.numeric(umbral_vivienda))
+  stopifnot(is.numeric(distancia))
   stopifnot(is.logical(catastro))
   stopifnot(any(cambios$sc_ref %in% cartografia$seccion))
   stopifnot(!is.null(poblacion) && any(cambios$sc_ref %in% poblacion$seccion))
@@ -252,7 +261,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         cambios$no_11[i] <- TRUE
       }
     }
-    cambios[, distan_T := (dista < 100 | is.na(dista))]
+    cambios[, distan_T := (dista < distancia | is.na(dista))]
 
     if (catastro) {
       for (i in seq_len(nrow(cambios))) {
@@ -310,15 +319,24 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     for (i in seq_along(sc_ini)) {
       cartografia$cluster_id[cartografia$seccion == sc_ini[i]] <- id_cluster[i]
     }
-    cartografia$Group.1   <- NULL
-    islas_union           <- sapply(cartografia@polygons, function(x) length(x@Polygons))
-    sc_islas_union        <- cartografia@data[which(islas_union != 1), "seccion"]
+    cartografia$Group.1 <- NULL
 
-    if (length(sc_islas_union) > length(sc_islas_2011) |
-        any(!c("", sc_islas_union) %in% c("", sc_islas_2011))) {
-      cartografia$revision_manual[cartografia$seccion %in% sc_islas_union] <- "Revisar manualmente"
+    islas_union    <- which(sapply(cartografia@polygons, function(x) length(x@Polygons)) != 1)
+    sc_islas_union <- cartografia@data[islas_union, "seccion"]
+    all_sc_islas   <- strsplit(cartografia@data[islas_union, "cluster_id"], "-")
+    sc_comparacion <- ifelse(length(sc_islas_2011) == 0, TRUE, FALSE)
+    if (!sc_comparacion & length(sc_islas_union) > 0) {
+      sc_comparacion <- sapply(all_sc_islas, function(x) any(x %in% sc_islas_2011))
+    }
+    if ((length(sc_islas_union) > 0 & (length(sc_islas_union) > length(sc_islas_2011))) | any(!sc_comparacion)) {
+      if (all(length(all_sc_islas) > 0, length(sc_islas_2011) > 0)) {
+        islas_alerta <- sc_islas_union[!sc_comparacion]
+      } else if (length(all_sc_islas) > 0) {
+        islas_alerta <- sc_islas_union
+      }
+      cartografia$revision_manual[cartografia$seccion %in% islas_alerta] <- "Revisar manualmente"
       warning(
-        "Las secciones de la cartograf\u00eda: c('", paste(sc_islas_union, collapse = "-"), "'),",
+        "Las secciones de la cartograf\u00eda: c('", paste(islas_alerta, collapse = "-"), "'),",
         " est\u00e1n conformadas por varios pol\u00edgonos que no son colindantes.\n",
         "Por favor, rev\u00edselas manualmente (consulte la ayuda de la funci\u00f3n).",
         call. = FALSE
