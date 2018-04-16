@@ -182,10 +182,16 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
     }
   }
 
-  cambios <- lapply(cambios, function(x)
-    rbindlist(list(x[year == 2011], x[year != 2011, c(2, 1, 4, 3, 5)]))
+  cambios <- rbindlist(
+    lapply(cambios, function(x)
+      if (all(x$year < 2011)) {
+        setcolorder(x, c(2, 1, 4, 3, 5))
+        setnames(x, names(x)[c(2, 1, 4, 3, 5)])
+      } else {
+        x
+      }
+    )
   )
-  cambios <- rbindlist(cambios)
   class(cambios) <- c(class(cambios), "cambios_ine")
 
   if (!is.null(catastro)) {
