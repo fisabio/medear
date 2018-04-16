@@ -211,8 +211,9 @@
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
                           poblacion = NULL, corte_edad = 85, catastro = FALSE,
-                          umbral_vivienda = 5, distancia = 100) {
-
+                          umbral_vivienda = 5, distancia = 100,
+                          modo = c("auto", "manual"), sc1, sc2) {
+  modo <- match.arg(modo)
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
   if (!is.null(poblacion) && !"poblaciones_ine" %in% class(poblacion))
@@ -232,17 +233,17 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   stopifnot(is.logical(catastro))
   stopifnot(any(cambios$sc_ref %in% cartografia$seccion))
   stopifnot(!is.null(poblacion) && any(cambios$sc_ref %in% poblacion$seccion))
+  stopifnot(is.character(c(sc1, sc2)))
 
-  if ("vias" %in% names(cambios)) {
-    cambios[, vias := NULL]
-  }
-  utils::data("secciones")
+  if ("vias" %in% names(cambios)) cambios$vias <- NULL
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
+  utils::data("secciones")
 
   secciones_2011 <- secciones[
     year == 2011 & substr(seccion, 1, 5) %in% cambios[, substr(sc_ref, 1, 5)]
   ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
+  cambios$manual <- FALSE
   if (nrow(cambios) > 0) {
     islas_2011    <- sapply(cartografia@polygons, function(x) length(x@Polygons))
     sc_islas_2011 <- cartografia@data[which(islas_2011 != 1), "seccion"]
@@ -277,6 +278,15 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     } else {
       cambios[, incluido := no_11 == TRUE | distan_T]
       cambios_copy <- copy(cambios)
+      cambios <- cambios[incluido == TRUE]
+    }
+    if (modo == "manual") {
+      cambios_m <- cambios_copy[seq_len(length(sc1))]
+      cambios_m$sc_ref <- sc1
+      cambios_m$sc_new <- sc2
+      cambios_m$manual <- TRUE
+      cambios_m$incluido <- TRUE
+      cambios_copy <- rbindlist(cambios_copy, cambios_m)
       cambios <- cambios[incluido == TRUE]
     }
 
