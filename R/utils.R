@@ -24,57 +24,57 @@ filtrar_ein_esn <- function(datos) {
 
 #' @title Funcion para detectar cambios de seccionado en trameros
 #'
-#' @description Detecta cambios de sección censal para las provincias y el
-#'   período marcados.
+#' @description Detecta cambios de secciï¿½n censal para las provincias y el
+#'   perï¿½odo marcados.
 #'
-#' @param datos Objeto de clase \code{tramero_ine} (devuelto por la función
-#'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al año 2011.
-#' @param years Vector numérico de longitud >= 2 con los años para los que se
+#' @param datos Objeto de clase \code{tramero_ine} (devuelto por la funciï¿½n
+#'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al aï¿½o 2011.
+#' @param years Vector numï¿½rico de longitud >= 2 con los aï¿½os para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param catastro Carácter. Argumento opcional (nulo por defecto): ruta hasta
-#'   el archivo alfanumérico con la información catastral completa de un
+#' @param catastro Carï¿½cter. Argumento opcional (nulo por defecto): ruta hasta
+#'   el archivo alfanumï¿½rico con la informaciï¿½n catastral completa de un
 #'   municipio.
 #'
 #' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2016), catastro =
 #'   NULL)
 #'
-#' @details El tiempo de ejecución de la función varía según el número de
-#'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
-#'   de computación es mediante la ejecución en paralelo de la función.
+#' @details El tiempo de ejecuciï¿½n de la funciï¿½n varï¿½a segï¿½n el nï¿½mero de
+#'   provincias y el rango de aï¿½os. La forma mï¿½s sencilla de acelerar el proceso
+#'   de computaciï¿½n es mediante la ejecuciï¿½n en paralelo de la funciï¿½n.
 #'
-#'   Los códigos de sección censal siguen un orden preestablecido: los primeros
-#'   dos dígitos identifican la provincia, los siguientes tres dígitos el
-#'   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
-#'   hacen referencia a la sección censal.
+#'   Los cï¿½digos de secciï¿½n censal siguen un orden preestablecido: los primeros
+#'   dos dï¿½gitos identifican la provincia, los siguientes tres dï¿½gitos el
+#'   municipio, los prï¿½ximos dos dï¿½gitos el distrito y los ï¿½ltimos tres dï¿½gitos
+#'   hacen referencia a la secciï¿½n censal.
 #'
-#'   Si se proporciona un archivo alfanumérico con la información catastral de
-#'   un municipio, la función solo calcula y devuelve los cambios de ese
-#'   municipio, incorporando el número de viviendas y tramos detectados en la
-#'   información catastral.
+#'   Si se proporciona un archivo alfanumï¿½rico con la informaciï¿½n catastral de
+#'   un municipio, la funciï¿½n solo calcula y devuelve los cambios de ese
+#'   municipio, incorporando el nï¿½mero de viviendas y tramos detectados en la
+#'   informaciï¿½n catastral.
 #'
 #'   El archivo de catastro se debe descargar de la
 #'   \href{https://www.sedecatastro.gob.es/OVCFrames.aspx?TIPO=TIT&a=masiv}{sede
-#'   electronica del catastro} (apartado denominado "Descarga de información
-#'   alfanumérica (formato CAT)"), paso que requiere de un certificado digital.
+#'   electronica del catastro} (apartado denominado "Descarga de informaciï¿½n
+#'   alfanumï¿½rica (formato CAT)"), paso que requiere de un certificado digital.
 #'
-#'   En cualquier caso, y como la finalidad de esta función es servir en la
-#'   unión de secciones (función \code{\link{une_secciones}}), aunque se trata
-#'   de un argumento opcional es muy recomendable aportar la información
+#'   En cualquier caso, y como la finalidad de esta funciï¿½n es servir en la
+#'   uniï¿½n de secciones (funciï¿½n \code{\link{une_secciones}}), aunque se trata
+#'   de un argumento opcional es muy recomendable aportar la informaciï¿½n
 #'   catastral, pues resulta imprescindible a la hora de decidir si ha de
-#'   realizarse la unión de dos o más secciones.
+#'   realizarse la uniï¿½n de dos o mï¿½s secciones.
 #'
-#' @return Si no se proporciona un fichero con información catastral, la funcion
+#' @return Si no se proporciona un fichero con informaciï¿½n catastral, la funcion
 #'   devuelve un objeto de clase \code{cambios_ine} con 5 columnas:
-#'   \item{sc_ref}{Código de la sección censal en el primer año.}
-#'   \item{sc_new}{Código de la sección censal en el segundo año.}
-#'   \item{year}{Primer año.} \item{year2}{Segundo año.} \item{vias}{Lista con
-#'   el código de las vías que provocan el cambio de sección (incorporando un
-#'   dígito al final de la cadena indicando si se trata de numeración par (0) o
+#'   \item{sc_ref}{Cï¿½digo de la secciï¿½n censal en el primer aï¿½o.}
+#'   \item{sc_new}{Cï¿½digo de la secciï¿½n censal en el segundo aï¿½o.}
+#'   \item{year}{Primer aï¿½o.} \item{year2}{Segundo aï¿½o.} \item{vias}{Lista con
+#'   el cï¿½digo de las vï¿½as que provocan el cambio de secciï¿½n (incorporando un
+#'   dï¿½gito al final de la cadena indicando si se trata de numeraciï¿½n par (0) o
 #'   impar(1))}.
 #'
-#'   Si se proporciona un archivo con información catastral de un municipio, la
-#'   función solo calcula los cambios para ese municipio y devuelve, ademas de
-#'   los campos del anterior supuesto, el número de viviendas afectadas por cada
+#'   Si se proporciona un archivo con informaciï¿½n catastral de un municipio, la
+#'   funciï¿½n solo calcula los cambios para ese municipio y devuelve, ademas de
+#'   los campos del anterior supuesto, el nï¿½mero de viviendas afectadas por cada
 #'   cambio y el porcentaje de tramos identificados en el archivo catastral.
 #'
 #'
@@ -83,11 +83,11 @@ filtrar_ein_esn <- function(datos) {
 #' \dontrun{
 #'   library(medear)
 #'   trameros <- descarga_trameros(cod_provincia = c("51", "52"))
-#'   # Sin información catastral
+#'   # Sin informaciï¿½n catastral
 #'   cambios  <- detecta_cambios(datos = trameros)
 #'   cambios
 #'
-#'   # Con información catastral para la ciudad de Castellón de la Plana
+#'   # Con informaciï¿½n catastral para la ciudad de Castellï¿½n de la Plana
 #'   # (el nombre del archivo puede variar)
 #'   trameros <- descarga_trameros(cod_provincia = "12")
 #'   cambios  <- detecta_cambios(datos = trameros, catastro = "12_900_U_2018-01-19.CAT")
@@ -206,14 +206,14 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
 
 #' @title Carga los datos privados de poblacion para el proyecto MEDEA3
 #'
-#' @description Algunos datos del proyecto MEDEA3 están encriptados para poder
-#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
-#'   los desencripta y añade a los datos públicos (resto de años), adjuntando el
+#' @description Algunos datos del proyecto MEDEA3 estï¿½n encriptados para poder
+#'   cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta funciï¿½n
+#'   los desencripta y aï¿½ade a los datos pï¿½blicos (resto de aï¿½os), adjuntando el
 #'   resultado al entorno global.
 #'
-#' @details La contraseña no se almacena en el historial.
+#' @details La contraseï¿½a no se almacena en el historial.
 #'
-#' @param key Cadena de carácteres con la contraseña.
+#' @param key Cadena de carï¿½cteres con la contraseï¿½a.
 #' @return No se devuelve nada.
 #'
 #' @usage carga_datos(key)
@@ -225,7 +225,7 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
 #' @examples
 #'
 #' \dontrun{
-#'   carga_datos(key = "contraseña")
+#'   carga_datos(key = "contraseï¿½a")
 #' }
 #'
 #' @encoding UTF-8
@@ -514,7 +514,7 @@ calcula_viviendas <- function(tramero_cambios, catastro_finca) {
         ][]
       tramero[, V1 := .(lapply(V1, unique))]
 
-      # Conservar las vías con portales asociados
+      # Conservar las vï¿½as con portales asociados
       tramero <- tramero[which(sapply(V1, length) != 0)]
 
       # Retirar palabras de tres o menos caracteres

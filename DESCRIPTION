@@ -6,11 +6,11 @@ Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
     person("Carlos", "Vergara-Hernandez", email = "carlos.vergara@uv.es", role = c("aut", "cre"))
     )
-Maintainer: Carlos Vergara-Hernández <carlos.vergara@uv.es>
-Description: Descarga, manipulación y extracción de poblaciones desde 1996 a 2016
-    por sección censal, de acuerdo con los datos del INE, incluyendo la cartografía
-    asociada al año 2011. Incluye rutinas de geocodificado, unión de secciones 
-    censales a lo largo del período de estudio, y otras funcionalidades del proyecto.
+Maintainer: Carlos Vergara-Hernï¿½ndez <carlos.vergara@uv.es>
+Description: Descarga, manipulaciï¿½n y extracciï¿½n de poblaciones desde 1996 a 2016
+    por secciï¿½n censal, de acuerdo con los datos del INE, incluyendo la cartografï¿½a
+    asociada al aï¿½o 2011. Incluye rutinas de geocodificado, uniï¿½n de secciones 
+    censales a lo largo del perï¿½odo de estudio, y otras funcionalidades del proyecto.
 Depends: R (>= 3.3.0)
 License: MIT + file LICENSE
 Encoding: latin1
