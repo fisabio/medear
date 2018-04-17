@@ -7,7 +7,7 @@
 \usage{
 une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia =
-  100)
+  100, modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
@@ -38,6 +38,23 @@ secciones. Por defecto se fija en 100 metros. En algunos casos
 (principalmente en ciudades donde no haya problemas con pedanías que
 compartan nombres de vía con el núcleo urbano principal) puede ser
 conveniente aumentar este parámetro.}
+
+\item{modo}{Carácter: Modalidad de la unión (\code{auto} o \code{manual}), por
+defecto \code{auto}. Si se escoge el modo \code{auto} la función detectará
+los cambios que conllevan una unión de secciones según los parámetros que
+el usuario haya elegido; si se escoge el modo \code{manual}, además de
+realizar todo el proceso que involucra el otro modo, se permite al usuario
+incluir uniones que el modo \code{auto} puede haber pasado por alto,
+realizando uniones de seccionado 1-1 mediante los argumentos \code{sc1} y
+\code{sc2}.}
+
+\item{sc1}{Vector de caracteres: Primer bloque de secciones a unir
+manualmente, vacío por defecto. Si se proporciona debe tener la misma
+longitud que \code{sc2}.}
+
+\item{sc2}{Vector de caracteres: Segundo bloque de secciones a unir
+manualmente, vacío por defecto. Si se proporciona debe tener la misma
+longitud que \code{sc1}.}
 }
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de
@@ -211,7 +228,8 @@ La función trabaja con la siguiente dinámica:
 
   nrow(union_con_cat$cartografia) # 466 secciones
   length(unique(union_con_cat$poblacion$seccion)) # 478 secciones
-  round(nrow(union_con_cat$cartografia) / nrow(cartografia_se) * 100) # Conserva el 88 \\\% de secciones
+  round(nrow(union_con_cat$cartografia) / nrow(cartografia_se) * 100)
+  # Conserva el 88 \\\% de secciones
 
   ## POR COMPLETAR ##
 

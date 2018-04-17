@@ -2,146 +2,160 @@
 #' @title Une los cambios del seccionado del INE
 #'
 #' @description Une los cambios del seccionado del INE (tomando como referencia
-#'   la cartografï¿½a INE 2011), adaptando a su vez las poblaciones por sexo aï¿½o y
-#'   secciï¿½n censal. Si el archivo de cambios incorpora informaciï¿½n catastral
-#'   (nï¿½mero de viviendas afectada por cada cambio de secciï¿½n), se puede fijar
+#'   la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
+#'   sección censal. Si el archivo de cambios incorpora información catastral
+#'   (número de viviendas afectada por cada cambio de sección), se puede fijar
 #'   un umbral de cambio (\%) para rechazar aquellos cambios que involucren a
 #'   muy pocas viviendas.
 #'
-#' @details La funciï¿½n trabaja con la siguiente dinï¿½mica:
+#' @details La función trabaja con la siguiente dinámica:
 #'
-#'   \itemize{ \item Filtrado del archivo de cambios segï¿½n el rango de aï¿½os
+#'   \itemize{ \item Filtrado del archivo de cambios según el rango de años
 #'   escogido. \item Para cada cambio, si ambas secciones existen en la
-#'   cartografï¿½a proporcionada se calculan las distancias (en metros) entre
+#'   cartografía proporcionada se calculan las distancias (en metros) entre
 #'   ellas. \item Si se ha decidido utilizar el filtro de catastro, se calcula
-#'   el porcentaje de viviendas implicadas en cada cambio (opciï¿½n no disponible
+#'   el porcentaje de viviendas implicadas en cada cambio (opción no disponible
 #'   para Euskadi y Navarra), y se procede al filtrado del archivo de cambios
-#'   segï¿½n el umbral escogido en la llamada a la funciï¿½n, asegurando siempre la
+#'   según el umbral escogido en la llamada a la función, asegurando siempre la
 #'   presencia de aquellos cambios que implequen a secciones que no existan en
-#'   la cartografï¿½a proporcionada, y restringiendo el filtrado a secciones que
-#'   disten menos de 100 metros entre sï¿½. \item  En caso de no utilizar el
+#'   la cartografía proporcionada, y restringiendo el filtrado a secciones que
+#'   disten menos de 100 metros entre sí. \item  En caso de no utilizar el
 #'   filtro de catastro, se filtra el archivo de cambios asegurando siempre la
 #'   presencia de aquellos cambios que implequen a secciones que no existan en
-#'   la cartografï¿½a proporcionada, y restringiendo el filtrado a secciones que
-#'   disten menos de 100 metros entre sï¿½. \item Una vez que se dispone del
+#'   la cartografía proporcionada, y restringiendo el filtrado a secciones que
+#'   disten menos de 100 metros entre sí. \item Una vez que se dispone del
 #'   archivo de cambios definitivo, se crean las agrupaciones de secciones, y se
-#'   realiza la uniï¿½n de las mismas en la cartografï¿½a. \item Si se proporciona
-#'   un archivo de poblaciones, se agrega la poblaciï¿½n empleando las mismas
+#'   realiza la unión de las mismas en la cartografía. \item Si se proporciona
+#'   un archivo de poblaciones, se agrega la población empleando las mismas
 #'   agrupaciones de secciones del punto previo.}
 #'
-#'   No obstante, y dado que la funciï¿½n asume que el callejero, el archivo de
-#'   poblaciones y la cartografï¿½a estï¿½n libres de errores. Como puede
-#'   imaginarse, esto no es asï¿½, de modo que la funciï¿½n puede comportarse de
+#'   No obstante, y dado que la función asume que el callejero, el archivo de
+#'   poblaciones y la cartografía están libres de errores. Como puede
+#'   imaginarse, esto no es así, de modo que la función puede comportarse de
 #'   forma inestable en dos supuestos:
 #'
-#'   \enumerate{ \item Cuando se quiera unir cambios no solo en la cartografï¿½a
-#'   sino tambiï¿½n en los datos de poblaciï¿½n, puede aparecer un comportamiento
-#'   inestable de la funciï¿½, debido a divergencias existentes en la informaciï¿½n
-#'   contenida en los datos de poblaciï¿½n y en los trameros (que es desde donde
-#'   se crea el listado de cambios de secciï¿½n), a pesar de que en ambos casos la
-#'   fuente de informaciï¿½n es el propio INE.
+#'   \enumerate{ \item Cuando se quiera unir cambios no solo en la cartografía
+#'   sino también en los datos de población, puede aparecer un comportamiento
+#'   inestable de la funció, debido a divergencias existentes en la información
+#'   contenida en los datos de población y en los trameros (que es desde donde
+#'   se crea el listado de cambios de sección), a pesar de que en ambos casos la
+#'   fuente de información es el propio INE.
 #'
-#'   Lo anterior se traduce en que, para determinadas consultas, el nï¿½mero de
-#'   secciones contenidas en los datos de cartografï¿½a y poblaciones no serï¿½ el
-#'   mismo. Cuando esto pase (si pasa) la funciï¿½n devolverï¿½ un aviso, indicando
-#'   quï¿½ secciones se ven afectadas y en quï¿½ aï¿½os, de forma que el usuario pueda
-#'   tratar de solucionarlo por su cuenta, aunque no hay una soluciï¿½n perfecta.
+#'   Lo anterior se traduce en que, para determinadas consultas, el número de
+#'   secciones contenidas en los datos de cartografía y poblaciones no será el
+#'   mismo. Cuando esto pase (si pasa) la función devolverá un aviso, indicando
+#'   qué secciones se ven afectadas y en qué años, de forma que el usuario pueda
+#'   tratar de solucionarlo por su cuenta, aunque no hay una solución perfecta.
 #'
-#'   Las dos soluciones mï¿½s efectivas (aunque son soluciones \emph{ad hoc} y
-#'   recae en el usuario encontrar la mï¿½s apropiada para su consulta concreta)
+#'   Las dos soluciones más efectivas (aunque son soluciones \emph{ad hoc} y
+#'   recae en el usuario encontrar la más apropiada para su consulta concreta)
 #'   que se han encontrado son:
 #'
 #'   \itemize{ \item modificar los criterios temporales de la consulta,
-#'   ampliando o reduciendo el marco temporal (p. ej., pasar de un perï¿½odo
+#'   ampliando o reduciendo el marco temporal (p. ej., pasar de un período
 #'   2001:2015 a 1996:2015 o 2002:2014); \item consultar las secciones
-#'   problemï¿½ticas (accesibles mediante la consulta \code{attr(objeto_devuelto,
-#'   "sc_not_in_cartografia")}) en los datos de poblaciï¿½n y, en base al archivo
-#'   de cambios de secciï¿½n, decidir con quï¿½ secciï¿½n se deberï¿½a realizar la
-#'   uniï¿½n.}
+#'   problemáticas (accesibles mediante la consulta \code{attr(objeto_devuelto,
+#'   "sc_not_in_cartografia")}) en los datos de población y, en base al archivo
+#'   de cambios de sección, decidir con qué sección se debería realizar la
+#'   unión.}
 #'
-#'   \item Por otra parte, es posible encontrar vï¿½as que aparecen literalmente
-#'   "de la nada", especialmente en barrios de nueva creaciï¿½n o gran expansiï¿½n.
-#'   El proceso de detecciï¿½n de cambios de secciï¿½n (funciï¿½n
+#'   \item Por otra parte, es posible encontrar vías que aparecen literalmente
+#'   "de la nada", especialmente en barrios de nueva creación o gran expansión.
+#'   El proceso de detección de cambios de sección (función
 #'   \code{\link{detecta_cambios}}) compara las secciones a las que se asigna
 #'   cada tramo del callejero de 2011, con las secciones a las que se asignan
 #'   esos mismos tramos (u otros pero contengan portales asociados a los tramos
-#'   previos) en los callejeros del resto de aï¿½os.
+#'   previos) en los callejeros del resto de años.
 #'
-#'   No obstante, esto plantea un problema en la detecciï¿½n de cambios al
-#'   considerar la apariciï¿½n de vï¿½as completamente nuevas, puesto que la
-#'   comparaciï¿½n 2011-otros aï¿½os no es posible. En esos casos, y siempre que no
-#'   haya uniones adicionales que resuelvan el problema por sï¿½ solo, el archivo
-#'   de poblaciones tras la uniï¿½n contendrï¿½ valores iguales a uno en todas las
-#'   categorï¿½as de edad para los aï¿½os anteriores a la creaciï¿½n de la vï¿½a.
-#'   Nuevamente, cuando esto pase (si pasa) la funciï¿½n devolverï¿½ un aviso,
-#'   indicando quï¿½ secciones se ven afectadas y en quï¿½ aï¿½os, de forma que el
+#'   No obstante, esto plantea un problema en la detección de cambios al
+#'   considerar la aparición de vías completamente nuevas, puesto que la
+#'   comparación 2011-otros años no es posible. En esos casos, y siempre que no
+#'   haya uniones adicionales que resuelvan el problema por sí solo, el archivo
+#'   de poblaciones tras la unión contendrá valores iguales a uno en todas las
+#'   categorías de edad para los años anteriores a la creación de la vía.
+#'   Nuevamente, cuando esto pase (si pasa) la función devolverá un aviso,
+#'   indicando qué secciones se ven afectadas y en qué años, de forma que el
 #'   usuario pueda tratar de solucionarlo por su cuenta.
 #'
-#'   La soluciï¿½n a este problema es similar al lo anteriormente expuesto: por un
-#'   lado se puede variar el rango de aï¿½os, y por otro tratar de solucionarlo
-#'   manualmente consultando el archivo de cambios de secciï¿½n y el de
+#'   La solución a este problema es similar al lo anteriormente expuesto: por un
+#'   lado se puede variar el rango de años, y por otro tratar de solucionarlo
+#'   manualmente consultando el archivo de cambios de sección y el de
 #'   poblaciones, buscando las secciones que devuelva la consulta
 #'   \code{attr(resultado, "pob_igual_uno")}.}
 #'
-#'   En el apartado de ejemplos se desarrollarï¿½n los abordajes a estos
-#'   problemas, con un tratamiento mï¿½s extenso en la viï¿½eta de uniï¿½n de
-#'   seccionado (aï¿½n por elaborar).
+#'   En el apartado de ejemplos se desarrollarán los abordajes a estos
+#'   problemas, con un tratamiento más extenso en la viñeta de unión de
+#'   seccionado (aún por elaborar).
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}.
 #' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}}, y con
 #'   datos de clase \code{cartografia_ine}.
-#' @param years Vector numï¿½rico de longitud >= 1 con los aï¿½os para los que se
-#'   desee consultar las variaciones de seccionado. El aï¿½o 2011 debe figurar
-#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de mï¿½s de un
-#'   aï¿½o).
+#' @param years Vector numérico de longitud >= 1 con los años para los que se
+#'   desee consultar las variaciones de seccionado. El año 2011 debe figurar
+#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
+#'   año).
 #' @param poblacion Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 #'   proporcionar en caso de querer agregar las poblaciones.
-#' @param corte_edad Numï¿½rico: punto de corte para los grupos de edad (85 o
+#' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
-#' @param catastro Lï¿½gico: ï¿½Debe aplicarse el filtro de informaciï¿½n catastral?
+#' @param catastro Lógico: ¿Debe aplicarse el filtro de información catastral?
 #'   Por defecto \code{catastro = FALSE}.
-#' @param umbral_vivienda Numï¿½rico: porcentaje de viviendas afectadas en el
-#'   cambio de secciï¿½n. Solo se utiliza si \code{catastro = TRUE}. Por defecto
+#' @param umbral_vivienda Numérico: porcentaje de viviendas afectadas en el
+#'   cambio de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto
 #'   se fija al 5 \%.
-#' @param distancia Numï¿½rico: Mï¿½xima distancia (en metros) de separaciï¿½n entre
+#' @param distancia Numérico: Máxima distancia (en metros) de separación entre
 #'   secciones. Por defecto se fija en 100 metros. En algunos casos
-#'   (principalmente en ciudades donde no haya problemas con pedanï¿½as que
-#'   compartan nombres de vï¿½a con el nï¿½cleo urbano principal) puede ser
-#'   conveniente aumentar este parï¿½metro.
+#'   (principalmente en ciudades donde no haya problemas con pedanías que
+#'   compartan nombres de vía con el núcleo urbano principal) puede ser
+#'   conveniente aumentar este parámetro.
+#' @param modo Carácter: Modalidad de la unión (\code{auto} o \code{manual}), por
+#'   defecto \code{auto}. Si se escoge el modo \code{auto} la función detectará
+#'   los cambios que conllevan una unión de secciones según los parámetros que
+#'   el usuario haya elegido; si se escoge el modo \code{manual}, además de
+#'   realizar todo el proceso que involucra el otro modo, se permite al usuario
+#'   incluir uniones que el modo \code{auto} puede haber pasado por alto,
+#'   realizando uniones de seccionado 1-1 mediante los argumentos \code{sc1} y
+#'   \code{sc2}.
+#' @param sc1 Vector de caracteres: Primer bloque de secciones a unir
+#'   manualmente, vacío por defecto. Si se proporciona debe tener la misma
+#'   longitud que \code{sc2}.
+#' @param sc2 Vector de caracteres: Segundo bloque de secciones a unir
+#'   manualmente, vacío por defecto. Si se proporciona debe tener la misma
+#'   longitud que \code{sc1}.
 #'
 #' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
 #'   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia =
-#'   100)
+#'   100, modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
 #'
-#' @return El resultado devuelto varï¿½a en funciï¿½n de si se proporcionan datos de
+#' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
 #'   \code{cartografia_ine} y \code{\link[sp]{SpatialPolygonsDataFrame}} con la
-#'   cartografï¿½a, donde cada fila es una secciï¿½n censal y que cuenta con 9
-#'   columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el cï¿½digo de
-#'   secciï¿½n censal (incluye provincia, municipio y distrito).}
-#'   \item{CUMUN}{Cadena de 5 caracteres con el cï¿½digo del municipio (incluye
-#'   provincia).} \item{CCA}{Cadena de 2 caracteres con el cï¿½digo de comunidad
-#'   autï¿½noma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
-#'   comunidad autï¿½noma.} \item{NMUN}{Nombre del municipio.}
-#'   \item{geometry}{Columna de tipo lista con la geometrï¿½a asociada a cada
-#'   secciï¿½n censal.} \item{cluster_id}{Cï¿½digo de identificaciï¿½n del cluster de
-#'   uniones.} \item{sc_unida}{Cï¿½digo de las secciones unidas.}}
+#'   cartografía, donde cada fila es una sección censal y que cuenta con 9
+#'   columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el código de
+#'   sección censal (incluye provincia, municipio y distrito).}
+#'   \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
+#'   provincia).} \item{CCA}{Cadena de 2 caracteres con el código de comunidad
+#'   autónoma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
+#'   comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
+#'   \item{geometry}{Columna de tipo lista con la geometría asociada a cada
+#'   sección censal.} \item{cluster_id}{Código de identificación del cluster de
+#'   uniones.} \item{sc_unida}{Código de las secciones unidas.}}
 #'
 #'   En caso de proporcionan poblaciones, se devuelve una lista de longitud
-#'   igual a dos, donde el primer elemento es la cartografï¿½a descrita
+#'   igual a dos, donde el primer elemento es la cartografía descrita
 #'   anteriormente y el segundo elemento de la lista es un objeto de clase
 #'   \code{poblaciones_ine} donde las filas representan las distintas secciones
-#'   censales. Las tres primeras columnas son: \describe{\item{seccion}{Cï¿½digo
-#'   de la secciï¿½n censal.} \item{sexo}{Sexo de la poblaciï¿½n (0 = masculino; 1 =
-#'   femenino).} \item{year}{Aï¿½o de referencia.}} El resto de columnas
+#'   censales. Las tres primeras columnas son: \describe{\item{seccion}{Código
+#'   de la sección censal.} \item{sexo}{Sexo de la población (0 = masculino; 1 =
+#'   femenino).} \item{year}{Año de referencia.}} El resto de columnas
 #'   representan los distintos grupos de edad, tras realizar el corte en los
 #'   grupos de edad (85 0 100).
 #'
 #' @examples
 #'
 #' \dontrun{
-#'   # En este ejemplo se trabaja con la ciudad de Sevilla (cï¿½digo ine: 41091)
-#'   # en los aï¿½os 2004-2015
+#'   # En este ejemplo se trabaja con la ciudad de Sevilla (código ine: 41091)
+#'   # en los años 2004-2015
 #'
 #'   library(medear)
 #'   data("poblacion")
@@ -169,12 +183,12 @@
 #'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_se) * 100) #
 #'   Conserva el 76 \% de secciones
 #'
-#'   # La funciï¿½n avisa acerca de divergencias en el seccionado entre
-#'   cartografï¿½a y el archivo de poblaciones. # Las secciones afectadas son
+#'   # La función avisa acerca de divergencias en el seccionado entre
+#'   cartografía y el archivo de poblaciones. # Las secciones afectadas son
 #'   accesibles mediante la siguiente consulta:
-#'   attributes(union_con_cat)$sc_not_in_cartografia # 12 SC problemï¿½ticas
+#'   attributes(union_con_cat)$sc_not_in_cartografia # 12 SC problemáticas
 #'
-#'   # En este caso, se resolverï¿½ la primera incidencia (SC 4109102089).
+#'   # En este caso, se resolverá la primera incidencia (SC 4109102089).
 #'   sc_problematica <- attributes(union_con_cat)$sc_not_in_cartografia[1]
 #'
 #'   ## POR COMPLETAR ##
@@ -196,7 +210,8 @@
 #'
 #'   nrow(union_con_cat$cartografia) # 466 secciones
 #'   length(unique(union_con_cat$poblacion$seccion)) # 478 secciones
-#'   round(nrow(union_con_cat$cartografia) / nrow(cartografia_se) * 100) # Conserva el 88 \% de secciones
+#'   round(nrow(union_con_cat$cartografia) / nrow(cartografia_se) * 100)
+#'   # Conserva el 88 \% de secciones
 #'
 #'   ## POR COMPLETAR ##
 #'
@@ -212,7 +227,7 @@
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
                           poblacion = NULL, corte_edad = 85, catastro = FALSE,
                           umbral_vivienda = 5, distancia = 100,
-                          modo = c("auto", "manual"), sc1, sc2) {
+                          modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL) {
   modo <- match.arg(modo)
   if (!"cambios_ine" %in% class(cambios))
     stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
@@ -232,18 +247,37 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   stopifnot(is.numeric(distancia))
   stopifnot(is.logical(catastro))
   stopifnot(any(cambios$sc_ref %in% cartografia$seccion))
-  stopifnot(!is.null(poblacion) && any(cambios$sc_ref %in% poblacion$seccion))
-  stopifnot(is.character(c(sc1, sc2)))
+  if (!is.null(poblacion)) stopifnot(any(cambios$sc_ref %in% poblacion$seccion))
+  if (modo == "manual") stopifnot(!is.null(sc1))
+  stopifnot(length(sc1) == length(sc2))
+  if (!is.null(sc1)) stopifnot(is.character(c(sc1, sc2)))
 
   if ("vias" %in% names(cambios)) cambios$vias <- NULL
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
   utils::data("secciones")
-
-  secciones_2011 <- secciones[
-    year == 2011 & substr(seccion, 1, 5) %in% cambios[, substr(sc_ref, 1, 5)]
-  ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
-  cambios$manual <- FALSE
+
+  tmp1 <- tmp2 <- list()
+  secciones[, tmp := FALSE]
+  for (i in years) {
+    tmp1[[paste(i)]] <- unique(secciones[year == i, seccion])
+  }
+  tmp2[[paste(last(years))]] <- secciones[year == last(years)][, tmp := TRUE]
+  for (i in years[years != last(years)]) {
+    tmp2[[paste(i)]] <- secciones[year == i]
+    tmp2[[paste(i)]][!tmp1[[paste(i)]] %in% tmp1[[paste(i + 1)]] == TRUE, tmp := TRUE]
+  }
+  secciones <- rbindlist(tmp2)
+  secciones[, final := last(years)]
+  secciones[tmp == TRUE, final := as.integer(year)]
+  secciones[, tmp := NULL]
+  sc_pob_conservar <- secciones[between(final, 2012, max(year) - 1), seccion]
+  secciones_2011   <- secciones[
+    year == 2011 & substr(seccion, 1, 5) %in% cambios[, substr(sc_ref, 1, 5)]
+    ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
+
+  cambios$modo   <- "auto"
+
   if (nrow(cambios) > 0) {
     islas_2011    <- sapply(cartografia@polygons, function(x) length(x@Polygons))
     sc_islas_2011 <- cartografia@data[which(islas_2011 != 1), "seccion"]
@@ -262,7 +296,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         cambios$no_11[i] <- TRUE
       }
     }
-    cambios[, distan_T := (dista < distancia | is.na(dista))]
+    cambios[, distan_T := (dista <= distancia | is.na(dista))]
 
     if (catastro) {
       for (i in seq_len(nrow(cambios))) {
@@ -278,16 +312,36 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     } else {
       cambios[, incluido := no_11 == TRUE | distan_T]
       cambios_copy <- copy(cambios)
-      cambios <- cambios[incluido == TRUE]
+      cambios      <- cambios[incluido == TRUE]
     }
+
+    sc_pob_conservar <- cambios_copy[
+      (sc_ref %in% sc_pob_conservar | sc_new %in% sc_pob_conservar) &
+        year2 > 2011
+    ]
+    cambios <- unique(rbindlist(list(cambios, sc_pob_conservar)))
+
     if (modo == "manual") {
       cambios_m <- cambios_copy[seq_len(length(sc1))]
-      cambios_m$sc_ref <- sc1
-      cambios_m$sc_new <- sc2
-      cambios_m$manual <- TRUE
-      cambios_m$incluido <- TRUE
-      cambios_copy <- rbindlist(cambios_copy, cambios_m)
-      cambios <- cambios[incluido == TRUE]
+      cambios_m[, `:=`(
+        sc_ref     = sc1,
+        sc_new     = sc2,
+        year       = NA_integer_,
+        year2      = NA_integer_,
+        viviendas  = NA_integer_,
+        tramo_por  = NA_real_,
+        modo       = "manual",
+        no_11      = NA,
+        dista      = NA_real_,
+        distan_T   = NA,
+        viv_ref    = NA_integer_,
+        cambio_ref = NA_real_,
+        umbral     = NA_real_,
+        umbral_T   = NA,
+        incluido   = TRUE
+      )]
+      cambios_copy <- rbindlist(list(cambios_copy, cambios_m))
+      cambios      <- rbindlist(list(cambios, cambios_m))
     }
 
     sc_unicas <- sort(
@@ -336,11 +390,12 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     all_sc_islas   <- strsplit(cartografia@data[islas_union, "cluster_id"], "-")
     sc_comparacion <- ifelse(length(sc_islas_2011) == 0, TRUE, FALSE)
     if (!sc_comparacion & length(sc_islas_union) > 0) {
-      sc_comparacion <- sapply(all_sc_islas, function(x) any(x %in% sc_islas_2011))
+      sc_comparacion <- lapply(all_sc_islas, function(x) ifelse(is.na(x), TRUE, any(x %in% sc_islas_2011)))
     }
-    if ((length(sc_islas_union) > 0 & (length(sc_islas_union) > length(sc_islas_2011))) | any(!sc_comparacion)) {
-      if (all(length(all_sc_islas) > 0, length(sc_islas_2011) > 0)) {
-        islas_alerta <- sc_islas_union[!sc_comparacion]
+    if ((length(sc_islas_union) > 0 & (length(sc_islas_union) > length(sc_islas_2011))) |
+        any(!sapply(sc_comparacion, any))) {
+      if (all(any(sapply(all_sc_islas, length) > 0), length(sc_islas_2011) > 0)) {
+        islas_alerta <- sc_islas_union[!sapply(sc_comparacion, any)]
       } else if (length(all_sc_islas) > 0) {
         islas_alerta <- sc_islas_union
       }
@@ -443,7 +498,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
     if (any(uno_vect)) {
       warning(
-        "En el per\u00edodo seleccionado algunas secciones no sufrieron cambios pero ",
+        "En el per\u00edodo seleccionado las secciones c('", paste0(unique(poblacion$seccion[uno_vect]), collapse = "', '"), "') no sufrieron cambios pero ",
         "aparecieron m\u00e1s tarde que el a\u00f1o de inicio elegido. Se asigna el valor 1 como ",
         "poblaci\u00f3n a dichas secciones para los a\u00f1os previos (hasta el a\u00f1o de inicio fijado).\n",
         "Por favor, consulte la ayuda de la funci\u00f3n para explorar este aspecto.",
