@@ -27,9 +27,6 @@
 #'   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
 #'   la sección censal.
 #'
-#' @param ... Parámetros adicionales en la lectura de datos (no es necesario su
-#'   uso).
-#'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
 #'   c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
 #'   = 10)
