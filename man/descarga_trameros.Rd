@@ -28,9 +28,6 @@ en el directorio oculto \code{./.trameros/} dentro del directorio de
 trabajo?}
 
 \item{ntries}{Valor numérico: número de intentos en caso de mala conexión.}
-
-\item{...}{Parámetros adicionales en la lectura de datos (no es necesario su
-uso).}
 }
 \value{
 Un objeto de clase \code{tramero_ine} con 11 columnas:
