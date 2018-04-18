@@ -1,9 +1,9 @@
 
 #' @title Datos de poblacion por seccion censal para las ciudades MEDEA3
-#'   (periodo 2006-2016)
+#'   (periodo 2004-2015)
 #'
 #' @description Datos de población por sexo (0=Hombres, 1=Mujeres), edad (grupos
-#'   quinquenales) y año (periodo 2006-2016) a nivel de sección censal para las
+#'   quinquenales) y año (periodo 2004-2015) a nivel de sección censal para las
 #'   ciudades de MEDEA3. Estos datos han sido descargados de la web del INE, que
 #'   los publica de forma libre, y se pueden obtener usando la función
 #'   \code{\link{descarga_poblaciones}} de este paquete.
@@ -26,8 +26,8 @@
 #'   forma que los años anteriores.
 #'
 #'   El paquete \code{medear} dispone también de los datos para todo el periodo
-#'   1996-2016 pero estos están encriptados ya que los datos para el periodo
-#'   1996-2005 son propiedad del INE, que han sido adquiridos para uso exclusivo
+#'   1996-2015 pero estos están encriptados ya que los datos para el periodo
+#'   1996-2003 son propiedad del INE, que han sido adquiridos para uso exclusivo
 #'   del proyecto MEDEA3. Estos datos son accesibles mediante la función
 #'   \code{\link{carga_datos}} que necesita una contraseña de desencriptación,
 #'   que se hará disponible a todos los grupos del proyecto MEDEA. La llamada a
@@ -37,7 +37,7 @@
 #'
 #'   Notar que las poblaciones corresponden al seccionado censal de cada año por
 #'   lo que algunas de las secciones censales consideradas pueden no tener
-#'   información para todo el periodo 2006-2016 si es que dicha sección no ha
+#'   información para todo el periodo 2004-2015 si es que dicha sección no ha
 #'   existido durante todo este periodo. Este comentario también aplica a la
 #'   función \code{\link{carga_datos}}.
 #'
@@ -54,10 +54,10 @@
 #'   de edad. Todo objeto de la clase \code{poblaciones_ine} deberá tener este
 #'   formato.
 #'
-#' @references \url{http://www.ine.es/}{ Sitio web del INE}.
+#' @references \href{http://www.ine.es/}{ Sitio web del INE}.
 #'
-#' \url{http://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{
-#' Poblaciones}.
+#'   \href{http://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{
+#'    Poblaciones}.
 #'
 #' @encoding UTF-8
 #'
@@ -101,9 +101,9 @@
 #'   \item{n_viv}{Número de viviendas por sección censal (datos cruzados con
 #'   Dirección General de Catastro).}}
 #'
-#' @references \url{http://www.ine.es/}{ Sitio web del INE}.
+#' @references \href{http://www.ine.es/}{ Sitio web del INE}.
 #'
-#'   \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
+#'   \href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
 #'
 #'
 #' @encoding UTF-8
@@ -147,9 +147,9 @@
 #'   }
 #'
 #' @references
-#'   \url{http://www.ine.es/}{ Sitio web del INE}.
+#'   \href{http://www.ine.es/}{ Sitio web del INE}.
 #'
-#'   \url{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{ Codificación INE}.
+#'   \href{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{ Codificación INE}.
 #'
 #' @keywords datasets
 #'
@@ -164,13 +164,13 @@
 "codigos_ine"
 
 #' @title Cambios temporales de seccionado para todas las ciudades MEDEA3
-#'   (periodo 1996-2016)
+#'   (periodo 1996-2015)
 #'
 #' @description Relación de secciones censales que interseccionan
 #'   geográficamente con el seccionado de 2011, según la definición de dicha
 #'   sección sección censal en ambos años siguiendo el tramero del INE. Este
 #'   objeto contiene todas las intersecciones entre secciones censales distintas
-#'   para el período 1996-2016. Esta información es costosa de calcular y se
+#'   para el período 1996-2015. Esta información es costosa de calcular y se
 #'   necesita para la función \code{\link{une_secciones}} por ello se ha
 #'   considerado conveniente almacenar sus resultados dentro del paquete.
 #'
@@ -209,9 +209,9 @@
 "cambios_seccion"
 
 
-#' @title Secciones censales unicas por periodo (1996-2016)
+#' @title Secciones censales unicas por periodo (1996-2015)
 #'
-#' @description Listado con las secciones censales únicas por año (1996-2016) de
+#' @description Listado con las secciones censales únicas por año (1996-2015) de
 #'   ciudades MEDEA3.
 #'
 #' @name secciones

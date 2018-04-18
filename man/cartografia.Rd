@@ -39,8 +39,8 @@ Contiene la cartografía por sección censal tal cual puede ser
 }
 }
 \references{
-\url{http://www.ine.es/}{ Sitio web del INE}.
+\href{http://www.ine.es/}{ Sitio web del INE}.
 
-  \url{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
+  \href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
 }
 \keyword{datasets}
