@@ -258,6 +258,31 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
 
   if (!is.null(poblacion)) {
+    poblacion <- poblacion[between(year, min(years), max(years))]
+
+    if (!all(unique(poblacion$seccion) %in% unique(secciones$seccion))) {
+      sc_pob_not_sc <- unique(poblacion$seccion)[!unique(poblacion$seccion) %in% unique(secciones$seccion)]
+        secciones <- unique(
+          rbindlist(
+            list(
+              secciones,
+              poblacion[sexo == 0 & seccion %in% sc_pob_not_sc, seccion, by = year]
+            )
+          )
+        )[order(seccion, year)]
+    }
+    if (!all(unique(poblacion$year) %in% unique(secciones$year))) {
+      year_not_sc <- unique(poblacion$year)[!unique(poblacion$year) %in% unique(secciones$year)]
+        secciones <- unique(
+          rbindlist(
+            list(
+              secciones,
+              poblacion[sexo == 0 & year %in% year_not_sc, seccion, by = year]
+            )
+          )
+        )[order(seccion, year)]
+    }
+
     tmp1 <- tmp2 <- list()
     secciones[, tmp := FALSE]
     for (i in years) {
@@ -419,7 +444,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
 
   if (!is.null(poblacion)) {
-    poblacion <- poblacion[between(year, min(years), max(years))]
     poblacion <- elige_corte(poblacion, corte_edad)
     if (nrow(cambios) > 0) {
       poblacion[, cluster := cluster_sc[match(seccion, sc), id_cluster]]
