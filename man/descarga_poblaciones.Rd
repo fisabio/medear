@@ -37,7 +37,7 @@ Un objeto de clase \code{poblaciones_ine} donde las filas representan
 }
 \description{
 Descarga o carga las poblaciones anuales del INE por sección
-  censal, sexo y edad por grupos quinquenales (datos desde 2006).
+  censal, sexo y edad por grupos quinquenales (datos desde 2006 en adelante).
 }
 \details{
 El tiempo de ejecución de la función varía según el número de

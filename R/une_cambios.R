@@ -257,24 +257,26 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   utils::data("secciones")
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
 
-  tmp1 <- tmp2 <- list()
-  secciones[, tmp := FALSE]
-  for (i in years) {
-    tmp1[[paste(i)]] <- unique(secciones[year == i, seccion])
+  if (!is.null(poblacion)) {
+    tmp1 <- tmp2 <- list()
+    secciones[, tmp := FALSE]
+    for (i in years) {
+      tmp1[[paste(i)]] <- unique(secciones[year == i, seccion])
+    }
+    tmp2[[paste(last(years))]] <- secciones[year == last(years)][, tmp := TRUE]
+    for (i in years[years != last(years)]) {
+      tmp2[[paste(i)]] <- secciones[year == i]
+      tmp2[[paste(i)]][!tmp1[[paste(i)]] %in% tmp1[[paste(i + 1)]] == TRUE, tmp := TRUE]
+    }
+    secciones <- rbindlist(tmp2)
+    secciones[, final := last(years)]
+    secciones[tmp == TRUE, final := as.integer(year)]
+    secciones[, tmp := NULL]
+    sc_pob_conservar <- secciones[between(final, 2012, max(year) - 1), seccion]
+    secciones_2011   <- secciones[
+      year == 2011 & substr(seccion, 1, 5) %in% cambios[, substr(sc_ref, 1, 5)]
+      ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
   }
-  tmp2[[paste(last(years))]] <- secciones[year == last(years)][, tmp := TRUE]
-  for (i in years[years != last(years)]) {
-    tmp2[[paste(i)]] <- secciones[year == i]
-    tmp2[[paste(i)]][!tmp1[[paste(i)]] %in% tmp1[[paste(i + 1)]] == TRUE, tmp := TRUE]
-  }
-  secciones <- rbindlist(tmp2)
-  secciones[, final := last(years)]
-  secciones[tmp == TRUE, final := as.integer(year)]
-  secciones[, tmp := NULL]
-  sc_pob_conservar <- secciones[between(final, 2012, max(year) - 1), seccion]
-  secciones_2011   <- secciones[
-    year == 2011 & substr(seccion, 1, 5) %in% cambios[, substr(sc_ref, 1, 5)]
-    ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
 
   cambios$modo   <- "auto"
 

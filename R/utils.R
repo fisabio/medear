@@ -31,12 +31,15 @@ filtrar_ein_esn <- function(datos) {
 #'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al año 2011.
 #' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
+#' @param cod_postal Valor lógico: ¿Debe añadirse el código postal a la vía? Por
+#'   defecto falso, aunque es útil en casos de ciudades con pedanías que tengan
+#'   nombres de vía comunes (a su vez suelen compartir mismo código de vía).
 #' @param catastro Carácter. Argumento opcional (nulo por defecto): ruta hasta
 #'   el archivo alfanumérico con la información catastral completa de un
 #'   municipio.
 #'
-#' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2016), catastro =
-#'   NULL)
+#' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2016), cod_postal =
+#'   FALSE, catastro = NULL)
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -100,7 +103,8 @@ filtrar_ein_esn <- function(datos) {
 #'
 #' @seealso \code{\link{une_secciones}} y \code{\link{descarga_trameros}}.
 #'
-detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = NULL) {
+detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016),
+                            cod_postal = FALSE, catastro = NULL) {
 
   stopifnot("tramero_ine" %in% class(datos))
   stopifnot(is.numeric(years))
@@ -109,17 +113,15 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = 
   stopifnot(years %in% unique(datos$year))
   if (!is.null(catastro)) {
     stopifnot(file.exists(catastro))
-
     catastro_finca  <- lee_catastro(catastro)
-
     stopifnot(unique(catastro_finca$prov_ine) %in% datos$CPRO)
     stopifnot(unique(catastro_finca$muni_ine) %in% datos$CMUM)
-
     datos <- datos[
       CPRO == unique(catastro_finca$prov_ine) &
         CMUM == unique(catastro_finca$muni_ine)
     ]
   }
+  if (cod_postal) datos[, via := paste0(via, CPOS)]
 
   cambios <- list()
   for (i in unique(datos$CPRO)) {
