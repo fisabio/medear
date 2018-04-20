@@ -109,8 +109,13 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016),
   stopifnot("tramero_ine" %in% class(datos))
   stopifnot(is.numeric(years))
   stopifnot(length(years) > 1 & 2011 %in% years)
+  stopifnot(all(c("CPRO", "CMUM", "CVIA", "EIN", "ESN",
+                  "DIST", "SECC", "CPOS", "year") %in% names(datos)))
   stopifnot(2011 %in% unique(datos$year))
   stopifnot(years %in% unique(datos$year))
+
+  datos[, via := paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)]
+
   if (!is.null(catastro)) {
     stopifnot(file.exists(catastro))
     catastro_finca  <- lee_catastro(catastro)

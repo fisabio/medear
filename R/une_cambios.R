@@ -333,7 +333,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       }
       cambios[, umbral := cambio_ref + tramo_por]
       cambios[, umbral_T := umbral >= umbral_vivienda]
-      cambios[, incluido := no_11 == TRUE | (umbral_T & distan_T)]
+      cambios[, incluido := umbral_T == T & (no_11 | distan_T)]
       cambios_copy <- copy(cambios)
       cambios <- cambios[incluido == TRUE]
     } else {
