@@ -325,7 +325,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE, ntries = 10) {
 #'   se debe utilizar la función \code{\link{carga_datos}}.
 #'
 #' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
-#'   = 2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries)
+#'   = 2006:2015, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries = 10)
 #'
 #' @return Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
