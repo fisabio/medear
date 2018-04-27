@@ -342,10 +342,10 @@ lee_catastro <- function(archivo) {
   stopifnot(is.character(archivo))
 
   estructura_finca <- readr::fwf_positions(
-    start     = c(1, 26, 31, 51, 81, 154, 334, 343),
-    end       = c(2, 28, 44, 52, 83, 158, 342, 352),
+    start     = c(1, 26, 31, 51, 81, 154, 334, 343, 672),
+    end       = c(2, 28, 44, 52, 83, 158, 342, 352, 677),
     col_names = c("tipo_reg", "muni_dgc", "ref_cat", "prov_ine", "muni_ine",
-                  "via_dgc", "lng", "lat")
+                  "via_dgc", "lng", "lat", "epsg")
   )
   catastro_finca <- readr::read_fwf(
     file          = archivo,
@@ -388,6 +388,13 @@ lee_catastro <- function(archivo) {
       tvia  = catastro_vivienda$tvia,
       nvia  = catastro_vivienda$nvia,
       npoli = catastro_vivienda$npoli)][]
+  catastro_finca[, c("lng", "lat") := lapply(.SD, function(x)
+    as.numeric(paste0(substr(x, 1, 2), gsub("^(.{2})", ".", x)))
+  ), .SDcols = c("lng", "lat")
+  ]
+  attributes(catastro_finca)$epsg <- max(unique(catastro_finca$epsg))
+  catastro_finca[, c("epsg") := NULL]
+
   class(catastro_finca) <- c(class(catastro_finca), "catastro")
 
   return(catastro_finca)
