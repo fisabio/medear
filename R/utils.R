@@ -604,6 +604,57 @@ descarga_segura <- function(x, tries = 10, ...) {
   )
 }
 
+#' @title Deteccion de agrupaciones de mortalidad a revisar manualmente
+#'
+#' @description Esta función es útil a la hora de comprobar la geocodificación
+#'   de la mortalidad, pues devuelve aquellos puntos con un exceso de
+#'   fallecimientos en relación a la media de sus vecinos más próximos.
+#'
+#' @usage detecta_cluster(datos, epsg = 4326, columnas = c("lng", "lat"),
+#'   vecinos = 10, limite = 1e-20)
+#'
+#' @param datos Base de datos con las coordenadas que ubican cada uno de los
+#'   fallecimientos.
+#' @param epsg Numérico con longitud igual a 1: código EPSG con la proyección de
+#'   las coordenadas de la base de datos.
+#' @param columnas Carácter con longitud igual a 2: nombre de las columnas con
+#'   las coordenadas. Debe respetarse su orden, de forma que primero se indique
+#'   el nombre de la columna con las longitudes y después el de las latitudes.
+#' @param vecinos Numérico con longitud igual a 1: número de vecinos más
+#'   próximos con los que comparar la mortalidad de cada punto.
+#' @param limite Numérico con longitud igual a 1: límite de probabilidad.
+#'
+#' @details La función comienza calculando el número de fallecimientos en cada
+#'   par único de coordenadas (\emph{F}), identifica los \emph{n} vecinos más próximos a cada
+#'   punto y calcula la media de fallecimientos en los mismos (\eqn{\bar{x}}). Considerando que \eqn{F_i \sim Poisson(\bar{x})}, se calcula \eqn{P[F_i < \bar{x}]}.
+#'
+#' @encoding UTF-8
+#'
+#' @export
+detecta_cluster <- function(datos, epsg = 4326, columnas = c("lng", "lat"),
+                            vecinos = 10, limite = 1e-20) {
+  stopifnot(is.numeric(epsg) & length(epsg) == 1)
+  stopifnot(is.character(columnas) & length(columnas) == 2)
+  stopifnot(is.numeric(vecinos) & length(vecinos) == 1)
+  stopifnot(is.numeric(limite) & length(limite) == 1)
+
+  bdd   <- as.data.table(datos[complete.cases(datos[, columnas]), ])
+  grupo <- bdd[, c(columnas), with = FALSE][, .N, by = c(columnas)]
+  for (i in seq_along(columnas)) {
+    set(grupo, j = columnas[i], value = as.numeric(grupo[[columnas[i]]]))
+  }
+  grupo_sp <- copy(grupo)
+  sp::coordinates(grupo_sp) <- as.formula(paste("~", paste(columnas, collapse = " + ")))
+  sp::proj4string(grupo_sp) <- sp::CRS(paste0("+init=epsg:", epsg))
+  knn10 <- nabor::knn(coordinates(grupo_sp), k = vecinos + 1)[[1]][, -1]
+  grupo[, pr := .(lapply(seq_len(nrow(knn10)), function(x) knn10[x, ]))]
+  grupo[, tr := sapply(pr, function(x) as.integer(round(mean(grupo[x, N]))))]
+  grupo[, pr := NULL]
+  grupo[, prob := mapply(function(x, y) stats::ppois(x, y, lower.tail = FALSE), N, tr)]
+
+  return(grupo_sp[grupo$prob < limite, ])
+}
+
 
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
