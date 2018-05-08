@@ -255,7 +255,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   if ("vias" %in% names(cambios)) cambios$vias <- NULL
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-  utils::data("secciones")
+  utils::data("secciones", envir = environment())
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
 
   if (!is.null(poblacion)) {

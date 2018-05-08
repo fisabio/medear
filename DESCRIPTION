@@ -1,7 +1,7 @@
 Package: medear
 Title: Poblaciones y cartografia por seccion censal INE
-Version: 0.3.1.9004
-Date: 2018-05-03
+Version: 0.3.1.9005
+Date: 2018-05-08
 Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
     person("Carlos", "Vergara-Hernandez", email = "vergara_car@gva.es", role = c("aut", "cre"))
@@ -19,12 +19,14 @@ URL: https://github.com/fisabio/medear
 BugReports: https://github.com/fisabio/medear/issues
 Imports:
     caRtociudad (>= 0.5.5),
-    data.table (>= 1.10.4-3),
+    data.table (>= 1.11.0),
     sp (>= 1.2-7),
     ggmap (>= 2.6.1),
+    leaflet (>= 2.0.0),
+    leaflet.extras (>= 1.0.0),
     nabor (>= 0.4.7),
     readr (>= 1.1.1),
-    rgdal (>= 1.2-18),
+    rgdal (>= 1.2-20),
     rgeos (>= 0.3-26),
     sodium (>= 1.1),
     utils (>= 3.3.0),
