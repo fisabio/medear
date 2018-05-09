@@ -696,10 +696,12 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   }
   carto_cl <- cartografia
   limite <- c(1e-10, 1e-15, 1e-20)
+  datos$id_n <- seq_len(nrow(datos))
   if (is.data.table(datos)) {
     bdd <- datos[stats::complete.cases(datos[, columnas, with = FALSE])]
   } else {
-    bdd <- as.data.table(datos[stats::complete.cases(datos[, columnas]), ])
+    datos <- as.data.table(datos)
+    bdd   <- datos[stats::complete.cases(datos[, columnas])]
   }
 
   setkeyv(bdd, columnas)
@@ -727,12 +729,14 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   rownames(grupo_sp@data)                 <- seq_len(nrow(grupo_sp))
   coord_grupo                             <- sp::coordinates(grupo_sp)
   for (i in seq_len(nrow(coord_grupo))) {
-    pegote <- bdd[
+    pegote <- datos[
       lng == coord_grupo[i, "lng"] & lat == coord_grupo[i, "lat"],
-      c("geo_dir", "BOD.direccion")
+      c(paste0(tip_via, " ", address, " ", portalNumber, ", ",
+               muni, ", ", province, ", ", postalCode),
+        "BOD.direccion", "id_n")
     ]
-    grupo_sp$geo_dir[i] <- paste("<p>", seq_len(nrow(pegote)), pegote[[1]], "</p>", collapse = "")
-    grupo_sp$bod_dir[i] <- paste("<p>", seq_len(nrow(pegote)), pegote[[2]], "</p>", collapse = "")
+    grupo_sp$geo_dir[i] <- paste("<p>", pegote[[3]], pegote[[1]], "</p>", collapse = "")
+    grupo_sp$bod_dir[i] <- paste("<p>", pegote[[3]], pegote[[2]], "</p>", collapse = "")
   }
 
   xx <- suppressWarnings(rgeos::gWithin(grupo_sp, carto_cl, byid = T))
