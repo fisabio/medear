@@ -2,7 +2,7 @@
 #' @title Descarga los trameros del INE
 #'
 #' @description Descarga los trameros que ofrece al público el INE para el año
-#'   2001 y desde 2004 a 2016.
+#'   2001 y desde 2004 en adelante.
 #'
 #' @param cod_provincia Cadena de carácteres de longitud >= 1 con el código de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
@@ -28,7 +28,7 @@
 #'   la sección censal.
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   c(2001, 2004:2016), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
+#'   c(2001, 2004:2015), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
 #'   = 10)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
@@ -60,12 +60,12 @@
 #'   \code{\link{descarga_poblaciones}}.
 #'
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
-                              years = c(2001, 2004:2016), descarga = TRUE, ruta = NULL,
+                              years = c(2001, 2004:2015), descarga = TRUE, ruta = NULL,
                               conservar = TRUE, ntries = 10) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) > 0 & years %in% c(2001, 2004:2016))
+  stopifnot(length(years) > 0 & years %in% c(2001, 2004:(as.numeric(format(Sys.time(), "%Y")) - 1)))
   stopifnot(is.logical(descarga))
   stopifnot(is.logical(conservar))
   stopifnot(is.character(ruta) | is.null(ruta))
@@ -167,7 +167,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       trameros[[paste0("p", i, j)]] <- as.data.table(tramero)[, `:=`(
         year    = years[j],
         seccion = paste0(CPRO, CMUM, DIST, SECC),
-        via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2, CPOS)
+        via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
       )]
     }
   }
@@ -192,7 +192,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     trameros[["n_2001"]] <- as.data.table(tramero)[, `:=`(
       year    = 2001,
       seccion = paste0(CPRO, CMUM, DIST, SECC),
-      via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2, CPOS)
+      via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
     )][CPRO %in% cod_provincia]
   }
   if (!conservar)
@@ -293,7 +293,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE, ntries = 10) {
 #' @title Descarga poblaciones del INE por seccion censal, sexo, edad y periodo
 #'
 #' @description Descarga o carga las poblaciones anuales del INE por sección
-#'   censal, sexo y edad por grupos quinquenales (datos desde 2006).
+#'   censal, sexo y edad por grupos quinquenales (datos desde 2006 en adelante).
 #'
 #' @param cod_provincia Cadena de carácteres de longitud >= 1 con el código de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
@@ -325,7 +325,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE, ntries = 10) {
 #'   se debe utilizar la función \code{\link{carga_datos}}.
 #'
 #' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
-#'   = 2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries)
+#'   = 2006:2015, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries = 10)
 #'
 #' @return Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
@@ -349,12 +349,12 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE, ntries = 10) {
 #'   \code{\link{descarga_cartografia}}.
 #'
 descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
-                                 years = 2006:2016, descarga = TRUE, ruta = NULL,
+                                 years = 2006:2015, descarga = TRUE, ruta = NULL,
                                  conservar = TRUE, ntries = 10) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) >= 1 & years %in% 2006:2016)
+  stopifnot(length(years) >= 1 & years %in% 2006:(as.numeric(format(Sys.time(), "%Y")) - 1))
   stopifnot(is.logical(descarga))
   stopifnot(is.logical(conservar))
   stopifnot(is.character(ruta) | is.null(ruta))

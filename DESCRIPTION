@@ -1,16 +1,16 @@
 Package: medear
 Title: Poblaciones y cartografia por seccion censal INE
-Version: 0.3.1.9001
-Date: 2018-04-05
+Version: 0.3.1.9005
+Date: 2018-05-09
 Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
-    person("Carlos", "Vergara-Hernandez", email = "carlos.vergara@uv.es", role = c("aut", "cre"))
+    person("Carlos", "Vergara-Hernandez", email = "vergara_car@gva.es", role = c("aut", "cre"))
     )
-Maintainer: Carlos Vergara-Hernandez <carlos.vergara@uv.es>
-Description: Descarga, manipulacion y extraccion de poblaciones desde 1996 a 2016
-    por seccion censal, de acuerdo con los datos del INE, incluyendo la cartografia
-    asociada a 2011. Incluye rutinas de geocodificado, union de secciones 
-    censales a lo largo del periodo de estudio, y otras funcionalidades del proyecto.
+Maintainer: Carlos Vergara-Hern�ndez <vergara_car@gva.es>
+Description: Descarga, manipulaci�n y extracci�n de poblaciones desde 1996 a 2016 
+    por secci�n censal, de acuerdo con los datos del INE, incluyendo la cartograf�a 
+    asociada a 2011. Incluye rutinas de geocodificado, uni�n de secciones 
+    censales a lo largo del per�odo de estudio, y otras funcionalidades del proyecto.
 Depends: R (>= 3.3.0)
 License: MIT + file LICENSE
 Encoding: latin1
@@ -19,18 +19,22 @@ URL: https://github.com/fisabio/medear
 BugReports: https://github.com/fisabio/medear/issues
 Imports:
     caRtociudad (>= 0.5.5),
-    data.table (>= 1.10.4-3),
+    data.table (>= 1.11.2),
     sp (>= 1.2-7),
     ggmap (>= 2.6.1),
+    leaflet (>= 2.0.0),
+    leaflet.extras (>= 1.0.0),
+    nabor (>= 0.4.7),
     readr (>= 1.1.1),
-    rgdal (>= 1.2-18),
+    rgdal (>= 1.2-20),
     rgeos (>= 0.3-26),
     sodium (>= 1.1),
-    utils (>= 3.3.0)
+    utils (>= 3.3.0),
+    stats (>= 3.3.0)
 Remotes: carlosvergara/caRtociudad
 RoxygenNote: 6.0.1
 ByteCompile: yes
-Suggests: 
+Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr

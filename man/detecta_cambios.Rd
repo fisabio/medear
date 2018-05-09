@@ -5,8 +5,8 @@
 \alias{detecta_cambios}
 \title{Funcion para detectar cambios de seccionado en trameros}
 \usage{
-detecta_cambios(datos, years = c(1996, 2001, 2004:2016), catastro =
-  NULL)
+detecta_cambios(datos, years = c(1996, 2001, 2004:2016), cod_postal =
+  FALSE, catastro = NULL)
 }
 \arguments{
 \item{datos}{Objeto de clase \code{tramero_ine} (devuelto por la función
@@ -14,6 +14,10 @@ detecta_cambios(datos, years = c(1996, 2001, 2004:2016), catastro =
 
 \item{years}{Vector numérico de longitud >= 2 con los años para los que se
 desee consultar las variaciones de seccionado.}
+
+\item{cod_postal}{Valor lógico: ¿Debe añadirse el código postal a la vía? Por
+defecto falso, aunque es útil en casos de ciudades con pedanías que tengan
+nombres de vía comunes (a su vez suelen compartir mismo código de vía).}
 
 \item{catastro}{Carácter. Argumento opcional (nulo por defecto): ruta hasta
 el archivo alfanumérico con la información catastral completa de un

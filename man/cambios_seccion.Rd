@@ -5,17 +5,18 @@
 \name{cambios_seccion}
 \alias{cambios_seccion}
 \title{Cambios temporales de seccionado para todas las ciudades MEDEA3
-  (periodo 1996-2016)}
+  (periodo 1996-2015)}
 \format{Un objeto de clase \code{cambios_ine}, donde cada fila es un un
   cambio de sección y que cuenta con 7 columnas: \describe{
   \item{sc_ref}{Cádena de 10 caracteres con el código de la sección 2011.}
   \item{sc_new}{Cádena de 10 caracteres con el código de la sección en año ==
   year2.} \item{year}{Año de referencia: 2011.} \item{year2}{Año de
-  comparacion.} \item{vias}{Lista con las vías afectadas por el cambio de
-  sección} \item{viviendas}{Número de viviendas afectadas por el cambio de
-  sección} \item{tramo_por}{Porcentaje de tramos, no detectados en catastro,
-  afectados por el cambio de sección, respecto al total de tramos que incluye
-  la sección de 2011.}}}
+  comparacion.} \item{viviendas}{Número de viviendas afectadas por el cambio
+  de sección.} \item{tramo_por}{Porcentaje de tramos, no detectados en
+  catastro, afectados por el cambio de sección, respecto al total de tramos
+  que incluye la sección de 2011.} \item{codigo_postal}{¿La detección de los
+  cambios se hizo usando el código postal?.}  \item{vias}{Lista con las vías
+  afectadas por el cambio de sección.} }}
 \usage{
 cambios_seccion
 }
@@ -24,8 +25,9 @@ Relación de secciones censales que interseccionan
   geográficamente con el seccionado de 2011, según la definición de dicha
   sección sección censal en ambos años siguiendo el tramero del INE. Este
   objeto contiene todas las intersecciones entre secciones censales distintas
-  para el período 1996-2016. Esta información es costosa de calcular y se
-  necesita para la función \code{\link{une_secciones}} por ello se ha
+  para el período 1996-2015 (tanto haciendo uso del código postal como sin
+  el: campo \code{codigo_postal}). Esta información es costosa de calcular y
+  se necesita para la función \code{\link{une_secciones}} por ello se ha
   considerado conveniente almacenar sus resultados dentro del paquete.
 
   Salvo Vitoria-Gasteiz, Barcelona, Donostia, Madrid, Pamplona y Bilbao, el
@@ -40,6 +42,8 @@ Relación de secciones censales que interseccionan
 \dontrun{
 library(medear)
 data(cambios_seccion)
+cambios_sin_cp <- cambios_seccion[cambios_seccion$cp == FALSE, ]
+cambios_con_cp <- cambios_seccion[cambios_seccion$cp == TRUE, ]
 }
 }
 \keyword{datasets}

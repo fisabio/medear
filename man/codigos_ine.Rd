@@ -29,8 +29,8 @@ Codificación/nombres usados por el INE para las provincias y los
 }
 }
 \references{
-\url{http://www.ine.es/}{ Sitio web del INE}.
+\href{http://www.ine.es/}{ Sitio web del INE}.
 
-  \url{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{ Codificación INE}.
+  \href{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{ Codificación INE}.
 }
 \keyword{datasets}

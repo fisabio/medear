@@ -7,7 +7,7 @@
 #'   de sección censal. Aunque algunos datos de población están encriptados por
 #'   tratarse de consultas específicas realizadas al Instituto Nacional de
 #'   Estadística -INE- (se puede acceder a ellos mediante contraseña), los datos
-#'   desde 2006 hasta 2017 son de libre acceso siguiendo la licencia del INE.
+#'   desde 2006 son de libre acceso siguiendo la licencia del INE.
 #'
 #' @details El uso habitual del paquete será la carga de datos o de la
 #'   cartografia (\code{\link[utils]{data}}) y su preparación para unir las
@@ -18,20 +18,20 @@
 #'   última actualización de los datos (siempre que esté disponible) como un
 #'   atributo de los objetos.
 #'
-#'   Un uso potencial puede ser la preparación de consultas personalizadas
-#'   para ciudades o provincias completas, por lo que el paquete ofrece todas
-#'   las funciones necesarias para descargar los datos y la cartografía
-#'   directamente desde el INE y trabajarlos para obtener el producto final. En
-#'   este sentido, las funciones deberían ejecutarse en el siguiente orden:
+#'   Un uso potencial puede ser la preparación de consultas personalizadas para
+#'   ciudades o provincias completas, por lo que el paquete ofrece todas las
+#'   funciones necesarias para descargar los datos y la cartografía directamente
+#'   desde el INE y trabajarlos para obtener el producto final. En este sentido,
+#'   las funciones deberían ejecutarse en el siguiente orden:
 #'
 #'   \describe{\item{\code{\link{descarga_cartografia}}}{Descarga de la
 #'   cartografía nacional por sección censal para el año 2011 en formato SHP.}
 #'   \item{\code{\link{descarga_poblaciones}}}{Descarga de la poblaciones por
-#'   sección censal, sexo y grupos de edad (disponibilidad desde 2006 hasta
-#'   2017).} \item{\code{\link{descarga_trameros}}}{Descarga de los trameros
+#'   sección censal, sexo y grupos de edad (disponibilidad desde 2006 en
+#'   adelante).} \item{\code{\link{descarga_trameros}}}{Descarga de los trameros
 #'   para las provincias indicadas en los años marcados (disponible desde 2004
-#'   hasta 2017).} \item{\code{\link{detecta_cambios}}}{Identifica los cambios
-#'   de sección censal entre distintos años.}
+#'   en adelante).} \item{\code{\link{detecta_cambios}}}{Identifica los cambios
+#'   de sección censal comparando el tramero de 2011 con el de otros años.}
 #'   \item{\code{\link{une_secciones}}}{Habiendo obtenido los cambios en el
 #'   seccionado, se realiza la unión de las secciones en la cartografía y en las
 #'   cifras de población.} }
@@ -52,11 +52,13 @@
 #'
 #'   \describe{\item{\code{\link{cartografia}}}{Cartografia por seccion censal
 #'   para las ciudades MEDEA3.} \item{\code{\link{poblacion}}}{Datos de
-#'   poblacion por seccion censal para las ciudades MEDEA3 (periodo 2006-2016).}
-#'   \item{\code{\link{secciones}}}{Secciones censales únicas por período
-#'   (1996-2016).} \item{\code{\link{cambios_seccion}}}{Cambios temporales de
-#'   seccionado para todo el país, incluyendo las ciudades MEDEA3 (período
-#'   2004-2017).} \item{\code{\link{codigos_ine}}}{Nombres de municipios y
+#'   poblacion por seccion censal para las ciudades MEDEA3 (periodo 2004-2015:
+#'   si desea cargarse el período 1996-2015, usar la función
+#'   \code{\link{carga_datos}}).} \item{\code{\link{secciones}}}{Secciones
+#'   censales únicas por período (1996-2015).}
+#'   \item{\code{\link{cambios_seccion}}}{Cambios de seccionado para las
+#'   ciudades MEDEA3 (período 1996-2015).}
+#'   \item{\code{\link{codigos_ine}}}{Códigos y nombres de municipios y
 #'   provincias según terminología oficial del INE.} }
 #'
 #'   Fuente: Elaboración propia con datos extraídos del \href{www.ine.es}{sitio

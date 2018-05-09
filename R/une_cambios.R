@@ -155,13 +155,14 @@
 #'
 #' \dontrun{
 #'   # En este ejemplo se trabaja con la ciudad de Sevilla (código ine: 41091)
-#'   # en los años 2004-2015
+#'   # en los años 2004-2015, sin usar códigos postales.
 #'
 #'   library(medear)
 #'   data("poblacion")
 #'   data("cambios_seccion")
 #'   data("cartografia")
-#'   cambios_se     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "41091", ]
+#'   cambios_se     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "41091" &
+#'                                     cambios_seccion$codigo_postal == FALSE, ]
 #'   cartografia_se <- cartografia[cartografia$CUMUN == "41091", ]
 #'   poblacion_se   <- poblacion[substr(poblacion$seccion, 1, 5) == "41091", ]
 #'
@@ -254,27 +255,54 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   if ("vias" %in% names(cambios)) cambios$vias <- NULL
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-  utils::data("secciones")
+  utils::data("secciones", envir = environment())
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
 
-  tmp1 <- tmp2 <- list()
-  secciones[, tmp := FALSE]
-  for (i in years) {
-    tmp1[[paste(i)]] <- unique(secciones[year == i, seccion])
+  if (!is.null(poblacion)) {
+    poblacion <- poblacion[between(year, min(years), max(years))]
+
+    if (!all(unique(poblacion$seccion) %in% unique(secciones$seccion))) {
+      sc_pob_not_sc <- unique(poblacion$seccion)[!unique(poblacion$seccion) %in% unique(secciones$seccion)]
+        secciones <- unique(
+          rbindlist(
+            list(
+              secciones,
+              poblacion[sexo == 0 & seccion %in% sc_pob_not_sc, seccion, by = year]
+            )
+          )
+        )[order(seccion, year)]
+    }
+    if (!all(unique(poblacion$year) %in% unique(secciones$year))) {
+      year_not_sc <- unique(poblacion$year)[!unique(poblacion$year) %in% unique(secciones$year)]
+        secciones <- unique(
+          rbindlist(
+            list(
+              secciones,
+              poblacion[sexo == 0 & year %in% year_not_sc, seccion, by = year]
+            )
+          )
+        )[order(seccion, year)]
+    }
+
+    tmp1 <- tmp2 <- list()
+    secciones[, tmp := FALSE]
+    for (i in years) {
+      tmp1[[paste(i)]] <- unique(secciones[year == i, seccion])
+    }
+    tmp2[[paste(last(years))]] <- secciones[year == last(years)][, tmp := TRUE]
+    for (i in years[years != last(years)]) {
+      tmp2[[paste(i)]] <- secciones[year == i]
+      tmp2[[paste(i)]][!tmp1[[paste(i)]] %in% tmp1[[paste(i + 1)]] == TRUE, tmp := TRUE]
+    }
+    secciones <- rbindlist(tmp2)
+    secciones[, final := last(years)]
+    secciones[tmp == TRUE, final := as.integer(year)]
+    secciones[, tmp := NULL]
+    sc_pob_conservar <- secciones[between(final, 2012, max(year) - 1), seccion]
+    secciones_2011   <- secciones[
+      year == 2011 & substr(seccion, 1, 5) %in% cambios[, substr(sc_ref, 1, 5)]
+      ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
   }
-  tmp2[[paste(last(years))]] <- secciones[year == last(years)][, tmp := TRUE]
-  for (i in years[years != last(years)]) {
-    tmp2[[paste(i)]] <- secciones[year == i]
-    tmp2[[paste(i)]][!tmp1[[paste(i)]] %in% tmp1[[paste(i + 1)]] == TRUE, tmp := TRUE]
-  }
-  secciones <- rbindlist(tmp2)
-  secciones[, final := last(years)]
-  secciones[tmp == TRUE, final := as.integer(year)]
-  secciones[, tmp := NULL]
-  sc_pob_conservar <- secciones[between(final, 2012, max(year) - 1), seccion]
-  secciones_2011   <- secciones[
-    year == 2011 & substr(seccion, 1, 5) %in% cambios[, substr(sc_ref, 1, 5)]
-    ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
 
   cambios$modo   <- "auto"
 
@@ -306,7 +334,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       }
       cambios[, umbral := cambio_ref + tramo_por]
       cambios[, umbral_T := umbral >= umbral_vivienda]
-      cambios[, incluido := no_11 == TRUE | (umbral_T & distan_T)]
+      cambios[, incluido := umbral_T == T & (no_11 | distan_T)]
       cambios_copy <- copy(cambios)
       cambios <- cambios[incluido == TRUE]
     } else {
@@ -417,7 +445,6 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
 
   if (!is.null(poblacion)) {
-    poblacion <- poblacion[between(year, min(years), max(years))]
     poblacion <- elige_corte(poblacion, corte_edad)
     if (nrow(cambios) > 0) {
       poblacion[, cluster := cluster_sc[match(seccion, sc), id_cluster]]

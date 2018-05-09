@@ -6,7 +6,7 @@
 \title{Descarga poblaciones del INE por seccion censal, sexo, edad y periodo}
 \usage{
 descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
-  = 2006:2016, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries)
+  = 2006:2015, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries = 10)
 }
 \arguments{
 \item{cod_provincia}{Cadena de carácteres de longitud >= 1 con el código de
@@ -37,7 +37,7 @@ Un objeto de clase \code{poblaciones_ine} donde las filas representan
 }
 \description{
 Descarga o carga las poblaciones anuales del INE por sección
-  censal, sexo y edad por grupos quinquenales (datos desde 2006).
+  censal, sexo y edad por grupos quinquenales (datos desde 2006 en adelante).
 }
 \details{
 El tiempo de ejecución de la función varía según el número de
