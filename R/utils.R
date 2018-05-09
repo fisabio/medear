@@ -690,22 +690,23 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   if (!is.null(cartografia) && !"SpatialPolygonsDataFrame" %in% class(cartografia)) {
     stop("\nEl objeto 'cartografia' debe ser un 'SpatialPolygonsDataFrame'")
   }
+  datos_c <- copy(datos)
 
   if (is.null(cartografia)) {
     utils::data("cartografia", envir = environment())
   }
   carto_cl <- cartografia
   limite <- c(1e-10, 1e-15, 1e-20)
-  datos$id_n <- seq_len(nrow(datos))
-  if (is.data.table(datos)) {
-    bdd <- datos[stats::complete.cases(datos[, columnas, with = FALSE])]
+  datos_c$id_n <- seq_len(nrow(datos_c))
+  datos_c[, geo_dir := paste0(tip_via, " ", address, " ", portalNumber, ", ", muni, ", ", province, ", ", postalCode)]
+  if (is.data.table(datos_c)) {
+    bdd <- datos_c[stats::complete.cases(datos_c[, columnas, with = FALSE])]
   } else {
-    datos <- as.data.table(datos)
-    bdd   <- datos[stats::complete.cases(datos[, columnas])]
+    datos_c <- as.data.table(datos_c)
+    bdd   <- datos_c[stats::complete.cases(datos_c[, columnas])]
   }
 
   setkeyv(bdd, columnas)
-  bdd[, geo_dir := paste0(tip_via, " ", address, " ", portalNumber, ", ", muni, ", ", province, ", ", postalCode)]
   grupo  <- bdd[, c(columnas), with = FALSE][, .N, by = c(columnas)]
   for (i in seq_along(columnas)) {
     set(grupo, j = columnas[i], value = as.numeric(grupo[[columnas[i]]]))
@@ -729,14 +730,12 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   rownames(grupo_sp@data)                 <- seq_len(nrow(grupo_sp))
   coord_grupo                             <- sp::coordinates(grupo_sp)
   for (i in seq_len(nrow(coord_grupo))) {
-    pegote <- datos[
+    pegote <- datos_c[
       lng == coord_grupo[i, "lng"] & lat == coord_grupo[i, "lat"],
-      c(paste0(tip_via, " ", address, " ", portalNumber, ", ",
-               muni, ", ", province, ", ", postalCode),
-        "BOD.direccion", "id_n")
+      c("geo_dir", "BOD.direccion", "id_n")
     ]
-    grupo_sp$geo_dir[i] <- paste("<p>", pegote[[3]], pegote[[1]], "</p>", collapse = "")
-    grupo_sp$bod_dir[i] <- paste("<p>", pegote[[3]], pegote[[2]], "</p>", collapse = "")
+    grupo_sp$geo_dir[i] <- paste("<p>", "<b>", pegote[[3]], "</b>", "<i>", pegote[[1]], "</i>", "</p>", collapse = "")
+    grupo_sp$bod_dir[i] <- paste("<p>", "<b>", pegote[[3]], "</b>", "<i>", pegote[[2]], "</i>", "</p>", collapse = "")
   }
 
   xx <- suppressWarnings(rgeos::gWithin(grupo_sp, carto_cl, byid = T))
