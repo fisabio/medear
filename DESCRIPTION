@@ -1,6 +1,6 @@
 Package: medear
 Title: Poblaciones y cartografia por seccion censal INE
-Version: 0.3.1.9005
+Version: 0.3.2
 Date: 2018-05-09
 Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
