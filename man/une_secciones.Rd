@@ -173,13 +173,14 @@ La función trabaja con la siguiente dinámica:
 
 \dontrun{
   # En este ejemplo se trabaja con la ciudad de Sevilla (código ine: 41091)
-  # en los años 2004-2015
+  # en los años 2004-2015, sin usar códigos postales.
 
   library(medear)
   data("poblacion")
   data("cambios_seccion")
   data("cartografia")
-  cambios_se     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "41091", ]
+  cambios_se     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "41091" &
+                                    cambios_seccion$codigo_postal == FALSE, ]
   cartografia_se <- cartografia[cartografia$CUMUN == "41091", ]
   poblacion_se   <- poblacion[substr(poblacion$seccion, 1, 5) == "41091", ]
 

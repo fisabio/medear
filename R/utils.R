@@ -31,12 +31,15 @@ filtrar_ein_esn <- function(datos) {
 #'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al año 2011.
 #' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
+#' @param cod_postal Valor lógico: ¿Debe añadirse el código postal a la vía? Por
+#'   defecto falso, aunque es útil en casos de ciudades con pedanías que tengan
+#'   nombres de vía comunes (a su vez suelen compartir mismo código de vía).
 #' @param catastro Carácter. Argumento opcional (nulo por defecto): ruta hasta
 #'   el archivo alfanumérico con la información catastral completa de un
 #'   municipio.
 #'
-#' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2016), catastro =
-#'   NULL)
+#' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2016), cod_postal =
+#'   FALSE, catastro = NULL)
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -100,26 +103,30 @@ filtrar_ein_esn <- function(datos) {
 #'
 #' @seealso \code{\link{une_secciones}} y \code{\link{descarga_trameros}}.
 #'
-detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016), catastro = NULL) {
+detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016),
+                            cod_postal = FALSE, catastro = NULL) {
 
   stopifnot("tramero_ine" %in% class(datos))
   stopifnot(is.numeric(years))
   stopifnot(length(years) > 1 & 2011 %in% years)
+  stopifnot(all(c("CPRO", "CMUM", "CVIA", "EIN", "ESN",
+                  "DIST", "SECC", "CPOS", "year") %in% names(datos)))
   stopifnot(2011 %in% unique(datos$year))
   stopifnot(years %in% unique(datos$year))
+
+  datos[, via := paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)]
+
   if (!is.null(catastro)) {
     stopifnot(file.exists(catastro))
-
     catastro_finca  <- lee_catastro(catastro)
-
     stopifnot(unique(catastro_finca$prov_ine) %in% datos$CPRO)
     stopifnot(unique(catastro_finca$muni_ine) %in% datos$CMUM)
-
     datos <- datos[
       CPRO == unique(catastro_finca$prov_ine) &
         CMUM == unique(catastro_finca$muni_ine)
     ]
   }
+  if (cod_postal) datos[, via := paste0(via, CPOS)]
 
   cambios <- list()
   for (i in unique(datos$CPRO)) {
@@ -245,7 +252,7 @@ carga_datos <- function(key) {
   cifrado <- unserialize(
     sodium::data_decrypt(readRDS(cifrado), key)
   )
-  utils::data("poblacion")
+  utils::data("poblacion", envir = environment())
   poblacion <- data.table::rbindlist(
     list(poblacion, cifrado), fill = TRUE
   )[order(year, sexo, seccion)]
@@ -335,10 +342,10 @@ lee_catastro <- function(archivo) {
   stopifnot(is.character(archivo))
 
   estructura_finca <- readr::fwf_positions(
-    start     = c(1, 26, 31, 51, 81, 154, 334, 343),
-    end       = c(2, 28, 44, 52, 83, 158, 342, 352),
+    start     = c(1, 26, 31, 51, 81, 154, 334, 343, 672),
+    end       = c(2, 28, 44, 52, 83, 158, 342, 352, 677),
     col_names = c("tipo_reg", "muni_dgc", "ref_cat", "prov_ine", "muni_ine",
-                  "via_dgc", "lng", "lat")
+                  "via_dgc", "lng", "lat", "epsg")
   )
   catastro_finca <- readr::read_fwf(
     file          = archivo,
@@ -381,6 +388,13 @@ lee_catastro <- function(archivo) {
       tvia  = catastro_vivienda$tvia,
       nvia  = catastro_vivienda$nvia,
       npoli = catastro_vivienda$npoli)][]
+  catastro_finca[, c("lng", "lat") := lapply(.SD, function(x)
+    as.numeric(paste0(substr(x, 1, 2), gsub("^(.{2})", ".", x)))
+  ), .SDcols = c("lng", "lat")
+  ]
+  attributes(catastro_finca)$epsg <- max(unique(catastro_finca$epsg))
+  catastro_finca[, c("epsg") := NULL]
+
   class(catastro_finca) <- c(class(catastro_finca), "catastro")
 
   return(catastro_finca)
@@ -590,6 +604,219 @@ descarga_segura <- function(x, tries = 10, ...) {
   )
 }
 
+#' @title Deteccion de agrupaciones de mortalidad a revisar manualmente
+#'
+#' @description Esta función es útil a la hora de comprobar la geocodificación
+#'   de la mortalidad, pues devuelve aquellos puntos con un exceso de
+#'   fallecimientos en relación a la media de sus vecinos más próximos. Del
+#'   mismo modo, también identifica los centros residenciales, donde es de
+#'   esperar una mayor aglomeración de defunciones.
+#'
+#' @usage detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL)
+#'
+#' @param datos Base de datos con las coordenadas que ubican cada uno de los
+#'   fallecimientos. Debe contener, al menos, 9 columnas: \code{BOD.direccion},
+#'   \code{lat}, \code{lng}, \code{province}, \code{muni}, \code{tip_via},
+#'   \code{address}, \code{portalNumber} y \code{postalCode}), las cuales deben
+#'   tener exactamente esos nombres (son los que resultan del protocolo de
+#'   geocodificación, así que este aspecto no debería causar problema alguno).
+#'   Si la base de datos tuviera otros nombres, seria trabajo del usuario
+#'   cambiárselos como paso previo al uso de la función.
+#' @param epsg Numérico con longitud igual a 1: código EPSG con la proyección de
+#'   las coordenadas de la base de datos. Por defecto se usa el EPSG 4326
+#'   (longlat WGS 84).
+#' @param vecinos Numérico con longitud igual a 1: número de vecinos más
+#'   próximos con los que comparar la mortalidad de cada punto. Por defecto 10.
+#' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}}. Con
+#'   ella se representa el seccionado oficial de 2011 a modo de referencia con
+#'   la que juzgar la geocodificación de un conjunto de defunciones anómalas. En
+#'   principio tiene valor nulo, lo que implica usar la cartografía asociada al
+#'   paquete para las ciudades MEDEA3. Si el usuario desea consultar otros
+#'   municipios puede hacer uso de este argumento para tener el seccionado de
+#'   fondo.
+#'
+#' @details La función comienza calculando el número de fallecimientos en cada
+#'   par único de coordenadas, identifica los \emph{n} vecinos más próximos a
+#'   cada punto y calcula la media de fallecimientos en los mismos. Considerando
+#'   que los fallecimientos en cada par de coordenadas siguen una distribución
+#'   de Poisson cuya media es la media de los fallecimientos en los puntos más
+#'   cercanos, se calcula la probabilidad de superar esa media. En la
+#'   representación
+#'
+#' @return Un objeto de clase \code{\link[leaflet]{leaflet}} en el que se marcan
+#'   los puntos a revisar. Los puntos se dividen en tres colores en función de
+#'   la mortalidad acontecida en las coordenadas vecinas: verde si la
+#'   probabilidad de obtener ese resultado es inferior a 1e-10, amarillo si es
+#'   inferior a 1e-15 y rojo si es inferior a 1e-20 (el caso más evidente).
+#'   Haciendo clic en cada uno de los puntos se puede consultar las direcciones,
+#'   tanto del BOD como las obtenidas en la geocodificación (se puede cambiar
+#'   entre una y otra en el menú del extremo superior derecho), asociadas a cada
+#'   punto. Al comienzo de cada dirección se indica el número de fila al que
+#'   hace referencia cada dirección en los datos que se facilitaron, de forma
+#'   que pueda recuperarse fácilmente dicha información para explorar los datos
+#'   en profundidad.
+#'
+#'   Respecto al menú anteriormente mencionado, también permite cambiar la capa
+#'   de visualización de fondo, utilizando OpenStreetMap, Google Maps o Google
+#'   Satellite (de forma que pueda disponerse de información extra sin salir de
+#'   la aplicación).
+#'
+#'   Si se desea efectuar el cálculo de distancias o áreas, en la esquina
+#'   inferior izquierda se dispone de un menú para realizarlas (en metros y en
+#'   metros cuadrados).
+#'
+#' @examples
+#' \dontrun{
+#'   library(medear)
+#'   library(sp)
+#'   revisar <- detecta_cluster(datosmort)
+#'   plot(revisar)
+#' }
+#'
+#' @encoding UTF-8
+#'
+#' @export
+detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL) {
+
+  vars <- c("BOD.direccion", "lat", "lng", "province", "muni",
+            "tip_via", "address", "portalNumber", "postalCode")
+  columnas = c("lng", "lat")
+  if (!all(vars %in% names(datos))) {
+    stop("\nAlguna de las variables necesarias est\u00e1n ausentes en los datos o ",
+         "requieren un cambio de nombre.\nPor favor, revise la documentaci\u00f3n.")
+  }
+  stopifnot(is.numeric(vecinos) & length(vecinos) == 1)
+  stopifnot(is.numeric(epsg) & length(epsg) == 1)
+  if (!is.null(cartografia) && !"SpatialPolygonsDataFrame" %in% class(cartografia)) {
+    stop("\nEl objeto 'cartografia' debe ser un 'SpatialPolygonsDataFrame'")
+  }
+
+  if (is.null(cartografia)) {
+    utils::data("cartografia", envir = environment())
+  }
+  carto_cl <- cartografia
+  limite <- c(1e-10, 1e-15, 1e-20)
+  if (is.data.table(datos)) {
+    bdd <- datos[stats::complete.cases(datos[, columnas, with = FALSE])]
+  } else {
+    bdd <- as.data.table(datos[stats::complete.cases(datos[, columnas]), ])
+  }
+
+  setkeyv(bdd, columnas)
+  bdd[, geo_dir := paste0(tip_via, " ", address, " ", portalNumber, ", ", muni, ", ", province, ", ", postalCode)]
+  grupo  <- bdd[, c(columnas), with = FALSE][, .N, by = c(columnas)]
+  for (i in seq_along(columnas)) {
+    set(grupo, j = columnas[i], value = as.numeric(grupo[[columnas[i]]]))
+  }
+  grupo_sp                  <- copy(grupo)
+  sp::coordinates(grupo_sp) <- stats::as.formula(paste("~", paste(columnas, collapse = " + ")))
+  sp::proj4string(grupo_sp) <- sp::CRS(paste0("+init=epsg:", epsg))
+  knn10 <- nabor::knn(sp::coordinates(grupo_sp), k = vecinos + 1)[[1]][, -1]
+  grupo[, pr := .(lapply(seq_len(nrow(knn10)), function(x) knn10[x, ]))]
+  grupo[, tr := sapply(pr, function(x) as.integer(round(mean(grupo[x, N]))))]
+  grupo[, pr := NULL]
+  grupo[, prob := mapply(function(x, y) stats::ppois(x, y, lower.tail = FALSE), N, tr)]
+
+  grupo_sp$limite                         <- NA_character_
+  grupo_sp$bod_dir                        <- NA_character_
+  grupo_sp$geo_dir                        <- NA_character_
+  grupo_sp$limite[grupo$prob < limite[1]] <- "1e-10"
+  grupo_sp$limite[grupo$prob < limite[2]] <- "1e-15"
+  grupo_sp$limite[grupo$prob < limite[3]] <- "1e-20"
+  grupo_sp                                <- grupo_sp[grupo$prob < limite[1], ]
+  rownames(grupo_sp@data)                 <- seq_len(nrow(grupo_sp))
+  coord_grupo                             <- sp::coordinates(grupo_sp)
+  for (i in seq_len(nrow(coord_grupo))) {
+    pegote <- bdd[
+      lng == coord_grupo[i, "lng"] & lat == coord_grupo[i, "lat"],
+      c("geo_dir", "BOD.direccion")
+    ]
+    grupo_sp$geo_dir[i] <- paste("<p>", seq_len(nrow(pegote)), pegote[[1]], "</p>", collapse = "")
+    grupo_sp$bod_dir[i] <- paste("<p>", seq_len(nrow(pegote)), pegote[[2]], "</p>", collapse = "")
+  }
+
+  xx <- suppressWarnings(rgeos::gWithin(grupo_sp, carto_cl, byid = T))
+  yy <- apply(xx, 1, sum)
+  zz <- unique(carto_cl$CUMUN[which(yy != 0)])
+
+  carto_cl <- carto_cl[carto_cl$CUMUN %in% zz, ]
+  icon_pop    <- leaflet.extras::pulseIcons(
+    color     = ifelse(
+      grupo_sp$limite == "1e-10", "green", ifelse(grupo_sp$limite == "1e-15", "orange", "red")
+    ),
+    iconSize  = 5,
+    heartbeat = .5
+  )
+
+
+  mapa_cluster <- leaflet::leaflet()
+  mapa_cluster <- leaflet::addPolygons(
+    map              = mapa_cluster,
+    data             = carto_cl,
+    popup            = paste0("Secci\u00f3n (2011): ", carto_cl$seccion),
+    color            = "#6890FF",
+    weight           = 2,
+    smoothFactor     = 0.5,
+    opacity          = 1.0,
+    fillOpacity      = 0,
+    highlightOptions = leaflet::highlightOptions(color = "#53C853", weight = 1.5, bringToFront = TRUE),
+    group            = "Secciones INE 2011"
+  )
+  mapa_cluster <- leaflet.extras::addPulseMarkers(
+    map          = mapa_cluster,
+    data         = grupo_sp,
+    popup        = ~ grupo_sp$bod_dir,
+    icon         = icon_pop,
+    group        = "Agrupaci\u00f3n (direcciones BOD)",
+    popupOptions = leaflet::popupOptions(maxHeight = 300, maxWidth = 500)
+  )
+  mapa_cluster <-   leaflet.extras::addPulseMarkers(
+    map          = mapa_cluster,
+    data         = grupo_sp,
+    popup        = ~ grupo_sp$geo_dir,
+    icon         = icon_pop,
+    group        = "Agrupaci\u00f3n (direcciones GEO)",
+    popupOptions = leaflet::popupOptions(maxHeight = 300, maxWidth = 500)
+  )
+  mapa_cluster <- leaflet::addTiles(
+    map         = mapa_cluster,
+    urlTemplate = "http://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    group       = "Callejero (OSM)",
+    attribution = '<a href="https://www.openstreetmap.org/" title="OpenStreetMap">&copy; OpenStreetMap (OSM)'
+  )
+  mapa_cluster <- leaflet::addTiles(
+    map         = mapa_cluster,
+    urlTemplate = "https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}",
+    group       = "Callejero (Google)",
+    attribution = '<a href="https://www.google.com/maps" title="GoogleMaps">&copy; Google Maps'
+  )
+  mapa_cluster <- leaflet::addTiles(
+    map         = mapa_cluster,
+    urlTemplate = "http://www.google.es/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}",
+    group       = "Sat\u00e9lite",
+    attribution = '<a href="https://www.google.com/maps" title="GoogleSatellite">&copy; Google Satellite'
+  )
+
+  mapa_cluster <- leaflet::addLayersControl(
+    map           = mapa_cluster,
+    baseGroups    = c("Callejero (OSM)", "Callejero (Google)", "Sat\u00e9lite"),
+    overlayGroups = c("Secciones INE 2011", "Agrupaci\u00f3n (direcciones BOD)", "Agrupaci\u00f3n (direcciones GEO)")
+  )
+  mapa_cluster <- leaflet::addMiniMap(map = mapa_cluster)
+  mapa_cluster <- leaflet::addMeasure(
+    map               = mapa_cluster,
+    position          = "bottomleft",
+    primaryLengthUnit = "meters",
+    primaryAreaUnit   = "sqmeters",
+    activeColor       = "#3D535D",
+    completedColor    = "#7D4479"
+  )
+  mapa_cluster <- leaflet::hideGroup(map = mapa_cluster, "Agrupaci\u00f3n (direcciones GEO)")
+
+
+  return(mapa_cluster)
+}
+
 
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
@@ -604,5 +831,5 @@ utils::globalVariables(
     "npk", "npoli", "nvia", "nvia2", "old_ein", "old_esn", "vias", "xx",
     "year_new", "year_ref", "yy", "zz", "CPOS", "clave", "npolis", "ref_cat",
     "tipo_reg", "tramo_por", "tvias", "tmp", "final", "distan_T", "dista",
-    "umbral", "umbral_T", "incluido")
+    "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng", "lat")
 )
