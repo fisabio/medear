@@ -734,8 +734,16 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
       lng == coord_grupo[i, "lng"] & lat == coord_grupo[i, "lat"],
       c("geo_dir", "BOD.direccion", "id_n")
     ]
-    grupo_sp$geo_dir[i] <- paste("<p>", "<b>", pegote[[3]], "</b>", "<i>", pegote[[1]], "</i>", "</p>", collapse = "")
-    grupo_sp$bod_dir[i] <- paste("<p>", "<b>", pegote[[3]], "</b>", "<i>", pegote[[2]], "</i>", "</p>", collapse = "")
+    grupo_sp$geo_dir[i] <- paste(
+      "<center><h3>N:", nrow(pegote), "</h3></center>",
+      paste("<p>", "<b>", pegote[[3]], "</b>", "<i>",
+            pegote[[1]], "</i>", "</p>", collapse = "")
+    )
+    grupo_sp$bod_dir[i] <- paste(
+      "<center><h3>N:", nrow(pegote), "</h3></center>",
+      paste("<p>", "<b>", pegote[[3]], "</b>", "<i>",
+            pegote[[2]], "</i>", "</p>", collapse = "")
+    )
   }
 
   xx <- suppressWarnings(rgeos::gWithin(grupo_sp, carto_cl, byid = T))
