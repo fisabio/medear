@@ -5,7 +5,8 @@
 \alias{detecta_cluster}
 \title{Deteccion de agrupaciones de mortalidad a revisar manualmente}
 \usage{
-detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL)
+detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
+  limite = c(1e-10, 1e-15, 1e-20))
 }
 \arguments{
 \item{datos}{Base de datos con las coordenadas que ubican cada uno de los
@@ -31,13 +32,17 @@ principio tiene valor nulo, lo que implica usar la cartografía asociada al
 paquete para las ciudades MEDEA3. Si el usuario desea consultar otros
 municipios puede hacer uso de este argumento para tener el seccionado de
 fondo.}
+
+\item{limite}{Numérico con longitud >= a 1 y <= a 9: límites de probabilidad
+con los que se identifican las agrupaciones sospechosas. Por defecto viene
+fijado a 1e-10, 1e-15 y 1e-20.}
 }
 \value{
-Un objeto de clase \code{\link[leaflet]{leaflet}} en el que se marcan
-  los puntos a revisar. Los puntos se dividen en tres colores en función de
-  la mortalidad acontecida en las coordenadas vecinas: verde si la
-  probabilidad de obtener ese resultado es inferior a 1e-10, amarillo si es
-  inferior a 1e-15 y rojo si es inferior a 1e-20 (el caso más evidente).
+Representa un objeto de clase \code{\link[leaflet]{leaflet}} en el
+  que se marcan los puntos a revisar. Los puntos se dividen en tres colores
+  en función de la mortalidad acontecida en las coordenadas vecinas: verde si
+  la probabilidad de obtener ese resultado es inferior a 1e-10, amarillo si
+  es inferior a 1e-15 y rojo si es inferior a 1e-20 (el caso más evidente).
   Haciendo clic en cada uno de los puntos se puede consultar las direcciones,
   tanto del BOD como las obtenidas en la geocodificación (se puede cambiar
   entre una y otra en el menú del extremo superior derecho), asociadas a cada
@@ -54,6 +59,9 @@ Un objeto de clase \code{\link[leaflet]{leaflet}} en el que se marcan
   Si se desea efectuar el cálculo de distancias o áreas, en la esquina
   inferior izquierda se dispone de un menú para realizarlas (en metros y en
   metros cuadrados).
+
+  La función también devuelve los datos con las cooredenadas, número de
+  defunciones y direcciones asociadas a cada punto.
 }
 \description{
 Esta función es útil a la hora de comprobar la geocodificación
@@ -69,7 +77,7 @@ La función comienza calculando el número de fallecimientos en cada
   que los fallecimientos en cada par de coordenadas siguen una distribución
   de Poisson cuya media es la media de los fallecimientos en los puntos más
   cercanos, se calcula la probabilidad de superar esa media. En la
-  representación
+  representación.
 }
 \examples{
 \dontrun{

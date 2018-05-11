@@ -19,7 +19,7 @@ trabajo?}
 \item{ntries}{Valor numérico: número de intentos en caso de mala conexión.}
 }
 \value{
-Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}, donde
+Un objeto de clase \code{\link[sp]{SpatialPolygons}}, donde
   cada fila es una sección censal y que cuenta con 7 columnas:
   \item{seccion}{Cadena de 10 carácteres con el código de sección censal
   (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
