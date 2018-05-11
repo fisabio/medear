@@ -612,7 +612,8 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   mismo modo, también identifica los centros residenciales, donde es de
 #'   esperar una mayor aglomeración de defunciones.
 #'
-#' @usage detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL)
+#' @usage detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
+#'   limite = c(1e-10, 1e-15, 1e-20))
 #'
 #' @param datos Base de datos con las coordenadas que ubican cada uno de los
 #'   fallecimientos. Debe contener, al menos, 9 columnas: \code{BOD.direccion},
@@ -634,6 +635,9 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   paquete para las ciudades MEDEA3. Si el usuario desea consultar otros
 #'   municipios puede hacer uso de este argumento para tener el seccionado de
 #'   fondo.
+#' @param limite Numérico con longitud >= a 1 y <= a 9: límites de probabilidad
+#'   con los que se identifican las agrupaciones sospechosas. Por defecto viene
+#'   fijado a 1e-10, 1e-15 y 1e-20.
 #'
 #' @details La función comienza calculando el número de fallecimientos en cada
 #'   par único de coordenadas, identifica los \emph{n} vecinos más próximos a
@@ -641,13 +645,13 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   que los fallecimientos en cada par de coordenadas siguen una distribución
 #'   de Poisson cuya media es la media de los fallecimientos en los puntos más
 #'   cercanos, se calcula la probabilidad de superar esa media. En la
-#'   representación
+#'   representación.
 #'
-#' @return Un objeto de clase \code{\link[leaflet]{leaflet}} en el que se marcan
-#'   los puntos a revisar. Los puntos se dividen en tres colores en función de
-#'   la mortalidad acontecida en las coordenadas vecinas: verde si la
-#'   probabilidad de obtener ese resultado es inferior a 1e-10, amarillo si es
-#'   inferior a 1e-15 y rojo si es inferior a 1e-20 (el caso más evidente).
+#' @return Representa un objeto de clase \code{\link[leaflet]{leaflet}} en el
+#'   que se marcan los puntos a revisar. Los puntos se dividen en tres colores
+#'   en función de la mortalidad acontecida en las coordenadas vecinas: verde si
+#'   la probabilidad de obtener ese resultado es inferior a 1e-10, amarillo si
+#'   es inferior a 1e-15 y rojo si es inferior a 1e-20 (el caso más evidente).
 #'   Haciendo clic en cada uno de los puntos se puede consultar las direcciones,
 #'   tanto del BOD como las obtenidas en la geocodificación (se puede cambiar
 #'   entre una y otra en el menú del extremo superior derecho), asociadas a cada
@@ -665,6 +669,9 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   inferior izquierda se dispone de un menú para realizarlas (en metros y en
 #'   metros cuadrados).
 #'
+#'   La función también devuelve los datos con las cooredenadas, número de
+#'   defunciones y direcciones asociadas a cada punto.
+#'
 #' @examples
 #' \dontrun{
 #'   library(medear)
@@ -676,7 +683,8 @@ descarga_segura <- function(x, tries = 10, ...) {
 #' @encoding UTF-8
 #'
 #' @export
-detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL) {
+detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
+                            limite = c(1e-10, 1e-15, 1e-20)) {
 
   vars <- c("BOD.direccion", "lat", "lng", "province", "muni",
             "tip_via", "address", "portalNumber", "postalCode")
@@ -687,16 +695,17 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   }
   stopifnot(is.numeric(vecinos) & length(vecinos) == 1)
   stopifnot(is.numeric(epsg) & length(epsg) == 1)
+  stopifnot(is.numeric(limite) & length(limite) >= 1 & length(limite) <= 9)
   if (!is.null(cartografia) && !"SpatialPolygonsDataFrame" %in% class(cartografia)) {
     stop("\nEl objeto 'cartografia' debe ser un 'SpatialPolygonsDataFrame'")
   }
   datos_c <- copy(datos)
+  limite  <- sort(limite, decreasing = TRUE)
 
   if (is.null(cartografia)) {
     utils::data("cartografia", envir = environment())
   }
   carto_cl <- cartografia
-  limite <- c(1e-10, 1e-15, 1e-20)
   datos_c$id_n <- seq_len(nrow(datos_c))
   datos_c[, geo_dir := paste0(tip_via, " ", address, " ", portalNumber, ", ", muni, ", ", province, ", ", postalCode)]
   if (is.data.table(datos_c)) {
@@ -720,57 +729,54 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   grupo[, pr := NULL]
   grupo[, prob := mapply(function(x, y) stats::ppois(x, y, lower.tail = FALSE), N, tr)]
 
-  grupo_sp$limite                         <- NA_character_
-  grupo_sp$bod_dir                        <- NA_character_
-  grupo_sp$geo_dir                        <- NA_character_
-  grupo_sp$limite[grupo$prob < limite[1]] <- "1e-10"
-  grupo_sp$limite[grupo$prob < limite[2]] <- "1e-15"
-  grupo_sp$limite[grupo$prob < limite[3]] <- "1e-20"
-  grupo_sp                                <- grupo_sp[grupo$prob < limite[1], ]
-  rownames(grupo_sp@data)                 <- seq_len(nrow(grupo_sp))
-  coord_grupo                             <- sp::coordinates(grupo_sp)
+  grupo_sp$bod_dir <- grupo_sp$geo_dir <- NA_character_
+  grupo_sp$limite <- factor(NA, levels = seq_along(limite), labels = paste(limite))
+  for (i in seq_along(limite)) {
+    grupo_sp$limite[grupo$prob < limite[i]] <- paste(limite[i])
+  }
+  grupo_sp                <- grupo_sp[grupo$prob < limite[1], ]
+  rownames(grupo_sp@data) <- seq_len(nrow(grupo_sp))
+  coord_grupo             <- sp::coordinates(grupo_sp)
+  pegote                  <- vector("list", nrow(coord_grupo))
   for (i in seq_len(nrow(coord_grupo))) {
-    pegote <- datos_c[
+    pegote[[i]] <- datos_c[
       lng == coord_grupo[i, "lng"] & lat == coord_grupo[i, "lat"],
       c("geo_dir", "BOD.direccion", "id_n")
     ]
-    grupo_sp$geo_dir[i] <- paste(
-      "<center><h3>N:", nrow(pegote), "</h3></center>",
-      paste("<p>", "<b>", pegote[[3]], "</b>", "<i>",
-            pegote[[1]], "</i>", "</p>", collapse = "")
+    grupo_sp$geo_dir[i] <- paste0(
+      "<center><h3>N: ", nrow(pegote[[i]]), "</h3></center>",
+      paste("<p>", "<b>", pegote[[i]][[3]], ".- </b>", "<i>",
+            pegote[[i]][[1]], "</i>", "</p>", collapse = "")
     )
-    grupo_sp$bod_dir[i] <- paste(
-      "<center><h3>N:", nrow(pegote), "</h3></center>",
-      paste("<p>", "<b>", pegote[[3]], "</b>", "<i>",
-            pegote[[2]], "</i>", "</p>", collapse = "")
+    grupo_sp$bod_dir[i] <- paste0(
+      "<center><h3>N: ", nrow(pegote[[i]]), "</h3></center>",
+      paste0("<p>", "<b>", pegote[[i]][[3]], ".- </b>", "<i>",
+             pegote[[i]][[2]], "</i>", "</p>", collapse = "")
     )
   }
 
-  xx <- suppressWarnings(rgeos::gWithin(grupo_sp, carto_cl, byid = T))
-  yy <- apply(xx, 1, sum)
-  zz <- unique(carto_cl$CUMUN[which(yy != 0)])
-
+  xx       <- suppressWarnings(rgeos::gWithin(grupo_sp, carto_cl, byid = T))
+  yy       <- apply(xx, 1, sum)
+  zz       <- unique(carto_cl$CUMUN[which(yy != 0)])
   carto_cl <- carto_cl[carto_cl$CUMUN %in% zz, ]
-  icon_pop    <- leaflet.extras::pulseIcons(
-    color     = ifelse(
-      grupo_sp$limite == "1e-10", "green", ifelse(grupo_sp$limite == "1e-15", "orange", "red")
-    ),
-    iconSize  = 5,
-    heartbeat = .5
+
+  paleta       <- leaflet::colorFactor(
+    palette = "Set1", domain = grupo_sp$limite, ordered = TRUE, reverse = TRUE
   )
-
-
+  icon_pop     <- leaflet.extras::pulseIcons(
+    color = paleta(grupo_sp$limite), iconSize = 5, heartbeat = .5
+  )
   mapa_cluster <- leaflet::leaflet()
   mapa_cluster <- leaflet::addPolygons(
     map              = mapa_cluster,
     data             = carto_cl,
     popup            = paste0("Secci\u00f3n (2011): ", carto_cl$seccion),
-    color            = "#6890FF",
-    weight           = 2,
-    smoothFactor     = 0.5,
-    opacity          = 1.0,
+    color            = "black",
+    weight           = 1,
+    smoothFactor     = .5,
+    opacity          = .7,
     fillOpacity      = 0,
-    highlightOptions = leaflet::highlightOptions(color = "#53C853", weight = 1.5, bringToFront = TRUE),
+    highlightOptions = leaflet::highlightOptions(color = "white", weight = 1.5, bringToFront = TRUE),
     group            = "Secciones INE 2011"
   )
   mapa_cluster <- leaflet.extras::addPulseMarkers(
@@ -813,7 +819,6 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     baseGroups    = c("Callejero (OSM)", "Callejero (Google)", "Sat\u00e9lite"),
     overlayGroups = c("Secciones INE 2011", "Agrupaci\u00f3n (direcciones BOD)", "Agrupaci\u00f3n (direcciones GEO)")
   )
-  mapa_cluster <- leaflet::addMiniMap(map = mapa_cluster)
   mapa_cluster <- leaflet::addMeasure(
     map               = mapa_cluster,
     position          = "bottomleft",
@@ -823,9 +828,23 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     completedColor    = "#7D4479"
   )
   mapa_cluster <- leaflet::hideGroup(map = mapa_cluster, "Agrupaci\u00f3n (direcciones GEO)")
+  mapa_cluster <- leaflet::addLegend(
+    map       = mapa_cluster,
+    position  = "bottomright",
+    pal       = paleta,
+    values    = grupo_sp$limite,
+    labFormat = leaflet::labelFormat(prefix = "<="),
+    title     = "P(Esp >= Obs)",
+    opacity   = 1
+  )
+  print(mapa_cluster)
+
+  grupo_sp         <- as.data.table(grupo_sp)
+  grupo_sp$detalle <- pegote
+  grupo_sp         <- grupo_sp[, c("lng", "lat", "N", "limite", "detalle")]
 
 
-  return(mapa_cluster)
+  return(grupo_sp[])
 }
 
 

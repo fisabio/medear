@@ -259,7 +259,7 @@ filtra_dir <- function(vias, nivel) {
 #'   proyección a ETRS89).
 #'
 #' @param punto Un data.frame con dos columnas: lng y lat.
-#' @param poligono Un objeto de clase \code{\link[sp]{SpatialPolygonsDataFrame}}
+#' @param poligono Un objeto de clase \code{\link[sp]{SpatialPolygons}}
 #'   con el polígono de referencia sobre el que se desee contrastar la
 #'   pertenecia de las coordenadas.
 #'
@@ -379,7 +379,7 @@ limpiadirecGoogle <- function(cadena){
 #'
 #' @param direc Cadena de carácteres con laa direcciones a georreferenciar.
 #' @param poligono Opcional: objeto de clase
-#'   \code{\link[sp]{SpatialPolygonsDataFrame}}.
+#'   \code{\link[sp]{SpatialPolygons}}.
 #'
 #' @usage geocodificar_cartociudad(direc, poligono = NULL)
 #'
@@ -460,7 +460,7 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 #'
 #' @param direc Cadena de carácteres con laa direcciones a georreferenciar.
 #' @param poligono Opcional: objeto de clase
-#'   \code{\link[sp]{SpatialPolygonsDataFrame}}.
+#'   \code{\link[sp]{SpatialPolygons}}.
 #'
 #' @usage geocodificar_google(direc, poligono = NULL)
 #'

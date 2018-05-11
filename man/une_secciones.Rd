@@ -59,7 +59,7 @@ longitud que \code{sc1}.}
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de
   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
-  \code{cartografia_ine} y \code{\link[sp]{SpatialPolygonsDataFrame}} con la
+  \code{cartografia_ine} y \code{\link[sp]{SpatialPolygons}} con la
   cartografía, donde cada fila es una sección censal y que cuenta con 9
   columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el código de
   sección censal (incluye provincia, municipio y distrito).}

@@ -12,7 +12,7 @@ geocodificar_cartociudad(direc, poligono = NULL)
 \item{direc}{Cadena de carácteres con laa direcciones a georreferenciar.}
 
 \item{poligono}{Opcional: objeto de clase
-\code{\link[sp]{SpatialPolygonsDataFrame}}.}
+\code{\link[sp]{SpatialPolygons}}.}
 }
 \value{
 Un data.frame con tantas filas como direcciones se haya proporcionado
