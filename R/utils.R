@@ -735,6 +735,7 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     grupo_sp$limite[grupo$prob < limite[i]] <- paste(limite[i])
   }
   grupo_sp                <- grupo_sp[grupo$prob < limite[1], ]
+  grupo_sp$id <- seq_len(nrow(grupo_sp))
   rownames(grupo_sp@data) <- seq_len(nrow(grupo_sp))
   coord_grupo             <- sp::coordinates(grupo_sp)
   pegote                  <- vector("list", nrow(coord_grupo))
@@ -744,12 +745,12 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
       c("geo_dir", "BOD.direccion", "id_n")
     ]
     grupo_sp$geo_dir[i] <- paste0(
-      "<center><h3>N: ", nrow(pegote[[i]]), "</h3></center>",
+      "<center><h3>Punto ", grupo_sp$id[i], " (N = ", nrow(pegote[[i]]), ")</h3></center>",
       paste("<p>", "<b>", pegote[[i]][[3]], ".- </b>", "<i>",
             pegote[[i]][[1]], "</i>", "</p>", collapse = "")
     )
     grupo_sp$bod_dir[i] <- paste0(
-      "<center><h3>N: ", nrow(pegote[[i]]), "</h3></center>",
+      "<center><h3>Punto ", grupo_sp$id[i], " (N = ", nrow(pegote[[i]]), ")</h3></center>",
       paste0("<p>", "<b>", pegote[[i]][[3]], ".- </b>", "<i>",
              pegote[[i]][[2]], "</i>", "</p>", collapse = "")
     )
@@ -834,7 +835,7 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     pal       = paleta,
     values    = grupo_sp$limite,
     labFormat = leaflet::labelFormat(prefix = "<="),
-    title     = "P(Esp >= Obs)",
+    title     = "Pr(Esp >= Obs)",
     opacity   = 1
   )
   print(mapa_cluster)
