@@ -608,9 +608,10 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'
 #' @description Esta función es útil a la hora de comprobar la geocodificación
 #'   de la mortalidad, pues devuelve aquellos puntos con un exceso de
-#'   fallecimientos en relación a la media de sus vecinos más próximos. Del
-#'   mismo modo, también identifica los centros residenciales, donde es de
-#'   esperar una mayor aglomeración de defunciones.
+#'   fallecimientos en relación a la media de sus vecinos más próximos. Con esta
+#'   dinámica es fácil identificar los centros residenciales o errores
+#'   sistemáticos en la geocodificación, donde es de esperar una mayor
+#'   aglomeración de defunciones.
 #'
 #' @usage detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
 #'   limite = c(1e-10, 1e-15, 1e-20))
@@ -618,7 +619,7 @@ descarga_segura <- function(x, tries = 10, ...) {
 #' @param datos Base de datos con las coordenadas que ubican cada uno de los
 #'   fallecimientos. Debe contener, al menos, 9 columnas: \code{BOD.direccion},
 #'   \code{lat}, \code{lng}, \code{province}, \code{muni}, \code{tip_via},
-#'   \code{address}, \code{portalNumber} y \code{postalCode}), las cuales deben
+#'   \code{address}, \code{portalNumber} y \code{postalCode}, las cuales deben
 #'   tener exactamente esos nombres (son los que resultan del protocolo de
 #'   geocodificación, así que este aspecto no debería causar problema alguno).
 #'   Si la base de datos tuviera otros nombres, seria trabajo del usuario
@@ -635,8 +636,8 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   paquete para las ciudades MEDEA3. Si el usuario desea consultar otros
 #'   municipios puede hacer uso de este argumento para tener el seccionado de
 #'   fondo.
-#' @param limite Numérico con longitud >= a 1 y <= a 9: límites de probabilidad
-#'   con los que se identifican las agrupaciones sospechosas. Por defecto viene
+#' @param limite Numérico con longitud 1 <= x <= 9: límites de probabilidad con
+#'   los que se identifican las agrupaciones sospechosas. Por defecto viene
 #'   fijado a 1e-10, 1e-15 y 1e-20.
 #'
 #' @details La función comienza calculando el número de fallecimientos en cada
@@ -644,21 +645,20 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   cada punto y calcula la media de fallecimientos en los mismos. Considerando
 #'   que los fallecimientos en cada par de coordenadas siguen una distribución
 #'   de Poisson cuya media es la media de los fallecimientos en los puntos más
-#'   cercanos, se calcula la probabilidad de superar esa media. En la
-#'   representación.
+#'   cercanos, se calcula la probabilidad de superar esa media.
 #'
 #' @return Representa un objeto de clase \code{\link[leaflet]{leaflet}} en el
-#'   que se marcan los puntos a revisar. Los puntos se dividen en tres colores
-#'   en función de la mortalidad acontecida en las coordenadas vecinas: verde si
-#'   la probabilidad de obtener ese resultado es inferior a 1e-10, amarillo si
-#'   es inferior a 1e-15 y rojo si es inferior a 1e-20 (el caso más evidente).
-#'   Haciendo clic en cada uno de los puntos se puede consultar las direcciones,
-#'   tanto del BOD como las obtenidas en la geocodificación (se puede cambiar
-#'   entre una y otra en el menú del extremo superior derecho), asociadas a cada
-#'   punto. Al comienzo de cada dirección se indica el número de fila al que
-#'   hace referencia cada dirección en los datos que se facilitaron, de forma
-#'   que pueda recuperarse fácilmente dicha información para explorar los datos
-#'   en profundidad.
+#'   que se marcan los puntos a revisar. Por defecto los puntos se dividen en
+#'   tres colores en función de la mortalidad acontecida en las coordenadas
+#'   vecinas: verde si la probabilidad de obtener ese resultado es inferior a
+#'   1e-10, azul si es inferior a 1e-15 y rojo si es inferior a 1e-20 (el caso
+#'   más evidente). Haciendo clic en cada uno de los puntos se puede consultar
+#'   las direcciones, tanto del BOD como las obtenidas en la geocodificación (se
+#'   puede cambiar entre una y otra en el menú del extremo superior derecho),
+#'   asociadas a cada punto. Al comienzo de cada dirección se indica el número
+#'   de fila al que hace referencia cada dirección en los datos que se
+#'   facilitaron, de forma que pueda recuperarse fácilmente dicha información
+#'   para explorar los datos en profundidad.
 #'
 #'   Respecto al menú anteriormente mencionado, también permite cambiar la capa
 #'   de visualización de fondo, utilizando OpenStreetMap, Google Maps o Google
@@ -669,15 +669,17 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   inferior izquierda se dispone de un menú para realizarlas (en metros y en
 #'   metros cuadrados).
 #'
-#'   La función también devuelve los datos con las cooredenadas, número de
-#'   defunciones y direcciones asociadas a cada punto.
+#'   La función también devuelve los datos con las cooredenadas (campos
+#'   \code{lng} y \code{lat}), número de defunciones (campo \code{N}), límite
+#'   dentro del cual recae (campo \code{limite}, útil para filtrar resultados) y
+#'   direcciones asociadas a cada punto (campo \code{detalle}, de tipo lista
+#'   donde cada elemento contiene un data.frame con la información detallada).
 #'
 #' @examples
 #' \dontrun{
 #'   library(medear)
-#'   library(sp)
 #'   revisar <- detecta_cluster(datosmort)
-#'   plot(revisar)
+#'   revisar
 #' }
 #'
 #' @encoding UTF-8
