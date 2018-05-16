@@ -617,13 +617,16 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   limite = c(1e-10, 1e-15, 1e-20))
 #'
 #' @param datos Base de datos con las coordenadas que ubican cada uno de los
-#'   fallecimientos. Debe contener, al menos, 9 columnas: \code{BOD.direccion},
-#'   \code{lat}, \code{lng}, \code{province}, \code{muni}, \code{tip_via},
-#'   \code{address}, \code{portalNumber} y \code{postalCode}, las cuales deben
-#'   tener exactamente esos nombres (son los que resultan del protocolo de
-#'   geocodificación, así que este aspecto no debería causar problema alguno).
-#'   Si la base de datos tuviera otros nombres, seria trabajo del usuario
-#'   cambiárselos como paso previo al uso de la función.
+#'   fallecimientos. Debe contener, al menos, 3 columnas: \code{BOD.direccion},
+#'   \code{lat} y \code{lng}, las cuales deben tener exactamente esos nombres.
+#'   De forma paralela la función tratará de buscar otras seis columnas fruto
+#'   del protocolo de geocodificación (\code{province}, \code{muni},
+#'   \code{tip_via}, \code{address}, \code{portalNumber} y \code{postalCode})
+#'   (nuevamente deben tener exactamente esos nombres, que son los que resultan
+#'   del protocolo de geocodificación), con el propósito de mostrar, junto a las
+#'   direcciones del BOD, las direcciones devueltas por los servicios de
+#'   geocodificado. Si la base de datos tuviera otros nombres, seria trabajo del
+#'   usuario cambiárselos como paso previo al uso de la función.
 #' @param epsg Numérico con longitud igual a 1: código EPSG con la proyección de
 #'   las coordenadas de la base de datos. Por defecto se usa el EPSG 4326
 #'   (longlat WGS 84).
@@ -688,10 +691,9 @@ descarga_segura <- function(x, tries = 10, ...) {
 detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
                             limite = c(1e-10, 1e-15, 1e-20)) {
 
-  vars <- c("BOD.direccion", "lat", "lng", "province", "muni",
-            "tip_via", "address", "portalNumber", "postalCode")
-  columnas = c("lng", "lat")
-  if (!all(vars %in% names(datos))) {
+  vars_ob <- c("BOD.direccion", "lng", "lat")
+  vars_op <- c("province", "muni", "tip_via", "address", "portalNumber", "postalCode")
+  if (!all(vars_ob %in% names(datos))) {
     stop("\nAlguna de las variables necesarias est\u00e1n ausentes en los datos o ",
          "requieren un cambio de nombre.\nPor favor, revise la documentaci\u00f3n.")
   }
@@ -709,21 +711,31 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   }
   carto_cl <- cartografia
   datos_c$id_n <- seq_len(nrow(datos_c))
+  if (!any(vars_op %in% names(datos_c))) {
+    datos_c[, `:=`(
+      tip_via      = NA_character_,
+      address      = NA_character_,
+      portalNumber = NA_character_,
+      muni         = NA_character_,
+      province     = NA_character_,
+      postalCode   = NA_character_
+    )]
+  }
   datos_c[, geo_dir := paste0(tip_via, " ", address, " ", portalNumber, ", ", muni, ", ", province, ", ", postalCode)]
   if (is.data.table(datos_c)) {
-    bdd <- datos_c[stats::complete.cases(datos_c[, columnas, with = FALSE])]
+    bdd <- datos_c[stats::complete.cases(datos_c[, vars_ob[2:3], with = FALSE])]
   } else {
     datos_c <- as.data.table(datos_c)
-    bdd   <- datos_c[stats::complete.cases(datos_c[, columnas])]
+    bdd   <- datos_c[stats::complete.cases(datos_c[, vars_ob[2:3]])]
   }
 
-  setkeyv(bdd, columnas)
-  grupo  <- bdd[, c(columnas), with = FALSE][, .N, by = c(columnas)]
-  for (i in seq_along(columnas)) {
-    set(grupo, j = columnas[i], value = as.numeric(grupo[[columnas[i]]]))
+  setkeyv(bdd, vars_ob[2:3])
+  grupo  <- bdd[, c(vars_ob[2:3]), with = FALSE][, .N, by = c(vars_ob[2:3])]
+  for (i in seq_along(vars_ob[2:3])) {
+    set(grupo, j = vars_ob[2:3][i], value = as.numeric(grupo[[vars_ob[2:3][i]]]))
   }
   grupo_sp                  <- copy(grupo)
-  sp::coordinates(grupo_sp) <- stats::as.formula(paste("~", paste(columnas, collapse = " + ")))
+  sp::coordinates(grupo_sp) <- stats::as.formula(paste("~", paste(vars_ob[2:3], collapse = " + ")))
   sp::proj4string(grupo_sp) <- sp::CRS(paste0("+init=epsg:", epsg))
   knn10 <- nabor::knn(sp::coordinates(grupo_sp), k = vecinos + 1)[[1]][, -1]
   grupo[, pr := .(lapply(seq_len(nrow(knn10)), function(x) knn10[x, ]))]

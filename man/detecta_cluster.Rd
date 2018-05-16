@@ -10,13 +10,16 @@ detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
 }
 \arguments{
 \item{datos}{Base de datos con las coordenadas que ubican cada uno de los
-fallecimientos. Debe contener, al menos, 9 columnas: \code{BOD.direccion},
-\code{lat}, \code{lng}, \code{province}, \code{muni}, \code{tip_via},
-\code{address}, \code{portalNumber} y \code{postalCode}, las cuales deben
-tener exactamente esos nombres (son los que resultan del protocolo de
-geocodificación, así que este aspecto no debería causar problema alguno).
-Si la base de datos tuviera otros nombres, seria trabajo del usuario
-cambiárselos como paso previo al uso de la función.}
+fallecimientos. Debe contener, al menos, 3 columnas: \code{BOD.direccion},
+\code{lat} y \code{lng}, las cuales deben tener exactamente esos nombres.
+De forma paralela la función tratará de buscar otras seis columnas fruto
+del protocolo de geocodificación (\code{province}, \code{muni},
+\code{tip_via}, \code{address}, \code{portalNumber} y \code{postalCode})
+(nuevamente deben tener exactamente esos nombres, que son los que resultan
+del protocolo de geocodificación), con el propósito de mostrar, junto a las
+direcciones del BOD, las direcciones devueltas por los servicios de
+geocodificado. Si la base de datos tuviera otros nombres, seria trabajo del
+usuario cambiárselos como paso previo al uso de la función.}
 
 \item{epsg}{Numérico con longitud igual a 1: código EPSG con la proyección de
 las coordenadas de la base de datos. Por defecto se usa el EPSG 4326
