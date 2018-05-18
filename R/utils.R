@@ -703,7 +703,7 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   if (!is.null(cartografia) && !"SpatialPolygonsDataFrame" %in% class(cartografia)) {
     stop("\nEl objeto 'cartografia' debe ser un 'SpatialPolygonsDataFrame'")
   }
-  datos_c <- copy(datos)
+  datos_c <- copy(as.data.table(datos))
   limite  <- sort(limite, decreasing = TRUE)
 
   if (is.null(cartografia)) {
