@@ -5,10 +5,10 @@
 \alias{descarga_cartografia}
 \title{Descarga la cartografia con el seccionado del INE para 2011}
 \usage{
-descarga_cartografia(crs = 4326, conservar = TRUE, ntries = 10)
+descarga_cartografia(epsg = 4326, conservar = TRUE, ntries = 10)
 }
 \arguments{
-\item{crs}{Vector numérico de longitud uno con el código EPSG del sistema de
+\item{epsg}{Vector numérico de longitud uno con el código EPSG del sistema de
 referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 datum WGS84).}
 

@@ -252,7 +252,7 @@ carga_datos <- function(key) {
   cifrado <- unserialize(
     sodium::data_decrypt(readRDS(cifrado), key)
   )
-  utils::data("poblacion", envir = environment())
+  utils::data("poblacion", envir = environment(), package = "medear")
   poblacion <- data.table::rbindlist(
     list(poblacion, cifrado), fill = TRUE
   )[order(year, sexo, seccion)]
@@ -707,7 +707,7 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   limite  <- sort(limite, decreasing = TRUE)
 
   if (is.null(cartografia)) {
-    utils::data("cartografia", envir = environment())
+    utils::data("cartografia", envir = environment(), package = "medear")
   }
   carto_cl <- cartografia
   datos_c$id_n <- seq_len(nrow(datos_c))
