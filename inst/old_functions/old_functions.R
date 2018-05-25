@@ -442,7 +442,7 @@ geocodificar <- function(direcciones, idn = NULL, codigos = NULL, cartografia = 
       )
       codigos      <- character(length(muni_provs))
       provs_carto  <- munis_carto <- vector("list", length(muni_provs))
-      utils::data("codigos_ine")
+      utils::data("codigos_ine", envir = environment(), package = "medear")
       for (i in seq_along(codigos)) {
         provs_carto[[i]] <- grep(
           paste0("^", muni_provs[[i]][2], "$|^", muni_provs[[i]][2], "\\/"),

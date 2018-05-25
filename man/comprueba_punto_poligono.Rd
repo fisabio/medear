@@ -23,13 +23,13 @@ Con el fin de asegurar que el resultado de la geocodificación
   no estén incluidas en un polígono concreto (una sección, un distrito, un
   municipio o una provincia). Para ello es necesario proporcionar un polígono
   de referencia para cada par de coordenadas, en las cuales se utiliza el CRS
-  ETRS89 (código EPSG 4258), que es el empleado el sistema de referencia de
-  CartoCiudad (si se desea utilizar esta función para coordenadas no
+  WGS84 (código EPSG 4326), que es el sistema de referencia de coordenadas
+  empleado en MEDEA. Si se desea utilizar esta función para coordenadas no
   recuperadas con las funciones de este paquete
   (\code{\link{geocodificar_cartociudad}}, \code{\link{geocodificar_google}})
   o tras llamar directamente a
   \code{\link[caRtociudad]{cartociudad_geocode}}, habrá que transformar la
-  proyección a ETRS89).
+  proyección.
 }
 \seealso{
 \code{\link{geocodificar_cartociudad}} y

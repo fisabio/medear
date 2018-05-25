@@ -250,13 +250,13 @@ filtra_dir <- function(vias, nivel) {
 #'   no estén incluidas en un polígono concreto (una sección, un distrito, un
 #'   municipio o una provincia). Para ello es necesario proporcionar un polígono
 #'   de referencia para cada par de coordenadas, en las cuales se utiliza el CRS
-#'   ETRS89 (código EPSG 4258), que es el empleado el sistema de referencia de
-#'   CartoCiudad (si se desea utilizar esta función para coordenadas no
+#'   WGS84 (código EPSG 4326), que es el sistema de referencia de coordenadas
+#'   empleado en MEDEA. Si se desea utilizar esta función para coordenadas no
 #'   recuperadas con las funciones de este paquete
 #'   (\code{\link{geocodificar_cartociudad}}, \code{\link{geocodificar_google}})
 #'   o tras llamar directamente a
 #'   \code{\link[caRtociudad]{cartociudad_geocode}}, habrá que transformar la
-#'   proyección a ETRS89).
+#'   proyección.
 #'
 #' @param punto Un data.frame con dos columnas: lng y lat.
 #' @param poligono Un objeto de clase \code{\link[sp]{SpatialPolygons}}
@@ -276,8 +276,12 @@ comprueba_punto_poligono <- function(punto, poligono) {
 
   stopifnot(is.data.frame(punto))
   stopifnot(is.numeric(unlist(punto)))
-  stopifnot(class(poligono) == "SpatialPolygonsDataFrame")
+  if ("SpatialPolygonsDataFrame" != class(poligono))
+    stop("El objeto 'poligono' debe ser de clase 'SpatialPolygonsDataFrame'.")
+  if (is.na(sp::proj4string(poligono)))
+    stop("El objeto 'poligono' no tiene asignado un CRS.")
 
+  poligono     <- sp::spTransform(poligono, sp::CRS("+init=epsg:4326"))
   CRScarto     <- sp::CRS(sp::proj4string(poligono))
   poligono     <- sp::spTransform(poligono, CRScarto)
   punto.lonlat <- data.frame(
@@ -286,7 +290,7 @@ comprueba_punto_poligono <- function(punto, poligono) {
   )
 
   sp::coordinates(punto.lonlat) <- ~ longitude + latitude
-  sp::proj4string(punto.lonlat) <- sp::CRS("+init=epsg:4258")
+  sp::proj4string(punto.lonlat) <- sp::CRS("+init=epsg:4326")
 
   # Transformamos los puntos a la misma proyeccion que la cartografia
   puntos.fin <- try(sp::spTransform(punto.lonlat, CRScarto), silent = TRUE)

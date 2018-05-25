@@ -240,6 +240,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     stop("2011 debe estar incluido en el objeto 'years'.")
   if ("SpatialPolygonsDataFrame" != class(cartografia))
     stop("El objeto 'cartografia' debe ser de clase 'SpatialPolygonsDataFrame'.")
+  if (is.na(sp::proj4string(cartografia)))
+    stop("El objeto 'cartografia' no tiene asignado un CRS.")
   years <- sort(years)
   if (any(years != min(years):max(years)))
     stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
@@ -253,9 +255,10 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   stopifnot(length(sc1) == length(sc2))
   if (!is.null(sc1)) stopifnot(is.character(c(sc1, sc2)))
 
+  cartografia <- sp::spTransform(cartografia, sp::CRS("+init=epsg:4326"))
   if ("vias" %in% names(cambios)) cambios$vias <- NULL
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
-  utils::data("secciones", envir = environment())
+  utils::data("secciones", envir = environment(), package = "medear")
   cambios        <- cambios[between(year2, years[1], years[length(years)])]
 
   if (!is.null(poblacion)) {

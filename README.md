@@ -21,9 +21,15 @@ momento. En el apartado de viñetas del paquete podrás consultar los
 diversos protocolos que se vayan creando (actualmente ya está disponible
 el protocolo de geocodificación.)
 
+Del mismo modo, y una vez ya se disponga de la mortalidad geocodificada,
+también se incluye una función para la detección de agrupaciones
+anómalas de defunciones en comparación con los `n` puntos más próximos,
+lo que permite detectar errores sistemáticos en la geocodificación y
+aborda el problema de la detección de centros residenciales.
+
 ## Instalación
 
-`medear` se puede instalar desde GitHub con:
+El paquete `medear` se puede instalar desde GitHub con:
 
 ``` r
 if (!"devtools" %in% installed.packages())
@@ -33,9 +39,9 @@ devtools::install_github("fisabio/medear", build_vignettes = TRUE)
 
 **IMPORTANTE**: si trabajas desde un ordenador conectado a la red a
 través de un *proxy*, es muy importante que te asegures de que tu
-conexión esté bien configurada, para lo cual debes ejecutar esta serie
-de comandos (sustituyendo el texto por los valores apropiados de tu
-centro: pregunta al servicio de informática):
+conexión esté bien configurada. Para ello debes ejecutar esta serie de
+comandos (sustituyendo el texto por los valores apropiados de tu centro:
+pregunta al servicio de informática):
 
 ``` r
 if (!"httr" %in% installed.packages())
@@ -50,6 +56,22 @@ httr::set_config(
 )
 ```
 
+## Otros usos del paquete
+
+Aunque el paquete surge como respuesta a una necesidad de un proyecto de
+investigación, consideramos que las herramientas pueden ser útiles para
+todo aquel que:
+
+1.  quiera extrapolar el proyecto MEDEA3 a otras ciudades,
+2.  trabaje con secciones censales en un marco temporal que abarque
+    varios años,
+3.  intente geocodificar direcciones y no quiera salir del entorno R,
+4.  utilice poblaciones por sección censal en sus cálculos.
+
+Es por ello que se ha intentado dejar bastante abiertos los argumentos
+de las funciones, con lo que no será difícil adaptar su uso a otros
+fines.
+
 ## Participación: dudas y consultas
 
 Para cualquier comentario, duda o consulta que se desee realizar, se
@@ -61,6 +83,6 @@ antojo y abrir un [*Pull
 Request*](https://github.com/fisabio/medear/pulls) en el repositorio.
 
 Por último, y si quieres contactar directamente en caso de tener
-problemas para instalar el paquete, puedes dirigirte a Carlos Vergara en
-la dirección de correo <vergara_car@gva.es>: él te orientará acerca de
-los pasos a seguir.
+problemas para instalar el paquete o acerca de su uso, puedes dirigirte
+a Carlos Vergara en la dirección de correo <vergara_car@gva.es>: él te
+orientará acerca de los pasos a seguir.

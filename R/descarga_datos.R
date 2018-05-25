@@ -212,7 +212,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @description Descarga la cartografía del seccionado censal ofrecida
 #'   públicamente por el INE para el año 2011.
 #'
-#' @param crs Vector numérico de longitud uno con el código EPSG del sistema de
+#' @param epsg Vector numérico de longitud uno con el código EPSG del sistema de
 #'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 #'   datum WGS84).
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
@@ -220,7 +220,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'   trabajo?
 #' @param ntries Valor numérico: número de intentos en caso de mala conexión.
 #'
-#' @usage descarga_cartografia(crs = 4326, conservar = TRUE, ntries = 10)
+#' @usage descarga_cartografia(epsg = 4326, conservar = TRUE, ntries = 10)
 #'
 #' @details Aunque el INE emplea otro CRS, se recomienda utlizar el CRS 4326
 #'   como elemento normalizado.
@@ -251,10 +251,10 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #' @seealso \code{\link{descarga_trameros}} y
 #'   \code{\link{descarga_poblaciones}}.
 #'
-descarga_cartografia <- function(crs = 4326, conservar = TRUE, ntries = 10) {
+descarga_cartografia <- function(epsg = 4326, conservar = TRUE, ntries = 10) {
   stopifnot(is.logical(conservar))
-  stopifnot(is.numeric(crs))
-  stopifnot(nchar(crs) == 4)
+  stopifnot(is.numeric(epsg))
+  stopifnot(nchar(epsg) == 4)
 
   dir_dest <- normalizePath(
     path     = paste0(getwd(), "/.cartografia"),
@@ -282,7 +282,7 @@ descarga_cartografia <- function(crs = 4326, conservar = TRUE, ntries = 10) {
   carto <- carto[, -grep("^Shape|^CNUT|CLAU2|^OB|^CSEC|^CDIS|^CMUN|^CPRO|^CUDIS",
                          colnames(carto@data))]
   names(carto)[names(carto) == "CUSEC"] <- "seccion"
-  carto <- sp::spTransform(carto, CRSobj = sp::CRS(paste0("+init=epsg:", crs)))
+  carto <- sp::spTransform(carto, CRSobj = sp::CRS(paste0("+init=epsg:", epsg)))
 
   attributes(carto@data)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   attributes(carto@data)$class  <-  c(attributes(carto@data)$class, "cartografia_ine")
