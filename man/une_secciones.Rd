@@ -5,9 +5,10 @@
 \alias{une_secciones}
 \title{Une los cambios del seccionado del INE}
 \usage{
-une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-  NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia =
-  100, modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
+une_secciones(cambios, cartografia, years = 1996:2016,
+poblacion = NULL, mortalidad = NULL, corte_edad = 85, catastro = FALSE,
+umbral_vivienda = 5, distancia = 100, modo = c("auto", "manual"),
+sc1 = NULL, sc2 = NULL)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}.}
@@ -22,6 +23,14 @@ año).}
 
 \item{poblacion}{Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 proporcionar en caso de querer agregar las poblaciones.}
+
+\item{mortalidad}{Objeto con los registros de mortalidad geocodificados. Este
+ es un argumento opcional a proporcionar en caso de querer agregar la
+mortalidad por sección censal. Se requiere que los datos tengan, como
+mínimo, las variables sexo, año de defunción, edad, causa de defunción y
+el par de coordenadas (longitud y latitud), y que tengan exactamente los
+siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
+'lng', y 'lat', respectivamente.}
 
 \item{corte_edad}{Numérico: punto de corte para los grupos de edad (85 o
 100). Argumento opcional en caso de proporcionar datos de poblaciones.}
@@ -83,11 +92,12 @@ El resultado devuelto varía en función de si se proporcionan datos de
 }
 \description{
 Une los cambios del seccionado del INE (tomando como referencia
-  la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
-  sección censal. Si el archivo de cambios incorpora información catastral
-  (número de viviendas afectada por cada cambio de sección), se puede fijar
-  un umbral de cambio (\%) para rechazar aquellos cambios que involucren a
-  muy pocas viviendas.
+  la cartografía INE 2011), adaptando a su vez las poblaciones o la
+  mortalidad por sexo año y sección censal (siempre que se desee, pues son
+  argumentos opcionales). Si el archivo de cambios incorpora información
+  catastral (número de viviendas afectada por cada cambio de sección), se
+  puede fijar un umbral de cambio (\%) para rechazar aquellos cambios que
+  involucren a muy pocas viviendas.
 }
 \details{
 La función trabaja con la siguiente dinámica:
@@ -172,67 +182,118 @@ La función trabaja con la siguiente dinámica:
 \examples{
 
 \dontrun{
-  # En este ejemplo se trabaja con la ciudad de Sevilla (código ine: 41091)
+  # En este ejemplo se trabaja con la ciudad de Córdoba (código ine: 14021)
   # en los años 2004-2015, sin usar códigos postales.
 
   library(medear)
   data("poblacion")
   data("cambios_seccion")
   data("cartografia")
-  cambios_se     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "41091" &
-                                    cambios_seccion$codigo_postal == FALSE, ]
-  cartografia_se <- cartografia[cartografia$CUMUN == "41091", ]
-  poblacion_se   <- poblacion[substr(poblacion$seccion, 1, 5) == "41091", ]
+  cartografia_co <- cartografia[cartografia$CUMUN == "14021", ]
+  poblacion_co   <- poblacion[substr(poblacion$seccion, 1, 5) == "14021", ]
+  cambios_co     <- cambios_seccion[
+    substr(cambios_seccion$sc_ref, 1, 5) == "14021" & cambios_seccion$codigo_postal == FALSE,
+  ]
 
   ##########################################################################
   ## Ejemplo sin utilizar el filtro de catastro                           ##
   ##########################################################################
 
   union_sin_cat <- une_secciones(
-    cambios         = cambios_se,
-    cartografia     = cartografia_se,
-    years           = 2004:2015,
-    poblacion       = poblacion_se,
-    catastro        = FALSE,
-    distancia       = 100
+    cambios     = cambios_co,
+    cartografia = cartografia_co,
+    years       = 2004:2015,
+    poblacion   = poblacion_co,
+    catastro    = FALSE,
+    distancia   = 100
   )
 
-  nrow(union_sin_cat$cartografia) # 402 secciones
-  length(unique(union_sin_cat$poblacion$seccion)) # 408 secciones
-  round(nrow(union_sin_cat$cartografia) / nrow(cartografia_se) * 100) #
-  Conserva el 76 \\\% de secciones
+  nrow(union_sin_cat$cartografia) # 215 secciones
+  length(unique(union_sin_cat$poblacion$seccion)) # 215 secciones
+  round(nrow(union_sin_cat$cartografia) / nrow(cartografia_co) * 100) #
+  Conserva el 87 \\\% de secciones
 
   # La función avisa acerca de divergencias en el seccionado entre
   cartografía y el archivo de poblaciones. # Las secciones afectadas son
   accesibles mediante la siguiente consulta:
-  attributes(union_con_cat)$sc_not_in_cartografia # 12 SC problemáticas
+  attributes(union_sin_cat)$pob_igual_uno # 1 SC problemática
 
-  # En este caso, se resolverá la primera incidencia (SC 4109102089).
-  sc_problematica <- attributes(union_con_cat)$sc_not_in_cartografia[1]
+  # En este caso, se resolverá la incidencia (SC 1402106047).
+  sc_problematica <- attributes(union_sin_cat)$pob_igual_uno
 
-  ## POR COMPLETAR ##
+  # Hay que revisar el archivo de cambios para comprobar si esta SC está
+  # involucrada en algún otro cambio de sección:
+  cambios_res <- attributes(union_sin_cat)$cambios
+  cambios_res[cambios_res$sc_ref == sc_problematica]
+  cambios_res[cambios_res$sc_new == sc_problematica]
 
+  # La SC debería unirse con la SC 1402106024, aunque ambas están a 104.9
+  # metros. Comprobemos esa otra sección:
+  cambios_res[cambios_res$sc_ref == "1402106024"]
+  cambios_res[cambios_res$sc_new == "1402106024"]
+
+  # La SC 1402106024 se une con la SC 1402106050 (no está en la cartografía
+  # de 2001) y con la 1402106038. Al representar estas SC (1402106047,
+  # y la unión 1402106024-1402106038), vemos que colindan, así que se puede
+  # realizar la unión manual:
+  plot(union_sin_cat$cartografia[union_sin_cat$cartografia$seccion \%in\%
+    c("1402106047", "1402106024"), ])
+  union_sin_cat <- une_secciones(
+    cambios     = cambios_co,
+    cartografia = cartografia_co,
+    years       = 2004:2015,
+    poblacion   = poblacion_co,
+    catastro    = FALSE,
+    distancia   = 100,
+    modo        = "manual",
+    sc1         = "1402106047",
+    sc2         = "1402106024"
+  )
+
+  # El aviso ha desaparecido, aunque todavía se mantiene un aviso sobre
+  # secciones conformadas por varios polígonos. Vamos a ver qué secciones
+  # forman esta unión:
+  union_sin_cat$cartografia@data[union_sin_cat$cartografia$seccion == "1402101006", ]
+
+  # La sección involucrada es 1402106010. Al representar ambas secciones
+  # vemos que sí se tocan, aunque solo en una esquina. A pesar del aviso,
+  # damos por buena la unión.
+  plot(union_sin_cat$cartografia[union_sin_cat$cartografia$seccion == "1402101006", ])
 
   ##########################################################################
   ## Ejemplo utilizando el filtro de catastro                             ##
   ##########################################################################
 
   union_con_cat <- une_secciones(
-    cambios         = cambios_se,
-    cartografia     = cartografia_se,
+    cambios         = cambios_co,
+    cartografia     = cartografia_co,
     years           = 2004:2015,
-    poblacion       = poblacion_se,
+    poblacion       = poblacion_co,
     catastro        = TRUE,
     umbral_vivienda = 5,
     distancia       = 100
   )
 
-  nrow(union_con_cat$cartografia) # 466 secciones
-  length(unique(union_con_cat$poblacion$seccion)) # 478 secciones
-  round(nrow(union_con_cat$cartografia) / nrow(cartografia_se) * 100)
-  # Conserva el 88 \\\% de secciones
+  nrow(union_con_cat$cartografia) # 223 secciones
+  length(unique(union_con_cat$poblacion$seccion)) # 223 secciones
+  round(nrow(union_con_cat$cartografia) / nrow(cartografia_co) * 100)
+  # Conserva el 91 \\\% de secciones
 
-  ## POR COMPLETAR ##
+  # Al utilizar información de catastro se ha aumentado de un 88 \\\% a un
+  # 91 \\\%, recuperando 8 secciones. Surgen los mismos avisos que antes, así
+  # que procedemos de la misma forma, tras lo cual se da por cerrada la unión:
+  union_con_cat <- une_secciones(
+    cambios         = cambios_co,
+    cartografia     = cartografia_co,
+    years           = 2004:2015,
+    poblacion       = poblacion_co,
+    catastro        = TRUE,
+    umbral_vivienda = 5,
+    distancia       = 100,
+    modo            = "manual",
+    sc1             = "1402106047",
+    sc2             = "1402106024"
+  )
 
 }
 
