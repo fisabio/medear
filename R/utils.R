@@ -876,5 +876,6 @@ utils::globalVariables(
     "npk", "npoli", "nvia", "nvia2", "old_ein", "old_esn", "vias", "xx",
     "year_new", "year_ref", "yy", "zz", "CPOS", "clave", "npolis", "ref_cat",
     "tipo_reg", "tramo_por", "tvias", "tmp", "final", "distan_T", "dista",
-    "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng", "lat")
+    "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng",
+    "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion")
 )

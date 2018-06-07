@@ -2,11 +2,12 @@
 #' @title Une los cambios del seccionado del INE
 #'
 #' @description Une los cambios del seccionado del INE (tomando como referencia
-#'   la cartografía INE 2011), adaptando a su vez las poblaciones por sexo año y
-#'   sección censal. Si el archivo de cambios incorpora información catastral
-#'   (número de viviendas afectada por cada cambio de sección), se puede fijar
-#'   un umbral de cambio (\%) para rechazar aquellos cambios que involucren a
-#'   muy pocas viviendas.
+#'   la cartografía INE 2011), adaptando a su vez las poblaciones o la
+#'   mortalidad por sexo año y sección censal (siempre que se desee, pues son
+#'   argumentos opcionales). Si el archivo de cambios incorpora información
+#'   catastral (número de viviendas afectada por cada cambio de sección), se
+#'   puede fijar un umbral de cambio (\%) para rechazar aquellos cambios que
+#'   involucren a muy pocas viviendas.
 #'
 #' @details La función trabaja con la siguiente dinámica:
 #'
@@ -96,6 +97,13 @@
 #'   año).
 #' @param poblacion Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 #'   proporcionar en caso de querer agregar las poblaciones.
+#' @param mortalidad Objeto con los registros de mortalidad geocodificados. Este
+#'    es un argumento opcional a proporcionar en caso de querer agregar la
+#'   mortalidad por sección censal. Se requiere que los datos tengan, como
+#'   mínimo, las variables sexo, año de defunción, edad, causa de defunción y
+#'   el par de coordenadas (longitud y latitud), y que tengan exactamente los
+#'   siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
+#'   'lng', y 'lat', respectivamente.
 #' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones.
 #' @param catastro Lógico: ¿Debe aplicarse el filtro de información catastral?
@@ -123,9 +131,10 @@
 #'   manualmente, vacío por defecto. Si se proporciona debe tener la misma
 #'   longitud que \code{sc1}.
 #'
-#' @usage une_secciones(cambios, cartografia, years = 1996:2016, poblacion =
-#'   NULL, corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia =
-#'   100, modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
+#' @usage une_secciones(cambios, cartografia, years = 1996:2016,
+#' poblacion = NULL, mortalidad = NULL, corte_edad = 85, catastro = FALSE,
+#' umbral_vivienda = 5, distancia = 100, modo = c("auto", "manual"),
+#' sc1 = NULL, sc2 = NULL)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
 #'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
@@ -154,67 +163,118 @@
 #' @examples
 #'
 #' \dontrun{
-#'   # En este ejemplo se trabaja con la ciudad de Sevilla (código ine: 41091)
+#'   # En este ejemplo se trabaja con la ciudad de Córdoba (código ine: 14021)
 #'   # en los años 2004-2015, sin usar códigos postales.
 #'
 #'   library(medear)
 #'   data("poblacion")
 #'   data("cambios_seccion")
 #'   data("cartografia")
-#'   cambios_se     <- cambios_seccion[substr(cambios_seccion$sc_ref, 1, 5) == "41091" &
-#'                                     cambios_seccion$codigo_postal == FALSE, ]
-#'   cartografia_se <- cartografia[cartografia$CUMUN == "41091", ]
-#'   poblacion_se   <- poblacion[substr(poblacion$seccion, 1, 5) == "41091", ]
+#'   cartografia_co <- cartografia[cartografia$CUMUN == "14021", ]
+#'   poblacion_co   <- poblacion[substr(poblacion$seccion, 1, 5) == "14021", ]
+#'   cambios_co     <- cambios_seccion[
+#'     substr(cambios_seccion$sc_ref, 1, 5) == "14021" & cambios_seccion$codigo_postal == FALSE,
+#'   ]
 #'
 #'   ##########################################################################
 #'   ## Ejemplo sin utilizar el filtro de catastro                           ##
 #'   ##########################################################################
 #'
 #'   union_sin_cat <- une_secciones(
-#'     cambios         = cambios_se,
-#'     cartografia     = cartografia_se,
-#'     years           = 2004:2015,
-#'     poblacion       = poblacion_se,
-#'     catastro        = FALSE,
-#'     distancia       = 100
+#'     cambios     = cambios_co,
+#'     cartografia = cartografia_co,
+#'     years       = 2004:2015,
+#'     poblacion   = poblacion_co,
+#'     catastro    = FALSE,
+#'     distancia   = 100
 #'   )
 #'
-#'   nrow(union_sin_cat$cartografia) # 402 secciones
-#'   length(unique(union_sin_cat$poblacion$seccion)) # 408 secciones
-#'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_se) * 100) #
-#'   Conserva el 76 \% de secciones
+#'   nrow(union_sin_cat$cartografia) # 215 secciones
+#'   length(unique(union_sin_cat$poblacion$seccion)) # 215 secciones
+#'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_co) * 100) #
+#'   Conserva el 87 \% de secciones
 #'
 #'   # La función avisa acerca de divergencias en el seccionado entre
 #'   cartografía y el archivo de poblaciones. # Las secciones afectadas son
 #'   accesibles mediante la siguiente consulta:
-#'   attributes(union_con_cat)$sc_not_in_cartografia # 12 SC problemáticas
+#'   attributes(union_sin_cat)$pob_igual_uno # 1 SC problemática
 #'
-#'   # En este caso, se resolverá la primera incidencia (SC 4109102089).
-#'   sc_problematica <- attributes(union_con_cat)$sc_not_in_cartografia[1]
+#'   # En este caso, se resolverá la incidencia (SC 1402106047).
+#'   sc_problematica <- attributes(union_sin_cat)$pob_igual_uno
 #'
-#'   ## POR COMPLETAR ##
+#'   # Hay que revisar el archivo de cambios para comprobar si esta SC está
+#'   # involucrada en algún otro cambio de sección:
+#'   cambios_res <- attributes(union_sin_cat)$cambios
+#'   cambios_res[cambios_res$sc_ref == sc_problematica]
+#'   cambios_res[cambios_res$sc_new == sc_problematica]
 #'
+#'   # La SC debería unirse con la SC 1402106024, aunque ambas están a 104.9
+#'   # metros. Comprobemos esa otra sección:
+#'   cambios_res[cambios_res$sc_ref == "1402106024"]
+#'   cambios_res[cambios_res$sc_new == "1402106024"]
+#'
+#'   # La SC 1402106024 se une con la SC 1402106050 (no está en la cartografía
+#'   # de 2001) y con la 1402106038. Al representar estas SC (1402106047,
+#'   # y la unión 1402106024-1402106038), vemos que colindan, así que se puede
+#'   # realizar la unión manual:
+#'   plot(union_sin_cat$cartografia[union_sin_cat$cartografia$seccion %in%
+#'     c("1402106047", "1402106024"), ])
+#'   union_sin_cat <- une_secciones(
+#'     cambios     = cambios_co,
+#'     cartografia = cartografia_co,
+#'     years       = 2004:2015,
+#'     poblacion   = poblacion_co,
+#'     catastro    = FALSE,
+#'     distancia   = 100,
+#'     modo        = "manual",
+#'     sc1         = "1402106047",
+#'     sc2         = "1402106024"
+#'   )
+#'
+#'   # El aviso ha desaparecido, aunque todavía se mantiene un aviso sobre
+#'   # secciones conformadas por varios polígonos. Vamos a ver qué secciones
+#'   # forman esta unión:
+#'   union_sin_cat$cartografia@data[union_sin_cat$cartografia$seccion == "1402101006", ]
+#'
+#'   # La sección involucrada es 1402106010. Al representar ambas secciones
+#'   # vemos que sí se tocan, aunque solo en una esquina. A pesar del aviso,
+#'   # damos por buena la unión.
+#'   plot(union_sin_cat$cartografia[union_sin_cat$cartografia$seccion == "1402101006", ])
 #'
 #'   ##########################################################################
 #'   ## Ejemplo utilizando el filtro de catastro                             ##
 #'   ##########################################################################
 #'
 #'   union_con_cat <- une_secciones(
-#'     cambios         = cambios_se,
-#'     cartografia     = cartografia_se,
+#'     cambios         = cambios_co,
+#'     cartografia     = cartografia_co,
 #'     years           = 2004:2015,
-#'     poblacion       = poblacion_se,
+#'     poblacion       = poblacion_co,
 #'     catastro        = TRUE,
 #'     umbral_vivienda = 5,
 #'     distancia       = 100
 #'   )
 #'
-#'   nrow(union_con_cat$cartografia) # 466 secciones
-#'   length(unique(union_con_cat$poblacion$seccion)) # 478 secciones
-#'   round(nrow(union_con_cat$cartografia) / nrow(cartografia_se) * 100)
-#'   # Conserva el 88 \% de secciones
+#'   nrow(union_con_cat$cartografia) # 223 secciones
+#'   length(unique(union_con_cat$poblacion$seccion)) # 223 secciones
+#'   round(nrow(union_con_cat$cartografia) / nrow(cartografia_co) * 100)
+#'   # Conserva el 91 \% de secciones
 #'
-#'   ## POR COMPLETAR ##
+#'   # Al utilizar información de catastro se ha aumentado de un 88 \% a un
+#'   # 91 \%, recuperando 8 secciones. Surgen los mismos avisos que antes, así
+#'   # que procedemos de la misma forma, tras lo cual se da por cerrada la unión:
+#'   union_con_cat <- une_secciones(
+#'     cambios         = cambios_co,
+#'     cartografia     = cartografia_co,
+#'     years           = 2004:2015,
+#'     poblacion       = poblacion_co,
+#'     catastro        = TRUE,
+#'     umbral_vivienda = 5,
+#'     distancia       = 100,
+#'     modo            = "manual",
+#'     sc1             = "1402106047",
+#'     sc2             = "1402106024"
+#'   )
 #'
 #' }
 #'
@@ -226,40 +286,100 @@
 #'   \code{\link{descarga_cartografia}}
 #'
 une_secciones <- function(cambios, cartografia, years = 1996:2016,
-                          poblacion = NULL, corte_edad = 85, catastro = FALSE,
-                          umbral_vivienda = 5, distancia = 100,
+                          poblacion = NULL, mortalidad = NULL, corte_edad = 85,
+                          catastro = FALSE, umbral_vivienda = 5, distancia = 100,
                           modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL) {
+
+  ##############################################################################
+  ##  COMPROBACIONES INICIALES Y PREPARACION DE DATOS                         ##
+  ##############################################################################
+
   modo <- match.arg(modo)
   if (!"cambios_ine" %in% class(cambios))
-    stop("El objeto 'cambios' debe ser de clase 'cambios_ine'.")
+    stop("\nEl objeto 'cambios' debe ser de clase 'cambios_ine', tal ",
+         "cual se origina al usar la funci\u00f3n 'detecta_cambios'.")
   if (!is.null(poblacion) && !"poblaciones_ine" %in% class(poblacion))
-    stop("El objeto 'poblacion' debe ser de clase 'poblaciones_ine'.")
+    stop("\nEl objeto 'poblacion' debe ser de clase 'poblaciones_ine', tal ",
+         "cual se origina al usar la funci\u00f3n 'descarga_poblaciones'.")
   if (!is.numeric(years) & length(years) < 2)
-    stop("El objeto 'years' debe ser un vector numeric de longitud >= 2.")
+    stop("\nEl objeto 'years' debe ser un vector numeric de longitud >= 2.")
   if (!2011 %in% years)
-    stop("2011 debe estar incluido en el objeto 'years'.")
+    stop("\n2011 debe estar incluido en el objeto 'years'.")
   if ("SpatialPolygonsDataFrame" != class(cartografia))
     stop("El objeto 'cartografia' debe ser de clase 'SpatialPolygonsDataFrame'.")
   if (is.na(sp::proj4string(cartografia)))
-    stop("El objeto 'cartografia' no tiene asignado un CRS.")
+    stop("\nEl objeto 'cartografia' no tiene asignado un CRS.")
   years <- sort(years)
   if (any(years != min(years):max(years)))
-    stop("El rango de years debe ser continuo (sin saltos mayores a uno).")
+    stop("\nEl rango de 'years' debe ser continuo (sin saltos mayores a uno).")
   stopifnot(corte_edad %in% c(85, 100))
   stopifnot(is.numeric(umbral_vivienda))
   stopifnot(is.numeric(distancia))
   stopifnot(is.logical(catastro))
-  stopifnot(any(cambios$sc_ref %in% cartografia$seccion))
-  if (!is.null(poblacion)) stopifnot(any(cambios$sc_ref %in% poblacion$seccion))
-  if (modo == "manual") stopifnot(!is.null(sc1))
-  stopifnot(length(sc1) == length(sc2))
-  if (!is.null(sc1)) stopifnot(is.character(c(sc1, sc2)))
-
+  if (!any(cambios$sc_ref %in% cartografia$seccion)) {
+    stop("\nEl archivo de cambios de seccionado no contiene ninguna ",
+         "secci\u00f3n coincidente con las de la cartograf\u00eda.\n",
+         "Por favor, revise que los datos de cambios de seccionado hacen ",
+         "referencia a secciones contenidas en los datos de cartograf\u00eda")
+  }
+  if (!is.null(poblacion)) {
+    if (!any(cambios$sc_ref %in% poblacion$seccion)) {
+      stop("\nEl archivo de cambios de seccionado no contiene ninguna ",
+           "secci\u00f3n coincidente con las del archivo de poblaci\u00f3n.\n",
+           "Por favor, revise que los datos de cambios de seccionado hacen ",
+           "referencia a secciones contenidas en los datos de poblaciones.")
+    }
+  }
+  if (modo == "manual") {
+    if (is.null(sc1) && is.null(sc2)) {
+      stop("\nHa seleccionado modo manual, pero no ha proporcionado las ",
+           "secciones a unir manualmente en los argumentos 'sc1' y 'sc2'.")
+    }
+    if (length(sc1) != length(sc2)) {
+      stop("\nHa seleccionado modo manual, pero no ha proporcionado el mismo ",
+           "n\u00famero de secciones en los argumentos 'sc1' y 'sc2'.")
+    }
+    sc1 <- as.character(sc1)
+    sc2 <- as.character(sc2)
+    if (any(nchar(sc1) != 10) || any(nchar(sc2) != 10)) {
+      stop("\nHa seleccionado modo manual, pero alguna de las secciones que ha ",
+           "proporcionado en los argumentos 'sc1' y 'sc2' no tienen 10 ",
+           "caracteres (dos para provincia, tres para municipio, dos para ",
+           "distrito y tres para secci\u00f3n.).\nPor favor, revise estos apartados.")
+    }
+  }
+  if (!is.null(mortalidad)) {
+    if (is.null(poblacion)) {
+      stop("\nPara calcular el cubo de mortalidad es preciso aportar los datos",
+           " de poblaci\u00f3n.\nPor favor, revise los argumentos de la funci\u00f3n.")
+    }
+    mortalidad_c        <- copy(as.data.table(mortalidad))
+    names(mortalidad_c) <- tolower(names(mortalidad_c))
+    if (!all(c("lng", "lat") %in% names(mortalidad_c))) {
+      stop("\nEn los datos de mortalidad no est\u00e1n presentes las variables ",
+           "'lng' y 'lat', o tienen otro nombre.\nPor favor, revise los datos ",
+           "y vuelva a ejecutar la funci\u00f3n.")
+    }
+    mort_vars <- c("sexo", "year_defuncion", "edad", "causa_defuncion")
+    if (!all(mort_vars %in% names(mortalidad_c))) {
+      stop("\nAlgunas de las variables necesarias para calcular el cubo de ",
+           "mortalidad no est\u00e1n presentes en los datos proporcionados.\n",
+           "Por favor, revise los datos de mortalidad y aseg\u00farese de que las",
+           " variables 'sexo', 'year_defuncion', 'edad' y 'causa_defuncion' est\u00e1n ",
+           "presentes y tienen exactamente esos nombres.")
+    }
+  }
   cartografia <- sp::spTransform(cartografia, sp::CRS("+init=epsg:4326"))
   if ("vias" %in% names(cambios)) cambios$vias <- NULL
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
   utils::data("secciones", envir = environment(), package = "medear")
-  cambios        <- cambios[between(year2, years[1], years[length(years)])]
+  cambios    <- cambios[between(year2, years[1], years[length(years)])]
+  cambios$modo   <- "auto"
+
+
+  ##############################################################################
+  ##  IDENTIFICACION DE SECCIONES AUSENTES EN POBLACION                       ##
+  ##############################################################################
 
   if (!is.null(poblacion)) {
     poblacion <- poblacion[between(year, min(years), max(years))]
@@ -307,7 +427,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
   }
 
-  cambios$modo   <- "auto"
+  ##############################################################################
+  ##  SELECCION DE CAMBIOS Y UNION DE SECCIONES EN CARTOGRAFIA                ##
+  ##############################################################################
 
   if (nrow(cambios) > 0) {
     islas_2011    <- sapply(cartografia@polygons, function(x) length(x@Polygons))
@@ -371,8 +493,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         umbral_T   = NA,
         incluido   = TRUE
       )]
-      cambios_copy <- rbindlist(list(cambios_copy, cambios_m))
-      cambios      <- rbindlist(list(cambios, cambios_m))
+      cambios_copy <- rbindlist(list(cambios_copy, cambios_m), fill = TRUE)
+      cambios      <- rbindlist(list(cambios, cambios_m), fill = TRUE)
     }
 
     sc_unicas <- sort(
@@ -430,22 +552,28 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       } else if (length(all_sc_islas) > 0) {
         islas_alerta <- sc_islas_union
       }
-      cartografia$revision_manual[cartografia$seccion %in% islas_alerta] <- "Revisar manualmente"
-      warning(
-        "Las secciones de la cartograf\u00eda: c('", paste(islas_alerta, collapse = "-"), "'),",
-        " est\u00e1n conformadas por varios pol\u00edgonos que no son colindantes.\n",
-        "Por favor, rev\u00edselas manualmente (consulte la ayuda de la funci\u00f3n).",
-        call. = FALSE
-      )
+      if (exists("islas_alerta")) {
+        cartografia$revision_manual[cartografia$seccion %in% islas_alerta] <- "Revisar manualmente"
+        warning(
+          "\nLas secciones de la cartograf\u00eda: c('", paste(islas_alerta, collapse = "', '"), "'),",
+          " est\u00e1n conformadas por varios pol\u00edgonos que no son colindantes.\n",
+          "Por favor, rev\u00edselas manualmente (consulte la ayuda de la funci\u00f3n).",
+          call. = FALSE
+        )
+      }
     }
   } else if (is.null(poblacion)) {
-    attributes(cartografia@data)$cambios <- cambios_copy
-    message("En el per\u00edodo establecido no se ha detectado ning\u00fan cambio: ",
+    message("\nEn el per\u00edodo establecido no se ha detectado ning\u00fan cambio: ",
             "se devuelve la misma cartograf\u00eda.")
   }
+  attributes(cartografia@data)$cambios <- cambios_copy
   attributes(cartografia@data)$fuente  <- fuente
   res <- cartografia
 
+
+  ##############################################################################
+  ##  UNION DE SECCIONES EN POBLACION Y CREACION DE CUBO                      ##
+  ##############################################################################
 
   if (!is.null(poblacion)) {
     poblacion <- elige_corte(poblacion, corte_edad)
@@ -480,15 +608,24 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       }
     } else {
       message(
-        "En el per\u00edodo establecido no se ha detectado ning\u00fan cambio: ",
+        "\nEn el per\u00edodo establecido no se ha detectado ning\u00fan cambio: ",
         "se devuelve la misma cartograf\u00eda y poblaci\u00f3n para ese per\u00edodo, ",
         "ajustando esta \u00faltima al corte de edad marcado."
       )
     }
 
-    attributes(poblacion)$fuente <- fuente
+    name_dim_pob <- list(unique(poblacion$seccion), c("Masculino", "Femenino"),
+                         unique(poblacion$year), names(poblacion[, -c(1:3)]))
+    pob_array    <- array(
+      data     = unlist(poblacion[, -c(1:3)]),
+      dim      = c(length(unique(poblacion$seccion)), 2, length(unique(poblacion$year)), ncol(poblacion[, -c(1:3)])),
+      dimnames = name_dim_pob
+    )
+    pob_array <- aperm(pob_array, c(3, 2, 4, 1))
+
+    attributes(pob_array)$fuente <- fuente
     res                          <- list(
-      cartografia = cartografia, poblacion = poblacion
+      cartografia = cartografia, poblacion = pob_array
     )
     attributes(res)$fuente       <- fuente
     if (exists("cluster_sc")) {
@@ -501,7 +638,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       not_in_carto <- unique(poblacion$seccion)[!unique(poblacion$seccion) %in% cartografia$seccion]
       if (length(not_in_pobla) > 0) {
         warning(
-          "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
+          "\nTras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
           paste0(not_in_pobla, collapse = "', '"),
           "') aparecen en la cartograf\u00eda pero no en los datos de poblaci\u00f3n.\n",
           "Por favor, consulte la ayuda de la funci\u00f3n para tratar de solucionarlo.",
@@ -512,7 +649,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       if (length(not_in_carto) > 0) {
         not_in_years <- unique(poblacion[seccion %in% not_in_carto, year])
         warning(
-          "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
+          "\nTras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
           paste0(not_in_carto, collapse = "', '"),
           "') aparecen en los datos de poblaci\u00f3n pero no en la cartograf\u00eda, ",
            " para los a\u00f1os c(", paste0(not_in_years, collapse = ", "), ").\n",
@@ -528,14 +665,85 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
     if (any(uno_vect)) {
       warning(
-        "En el per\u00edodo seleccionado las secciones c('", paste0(unique(poblacion$seccion[uno_vect]), collapse = "', '"), "') no sufrieron cambios pero ",
-        "aparecieron m\u00e1s tarde que el a\u00f1o de inicio elegido. Se asigna el valor 1 como ",
-        "poblaci\u00f3n a dichas secciones para los a\u00f1os previos (hasta el a\u00f1o de inicio fijado).\n",
-        "Por favor, consulte la ayuda de la funci\u00f3n para explorar este aspecto.",
+        "\nEn el per\u00edodo seleccionado las secciones c('",
+        paste0(unique(poblacion$seccion[uno_vect]), collapse = "', '"),
+        "') no sufrieron cambios pero aparecieron m\u00e1s tarde que el ",
+        "a\u00f1o de inicio elegido. Se asigna el valor 1 como poblaci\u00f3n ",
+        "a dichas secciones para los a\u00f1os previos (hasta el a\u00f1o de ",
+        "inicio fijado).\nPor favor, consulte la ayuda de la funci\u00f3n ",
+        "para explorar este aspecto.",
         call. = FALSE
       )
       attr(res, "pob_igual_uno") <- unique(poblacion[uno_vect, seccion])
     }
+  }
+
+
+  ##############################################################################
+  ##  ASIGNACION DE SECCIONES EN MORTALIDAD Y CREACION DE CUBO                ##
+  ##############################################################################
+
+  if (!is.null(mortalidad)) {
+    mortalidad_c <- mortalidad_c[!is.na(lng) & !is.na(lat)]
+    mortalidad_c[, c("lng", "lat") := lapply(.SD, as.numeric), .SDcols = c("lng", "lat")]
+    sp::coordinates(mortalidad_c) <- ~ lng + lat
+    sp::proj4string(mortalidad_c) <- sp::CRS("+init=epsg:4326")
+    mortalidad_c <- sp::spTransform(mortalidad_c, sp::proj4string(cartografia))
+    mortalidad_c$seccion <- sp::over(mortalidad_c, cartografia)$seccion
+    mortalidad_c <- as.data.table(mortalidad_c)[
+      ,
+      c("year_defuncion", "sexo", "causa_defuncion", "edad", "seccion"),
+      with = TRUE
+    ]
+
+    grupo_edad <- names(poblacion[, -c(1:3)])
+    edades     <- strsplit(grupo_edad, "_")
+    edades     <- lapply(edades, function(x) as.numeric(x[grep("\\d+", x)]))
+    mortalidad_c[, g_edad := NA_character_]
+    for (i in seq_along(edades)) {
+      if (length(edades[[i]]) == 2) {
+        mortalidad_c[between(edad, edades[[i]][1], edades[[i]][2]), g_edad := grupo_edad[i]]
+      } else {
+        mortalidad_c[edad >= edades[[i]], g_edad := grupo_edad[i]]
+      }
+    }
+    mortalidad_c$edad <- NULL
+    setnames(mortalidad_c, "g_edad", "edad")
+    setcolorder(mortalidad_c, c(1, 2, 5, 4, 3))
+    year_def   <- unique(poblacion$year)
+    edad_def   <- names(poblacion[, -c(1:3)])
+    sc_def     <- unique(poblacion$seccion)
+    caus_def   <- sort(unique(mortalidad_c$causa_defuncion))
+    n_row_mort <- length(year_def) * 2 * length(edad_def) * length(sc_def) * length(caus_def)
+
+    mortalidad_cero <- data.table(
+      year_defuncion = rep(
+        1996:2015,
+        each       = 2 * length(edad_def) * length(sc_def) * length(caus_def),
+        length.out = n_row_mort
+      ),
+      sexo = rep(
+        0:1,
+        each       = length(edad_def) * length(sc_def) * length(caus_def),
+        length.out = n_row_mort
+      ),
+      edad = rep(edad_def, each = length(sc_def) * length(caus_def), length.out = n_row_mort),
+      seccion = rep(sc_def, each = length(caus_def), length.out = n_row_mort),
+      causa_defuncion = rep(caus_def, length.out = n_row_mort)
+    )
+    mortalidad_cero <- fsetdiff(mortalidad_cero, mortalidad_c)
+    mortalidad_cero[, N := integer(.N)]
+    mortalidad_c    <- mortalidad_c[, .N, by = .(year_defuncion, sexo, edad, seccion, causa_defuncion)]
+    mort            <- funion(mortalidad_c, mortalidad_cero)[
+      order(year_defuncion, sexo, edad, seccion, causa_defuncion)
+    ]
+    name_dim_mor <- list(year_def, c("Masculino", "Femenino"), edad_def, sc_def, caus_def)
+    mort_array <- array(
+      data     = mort[[6]],
+      dim      = c(length(year_def), 2, length(edad_def), length(sc_def), length(caus_def)),
+      dimnames = name_dim_mor
+    )
+    res <- append(res, list(mortalidad = mort_array))
   }
 
   return(res)
