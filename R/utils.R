@@ -863,6 +863,86 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 }
 
 
+
+#' @title Comprobacion de asignacion de distintas coordenadas a misma direccion
+#'
+#' @description Aunque no es frecuente, en algunas situaciones, y frente a una
+#'   misma dirección, se obtienen distintas coordenadas. Esta función detecta
+#'   estos casos para que pueda volver a lanzarse el algoritmo de geocodificado
+#'   sobre ellos. Opcionalmente puede eliminar estos registros de los datos de
+#'   mortalidad.
+#'
+#' @param mortalidad datos
+#' @param borrar lógico
+#'
+#' @export
+#'
+comprueba_geocodificado <- function(mortalidad, borrar = FALSE) {
+
+
+  ## Falta comprobación de puntos predetectados
+
+
+  mortalidad_c <- copy(as.data.table(mortalidad))
+  vars         <- c("lat", "lng", "tip_via", "portalNumber", "muni",
+                    "province", "postalCode", "address")
+  if (!all(vars[1:2] %in% names(mortalidad_c))) {
+    stop("\nEn los datos de mortalidad no est\u00e1n presentes las variables ",
+         "'lng' y 'lat', o tienen otro nombre.\nPor favor, revise los datos ",
+         "y vuelva a ejecutar la funci\u00f3n.")
+  }
+  if (!all(vars[-c(1:2)] %in% names(mortalidad_c))) {
+    stop("\nAlgunas de las variables necesarias no est\u00e1n presentes en los ",
+         "datos proporcionados.\nPor favor, revise los datos de mortalidad y ",
+         "aseg\u00farese de que las variables 'tip_via', 'portalNumber', ",
+         "'muni', 'province', 'postalCode', 'address' y est\u00e1n presentes ",
+         "y tienen exactamente esos nombres (todas ellas se crean tras aplicar ",
+         "el algoritmo de geocodificado).")
+  }
+
+
+  mortalidad_c <- mortalidad_c[!is.na(lng) & !is.na(lat)]
+  mortalidad_c[
+    , c("muni", "province") := lapply(
+      .SD,
+      gsub,
+      pattern = "\\/(?<=\\/)[A-Za-zÀ-ÿ0-9_]+",
+      replace = "",
+      ignore.case = TRUE,
+      perl = TRUE
+    ), .SDcols = c("muni", "province")
+  ]
+  mortalidad_c[, direccion := paste0(
+    tip_via, " ", address, " ", portalNumber,
+    ", ", muni, ", ", province, ", ", postalCode
+  )]
+  setindexv(mortalidad_c, c("direccion", "lng", "lat"))
+  repetir_dir <- mortalidad_c[
+    !grep("google", georef, ignore.case = TRUE),
+    length(unique(lng)),
+    by = direccion
+  ][V1 != 1][, direccion]
+  repetir_ind <- which(mortalidad_c$direccion %in% repetir_dir)
+  mortalidad_c$direccion <- NULL
+
+  if (length(repetir_ind) != 0) {
+    res <- sort(repetir_dir)
+
+    if (borrar) {
+      mortalidad_c$georef[repetir_ind] <- "repetir_geo_google"
+      for (j in seq_along(vars)) {
+        set(mortalidad_c, repetir_ind, vars[j], NA_character_)
+      }
+      res <- list(direcciones = res, mortalidad = mortalidad_c)
+    }
+    return(res)
+  } else {
+    message("\nNo hay coordenadas discordantes ante una misma direcci\u00f3n.")
+  }
+}
+
+
+
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
     "CUSEC", "idn", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",
@@ -877,5 +957,6 @@ utils::globalVariables(
     "year_new", "year_ref", "yy", "zz", "CPOS", "clave", "npolis", "ref_cat",
     "tipo_reg", "tramo_por", "tvias", "tmp", "final", "distan_T", "dista",
     "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng",
-    "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion")
+    "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion", "address",
+    "direccion")
 )
