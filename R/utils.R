@@ -869,53 +869,46 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 #' @description Aunque no es frecuente, en algunas situaciones, y frente a una
 #'   misma dirección, se obtienen distintas coordenadas. Esta función detecta
 #'   estos casos para que pueda volver a lanzarse el algoritmo de geocodificado
-#'   sobre ellos. Opcionalmente puede eliminar estos registros de los datos de
-#'   mortalidad.
+#'   sobre ellos. Concretamente se modifican estos registros de los datos de
+#'   mortalidad, sustituyendo los valores devueltos por el servicio de
+#'   geocodificado por \code{NA}'s, y fijando
+#'   \code{georef == "repetir_geo_google"}.
 #'
-#' @param mortalidad datos
-#' @param borrar lógico
+#' @param mortalidad Datos con la mortalidad geocodificada. Objeto de clase
+#'   \code{data.frame} que contenga, al menos, la siguiente información (los
+#'   nombres que deben tener las variables están entre paréntesis): longitud
+#'   (\code{lng}), latitud (\code{lat}) y dirección (\code{address}), número de
+#'   portal (\code{portalNumber}), municipio (\code{muni}) y provincia
+#'   (\code{province}) devueltos por el servicio de geocodificado.
+#'
+#' @usage comprueba_geocodificado(mortalidad)
+#'
+#' @return Devuelve un \code{data.frame} con la mortalidad y los registros
+#'   problemáticos modificados a \code{NA}, fijando el campo \code{georef} de
+#'   esos registros al valor \code{repetir_geo_google}.
 #'
 #' @export
 #'
-comprueba_geocodificado <- function(mortalidad, borrar = FALSE) {
+comprueba_geocodificado <- function(mortalidad) {
 
-
-  ## Falta comprobación de puntos predetectados
-
-
-  mortalidad_c <- copy(as.data.table(mortalidad))
-  vars         <- c("lat", "lng", "tip_via", "portalNumber", "muni",
-                    "province", "postalCode", "address")
-  if (!all(vars[1:2] %in% names(mortalidad_c))) {
+  vars         <- c("lat", "lng", "portalNumber", "muni", "province", "address")
+  if (!all(vars[1:2] %in% names(mortalidad))) {
     stop("\nEn los datos de mortalidad no est\u00e1n presentes las variables ",
          "'lng' y 'lat', o tienen otro nombre.\nPor favor, revise los datos ",
          "y vuelva a ejecutar la funci\u00f3n.")
   }
-  if (!all(vars[-c(1:2)] %in% names(mortalidad_c))) {
+  if (!all(vars[-c(1:2)] %in% names(mortalidad))) {
     stop("\nAlgunas de las variables necesarias no est\u00e1n presentes en los ",
          "datos proporcionados.\nPor favor, revise los datos de mortalidad y ",
-         "aseg\u00farese de que las variables 'tip_via', 'portalNumber', ",
-         "'muni', 'province', 'postalCode', 'address' y est\u00e1n presentes ",
-         "y tienen exactamente esos nombres (todas ellas se crean tras aplicar ",
-         "el algoritmo de geocodificado).")
+         "aseg\u00farese de que las variables 'address', 'portalNumber', ",
+         "'muni', 'province' est\u00e1n presentes y tienen exactamente esos ",
+         "nombres (todas ellas se crean tras aplicar el algoritmo de geocodificado).")
   }
 
-
-  mortalidad_c <- mortalidad_c[!is.na(lng) & !is.na(lat)]
-  mortalidad_c[
-    , c("muni", "province") := lapply(
-      .SD,
-      gsub,
-      pattern = "\\/(?<=\\/)[A-Za-zÀ-ÿ0-9_]+",
-      replace = "",
-      ignore.case = TRUE,
-      perl = TRUE
-    ), .SDcols = c("muni", "province")
-  ]
-  mortalidad_c[, direccion := paste0(
-    tip_via, " ", address, " ", portalNumber,
-    ", ", muni, ", ", province, ", ", postalCode
-  )]
+  mortalidad_1 <- copy(as.data.table(mortalidad))[, id_mort := as.integer(seq_len(.N))]
+  mortalidad_c <- mortalidad_1[!is.na(lng) & !is.na(lat)]
+  not_in_dt    <- fsetdiff(mortalidad_1, mortalidad_c)
+  mortalidad_c[, direccion := paste0(address, " ",portalNumber, ", ", muni, ", ", province)]
   setindexv(mortalidad_c, c("direccion", "lng", "lat"))
   repetir_dir <- mortalidad_c[
     !grep("google", georef, ignore.case = TRUE),
@@ -926,16 +919,13 @@ comprueba_geocodificado <- function(mortalidad, borrar = FALSE) {
   mortalidad_c$direccion <- NULL
 
   if (length(repetir_ind) != 0) {
-    res <- sort(repetir_dir)
-
-    if (borrar) {
-      mortalidad_c$georef[repetir_ind] <- "repetir_geo_google"
-      for (j in seq_along(vars)) {
-        set(mortalidad_c, repetir_ind, vars[j], NA_character_)
-      }
-      res <- list(direcciones = res, mortalidad = mortalidad_c)
+    mortalidad_c$georef[repetir_ind] <- "repetir_geo_google"
+    for (j in seq_along(vars)) {
+      set(mortalidad_c, repetir_ind, vars[j], NA_character_)
     }
-    return(res)
+    mortalidad_c <- rbindlist(list(mortalidad_c, not_in_dt))[order(id_mort)][, id_mort := NULL][]
+
+    return(mortalidad_c)
   } else {
     message("\nNo hay coordenadas discordantes ante una misma direcci\u00f3n.")
   }
@@ -958,5 +948,5 @@ utils::globalVariables(
     "tipo_reg", "tramo_por", "tvias", "tmp", "final", "distan_T", "dista",
     "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng",
     "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion", "address",
-    "direccion")
+    "direccion", "georef", "id_mort")
 )
