@@ -604,6 +604,7 @@ descarga_segura <- function(x, tries = 10, ...) {
   )
 }
 
+
 #' @title Deteccion de agrupaciones de mortalidad a revisar manualmente
 #'
 #' @description Esta función es útil a la hora de comprobar la geocodificación
@@ -863,7 +864,6 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 }
 
 
-
 #' @title Comprobacion de asignacion de distintas coordenadas a misma direccion
 #'
 #' @description Aunque no es frecuente, en algunas situaciones, y frente a una
@@ -931,6 +931,18 @@ comprueba_geocodificado <- function(mortalidad) {
   }
 }
 
+
+calcula_edad <- function(datos) {
+  datos$MESNAC[nchar(datos$MESNAC) == 1, ] <- paste0("0", datos$MESNAC[nchar(datos$MESNAC) == 1, ])
+  datos$DIANAC[nchar(datos$DIANAC) == 1, ] <- paste0("0", datos$DIANAC[nchar(datos$DIANAC) == 1, ])
+  datos$MESDEFUN[nchar(datos$MESDEFUN) == 1, ] <- paste0("0", datos$MESDEFUN[nchar(datos$MESDEFUN) == 1, ])
+  datos$DIADEFUN[nchar(datos$DIADEFUN) == 1, ] <- paste0("0", datos$DIADEFUN[nchar(datos$DIADEFUN) == 1, ])
+  datos$g_edad  <- paste0(datos$MESDEFUN, "-", datos$DIADEFUN) > paste0(datos$MESNAC, "-", datos$DIANAC)
+  datos$edad <- as.integer(datos$ANODEFUN) - as.integer(datos$ANONAC) - ifelse(datos$g_edad, 0, 1)
+  datos$EDAD <- edad
+  datos$g_edad <- NULL
+  return(datos)
+}
 
 
 utils::globalVariables(
