@@ -2,12 +2,13 @@
 #' @title Une los cambios del seccionado del INE
 #'
 #' @description Une los cambios del seccionado del INE (tomando como referencia
-#'   la cartografía INE 2011), adaptando a su vez las poblaciones o la
-#'   mortalidad por sexo año y sección censal (siempre que se desee, pues son
-#'   argumentos opcionales). Si el archivo de cambios incorpora información
-#'   catastral (número de viviendas afectada por cada cambio de sección), se
-#'   puede fijar un umbral de cambio (\%) para rechazar aquellos cambios que
-#'   involucren a muy pocas viviendas.
+#'   la cartografía INE 2011), adaptando a su vez las poblaciones por sexo,
+#'   año, grupo de edad y sección censal o la mortalidad por sexo, año de
+#'   defunción, grupo de edad, sección censal y causa de defunción (siempre que
+#'   se desee, pues son argumentos opcionales). Si el archivo de cambios
+#'   incorpora información catastral (número de viviendas afectada por cada
+#'   cambio de sección), se puede fijar un umbral de cambio (\%) para rechazar
+#'   aquellos cambios que involucren a muy pocas viviendas.
 #'
 #' @details La función trabaja con la siguiente dinámica:
 #'
@@ -28,7 +29,9 @@
 #'   archivo de cambios definitivo, se crean las agrupaciones de secciones, y se
 #'   realiza la unión de las mismas en la cartografía. \item Si se proporciona
 #'   un archivo de poblaciones, se agrega la población empleando las mismas
-#'   agrupaciones de secciones del punto previo.}
+#'   agrupaciones de secciones. \item Si se proporciona un archivo de
+#'   mortalidad geocodificada, se agregan las defunciones empleando las mismas
+#'   agrupaciones de secciones.}
 #'
 #'   No obstante, y dado que la función asume que el callejero, el archivo de
 #'   poblaciones y la cartografía están libres de errores. Como puede
@@ -37,7 +40,7 @@
 #'
 #'   \enumerate{ \item Cuando se quiera unir cambios no solo en la cartografía
 #'   sino también en los datos de población, puede aparecer un comportamiento
-#'   inestable de la funció, debido a divergencias existentes en la información
+#'   inestable de la función, debido a divergencias existentes en la información
 #'   contenida en los datos de población y en los trameros (que es desde donde
 #'   se crea el listado de cambios de sección), a pesar de que en ambos casos la
 #'   fuente de información es el propio INE.
@@ -137,11 +140,11 @@
 #' sc1 = NULL, sc2 = NULL)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
-#'   poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
-#'   \code{cartografia_ine} y \code{\link[sp]{SpatialPolygons}} con la
-#'   cartografía, donde cada fila es una sección censal y que cuenta con 9
-#'   columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el código de
-#'   sección censal (incluye provincia, municipio y distrito).}
+#'   poblaciones o mortalidad. Si no se proporciona ninguno se devuelve un
+#'   objeto de clase \code{cartografia_ine} y \code{\link[sp]{SpatialPolygons}}
+#'   con la cartografía, donde cada fila es una sección censal y que cuenta con
+#'   9 columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el código
+#'   de sección censal (incluye provincia, municipio y distrito).}
 #'   \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
 #'   provincia).} \item{CCA}{Cadena de 2 caracteres con el código de comunidad
 #'   autónoma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
@@ -150,15 +153,19 @@
 #'   sección censal.} \item{cluster_id}{Código de identificación del cluster de
 #'   uniones.} \item{sc_unida}{Código de las secciones unidas.}}
 #'
-#'   En caso de proporcionan poblaciones, se devuelve una lista de longitud
+#'   En caso de proporcionar poblaciones, se devuelve una lista de longitud
 #'   igual a dos, donde el primer elemento es la cartografía descrita
 #'   anteriormente y el segundo elemento de la lista es un objeto de clase
-#'   \code{poblaciones_ine} donde las filas representan las distintas secciones
-#'   censales. Las tres primeras columnas son: \describe{\item{seccion}{Código
-#'   de la sección censal.} \item{sexo}{Sexo de la población (0 = masculino; 1 =
-#'   femenino).} \item{year}{Año de referencia.}} El resto de columnas
-#'   representan los distintos grupos de edad, tras realizar el corte en los
-#'   grupos de edad (85 0 100).
+#'   \code{array} con cuatro dimensiones: año de defunción, sexo (0 =
+#'   masculino; 1 = femenino), grupo de edad (según corte establecido) y
+#'   sección censal.
+#'
+#'   En caso de proporcionar datos de mortalidad geocodificada, se devuelve una
+#'   lista de longitud igual a tres, donde los primeros elementos son los
+#'   anteriormente descritos y el tercer elemento es un objeto de clase
+#'   \code{array} con cinco dimensiones: año de defunción, sexo (0 = masculino;
+#'   1 = femenino), grupo de edad (según corte establecido), sección censal y
+#'   causa de muerte.
 #'
 #' @examples
 #'
@@ -190,7 +197,6 @@
 #'   )
 #'
 #'   nrow(union_sin_cat$cartografia) # 215 secciones
-#'   length(unique(union_sin_cat$poblacion$seccion)) # 215 secciones
 #'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_co) * 100) #
 #'   Conserva el 87 \% de secciones
 #'
@@ -256,7 +262,6 @@
 #'   )
 #'
 #'   nrow(union_con_cat$cartografia) # 223 secciones
-#'   length(unique(union_con_cat$poblacion$seccion)) # 223 secciones
 #'   round(nrow(union_con_cat$cartografia) / nrow(cartografia_co) * 100)
 #'   # Conserva el 91 \% de secciones
 #'
@@ -367,6 +372,11 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
            "Por favor, revise los datos de mortalidad y aseg\u00farese de que las",
            " variables 'sexo', 'year_defuncion', 'edad' y 'causa_defuncion' est\u00e1n ",
            "presentes y tienen exactamente esos nombres.")
+    }
+    if (!all(nchar(mortalidad_c$causa_defuncion) >= 3)) {
+      stop("\nTodas las causas de mortalidad (sin importar si se codificaron ",
+           "siguiendo CIE-9 o CIE-10) deben tener un m\u00ednimo de tres caracteres.",
+           "\nPor favor, revise que este aspecto se cumple en su base de datos.")
     }
   }
   cartografia <- sp::spTransform(cartografia, sp::CRS("+init=epsg:4326"))
@@ -684,65 +694,73 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
   ##############################################################################
 
   if (!is.null(mortalidad)) {
-    mortalidad_c <- mortalidad_c[!is.na(lng) & !is.na(lat)]
-    mortalidad_c[, c("lng", "lat") := lapply(.SD, as.numeric), .SDcols = c("lng", "lat")]
+    mortalidad_c <- mortalidad_c[
+      !is.na(lng) & !is.na(lat)
+      ][, c("lng", "lat") := lapply(.SD, as.numeric), .SDcols = c("lng", "lat")]
+    mortalidad_c[, causa_defuncion := gsub("\\.|,|\\s", "", causa_defuncion)]
     sp::coordinates(mortalidad_c) <- ~ lng + lat
     sp::proj4string(mortalidad_c) <- sp::CRS("+init=epsg:4326")
     mortalidad_c <- sp::spTransform(mortalidad_c, sp::proj4string(cartografia))
     mortalidad_c$seccion <- sp::over(mortalidad_c, cartografia)$seccion
-    mortalidad_c <- as.data.table(mortalidad_c)[
-      ,
-      c("year_defuncion", "sexo", "causa_defuncion", "edad", "seccion"),
-      with = TRUE
-    ]
+    mortalidad_c <- mortalidad_c[!is.na(mortalidad_c$seccion), ]
+
+    causas_def <- list()
+    causas_def[["01_sida"]]                    <- "^279[56]|^B2[0-4]"
+    causas_def[["02_cancer_estomago"]]         <- "^151|^C16"
+    causas_def[["03_cancer_colon"]]            <- "^153|^C18"
+    causas_def[["04_cancer_recto"]]            <- "^154|^C(19|2[01])"
+    causas_def[["05_cancer_colorectal"]]       <- "^153|^C18|^154|^C(19|2[01])"
+    causas_def[["06_cancer_laringe"]]          <- "^161|^C32"
+    causas_def[["07_cancer_pulmon"]]           <- "^162|^C3[3-4]"
+    causas_def[["08_cancer_mama"]]             <- "^174|^C50"
+    causas_def[["09_cancer_prostata"]]         <- "^185|^C61"
+    causas_def[["10_cancer_vejiga"]]           <- "^188|^C67"
+    causas_def[["11_cancer_hemato"]]           <- "^20[0-8]|^2733|^C(8[1-9]|9[0-6])"
+    causas_def[["12_diabetes"]]                <- "^250|^E1[0-4]"
+    causas_def[["13_ttos_mentales_organicos"]] <- "^290(?!1)|^F0[0-9]"
+    causas_def[["14_alzheimer"]]               <- "^2901|^3310|^G30"
+    causas_def[["15_demencia"]]                <- "^F0[0-9]|^290|3310|^G30"
+    causas_def[["16_isquemica_corazon"]]       <- "^41[0-4]|^I2[0-5]"
+    causas_def[["17_ictus"]]                   <- "^43[0-46-8]|^I6[0-9]"
+    causas_def[["18_epoc"]]                    <- "^49[0-24-6]|^J4[0-47]"
+    causas_def[["19_cirrosis"]]                <- "^571|^K7[034]|^K721|^K76[19]"
+    causas_def[["20_suicidios"]]               <- "^E95[0-9]|^X([6-7][0-9]|8[0-4])"
+    causas_def[["21_accidente_trafico"]]       <- paste0(
+      "^E81[0-9]|^V(0[2-4][19]|09[23]|1[2-4][3-59]|[1-7]9[4-69]|2[0-8][3-59]|",
+      "[3-7][0-8][4-79]|80[3-5]|8[12]1|8[3-6][0-3]|87[0-8]|89[29])"
+    )
+    causas_def[["22_todas_causas"]]            <- "[[:alnum:]]"
+    causas_def <- lapply(causas_def, grep, x = mortalidad_c$causa_defuncion, ignore.case = TRUE, perl = TRUE)
 
     grupo_edad <- names(poblacion[, -c(1:3)])
-    edades     <- strsplit(grupo_edad, "_")
-    edades     <- lapply(edades, function(x) as.numeric(x[grep("\\d+", x)]))
-    mortalidad_c[, g_edad := NA_character_]
-    for (i in seq_along(edades)) {
-      if (length(edades[[i]]) == 2) {
-        mortalidad_c[between(edad, edades[[i]][1], edades[[i]][2]), g_edad := grupo_edad[i]]
-      } else {
-        mortalidad_c[edad >= edades[[i]], g_edad := grupo_edad[i]]
-      }
-    }
-    mortalidad_c$edad <- NULL
-    setnames(mortalidad_c, "g_edad", "edad")
-    setcolorder(mortalidad_c, c(1, 2, 5, 4, 3))
-    year_def   <- unique(poblacion$year)
-    edad_def   <- names(poblacion[, -c(1:3)])
-    sc_def     <- unique(poblacion$seccion)
-    caus_def   <- sort(unique(mortalidad_c$causa_defuncion))
-    n_row_mort <- length(year_def) * 2 * length(edad_def) * length(sc_def) * length(caus_def)
+    mortalidad_c$edad <- as.numeric(mortalidad_c$edad)
+    mortalidad_c$edad <- factor(
+      cut(mortalidad_c$edad, c(-1, (5 * seq_along(grupo_edad[-length(grupo_edad)])) - 1, 125)),
+      labels = grupo_edad
+    )
+    mortalidad_c$seccion        <- factor(mortalidad_c$seccion)
+    mortalidad_c$year_defuncion <- factor(mortalidad_c$year_defuncion)
+    mortalidad_c$sexo           <- factor(mortalidad_c$sexo)
 
-    mortalidad_cero <- data.table(
-      year_defuncion = rep(
-        1996:2015,
-        each       = 2 * length(edad_def) * length(sc_def) * length(caus_def),
-        length.out = n_row_mort
-      ),
-      sexo = rep(
-        0:1,
-        each       = length(edad_def) * length(sc_def) * length(caus_def),
-        length.out = n_row_mort
-      ),
-      edad = rep(edad_def, each = length(sc_def) * length(caus_def), length.out = n_row_mort),
-      seccion = rep(sc_def, each = length(caus_def), length.out = n_row_mort),
-      causa_defuncion = rep(caus_def, length.out = n_row_mort)
-    )
-    mortalidad_cero <- fsetdiff(mortalidad_cero, mortalidad_c)
-    mortalidad_cero[, N := integer(.N)]
-    mortalidad_c    <- mortalidad_c[, .N, by = .(year_defuncion, sexo, edad, seccion, causa_defuncion)]
-    mort            <- funion(mortalidad_c, mortalidad_cero)[
-      order(year_defuncion, sexo, edad, seccion, causa_defuncion)
-    ]
-    name_dim_mor <- list(year_def, c("Masculino", "Femenino"), edad_def, sc_def, caus_def)
     mort_array <- array(
-      data     = mort[[6]],
-      dim      = c(length(year_def), 2, length(edad_def), length(sc_def), length(caus_def)),
-      dimnames = name_dim_mor
+      dim      = c(length(unique(poblacion$year)), 2, length(grupo_edad),
+                   length(unique(mortalidad_c$seccion)), length(causas_def)),
+      dimnames = list(
+        unique(poblacion$year),
+        levels(mortalidad_c$sexo),
+        grupo_edad,
+        unique(poblacion$seccion),
+        names(causas_def)
+      )
     )
+    for (i in seq_along(causas_def)) {
+      mort_array[ , , , , i] <- table(
+        mortalidad_c$year_defuncion[causas_def[[i]]],
+        mortalidad_c$sexo[causas_def[[i]]],
+        mortalidad_c$edad[causas_def[[i]]],
+        mortalidad_c$seccion[causas_def[[i]]]
+      )
+    }
     res <- append(res, list(mortalidad = mort_array))
   }
 
