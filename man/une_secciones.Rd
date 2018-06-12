@@ -67,11 +67,11 @@ longitud que \code{sc1}.}
 }
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de
-  poblaciones o no. Si no se proporcionan se devuelve un objeto de clase
-  \code{cartografia_ine} y \code{\link[sp]{SpatialPolygons}} con la
-  cartografía, donde cada fila es una sección censal y que cuenta con 9
-  columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el código de
-  sección censal (incluye provincia, municipio y distrito).}
+  poblaciones o mortalidad. Si no se proporciona ninguno se devuelve un
+  objeto de clase \code{cartografia_ine} y \code{\link[sp]{SpatialPolygons}}
+  con la cartografía, donde cada fila es una sección censal y que cuenta con
+  9 columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el código
+  de sección censal (incluye provincia, municipio y distrito).}
   \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
   provincia).} \item{CCA}{Cadena de 2 caracteres con el código de comunidad
   autónoma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
@@ -80,24 +80,29 @@ El resultado devuelto varía en función de si se proporcionan datos de
   sección censal.} \item{cluster_id}{Código de identificación del cluster de
   uniones.} \item{sc_unida}{Código de las secciones unidas.}}
 
-  En caso de proporcionan poblaciones, se devuelve una lista de longitud
+  En caso de proporcionar poblaciones, se devuelve una lista de longitud
   igual a dos, donde el primer elemento es la cartografía descrita
   anteriormente y el segundo elemento de la lista es un objeto de clase
-  \code{poblaciones_ine} donde las filas representan las distintas secciones
-  censales. Las tres primeras columnas son: \describe{\item{seccion}{Código
-  de la sección censal.} \item{sexo}{Sexo de la población (0 = masculino; 1 =
-  femenino).} \item{year}{Año de referencia.}} El resto de columnas
-  representan los distintos grupos de edad, tras realizar el corte en los
-  grupos de edad (85 0 100).
+  \code{array} con cuatro dimensiones: año de defunción, sexo (0 =
+  masculino; 1 = femenino), grupo de edad (según corte establecido) y
+  sección censal.
+
+  En caso de proporcionar datos de mortalidad geocodificada, se devuelve una
+  lista de longitud igual a tres, donde los primeros elementos son los
+  anteriormente descritos y el tercer elemento es un objeto de clase
+  \code{array} con cinco dimensiones: año de defunción, sexo (0 = masculino;
+  1 = femenino), grupo de edad (según corte establecido), sección censal y
+  causa de muerte.
 }
 \description{
 Une los cambios del seccionado del INE (tomando como referencia
-  la cartografía INE 2011), adaptando a su vez las poblaciones o la
-  mortalidad por sexo año y sección censal (siempre que se desee, pues son
-  argumentos opcionales). Si el archivo de cambios incorpora información
-  catastral (número de viviendas afectada por cada cambio de sección), se
-  puede fijar un umbral de cambio (\%) para rechazar aquellos cambios que
-  involucren a muy pocas viviendas.
+  la cartografía INE 2011), adaptando a su vez las poblaciones por sexo,
+  año, grupo de edad y sección censal o la mortalidad por sexo, año de
+  defunción, grupo de edad, sección censal y causa de defunción (siempre que
+  se desee, pues son argumentos opcionales). Si el archivo de cambios
+  incorpora información catastral (número de viviendas afectada por cada
+  cambio de sección), se puede fijar un umbral de cambio (\%) para rechazar
+  aquellos cambios que involucren a muy pocas viviendas.
 }
 \details{
 La función trabaja con la siguiente dinámica:
@@ -119,7 +124,9 @@ La función trabaja con la siguiente dinámica:
   archivo de cambios definitivo, se crean las agrupaciones de secciones, y se
   realiza la unión de las mismas en la cartografía. \item Si se proporciona
   un archivo de poblaciones, se agrega la población empleando las mismas
-  agrupaciones de secciones del punto previo.}
+  agrupaciones de secciones. \item Si se proporciona un archivo de
+  mortalidad geocodificada, se agregan las defunciones empleando las mismas
+  agrupaciones de secciones.}
 
   No obstante, y dado que la función asume que el callejero, el archivo de
   poblaciones y la cartografía están libres de errores. Como puede
@@ -128,7 +135,7 @@ La función trabaja con la siguiente dinámica:
 
   \enumerate{ \item Cuando se quiera unir cambios no solo en la cartografía
   sino también en los datos de población, puede aparecer un comportamiento
-  inestable de la funció, debido a divergencias existentes en la información
+  inestable de la función, debido a divergencias existentes en la información
   contenida en los datos de población y en los trameros (que es desde donde
   se crea el listado de cambios de sección), a pesar de que en ambos casos la
   fuente de información es el propio INE.
@@ -209,7 +216,6 @@ La función trabaja con la siguiente dinámica:
   )
 
   nrow(union_sin_cat$cartografia) # 215 secciones
-  length(unique(union_sin_cat$poblacion$seccion)) # 215 secciones
   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_co) * 100) #
   Conserva el 87 \\\% de secciones
 
@@ -275,7 +281,6 @@ La función trabaja con la siguiente dinámica:
   )
 
   nrow(union_con_cat$cartografia) # 223 secciones
-  length(unique(union_con_cat$poblacion$seccion)) # 223 secciones
   round(nrow(union_con_cat$cartografia) / nrow(cartografia_co) * 100)
   # Conserva el 91 \\\% de secciones
 
