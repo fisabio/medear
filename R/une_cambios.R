@@ -334,6 +334,12 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
            "Por favor, revise que los datos de cambios de seccionado hacen ",
            "referencia a secciones contenidas en los datos de poblaciones.")
     }
+    if (!all(years %in% unique(poblacion$year))) {
+      stop("\nNo hay datos de poblaci\u00f3n para todos los a\u00f1os marcados en el ",
+           "argumento 'years'.\nNo tiene sentido realizar uniones de seccionado.",
+           "\nPor favor, revise los datos de poblaci\u00f3n o escoja un rango de ",
+           "a\u00f1os para los que tenga datos.")
+    }
   }
   if (modo == "manual") {
     if (is.null(sc1) && is.null(sc2)) {
@@ -377,6 +383,12 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
       stop("\nTodas las causas de mortalidad (sin importar si se codificaron ",
            "siguiendo CIE-9 o CIE-10) deben tener un m\u00ednimo de tres caracteres.",
            "\nPor favor, revise que este aspecto se cumple en su base de datos.")
+    }
+    if (!all(years %in% unique(mortalidad_c$year_defuncion))) {
+      stop("\nNo hay datos de mortalidad para todos los a\u00f1os marcados en el ",
+           "argumento 'years'.\nNo tiene sentido realizar uniones de seccionado.",
+           "\nPor favor, revise los datos de mortalidad o escoja un rango de ",
+           "a\u00f1os para los que tenga datos.")
     }
   }
   cartografia <- sp::spTransform(cartografia, sp::CRS("+init=epsg:4326"))
