@@ -584,11 +584,11 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
         )
       }
     }
+    attributes(cartografia@data)$cambios <- cambios_copy
   } else if (is.null(poblacion)) {
     message("\nEn el per\u00edodo establecido no se ha detectado ning\u00fan cambio: ",
             "se devuelve la misma cartograf\u00eda.")
   }
-  attributes(cartografia@data)$cambios <- cambios_copy
   attributes(cartografia@data)$fuente  <- fuente
   res <- cartografia
 
@@ -748,9 +748,11 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
     grupo_edad <- names(poblacion[, -c(1:3)])
     mortalidad_c$edad <- as.numeric(mortalidad_c$edad)
+    mortalidad_c$edad <- cut(
+      mortalidad_c$edad, c(-1, (5 * seq_along(grupo_edad[-length(grupo_edad)])) - 1, 125)
+    )
     mortalidad_c$edad <- factor(
-      cut(mortalidad_c$edad, c(-1, (5 * seq_along(grupo_edad[-length(grupo_edad)])) - 1, 125)),
-      labels = grupo_edad
+      mortalidad_c$edad, levels = levels(mortalidad_c$edad), labels = grupo_edad
     )
     mortalidad_c$seccion        <- factor(mortalidad_c$seccion)
     mortalidad_c$year_defuncion <- factor(mortalidad_c$year_defuncion)
