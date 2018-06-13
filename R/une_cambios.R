@@ -695,8 +695,10 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
 
   if (!is.null(mortalidad)) {
     mortalidad_c <- mortalidad_c[
-      !is.na(lng) & !is.na(lat)
-      ][, c("lng", "lat") := lapply(.SD, as.numeric), .SDcols = c("lng", "lat")]
+      !is.na(lng) & !is.na(lat) & !is.na(year_defuncion) &
+        !is.na(sexo) & !is.na(edad) & !is.na(causa_defuncion)
+    ][between(year_defuncion, min(years), max(years))]
+    mortalidad_c <- mortalidad_c[, c("lng", "lat") := lapply(.SD, as.numeric), .SDcols = c("lng", "lat")]
     mortalidad_c[, causa_defuncion := gsub("\\.|,|\\s", "", causa_defuncion)]
     sp::coordinates(mortalidad_c) <- ~ lng + lat
     sp::proj4string(mortalidad_c) <- sp::CRS("+init=epsg:4326")
