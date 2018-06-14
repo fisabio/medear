@@ -38,7 +38,7 @@ filtrar_ein_esn <- function(datos) {
 #'   el archivo alfanumérico con la información catastral completa de un
 #'   municipio.
 #'
-#' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2016), cod_postal =
+#' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2015), cod_postal =
 #'   FALSE, catastro = NULL)
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
@@ -103,7 +103,7 @@ filtrar_ein_esn <- function(datos) {
 #'
 #' @seealso \code{\link{une_secciones}} y \code{\link{descarga_trameros}}.
 #'
-detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2016),
+detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2015),
                             cod_postal = FALSE, catastro = NULL) {
 
   stopifnot("tramero_ine" %in% class(datos))
