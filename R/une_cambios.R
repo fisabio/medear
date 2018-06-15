@@ -366,6 +366,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     }
     mortalidad_c        <- copy(as.data.table(mortalidad))
     names(mortalidad_c) <- tolower(names(mortalidad_c))
+    mortalidad_c[, c(colnames(mortalidad_c)) := lapply(.SD, as.character), .SDcols = colnames(mortalidad_c)]
+
     if (!all(c("lng", "lat") %in% names(mortalidad_c))) {
       stop("\nEn los datos de mortalidad no est\u00e1n presentes las variables ",
            "'lng' y 'lat', o tienen otro nombre.\nPor favor, revise los datos ",
