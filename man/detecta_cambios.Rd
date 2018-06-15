@@ -5,7 +5,7 @@
 \alias{detecta_cambios}
 \title{Funcion para detectar cambios de seccionado en trameros}
 \usage{
-detecta_cambios(datos, years = c(1996, 2001, 2004:2016), cod_postal =
+detecta_cambios(datos, years = c(1996, 2001, 2004:2015), cod_postal =
   FALSE, catastro = NULL)
 }
 \arguments{
