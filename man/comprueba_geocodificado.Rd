@@ -4,7 +4,7 @@
 \alias{comprueba_geocodificado}
 \title{Comprobacion de asignacion de distintas coordenadas a misma direccion}
 \usage{
-comprueba_geocodificado(mortalidad)
+comprueba_geocodificado(mortalidad, tip_via = FALSE)
 }
 \arguments{
 \item{mortalidad}{Datos con la mortalidad geocodificada. Objeto de clase
@@ -13,6 +13,10 @@ nombres que deben tener las variables están entre paréntesis): longitud
 (\code{lng}), latitud (\code{lat}) y dirección (\code{address}), número de
 portal (\code{portalNumber}), municipio (\code{muni}) y provincia
 (\code{province}) devueltos por el servicio de geocodificado.}
+
+\item{tipo_via}{Valor Lógico. ¿Debe incorporarse el tipo de vía en la
+búsqueda de duplicidades? De ser así la base de datos de mortalidad deberá
+incorporar dicha variable (\code{tip_via}).}
 }
 \value{
 Devuelve un \code{data.frame} con la mortalidad y los registros

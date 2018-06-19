@@ -880,8 +880,11 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 #'   (\code{lng}), latitud (\code{lat}) y dirección (\code{address}), número de
 #'   portal (\code{portalNumber}), municipio (\code{muni}) y provincia
 #'   (\code{province}) devueltos por el servicio de geocodificado.
+#' @param tipo_via Valor Lógico. ¿Debe incorporarse el tipo de vía en la
+#'   búsqueda de duplicidades? De ser así la base de datos de mortalidad deberá
+#'   incorporar dicha variable (\code{tip_via}).
 #'
-#' @usage comprueba_geocodificado(mortalidad)
+#' @usage comprueba_geocodificado(mortalidad, tip_via = FALSE)
 #'
 #' @return Devuelve un \code{data.frame} con la mortalidad y los registros
 #'   problemáticos modificados a \code{NA}, fijando el campo \code{georef} de
@@ -889,9 +892,11 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 #'
 #' @export
 #'
-comprueba_geocodificado <- function(mortalidad) {
+comprueba_geocodificado <- function(mortalidad, tip_via = FALSE) {
 
   vars         <- c("lat", "lng", "portalNumber", "muni", "province", "address")
+  if (tip_via)
+    c(vars, "tip_via")
   if (!all(vars[1:2] %in% names(mortalidad))) {
     stop("\nEn los datos de mortalidad no est\u00e1n presentes las variables ",
          "'lng' y 'lat', o tienen otro nombre.\nPor favor, revise los datos ",
@@ -901,14 +906,19 @@ comprueba_geocodificado <- function(mortalidad) {
     stop("\nAlgunas de las variables necesarias no est\u00e1n presentes en los ",
          "datos proporcionados.\nPor favor, revise los datos de mortalidad y ",
          "aseg\u00farese de que las variables 'address', 'portalNumber', ",
-         "'muni', 'province' est\u00e1n presentes y tienen exactamente esos ",
+         "'muni', 'province' y 'tip_via' (en caso de haber escogido esa ",
+         "opci\u00f3n) est\u00e1n presentes y tienen exactamente esos ",
          "nombres (todas ellas se crean tras aplicar el algoritmo de geocodificado).")
   }
 
   mortalidad_1 <- copy(as.data.table(mortalidad))[, id_mort := as.integer(seq_len(.N))]
   mortalidad_c <- mortalidad_1[!is.na(lng) & !is.na(lat)]
   not_in_dt    <- fsetdiff(mortalidad_1, mortalidad_c)
-  mortalidad_c[, direccion := paste0(address, " ",portalNumber, ", ", muni, ", ", province)]
+  if (tip_via) {
+    mortalidad_c[, direccion := paste0(tip_via, " ", address, " ", portalNumber, ", ", muni, ", ", province)]
+  } else {
+    mortalidad_c[, direccion := paste0(address, " ", portalNumber, ", ", muni, ", ", province)]
+  }
   setindexv(mortalidad_c, c("direccion", "lng", "lat"))
   repetir_dir <- mortalidad_c[
     !grep("google", georef, ignore.case = TRUE),
