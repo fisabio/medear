@@ -6,7 +6,7 @@
 \title{Deteccion de agrupaciones de mortalidad a revisar manualmente}
 \usage{
 detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
-  limite = c(1e-10, 1e-15, 1e-20))
+  limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE)
 }
 \arguments{
 \item{datos}{Base de datos con las coordenadas que ubican cada uno de los
@@ -39,6 +39,9 @@ fondo.}
 \item{limite}{Numérico con longitud 1 <= x <= 9: límites de probabilidad con
 los que se identifican las agrupaciones sospechosas. Por defecto viene
 fijado a 1e-10, 1e-15 y 1e-20.}
+
+\item{devuelve_datos}{Valor lógico, por defecto TRUE. ¿La función debe
+devolver un \code{data.frame} con los datos identificativos de los clústeres?}
 }
 \value{
 Representa un objeto de clase \code{\link[leaflet]{leaflet}} en el
