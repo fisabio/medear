@@ -615,7 +615,7 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   aglomeración de defunciones.
 #'
 #' @usage detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
-#'   limite = c(1e-10, 1e-15, 1e-20))
+#'   limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE)
 #'
 #' @param datos Base de datos con las coordenadas que ubican cada uno de los
 #'   fallecimientos. Debe contener, al menos, 3 columnas: \code{BOD.direccion},
@@ -643,6 +643,8 @@ descarga_segura <- function(x, tries = 10, ...) {
 #' @param limite Numérico con longitud 1 <= x <= 9: límites de probabilidad con
 #'   los que se identifican las agrupaciones sospechosas. Por defecto viene
 #'   fijado a 1e-10, 1e-15 y 1e-20.
+#' @param devuelve_datos Valor lógico, por defecto TRUE. ¿La función debe
+#'   devolver un \code{data.frame} con los datos identificativos de los clústeres?
 #'
 #' @details La función comienza calculando el número de fallecimientos en cada
 #'   par único de coordenadas, identifica los \emph{n} vecinos más próximos a
@@ -690,7 +692,7 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'
 #' @export
 detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
-                            limite = c(1e-10, 1e-15, 1e-20)) {
+                            limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE) {
 
   vars_ob <- c("BOD.direccion", "lng", "lat")
   vars_op <- c("province", "muni", "tip_via", "address", "portalNumber", "postalCode")
@@ -853,14 +855,16 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     title     = "Pr(Esp >= Obs)",
     opacity   = 1
   )
-  print(mapa_cluster)
 
-  grupo_sp         <- as.data.table(grupo_sp)
-  grupo_sp$detalle <- pegote
-  grupo_sp         <- grupo_sp[, c("lng", "lat", "N", "limite", "detalle")]
-
-
-  return(grupo_sp[])
+  if (devuelve_datos) {
+    print(mapa_cluster)
+    grupo_sp         <- as.data.table(grupo_sp)
+    grupo_sp$detalle <- pegote
+    grupo_sp         <- grupo_sp[, c("lng", "lat", "N", "limite", "detalle")]
+    return(grupo_sp[])
+  } else {
+    mapa_cluster
+  }
 }
 
 
@@ -877,14 +881,11 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 #' @param mortalidad Datos con la mortalidad geocodificada. Objeto de clase
 #'   \code{data.frame} que contenga, al menos, la siguiente información (los
 #'   nombres que deben tener las variables están entre paréntesis): longitud
-#'   (\code{lng}), latitud (\code{lat}) y dirección (\code{address}), número de
+#'   (\code{lng}), latitud (\code{lat}), tipo de vía (\code{tip_via}), dirección (\code{address}), número de
 #'   portal (\code{portalNumber}), municipio (\code{muni}) y provincia
 #'   (\code{province}) devueltos por el servicio de geocodificado.
-#' @param tipo_via Valor Lógico. ¿Debe incorporarse el tipo de vía en la
-#'   búsqueda de duplicidades? De ser así la base de datos de mortalidad deberá
-#'   incorporar dicha variable (\code{tip_via}).
 #'
-#' @usage comprueba_geocodificado(mortalidad, tip_via = FALSE)
+#' @usage comprueba_geocodificado(mortalidad)
 #'
 #' @return Devuelve un \code{data.frame} con la mortalidad y los registros
 #'   problemáticos modificados a \code{NA}, fijando el campo \code{georef} de
@@ -892,11 +893,9 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 #'
 #' @export
 #'
-comprueba_geocodificado <- function(mortalidad, tip_via = FALSE) {
+comprueba_geocodificado <- function(mortalidad) {
 
-  vars         <- c("lat", "lng", "portalNumber", "muni", "province", "address")
-  if (tip_via)
-    c(vars, "tip_via")
+  vars <- c("lat", "lng", "portalNumber", "muni", "province", "address", "tip_via")
   if (!all(vars[1:2] %in% names(mortalidad))) {
     stop("\nEn los datos de mortalidad no est\u00e1n presentes las variables ",
          "'lng' y 'lat', o tienen otro nombre.\nPor favor, revise los datos ",
@@ -906,19 +905,14 @@ comprueba_geocodificado <- function(mortalidad, tip_via = FALSE) {
     stop("\nAlgunas de las variables necesarias no est\u00e1n presentes en los ",
          "datos proporcionados.\nPor favor, revise los datos de mortalidad y ",
          "aseg\u00farese de que las variables 'address', 'portalNumber', ",
-         "'muni', 'province' y 'tip_via' (en caso de haber escogido esa ",
-         "opci\u00f3n) est\u00e1n presentes y tienen exactamente esos ",
+         "'muni', 'province' y 'tip_via' est\u00e1n presentes y tienen exactamente esos ",
          "nombres (todas ellas se crean tras aplicar el algoritmo de geocodificado).")
   }
 
   mortalidad_1 <- copy(as.data.table(mortalidad))[, id_mort := as.integer(seq_len(.N))]
   mortalidad_c <- mortalidad_1[!is.na(lng) & !is.na(lat)]
   not_in_dt    <- fsetdiff(mortalidad_1, mortalidad_c)
-  if (tip_via) {
-    mortalidad_c[, direccion := paste0(tip_via, " ", address, " ", portalNumber, ", ", muni, ", ", province)]
-  } else {
-    mortalidad_c[, direccion := paste0(address, " ", portalNumber, ", ", muni, ", ", province)]
-  }
+  mortalidad_c[, direccion := paste0(tip_via, " ", address, " ", portalNumber, ", ", muni, ", ", province)]
   setindexv(mortalidad_c, c("direccion", "lng", "lat"))
   repetir_dir <- mortalidad_c[
     !grep("google", georef, ignore.case = TRUE),
