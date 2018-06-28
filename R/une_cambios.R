@@ -151,7 +151,7 @@
 #'   comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
 #'   \item{geometry}{Columna de tipo lista con la geometría asociada a cada
 #'   sección censal.} \item{cluster_id}{Código de identificación del cluster de
-#'   uniones.} \item{sc_unida}{Código de las secciones unidas.}}
+#'   uniones.} \item{revision_manual}{Indica si debe revisarse esa unión.}}
 #'
 #'   En caso de proporcionar poblaciones, se devuelve una lista de longitud
 #'   igual a dos, donde el primer elemento es la cartografía descrita
@@ -163,9 +163,8 @@
 #'   En caso de proporcionar datos de mortalidad geocodificada, se devuelve una
 #'   lista de longitud igual a tres, donde los primeros elementos son los
 #'   anteriormente descritos y el tercer elemento es un objeto de clase
-#'   \code{array} con cinco dimensiones: año de defunción, sexo (0 = masculino;
-#'   1 = femenino), grupo de edad (según corte establecido), sección censal y
-#'   causa de muerte.
+#'   \code{array} con cinco dimensiones: año de defunción, sexo, grupo de edad
+#'   (según corte establecido), sección censal y causa de muerte.
 #'
 #' @examples
 #'
@@ -592,7 +591,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
             "se devuelve la misma cartograf\u00eda.")
   }
   attributes(cartografia@data)$fuente  <- fuente
-  res <- cartografia
+  union_sin_cat$cartografia@data$n_viv <- NULL
+  res                                  <- cartografia
 
 
   ##############################################################################
