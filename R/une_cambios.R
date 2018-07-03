@@ -134,7 +134,7 @@
 #'   manualmente, vacío por defecto. Si se proporciona debe tener la misma
 #'   longitud que \code{sc1}.
 #'
-#' @usage une_secciones(cambios, cartografia, years = 1996:2016,
+#' @usage une_secciones(cambios, cartografia, years = 1996:2015,
 #' poblacion = NULL, mortalidad = NULL, corte_edad = 85, catastro = FALSE,
 #' umbral_vivienda = 5, distancia = 100, modo = c("auto", "manual"),
 #' sc1 = NULL, sc2 = NULL)
@@ -289,7 +289,7 @@
 #' @seealso \code{\link{detecta_cambios}}, \code{\link{descarga_poblaciones}} y
 #'   \code{\link{descarga_cartografia}}
 #'
-une_secciones <- function(cambios, cartografia, years = 1996:2016,
+une_secciones <- function(cambios, cartografia, years = 1996:2015,
                           poblacion = NULL, mortalidad = NULL, corte_edad = 85,
                           catastro = FALSE, umbral_vivienda = 5, distancia = 100,
                           modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL) {
@@ -393,9 +393,15 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     }
   }
   cartografia <- sp::spTransform(cartografia, sp::CRS("+init=epsg:4326"))
+  cartografia <- cartografia[cartografia$CUMUN %in% substr(cambios$sc_ref, 1, 5), ]
   if ("vias" %in% names(cambios)) cambios$vias <- NULL
   fuente     <- "Fuente: Sitio web del INE: www.ine.es"
   utils::data("secciones", envir = environment(), package = "medear")
+  if (!is.null(poblacion)) {
+    secciones <- secciones[seccion %in% unique(c(cartografia$seccion, poblacion$seccion))]
+  } else {
+    secciones <- secciones[seccion %in% cartografia$seccion]
+  }
   cambios    <- cambios[between(year2, years[1], years[length(years)])]
   cambios$modo   <- "auto"
 
@@ -445,9 +451,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
     secciones[tmp == TRUE, final := as.integer(year)]
     secciones[, tmp := NULL]
     sc_pob_conservar <- secciones[between(final, 2012, max(year) - 1), seccion]
-    secciones_2011   <- secciones[
-      year == 2011 & substr(seccion, 1, 5) %in% cambios[, substr(sc_ref, 1, 5)]
-      ][, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
+    secciones_2011   <- data.table(year = 2011, seccion = cartografia$seccion)
+    secciones_2011   <- secciones_2011[, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
   }
 
   ##############################################################################
@@ -591,7 +596,7 @@ une_secciones <- function(cambios, cartografia, years = 1996:2016,
             "se devuelve la misma cartograf\u00eda.")
   }
   attributes(cartografia@data)$fuente  <- fuente
-  union_sin_cat$cartografia@data$n_viv <- NULL
+  cartografia@data$n_viv <- NULL
   res                                  <- cartografia
 
 
