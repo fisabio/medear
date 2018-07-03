@@ -208,8 +208,8 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2015),
       function(x, y) x / nrow(datos[seccion == y & year == 2011]) * 100,
       viviendas_def$n_na, cambios$sc_ref
     )
-    cambios[, viviendas := viviendas_def$n_viv]
-    cambios <- cambios[, tramo_por := tramos_cat][]
+    cambios$viviendas <- viviendas_def$n_viv
+    cambios$tramo_por <- tramos_cat
     setcolorder(cambios, c(1:4, 6:7, 5))
   }
 
