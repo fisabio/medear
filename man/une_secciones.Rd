@@ -5,8 +5,8 @@
 \alias{une_secciones}
 \title{Une los cambios del seccionado del INE}
 \usage{
-une_secciones(cambios, cartografia, years = 1996:2016,
-poblacion = NULL, mortalidad = NULL, corte_edad = 85, catastro = FALSE,
+une_secciones(cambios, cartografia, poblacion = NULL,
+mortalidad = NULL, years = 1996:2015, corte_edad = 85, catastro = FALSE,
 umbral_vivienda = 5, distancia = 100, modo = c("auto", "manual"),
 sc1 = NULL, sc2 = NULL)
 }
@@ -15,11 +15,6 @@ sc1 = NULL, sc2 = NULL)
 
 \item{cartografia}{Objeto de clase \code{\link[sp]{SpatialPolygons}}, y con
 datos de clase \code{cartografia_ine}.}
-
-\item{years}{Vector numérico de longitud >= 1 con los años para los que se
-desee consultar las variaciones de seccionado. El año 2011 debe figurar
-dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
-año).}
 
 \item{poblacion}{Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 proporcionar en caso de querer agregar las poblaciones.}
@@ -31,6 +26,11 @@ mínimo, las variables sexo, año de defunción, edad, causa de defunción y
 el par de coordenadas (longitud y latitud), y que tengan exactamente los
 siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
 'lng', y 'lat', respectivamente.}
+
+\item{years}{Vector numérico de longitud >= 1 con los años para los que se
+desee consultar las variaciones de seccionado. El año 2011 debe figurar
+dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
+año).}
 
 \item{corte_edad}{Numérico: punto de corte para los grupos de edad (85 o
 100). Argumento opcional en caso de proporcionar datos de poblaciones.}
