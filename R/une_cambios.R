@@ -134,8 +134,8 @@
 #'   manualmente, vacío por defecto. Si se proporciona debe tener la misma
 #'   longitud que \code{sc1}.
 #'
-#' @usage une_secciones(cambios, cartografia, years = 1996:2015,
-#' poblacion = NULL, mortalidad = NULL, corte_edad = 85, catastro = FALSE,
+#' @usage une_secciones(cambios, cartografia, poblacion = NULL,
+#' mortalidad = NULL, years = 1996:2015, corte_edad = 85, catastro = FALSE,
 #' umbral_vivienda = 5, distancia = 100, modo = c("auto", "manual"),
 #' sc1 = NULL, sc2 = NULL)
 #'
@@ -289,9 +289,9 @@
 #' @seealso \code{\link{detecta_cambios}}, \code{\link{descarga_poblaciones}} y
 #'   \code{\link{descarga_cartografia}}
 #'
-une_secciones <- function(cambios, cartografia, years = 1996:2015,
-                          poblacion = NULL, mortalidad = NULL, corte_edad = 85,
-                          catastro = FALSE, umbral_vivienda = 5, distancia = 100,
+une_secciones <- function(cambios, cartografia, poblacion = NULL, mortalidad = NULL,
+                          years = 1996:2015, corte_edad = 85, catastro = FALSE,
+                          umbral_vivienda = 5, distancia = 100,
                           modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL) {
 
   ##############################################################################
@@ -365,7 +365,9 @@ une_secciones <- function(cambios, cartografia, years = 1996:2015,
     }
     mortalidad_c        <- copy(as.data.table(mortalidad))
     names(mortalidad_c) <- tolower(names(mortalidad_c))
-    mortalidad_c[, c(colnames(mortalidad_c)) := lapply(.SD, as.character), .SDcols = colnames(mortalidad_c)]
+    for (i in seq_along(mortalidad_c)) {
+      set(mortalidad_c, j = i, value = as.character(mortalidad_c[[i]]))
+    }
 
     if (!all(c("lng", "lat") %in% names(mortalidad_c))) {
       stop("\nEn los datos de mortalidad no est\u00e1n presentes las variables ",
@@ -643,8 +645,8 @@ une_secciones <- function(cambios, cartografia, years = 1996:2015,
       )
     }
 
-    name_dim_pob <- list(unique(poblacion$seccion), c("Masculino", "Femenino"),
-                         unique(poblacion$year), names(poblacion[, -c(1:3)]))
+    name_dim_pob <- list(sort(unique(poblacion$seccion)), c("Masculino", "Femenino"),
+                         sort(unique(poblacion$year)), names(poblacion[, -c(1:3)]))
     pob_array    <- array(
       data     = unlist(poblacion[, -c(1:3)]),
       dim      = c(length(unique(poblacion$seccion)), 2, length(unique(poblacion$year)), ncol(poblacion[, -c(1:3)])),
@@ -761,18 +763,22 @@ une_secciones <- function(cambios, cartografia, years = 1996:2015,
     mortalidad_c$edad <- factor(
       mortalidad_c$edad, levels = levels(mortalidad_c$edad), labels = grupo_edad
     )
-    mortalidad_c$seccion        <- factor(mortalidad_c$seccion)
-    mortalidad_c$year_defuncion <- factor(mortalidad_c$year_defuncion)
+    mortalidad_c$seccion        <- factor(
+      mortalidad_c$seccion, levels = dimnames(pob_array)[[4]], labels = dimnames(pob_array)[[4]]
+    )
+    mortalidad_c$year_defuncion <- factor(
+      mortalidad_c$year_defuncion, levels = dimnames(pob_array)[[1]], labels = dimnames(pob_array)[[1]]
+    )
     mortalidad_c$sexo           <- factor(mortalidad_c$sexo)
 
     mort_array <- array(
       dim      = c(length(unique(poblacion$year)), 2, length(grupo_edad),
                    length(unique(mortalidad_c$seccion)), length(causas_def)),
       dimnames = list(
-        unique(poblacion$year),
+        dimnames(pob_array)[[1]],
         levels(mortalidad_c$sexo),
-        grupo_edad,
-        unique(poblacion$seccion),
+        dimnames(pob_array)[[3]],
+        dimnames(pob_array)[[4]],
         names(causas_def)
       )
     )
