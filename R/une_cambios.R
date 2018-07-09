@@ -633,10 +633,11 @@ une_secciones <- function(cambios, cartografia, poblacion = NULL, mortalidad = N
               sexo    = 0:1
             )][]
             set(pob1, j = names(pob1)[-c(1:3)], value = 1)
-            poblacion <- rbindlist(list(poblacion, pob1))[order(seccion, sexo, year)]
+            poblacion <- rbindlist(list(poblacion, pob1))
           }
         }
       }
+      poblacion <- poblacion[order(seccion, sexo, year)]
     } else {
       message(
         "\nEn el per\u00edodo establecido no se ha detectado ning\u00fan cambio: ",
@@ -645,14 +646,12 @@ une_secciones <- function(cambios, cartografia, poblacion = NULL, mortalidad = N
       )
     }
 
-    name_dim_pob <- list(sort(unique(poblacion$seccion)), c("Masculino", "Femenino"),
-                         sort(unique(poblacion$year)), names(poblacion[, -c(1:3)]))
-    pob_array    <- array(
-      data     = unlist(poblacion[, -c(1:3)]),
-      dim      = c(length(unique(poblacion$seccion)), 2, length(unique(poblacion$year)), ncol(poblacion[, -c(1:3)])),
-      dimnames = name_dim_pob
-    )
-    pob_array <- aperm(pob_array, c(3, 2, 4, 1))
+    name_dim_pob <- list(sort(unique(poblacion$year)), unique(poblacion$sexo),
+                         names(poblacion[, -c(1:3)]), sort(unique(poblacion$seccion)))
+    pob_array <- array(dim = sapply(name_dim_pob, length), dimnames = name_dim_pob)
+    for (i in seq_along(name_dim_pob[[4]])) {
+      pob_array[, , , name_dim_pob[[4]][i]] <- unlist(poblacion[seccion == name_dim_pob[[4]][i], -c(1:3)])
+    }
 
     attributes(pob_array)$fuente <- fuente
     res                          <- list(
@@ -790,7 +789,9 @@ une_secciones <- function(cambios, cartografia, poblacion = NULL, mortalidad = N
         mortalidad_c$seccion[causas_def[[i]]]
       )
     }
-    res <- append(res, list(mortalidad = mort_array))
+    res_attr <- attributes(res)
+    res      <- append(res, list(mortalidad = mort_array))
+    attributes(res) <- append(attributes(res), res_attr["names" != names(res_attr)])
   }
 
   return(res)
