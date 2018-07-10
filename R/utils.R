@@ -703,15 +703,20 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   stopifnot(is.numeric(vecinos) & length(vecinos) == 1)
   stopifnot(is.numeric(epsg) & length(epsg) == 1)
   stopifnot(is.numeric(limite) & length(limite) >= 1 & length(limite) <= 9)
-  if (!is.null(cartografia) && !"SpatialPolygonsDataFrame" %in% class(cartografia)) {
-    stop("\nEl objeto 'cartografia' debe ser un 'SpatialPolygonsDataFrame'")
-  }
-  datos_c <- copy(as.data.table(datos))
-  limite  <- sort(limite, decreasing = TRUE)
-
-  if (is.null(cartografia)) {
+  if (!is.null(cartografia)) {
+    if (!"SpatialPolygonsDataFrame" %in% class(cartografia)) {
+      stop("\nEl objeto 'cartografia' debe ser un 'SpatialPolygonsDataFrame'")
+    }
+    if (is.na(sp::proj4string(cartografia))) {
+      stop("\nEl objeto 'cartografia' no tiene asignado un CRS.")
+    }
+  } else {
     utils::data("cartografia", envir = environment(), package = "medear")
   }
+  cartografia <- sp::spTransform(cartografia, sp::CRS(paste0("+init=epsg:", epsg)))
+  datos_c     <- copy(as.data.table(datos))
+  limite      <- sort(limite, decreasing = TRUE)
+
   carto_cl <- cartografia
   datos_c$id_n <- seq_len(nrow(datos_c))
   if (!any(vars_op %in% names(datos_c))) {
@@ -795,7 +800,7 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     opacity          = .7,
     fillOpacity      = 0,
     highlightOptions = leaflet::highlightOptions(color = "white", weight = 1.5, bringToFront = TRUE),
-    group            = "Secciones INE 2011"
+    group            = "Seccionado de referencia"
   )
   mapa_cluster <- leaflet.extras::addPulseMarkers(
     map          = mapa_cluster,
@@ -831,11 +836,15 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     group       = "Sat\u00e9lite",
     attribution = '<a href="https://www.google.com/maps" title="GoogleSatellite">&copy; Google Satellite'
   )
-
+  mapa_cluster <- leaflet::addProviderTiles(
+    map         = mapa_cluster,
+    provider    = "CartoDB",
+    group       = "Callejero"
+  )
   mapa_cluster <- leaflet::addLayersControl(
     map           = mapa_cluster,
-    baseGroups    = c("Callejero (OSM)", "Callejero (Google)", "Sat\u00e9lite"),
-    overlayGroups = c("Secciones INE 2011", "Agrupaci\u00f3n (direcciones BOD)", "Agrupaci\u00f3n (direcciones GEO)")
+    baseGroups    = c("Callejero", "Callejero (OSM)", "Callejero (Google)", "Sat\u00e9lite"),
+    overlayGroups = c("Seccionado de referencia", "Agrupaci\u00f3n (direcciones BOD)", "Agrupaci\u00f3n (direcciones GEO)")
   )
   mapa_cluster <- leaflet::addMeasure(
     map               = mapa_cluster,
