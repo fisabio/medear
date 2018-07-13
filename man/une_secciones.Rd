@@ -5,16 +5,19 @@
 \alias{une_secciones}
 \title{Une los cambios del seccionado del INE}
 \usage{
-une_secciones(cambios, cartografia, poblacion = NULL,
-mortalidad = NULL, years = 1996:2015, corte_edad = 85, catastro = FALSE,
-umbral_vivienda = 5, distancia = 100, modo = c("auto", "manual"),
-sc1 = NULL, sc2 = NULL)
+une_secciones(cambios = NULL, cartografia, poblacion = NULL, mortalidad = NULL,
+datos_propios = FALSE, otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
+years_union = years_estudio, epsg = 4326, corte_edad = 85,
+catastro = FALSE, umbral_vivienda = 5, distancia = 100,
+modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
 }
 \arguments{
-\item{cambios}{Objeto de clase \code{cambios_ine}.}
+\item{cambios}{Objeto de clase \code{cambios_ine}. Por defecto se le asigna
+el valor NULL para no realizar ninguna unión y trabajar con la cartografía
+proporcionada.}
 
-\item{cartografia}{Objeto de clase \code{\link[sp]{SpatialPolygons}}, y con
-datos de clase \code{cartografia_ine}.}
+\item{cartografia}{Objeto de clase \code{\link[sp]{SpatialPolygons}} con
+proyección asignada (código EPSG).}
 
 \item{poblacion}{Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 proporcionar en caso de querer agregar las poblaciones.}
@@ -27,35 +30,57 @@ el par de coordenadas (longitud y latitud), y que tengan exactamente los
 siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
 'lng', y 'lat', respectivamente.}
 
-\item{years}{Vector numérico de longitud >= 1 con los años para los que se
+\item{datos_propios}{Valor lógico. Indica si se dispone de datos de población
+a nivel puntual. Por defecto tiene tiene el valor \code{FALSE}. En caso
+contrario la función devolvería el \code{array} de poblaciones pero con todos
+\code{NA} en todos los conteos, con lo que el usuario será el encargado de
+rellenar este \code{array} posteriormente.}
+
+\item{otras_causas}{Véctor de caracteres que indica los nombres de las
+columnas (columnas con valor 0-1) en la base de datos de mortalidad que
+identifican a dichas otras causas.}
+
+\item{medea3}{Valor lógico: ¿desea que se agrupen las causas de mortalidad
+siguiendo el patron de 22 grandes causas de MEDEA3? Este argumento es
+compatible con \code{otras_causas}.}
+
+\item{years_estudio}{Vector numérico de longitud >= 1 con los años para los que se
+desee construir el \code{array} de poblaciones o mortalidad.}
+
+\item{years_union}{Vector numérico de longitud >= 1 con los años para los que se
 desee consultar las variaciones de seccionado. El año 2011 debe figurar
 dentro del vector, cuyo rango debe ser continuo (sin saltos de más de un
 año).}
 
-\item{corte_edad}{Numérico: punto de corte para los grupos de edad (85 o
-100). Argumento opcional en caso de proporcionar datos de poblaciones.}
+\item{epsg}{Vector numérico de longitud uno con el código EPSG del sistema de
+referencia de coordenadas (CRS) empleado en los datos de mortalidad (por
+defecto se usa el 4326 con datum WGS84).}
 
-\item{catastro}{Lógico: ¿Debe aplicarse el filtro de información catastral?
-Por defecto \code{catastro = FALSE}.}
+\item{corte_edad}{Numérico: punto de corte para los grupos de edad (85 o
+100). Argumento opcional en caso de proporcionar datos de poblaciones o
+mortalidad.}
+
+\item{catastro}{Lógico: En caso de realizar uniones ¿debe aplicarse el filtro
+de información catastral? Por defecto \code{catastro = FALSE}.}
 
 \item{umbral_vivienda}{Numérico: porcentaje de viviendas afectadas en el
 cambio de sección. Solo se utiliza si \code{catastro = TRUE}. Por defecto
 se fija al 5 \%.}
 
-\item{distancia}{Numérico: Máxima distancia (en metros) de separación entre
-secciones. Por defecto se fija en 100 metros. En algunos casos
-(principalmente en ciudades donde no haya problemas con pedanías que
-compartan nombres de vía con el núcleo urbano principal) puede ser
+\item{distancia}{Numérico: En caso de realizar uniones, máxima distancia (en
+metros) de separación entre secciones. Por defecto se fija en 100 metros. En
+algunos casos (principalmente en ciudades donde no haya problemas con pedanías
+que compartan nombres de vía con el núcleo urbano principal) puede ser
 conveniente aumentar este parámetro.}
 
-\item{modo}{Carácter: Modalidad de la unión (\code{auto} o \code{manual}), por
-defecto \code{auto}. Si se escoge el modo \code{auto} la función detectará
-los cambios que conllevan una unión de secciones según los parámetros que
-el usuario haya elegido; si se escoge el modo \code{manual}, además de
-realizar todo el proceso que involucra el otro modo, se permite al usuario
-incluir uniones que el modo \code{auto} puede haber pasado por alto,
-realizando uniones de seccionado 1-1 mediante los argumentos \code{sc1} y
-\code{sc2}.}
+\item{modo}{Carácter: En caso de realizar uniones, modalidad de la unión
+(\code{auto} o \code{manual}), por defecto \code{auto}. Si se escoge el modo
+\code{auto} la función detectará los cambios que conllevan una unión de
+secciones según los parámetros que el usuario haya elegido; si se escoge el
+modo \code{manual}, además de realizar todo el proceso que involucra el otro
+modo, se permite al usuario incluir uniones que el modo \code{auto} puede
+haber pasado por alto, realizando uniones de seccionado 1-1 mediante los
+argumentos \code{sc1} y \code{sc2}.}
 
 \item{sc1}{Vector de caracteres: Primer bloque de secciones a unir
 manualmente, vacío por defecto. Si se proporciona debe tener la misma
@@ -68,16 +93,15 @@ longitud que \code{sc1}.}
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de
   poblaciones o mortalidad. Si no se proporciona ninguno se devuelve un
-  objeto de clase \code{cartografia_ine} y \code{\link[sp]{SpatialPolygons}}
-  con la cartografía, donde cada fila es una sección censal y que cuenta con
-  9 columnas: \describe{\item{seccion}{Cadena de 10 caracteres con el código
+  objeto de clase \code{\link[sp]{SpatialPolygons}} con la cartografía,
+  donde cada fila es una sección censal y que puede tener las columnas:
+  \describe{\item{seccion}{Cadena de 10 caracteres con el código
   de sección censal (incluye provincia, municipio y distrito).}
   \item{CUMUN}{Cadena de 5 caracteres con el código del municipio (incluye
   provincia).} \item{CCA}{Cadena de 2 caracteres con el código de comunidad
   autónoma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
   comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
-  \item{geometry}{Columna de tipo lista con la geometría asociada a cada
-  sección censal.} \item{cluster_id}{Código de identificación del cluster de
+  \item{cluster_id}{Código de identificación del cluster de
   uniones.} \item{revision_manual}{Indica si debe revisarse esa unión.}}
 
   En caso de proporcionar poblaciones, se devuelve una lista de longitud
@@ -189,7 +213,7 @@ La función trabaja con la siguiente dinámica:
 
 \dontrun{
   # En este ejemplo se trabaja con la ciudad de Córdoba (código ine: 14021)
-  # en los años 2004-2015, sin usar códigos postales.
+  # en los años 2004-2015, sin usar códigos postales ni mortalidad.
 
   library(medear)
   data("poblacion")
@@ -206,21 +230,20 @@ La función trabaja con la siguiente dinámica:
   ##########################################################################
 
   union_sin_cat <- une_secciones(
-    cambios     = cambios_co,
-    cartografia = cartografia_co,
-    years       = 2004:2015,
-    poblacion   = poblacion_co,
-    catastro    = FALSE,
-    distancia   = 100
+    cambios       = cambios_co,
+    cartografia   = cartografia_co,
+    years_estudio = 2004:2015,
+    poblacion     = poblacion_co,
+    catastro      = FALSE
   )
 
   nrow(union_sin_cat$cartografia) # 215 secciones
   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_co) * 100) #
-  Conserva el 87 \\\% de secciones
+  Conserva el 88 \\\% de secciones
 
   # La función avisa acerca de divergencias en el seccionado entre
-  cartografía y el archivo de poblaciones. # Las secciones afectadas son
-  accesibles mediante la siguiente consulta:
+  cartografía y el archivo de poblaciones.
+  # Las secciones afectadas son accesibles mediante la siguiente consulta:
   attributes(union_sin_cat)$pob_igual_uno # 1 SC problemática
 
   # En este caso, se resolverá la incidencia (SC 1402106047).
@@ -244,15 +267,14 @@ La función trabaja con la siguiente dinámica:
   plot(union_sin_cat$cartografia[union_sin_cat$cartografia$seccion \%in\%
     c("1402106047", "1402106024"), ])
   union_sin_cat <- une_secciones(
-    cambios     = cambios_co,
-    cartografia = cartografia_co,
-    years       = 2004:2015,
-    poblacion   = poblacion_co,
-    catastro    = FALSE,
-    distancia   = 100,
-    modo        = "manual",
-    sc1         = "1402106047",
-    sc2         = "1402106024"
+    cambios       = cambios_co,
+    cartografia   = cartografia_co,
+    years_estudio = 2004:2015,
+    poblacion     = poblacion_co,
+    catastro      = FALSE,
+    modo          = "manual",
+    sc1           = "1402106047",
+    sc2           = "1402106024"
   )
 
   # El aviso ha desaparecido, aunque todavía se mantiene un aviso sobre
@@ -272,11 +294,10 @@ La función trabaja con la siguiente dinámica:
   union_con_cat <- une_secciones(
     cambios         = cambios_co,
     cartografia     = cartografia_co,
-    years           = 2004:2015,
+    years_estudio   = 2004:2015,
     poblacion       = poblacion_co,
     catastro        = TRUE,
-    umbral_vivienda = 5,
-    distancia       = 100
+    umbral_vivienda = 5
   )
 
   nrow(union_con_cat$cartografia) # 223 secciones
@@ -289,11 +310,10 @@ La función trabaja con la siguiente dinámica:
   union_con_cat <- une_secciones(
     cambios         = cambios_co,
     cartografia     = cartografia_co,
-    years           = 2004:2015,
+    years_estudio   = 2004:2015,
     poblacion       = poblacion_co,
     catastro        = TRUE,
     umbral_vivienda = 5,
-    distancia       = 100,
     modo            = "manual",
     sc1             = "1402106047",
     sc2             = "1402106024"
