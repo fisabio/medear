@@ -302,7 +302,7 @@ elige_corte <- function(datos, corte) {
   stopifnot(corte %in% c(85, 100))
   res <- copy(datos)
   if (corte == 100 & "q_85_plus" %in% colnames(res)) {
-    res[, q_85_plus := NULL]
+    res[, q_85_plus := NULL][]
   } else {
     if (!"q_85_plus" %in% colnames(res))
       res[, q_85_plus := double(.N)]
@@ -956,6 +956,341 @@ calcula_edad <- function(datos) {
   datos$g_edad <- NULL
   return(datos)
 }
+
+
+#' @title Proyecta pares de coordenadas en un mapa
+#'
+#' @description Esta función proyecta las coordenadas (latitud y longitud) en
+#'   un mapa, devolviendo la base de datos origina con una columna extra en la que
+#'   se indica la sección censal en la que recae el punto.
+#'
+#' @param datos Objeto de clase \code{data.frame} con al menos dos columnas:
+#'   lat (latitud) y lng (longitud).
+#' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}}.
+#' @param epsg Vector numérico de longitud uno con el código EPSG del sistema de
+#'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
+#'   datum WGS84).
+#'
+#' @usage proyecta_secciones(datos, cartografia, epsg = 4326)
+#'
+#' @details Esta función es capaz de proyectar cualquier base de datos con
+#'   información puntual (mortalidad o población) en la cartografía.
+#'
+#' @return Se devuelve el \code{data.frame} con la columna extra \code{seccion}.
+#'
+#' @encoding UTF-8
+#'
+#' @export
+#'
+#' @seealso \code{\link{une_secciones}}, \code{\link{crea_cubo_mortalidad}} y
+#'   \code{\link{crea_cubo_poblacion}}.
+#'
+proyecta_secciones <- function(datos, cartografia, epsg = 4326) {
+
+  if (!is.data.frame(datos)) {
+    stop("\nLos datos deben ser de clase 'data.frame'.")
+  }
+  if (!all(c("lng", "lat") %in% names(datos))) {
+    stop("\nEn los datos no est\u00e1n presentes las variables ",
+         "'lng' y 'lat', o tienen otro nombre.\nPor favor, revise los datos ",
+         "y vuelva a ejecutar la funci\u00f3n.")
+  }
+  comprueba_datos(cartografia, "cartografia")
+
+  datos_c <- copy(as.data.table(datos))
+  names(datos_c) <- tolower(names(datos_c))
+
+  for (i in seq_along(datos_c)) {
+    set(datos_c, j = i, value = as.character(datos_c[[i]]))
+  }
+  cartografia <- sp::spTransform(cartografia, sp::CRS(paste0("+init=epsg:", epsg)))
+  datos_c <- datos_c[, c("lng", "lat") := lapply(.SD, as.numeric), .SDcols = c("lng", "lat")]
+  sp::coordinates(datos_c) <- ~ lng + lat
+  sp::proj4string(datos_c) <- sp::CRS(paste0("+init=epsg:", epsg))
+  datos_c         <- sp::spTransform(datos_c, sp::proj4string(cartografia))
+  datos_c$seccion <- sp::over(datos_c, cartografia)$seccion
+
+  return(as.data.table(datos_c)[])
+}
+
+
+#' @title Agrupa las causas de mortalidad
+#'
+#' @description Esta función realiza una agrupación de causas de mortalidad
+#'   identificadas mediante códigos CIE 9 y CIE 10 en los 22 grupos usados en
+#'   MEDEA (véase la viñeta sobre el formato de los datos en MEDEA3). De forma
+#'   adicional, se pueden incorporar otras causas manualmente empleando el
+#'   argumento \code{otras_causas}.
+#'
+#' @param datos Datos de mortalidad ajustados al formato requerido por el paquete.
+#' @param medea3 ¿Se desea utilizar las 22 agrupaciones MEDEA3? Por defecto sí.
+#' @param otras_causas Véctor de caracteres que indica los nombres de las
+#'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
+#'   identifican a dichas otras causas.
+#'
+#' @usage causas_defuncion(datos, medea3 = TRUE, otras_causas = NULL)
+#'
+#' @encoding UTF-8
+#'
+causas_defuncion <- function(datos, medea3 = TRUE, otras_causas = NULL) {
+
+  stopifnot(is.logical(medea3))
+  if (!is.null(otras_causas)) {
+    stopifnot(is.character(otras_causas))
+  }
+  comprueba_datos(datos, "mortalidad")
+  datos$causa_defuncion <- gsub("\\.|,|\\s", "",  datos$causa_defuncion)
+  causas_def <- list()
+
+  if (medea3) {
+    causas_def[["01_sida"]]                    <- "^279[56]|^B2[0-4]"
+    causas_def[["02_cancer_estomago"]]         <- "^151|^C16"
+    causas_def[["03_cancer_colon"]]            <- "^153|^C18"
+    causas_def[["04_cancer_recto"]]            <- "^154|^C(19|2[01])"
+    causas_def[["05_cancer_colorectal"]]       <- "^153|^C18|^154|^C(19|2[01])"
+    causas_def[["06_cancer_laringe"]]          <- "^161|^C32"
+    causas_def[["07_cancer_pulmon"]]           <- "^162|^C3[3-4]"
+    causas_def[["08_cancer_mama"]]             <- "^174|^C50"
+    causas_def[["09_cancer_prostata"]]         <- "^185|^C61"
+    causas_def[["10_cancer_vejiga"]]           <- "^188|^C67"
+    causas_def[["11_cancer_hemato"]]           <- "^20[0-8]|^2733|^C(8[1-9]|9[0-6])"
+    causas_def[["12_diabetes"]]                <- "^250|^E1[0-4]"
+    causas_def[["13_ttos_mentales_organicos"]] <- "^290(?!1)|^F0[0-9]"
+    causas_def[["14_alzheimer"]]               <- "^2901|^3310|^G30"
+    causas_def[["15_demencia"]]                <- "^F0[0-9]|^290|3310|^G30"
+    causas_def[["16_isquemica_corazon"]]       <- "^41[0-4]|^I2[0-5]"
+    causas_def[["17_ictus"]]                   <- "^43[0-46-8]|^I6[0-9]"
+    causas_def[["18_epoc"]]                    <- "^49[0-24-6]|^J4[0-47]"
+    causas_def[["19_cirrosis"]]                <- "^571|^K7[034]|^K721|^K76[19]"
+    causas_def[["20_suicidios"]]               <- "^E95[0-9]|^X([6-7][0-9]|8[0-4])"
+    causas_def[["21_accidente_trafico"]]       <- paste0(
+      "^E81[0-9]|^V(0[2-4][19]|09[23]|1[2-4][3-59]|[1-7]9[4-69]|2[0-8][3-59]|",
+      "[3-7][0-8][4-79]|80[3-5]|8[12]1|8[3-6][0-3]|87[0-8]|89[29])"
+    )
+    causas_def[["22_todas_causas"]]            <- "[[:alnum:]]"
+    causas_def <- lapply(causas_def, grep, x = datos$causa_defuncion, ignore.case = TRUE, perl = TRUE)
+  }
+
+  if (!is.null(otras_causas)) {
+    for (i in seq_along(otras_causas)) {
+      causas_def[[otras_causas[i]]] <-  which(datos[[otras_causas[i]]] != 0)
+    }
+  }
+
+  if (!medea3 & is.null(otras_causas)) {
+    warning("Se fij\u00f3 medea3 = FALSE y otras_causas = NULL: no se hace nada",
+            " (se devuelven las mismas causas).")
+  } else {
+    return(causas_def)
+  }
+}
+
+
+#' @title Comprobaciones de la clase de los datos
+#'
+#' @description Función para comprobar si los datos se ajustan al formato requerido.
+#'
+#' @param datos Datos sobre los que lanzar comprobaciones.
+#' @param tipo Tipo de datos a comprobar.
+#' @param periodo Período de estudio: solo aplicable en \code{tipo == "mortalidad"}
+#'   o \code{tipo == "poblacion"}.
+#'
+#' @usage comprueba_datos(datos, tipo = c("cartografia", "mortalidad",
+#' "poblacion"), periodo = NULL)
+#'
+#' @encoding UTF-8
+#'
+comprueba_datos <- function(datos, tipo = c("cartografia", "mortalidad", "poblacion"), periodo = NULL) {
+
+  tipo <- match.arg(tipo)
+
+  if (tipo == "cartografia") {
+    if ("SpatialPolygonsDataFrame" != class(datos))
+      stop("La cartograf\u00eda debe ser de clase 'SpatialPolygonsDataFrame'.")
+    if (is.na(sp::proj4string(datos)))
+      stop("\nLa cartograf\u00eda no tiene asignada una proyecci\u00f3n.")
+  } else if (tipo == "mortalidad") {
+    if (!is.data.frame(datos)) {
+      stop("\nEn los datos de mortalidad deben ser de clase 'data.frame'.")
+    }
+
+    if (!all(c("lng", "lat") %in% names(datos))) {
+      stop("\nEn los datos de mortalidad no est\u00e1n presentes las variables ",
+           "'lng' y 'lat', o tienen otro nombre.\nPor favor, revise los datos ",
+           "y vuelva a ejecutar la funci\u00f3n.")
+    }
+    mort_vars <- c("sexo", "year_defuncion", "edad", "causa_defuncion")
+    if (!all(mort_vars %in% names(datos))) {
+      stop("\nAlgunas de las variables necesarias para calcular el cubo de ",
+           "mortalidad no est\u00e1n presentes en los datos proporcionados.\n",
+           "Por favor, revise los datos de mortalidad y aseg\u00farese de que las",
+           " variables 'sexo', 'year_defuncion', 'edad' y 'causa_defuncion' est\u00e1n ",
+           "presentes y tienen exactamente esos nombres.")
+    }
+    if (!all(nchar(datos$causa_defuncion) >= 3)) {
+      stop("\nTodas las causas de mortalidad (sin importar si se codificaron ",
+           "siguiendo CIE-9 o CIE-10) deben tener un m\u00ednimo de tres caracteres.",
+           "\nPor favor, revise que este aspecto se cumple en su base de datos.")
+    }
+    if (!all(unique(datos$sexo) %in% 0:1)) {
+      stop("\nLa variable sexo debe codificarse como 0 (masculino) o 1 (femenino).",
+           "\nRevise la base de datos proporcionada")
+    }
+    if (!all(periodo %in% unique(datos$year_defuncion))) {
+      stop("\nNo hay datos de mortalidad para todos los a\u00f1os marcados en el ",
+           "argumento 'periodo'.")
+    }
+  } else {
+    if (!is.data.frame(datos)) {
+      stop("\nEn los datos de  poblaci\u00f3n deben ser de clase 'data.frame'.")
+    }
+    pob_vars <- c(
+      "seccion",
+      "sexo",
+      "year",
+      paste("q", seq(0, 99, 5), seq(4, 100, 5), sep = "_"),
+      "q_100_plus",
+      "q_85_plus"
+    )
+    if (!all(names(datos) %in% pob_vars)) {
+      stop("\nAlgunas de las variables de los datos de poblaci\u00f3n est\u00e1n ausentes",
+           " o reciben un nombre no est\u00e1ndar.\n\nLos posibles nombres son: ",
+           paste(pob_vars, collapse = ', '),
+           ".\nAdapte los datos al formato correcto antes de ejecutar la funci\u00f3n")
+    }
+    if (!all(unique(datos$sexo) %in% 0:1)) {
+      stop("\nLa variable sexo debe codificarse como 0 (masculino) o 1 (femenino).",
+           "\nRevise la base de datos proporcionada")
+    }
+    if (!all(periodo %in% unique(datos$year))) {
+      stop("\nNo hay datos de poblaci\u00f3n para todos los a\u00f1os marcados en el ",
+           "argumento 'periodo'.")
+    }
+  }
+}
+
+
+#' @title Crear la matriz 5-dimensional de mortalidad
+#'
+#' @description lala
+#'
+#' @param datos ll
+#' @param cartografia ll
+#' @param epsg ll
+#' @param medea3 ll
+#' @param otras_causas Véctor de caracteres que indica los nombres de las
+#'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
+#'   identifican a dichas otras causas.
+#' @param corte_edad ll
+#' @param periodo ll
+crea_cubo_mortalidad <- function(datos, cartografia, epsg = 4326, medea3 = TRUE,
+                                 otras_causas = NULL, corte_edad = 85,
+                                 periodo = 1996:2015) {
+
+  comprueba_datos(datos, "mortalidad")
+  comprueba_datos(cartografia, "cartografia")
+  stopifnot(corte_edad %in% c(85, 100))
+  periodo    <- sort(periodo)
+  datos_c    <- proyecta_secciones(datos, cartografia, epsg)
+  datos_c    <- datos_c[!is.na(datos_c$seccion), ]
+  datos_c    <- datos_c[between(year_defuncion, first(periodo), last(periodo))]
+  causas_def <- causas_defuncion(datos_c, medea3, otras_causas)
+
+  if (corte_edad == 85) {
+    grupo_edad <- c(paste("q", seq(0, 84, 5), seq(4, 85, 5), sep = "_"), "q_85_plus")
+  } else {
+    grupo_edad <-  c(paste("q", seq(0, 99, 5), seq(4, 100, 5), sep = "_"), "q_100_plus")
+  }
+
+  datos_c$edad <- as.numeric(datos_c$edad)
+  datos_c$edad <- cut(
+    datos_c$edad, c(-1, (5 * seq_along(grupo_edad[-length(grupo_edad)])) - 1, 125)
+  )
+  datos_c$edad <- factor(
+    datos_c$edad, levels = levels(datos_c$edad), labels = grupo_edad
+  )
+  datos_c$seccion        <- factor(
+    datos_c$seccion,
+    levels = sort(unique(cartografia$seccion)),
+    labels = sort(unique(cartografia$seccion))
+  )
+  datos_c$year_defuncion <- factor(
+    datos_c$year_defuncion, levels = periodo, labels = periodo
+  )
+  datos_c$sexo           <- factor(datos_c$sexo)
+
+  mort_array <- array(
+    dim      = c(length(periodo), 2, length(grupo_edad),
+                 length(unique(datos_c$seccion)), length(causas_def)),
+    dimnames = list(
+      paste(periodo),
+      levels(datos_c$sexo),
+      grupo_edad,
+      sort(unique(cartografia$seccion)),
+      names(causas_def)
+    )
+  )
+  for (i in seq_along(causas_def)) {
+    mort_array[ , , , , i] <- table(
+      datos_c$year_defuncion[causas_def[[i]]],
+      datos_c$sexo[causas_def[[i]]],
+      datos_c$edad[causas_def[[i]]],
+      datos_c$seccion[causas_def[[i]]]
+    )
+  }
+
+  return(mort_array)
+}
+
+
+#' @title Crear la matriz 4-dimensional de poblaciones
+#'
+#' @description lala
+#'
+#' @param datos ll
+#' @param cartografia ll
+#' @param epsg ll
+#' @param periodo ll
+#' @param datos_propios ll
+crea_cubo_poblacion <- function(datos, cartografia, epsg, periodo = 1996:2015,
+                                datos_propios = FALSE) {
+
+  comprueba_datos(datos, "poblacion")
+  comprueba_datos(cartografia, "cartografia")
+
+  periodo       <- sort(unique(periodo))
+  datos_c       <- as.data.table(datos)[between(year, first(periodo), last(periodo))]
+
+  name_dim_pob <- list(
+    periodo,
+    unique(datos_c$sexo),
+    names(datos_c[, -c("seccion", "sexo", "year")]),
+    sort(unique(cartografia$seccion))
+  )
+  pob_array <- array(dim = sapply(name_dim_pob, length), dimnames = name_dim_pob)
+
+  if (datos_propios) {
+    pob_array[, , , ] <- NA_integer_
+  } else {
+    if (!all(periodo %in% unique(datos$year))) {
+      stop("\nNo hay datos de poblaci\u00f3n para todos los a\u00f1os marcados en el ",
+           "argumento 'periodo'.")
+    }
+    if (!all(c(datos_c$seccion %in% cartografia$seccion, cartografia$seccion %in% datos_c$seccion))) {
+      stop("\nNo todas las secciones de la cartograf\u00eda y los datos de poblaci\u00f3n ",
+           "son compratidas.\nAmbos deben tener exactamente las mismas secciones.")
+    }
+    for (i in seq_along(name_dim_pob[[4]])) {
+      pob_array[, , , name_dim_pob[[4]][i]] <- unlist(
+        datos_c[seccion == name_dim_pob[[4]][i], -c("seccion", "sexo", "year")]
+      )
+    }
+  }
+
+  return(pob_array)
+}
+
+
 
 
 utils::globalVariables(
