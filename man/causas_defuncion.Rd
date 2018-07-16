@@ -23,3 +23,6 @@ Esta función realiza una agrupación de causas de mortalidad
   adicional, se pueden incorporar otras causas manualmente empleando el
   argumento \code{otras_causas}.
 }
+\seealso{
+\code{\link{une_secciones}} y \code{\link{crea_cubo_mortalidad}}.
+}
