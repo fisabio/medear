@@ -890,15 +890,18 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 #' @param mortalidad Datos con la mortalidad geocodificada. Objeto de clase
 #'   \code{data.frame} que contenga, al menos, la siguiente información (los
 #'   nombres que deben tener las variables están entre paréntesis): longitud
-#'   (\code{lng}), latitud (\code{lat}), tipo de vía (\code{tip_via}), dirección (\code{address}), número de
-#'   portal (\code{portalNumber}), municipio (\code{muni}) y provincia
-#'   (\code{province}) devueltos por el servicio de geocodificado.
+#'   (\code{lng}), latitud (\code{lat}), tipo de vía (\code{tip_via}),
+#'   dirección (\code{address}), número de portal (\code{portalNumber}),
+#'   municipio (\code{muni}) y provincia (\code{province}) devueltos por el
+#'   servicio de geocodificado.
 #'
 #' @usage comprueba_geocodificado(mortalidad)
 #'
 #' @return Devuelve un \code{data.frame} con la mortalidad y los registros
 #'   problemáticos modificados a \code{NA}, fijando el campo \code{georef} de
 #'   esos registros al valor \code{repetir_geo_google}.
+#'
+#' @encoding UTF-8
 #'
 #' @export
 #'
@@ -1031,6 +1034,8 @@ proyecta_secciones <- function(datos, cartografia, epsg = 4326) {
 #' @usage causas_defuncion(datos, medea3 = TRUE, otras_causas = NULL)
 #'
 #' @encoding UTF-8
+#'
+#' @seealso \code{\link{une_secciones}} y \code{\link{crea_cubo_mortalidad}}.
 #'
 causas_defuncion <- function(datos, medea3 = TRUE, otras_causas = NULL) {
 
@@ -1172,17 +1177,37 @@ comprueba_datos <- function(datos, tipo = c("cartografia", "mortalidad", "poblac
 
 #' @title Crear la matriz 5-dimensional de mortalidad
 #'
-#' @description lala
+#' @description Esta función crea la matriz 5-dimensional de mortalidad (año de
+#'   defunción, sexo, grupo de edad quinquenal, sección censal y causa de
+#'   defunción).
 #'
-#' @param datos ll
-#' @param cartografia ll
-#' @param epsg ll
-#' @param medea3 ll
+#' @param datos Objeto de clase \code{data.frame} con la mortalidad
+#'   geocodificada. Este objeto debe contener las variables \code{sexo},
+#'   \code{year_defuncion}, \code{edad}, \code{causa_defuncion} \code{lng} y
+#'   \code{lat}, con exactamente esos nombres.
+#' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}} con
+#'   proyección asignada (código EPSG).
+#' @param epsg Vector numérico de longitud uno con el código EPSG del sistema de
+#'   referencia de coordenadas (CRS) empleado en los datos de mortalidad (por
+#'   defecto se usa el 4326 con datum WGS84).
+#' @param medea3 ¿Se desea utilizar las 22 agrupaciones MEDEA3? Por defecto sí.
 #' @param otras_causas Véctor de caracteres que indica los nombres de las
 #'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 #'   identifican a dichas otras causas.
-#' @param corte_edad ll
-#' @param periodo ll
+#' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
+#'   100). Argumento opcional en caso de proporcionar datos de poblaciones o
+#'   mortalidad.
+#' @param periodo Vector numérico de longitud >= 1 con los años para los que se
+#'   desee construir el \code{array} de mortalidad.
+#'
+#' @usage crea_cubo_mortalidad(datos, cartografia, epsg = 4326, medea3 = TRUE,
+#'   otras_causas = NULL, corte_edad = 85, periodo = 1996:2015)
+#'
+#' @encoding UTF-8
+#'
+#' @seealso \code{\link{une_secciones}} y \code{\link{proyecta_secciones}}.
+#'
+#' @export
 crea_cubo_mortalidad <- function(datos, cartografia, epsg = 4326, medea3 = TRUE,
                                  otras_causas = NULL, corte_edad = 85,
                                  periodo = 1996:2015) {
@@ -1245,40 +1270,72 @@ crea_cubo_mortalidad <- function(datos, cartografia, epsg = 4326, medea3 = TRUE,
 
 #' @title Crear la matriz 4-dimensional de poblaciones
 #'
-#' @description lala
+#' @description Esta función crea la matriz 4-dimensional con las poblaciones
+#'   (año, sexo, grupo de edad quinquenal y sección censal).
 #'
-#' @param datos ll
-#' @param cartografia ll
-#' @param epsg ll
-#' @param periodo ll
-#' @param datos_propios ll
-crea_cubo_poblacion <- function(datos, cartografia, epsg, periodo = 1996:2015,
+#' @param datos Objeto de clase \code{data.frame} con las cifras de población.
+#'   Este objeto debe contener las variables \code{seccion},
+#'   \code{sexo}, \code{year} y los grupos quinquenales desde \code{q_0_4}
+#'   hasta \code{q_85_plus} o \code{q_100_plus}, con exactamente esos nombres.
+#' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
+#'   100). Argumento opcional en caso de proporcionar datos de poblaciones o
+#'   mortalidad.
+#' @param periodo Vector numérico de longitud >= 1 con los años para los que se
+#'   desee construir el \code{array} de mortalidad.
+#' @param datos_propios Valor lógico. Indica si se dispone de datos de población
+#'   a nivel puntual. Por defecto tiene tiene el valor \code{FALSE}. En caso
+#'   contrario la función devolvería el \code{array} de poblaciones pero con
+#'   \code{NA} en todos los conteos, con lo que el usuario será el encargado de
+#'   rellenar este \code{array} posteriormente.
+#'
+#' @usage crea_cubo_poblacion(datos, corte_edad = 85, periodo = 1996:2015,
+#'   datos_propios = FALSE)
+#'
+#' @encoding UTF-8
+#'
+#' @seealso \code{\link{une_secciones}} y \code{\link{crea_cubo_mortalidad}}.
+#'
+#' @export
+crea_cubo_poblacion <- function(datos, corte_edad = 85, periodo = 1996:2015,
                                 datos_propios = FALSE) {
 
   comprueba_datos(datos, "poblacion")
-  comprueba_datos(cartografia, "cartografia")
-
   periodo       <- sort(unique(periodo))
   datos_c       <- as.data.table(datos)[between(year, first(periodo), last(periodo))]
 
+  if (length(grep("_plus", names(datos_c))) == 2) {
+    if (corte_edad == 85) {
+      col_eliminar <- names(datos_c)[grep("9\\d|89|100", names(datos_c))]
+      if (length(col_eliminar) == 4) {
+        datos_c <- elige_corte(datos_c, corte_edad)
+      } else {
+        if (length(col_eliminar) > 0) {
+          for (i in seq_along(col_eliminar)) {
+            set(datos_c, j = col_eliminar[i], value = NULL)
+          }
+        }
+      }
+    } else {
+      col_eliminar <- names(datos_c)[grep("85_plus", names(datos_c))]
+      if (length(col_eliminar) == 1) {
+        datos_c <- elige_corte(datos_c, corte_edad)
+      }
+    }
+  }
   name_dim_pob <- list(
     periodo,
     unique(datos_c$sexo),
     names(datos_c[, -c("seccion", "sexo", "year")]),
-    sort(unique(cartografia$seccion))
+    sort(unique(datos_c$seccion))
   )
   pob_array <- array(dim = sapply(name_dim_pob, length), dimnames = name_dim_pob)
 
   if (datos_propios) {
     pob_array[, , , ] <- NA_integer_
   } else {
-    if (!all(periodo %in% unique(datos$year))) {
+    if (!all(periodo %in% unique(datos_c$year))) {
       stop("\nNo hay datos de poblaci\u00f3n para todos los a\u00f1os marcados en el ",
            "argumento 'periodo'.")
-    }
-    if (!all(c(datos_c$seccion %in% cartografia$seccion, cartografia$seccion %in% datos_c$seccion))) {
-      stop("\nNo todas las secciones de la cartograf\u00eda y los datos de poblaci\u00f3n ",
-           "son compratidas.\nAmbos deben tener exactamente las mismas secciones.")
     }
     for (i in seq_along(name_dim_pob[[4]])) {
       pob_array[, , , name_dim_pob[[4]][i]] <- unlist(
@@ -1291,7 +1348,43 @@ crea_cubo_poblacion <- function(datos, cartografia, epsg, periodo = 1996:2015,
 }
 
 
-
+#' @title Eliminar cambios manualmente de la base de datos cambios_seccion
+#'
+#' @description Esta función elimina los cambios especificados del listado de
+#'   cambios de sección detectados.
+#'
+#' @param datos Objeto de clase \code{cambios_ine} y \code{data.frame} con los
+#'   cambios de seccionado.
+#' @param sc_ref Cadena de caracteres de longitud >= 1 con las secciones de
+#'   2011 a eliminar.
+#' @param sc_new Cadena de caracteres de longitud >= 1 con las secciones del
+#'   resto de años a eliminar.
+#'
+#' @details Los argumentos sc_ref y sc_new deben hacer referencia a una misma
+#'   fila de la base de datos.
+#'
+#' @return Un \code{data.frame} sin los cambios seleccionados.
+#'
+#' @encoding UTF-8
+#'
+#' @seealso \code{\link{detecta_cambios}} y \code{\link{une_secciones}}.
+#'
+#' @export
+elimina_cambios <- function(datos, sc_ref, sc_new) {
+  datos_c  <- copy(as.data.table(datos))
+  eliminar <- mapply(
+    function(x, y) which(datos_c$sc_ref == x & datos_c$sc_new == y),
+    sc_ref,
+    sc_new,
+    SIMPLIFY = FALSE
+  )
+  eliminar <- unique(unlist(eliminar))
+  if (length(eliminar) > 0) {
+    return(datos_c[-eliminar, ][])
+  } else {
+    return(datos_c[])
+  }
+}
 
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",

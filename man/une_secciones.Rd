@@ -6,7 +6,7 @@
 \title{Une los cambios del seccionado del INE}
 \usage{
 une_secciones(cambios = NULL, cartografia, poblacion = NULL, mortalidad = NULL,
-datos_propios = FALSE, otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
+otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
 years_union = years_estudio, epsg = 4326, corte_edad = 85,
 catastro = FALSE, umbral_vivienda = 5, distancia = 100,
 modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
@@ -29,12 +29,6 @@ mínimo, las variables sexo, año de defunción, edad, causa de defunción y
 el par de coordenadas (longitud y latitud), y que tengan exactamente los
 siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
 'lng', y 'lat', respectivamente.}
-
-\item{datos_propios}{Valor lógico. Indica si se dispone de datos de población
-a nivel puntual. Por defecto tiene tiene el valor \code{FALSE}. En caso
-contrario la función devolvería el \code{array} de poblaciones pero con todos
-\code{NA} en todos los conteos, con lo que el usuario será el encargado de
-rellenar este \code{array} posteriormente.}
 
 \item{otras_causas}{Véctor de caracteres que indica los nombres de las
 columnas (columnas con valor 0-1) en la base de datos de mortalidad que

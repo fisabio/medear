@@ -105,11 +105,6 @@
 #'   el par de coordenadas (longitud y latitud), y que tengan exactamente los
 #'   siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
 #'   'lng', y 'lat', respectivamente.
-#' @param datos_propios Valor lógico. Indica si se dispone de datos de población
-#'   a nivel puntual. Por defecto tiene tiene el valor \code{FALSE}. En caso
-#'   contrario la función devolvería el \code{array} de poblaciones pero con todos
-#'   \code{NA} en todos los conteos, con lo que el usuario será el encargado de
-#'   rellenar este \code{array} posteriormente.
 #' @param otras_causas Véctor de caracteres que indica los nombres de las
 #'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 #'   identifican a dichas otras causas.
@@ -154,7 +149,7 @@
 #'   longitud que \code{sc1}.
 #'
 #' @usage une_secciones(cambios = NULL, cartografia, poblacion = NULL, mortalidad = NULL,
-#' datos_propios = FALSE, otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
+#' otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
 #' years_union = years_estudio, epsg = 4326, corte_edad = 85,
 #' catastro = FALSE, umbral_vivienda = 5, distancia = 100,
 #' modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
@@ -305,7 +300,7 @@
 #'   \code{\link{descarga_cartografia}}
 #'
 une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortalidad = NULL,
-                          datos_propios = FALSE, otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
+                          otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
                           years_union = years_estudio, epsg = 4326, corte_edad = 85,
                           catastro = FALSE, umbral_vivienda = 5, distancia = 100,
                           modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL) {
@@ -366,7 +361,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     }
   }
 
-
+  datos_propios <- !identical(years_estudio, years_union)
   cartografia <- sp::spTransform(cartografia, sp::CRS(paste0("+init=epsg:", epsg)))
   utils::data("secciones", envir = environment(), package = "medear")
   if (!is.null(poblacion)) {
@@ -601,24 +596,26 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
   ##############################################################################
 
   if (!is.null(poblacion)) {
-    if (corte_edad == 85) {
-      col_eliminar <- names(poblacion)[grep("9\\d|89|100", names(poblacion))]
-      if (length(col_eliminar) == 4) {
-        poblacion <- elige_corte(poblacion, corte_edad)
-      } else {
-        if (length(col_eliminar) > 0) {
-          for (i in seq_along(col_eliminar)) {
-            set(poblacion, j = col_eliminar[i], value = NULL)
+    if (length(grep("_plus", names(poblacion))) == 2) {
+      if (corte_edad == 85) {
+        col_eliminar <- names(poblacion)[grep("9\\d|89|100", names(poblacion))]
+        if (length(col_eliminar) == 4) {
+          poblacion <- elige_corte(poblacion, corte_edad)
+        } else {
+          if (length(col_eliminar) > 0) {
+            for (i in seq_along(col_eliminar)) {
+              set(poblacion, j = col_eliminar[i], value = NULL)
+            }
           }
         }
-      }
-    } else {
-      col_eliminar <- names(poblacion)[grep("85_plus", names(poblacion))]
-      if (length(col_eliminar) == 1) {
-        poblacion <- elige_corte(poblacion, corte_edad)
+      } else {
+        col_eliminar <- names(poblacion)[grep("85_plus", names(poblacion))]
+        if (length(col_eliminar) == 1) {
+          poblacion <- elige_corte(poblacion, corte_edad)
+        }
       }
     }
-    if (!is.null(cambios) && !datos_propios && identical(years_estudio, years_union)) {
+    if (!is.null(cambios) && !datos_propios) {
       if (nrow(cambios) > 0) {
         poblacion[, cluster := cluster_sc[match(seccion, sc), id_cluster]]
         poblacion[is.na(cluster), cluster := seccion]
@@ -659,8 +656,6 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     poblacion <- poblacion[order(seccion, sexo, year)]
     pob_array <- crea_cubo_poblacion(
       poblacion,
-      cartografia,
-      epsg          = epsg,
       periodo       = years_estudio,
       datos_propios = datos_propios
     )
