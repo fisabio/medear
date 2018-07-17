@@ -463,9 +463,11 @@ Unión provisional a falta de incorporar la división de dos secciones.
 codigo          <- "33024"
 cambios_seccion <- elimina_cambios(
   cambios_seccion,
-  c("3302405013", "3302407034", "3302403024"),
-  c("3302405022", "3302403019", "3302403019")
-)
+  c("3302405013", "3302407034", "3302403024", "3302403019",
+    "3302403021", "3302403022", "3302403024", "3302406020"),
+  c("3302405022", "3302403019", "3302403019",
+    rep("3302403010", 4), "3302406010")
+  )
 gijon           <- une_secciones(
   cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
