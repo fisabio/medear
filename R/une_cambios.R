@@ -361,7 +361,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     }
   }
 
-  datos_propios <- !identical(years_estudio, years_union)
+  datos_propios <- length(years_estudio) > length(years_union)
   cartografia <- sp::spTransform(cartografia, sp::CRS(paste0("+init=epsg:", epsg)))
   utils::data("secciones", envir = environment(), package = "medear")
   if (!is.null(poblacion)) {
