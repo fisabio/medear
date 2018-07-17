@@ -1,0 +1,1039 @@
+---
+title: "Prepararación de las bases de datos para el Proyecto MEDEA3"
+author: ""
+date: "17 de julio de 2018"
+output:
+  rmarkdown::html_vignette:
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introducción
+
+Este documento describe el formato en el que cada uno de los grupos debería estructurar la información del proyecto MEDEA3 para su transmisión al nodo coordinador. De esta forma se pretende que el formato de la información manejada, y transmitida, por todos los grupos sea completamente equivalente y por tanto el tratamiento estadístico que se le habría de dar.
+
+Cabe mencionar que el paquete `medear`, creado para dar cobertura al proyecto MEDEA3 en el entorno estadístico `R`, dispone de forma interna de:
+
+* Los datos de poblaciones por edad, sexo, año y sección censal para todas las ciudades MEDEA3 en todo el período de estudio (1996-2015). Cabe señalar que para cada año y ciudad el número de secciones censales puede cambiar por redefinición del seccionado censal. Como veremos, las utilidades del paquete MEDEA unificarán dichas secciones a un entramado común y modificarán los datos de poblaciones adecuándolos a dicho entramado.
+
+* La cartografía del seccionado censal para el año 2011 para cada ciudad del proyecto (Fuente INE). Hemos considerado 2011 como año de referencia dada su coincidencia con uno de los censos que manejamos. La función de modificación del seccionado censal propondrá una serie de uniones de esta cartografía, siendo la cartografía final una modificación (agregación) de la del año 2011.
+
+* Aunque en la versión actual del paquete todavía no se ha integrado, se pretende incluir en un futuro la información socioeconómica de los censos de 2001 y 2011. Para esta información ocurrirá también que el número de secciones censales de ambos censos no coincidirá pero el propio paquete, mediante sus funciones, proporcionará la información de ambos censos según un seccionado unificado para ambos años.
+
+Asimismo, el paquete también incorpora la función `une_secciones`, que se encarga de realizar las uniones de seccionado de las que hemos estado hablando. La base de información de esa función son los callejeros que proporciona el INE para los distintos años de estudio. Para el año 1996 ha sido necesario adquirir dicho archivo. Estos callejeros proporcionan la sección censal de cada tramo de vía para cada año de estudio y así, cruzando la información de los distintos años, podremos identificar qué tramos han cambiado de sección y entre qué secciones. De esta forma identificamos las secciones censales que se solapan en el tiempo. Adicionalmente, además de determinar qué secciones censales habrían de ser unidas para garantizar la estabilidad temporal de estas agrupaciones, `une_secciones` también prepara la cartografía unificada, los datos de población y mortalidad (y en un futuro la información socioeconómica) según el formato común requerido. Por tanto, aconsejamos el uso de `une_secciones` para generar la información en el formato unificado del proyecto, se haya seguido o no su protocolo de geocodificación.
+
+En este sentido, el documento de aquí en adelante se divide en dos secciones adicionales. La segunda sección describe con cierto detalle el formato que deberían tener los datos para ser transmitidos al nodo coordinador. Esta sección será de utilidad para aquellos nodos que no hayan seguido el protocolo de geocodificación del proyecto y quizá tengan que adaptar su información a la del resto del proyecto de forma más manual. Aquellos nodos que han seguido el protocolo de geocodificación del proyecto para geocodificar las defunciones de sus ciudades, pueden pasar directamente a la tercera sección de este documento, en la que se describe, ciudad por ciudad, la sintaxis que se debería ejecutar para obtener la información de sus ciudades según los requerimientos unificados del proyecto. Para aquellos nodos que no hayan seguido el protocolo de geocodificación la tercera parte del documento describe cómo creemos, desde el nodo coordinador, que deberían proceder para estructurar sus datos de acuerdo con el resto del proyecto.
+
+# Formato de las bases de datos
+
+A continuación detallamos el formato en el que se debería estructurar la información para transmitirla al nodo coordinador. Notar que el presente documento lleva adjunto, a modo de ejemplo, la información estructurada, tal y como se describe a continuación, para la ciudad de Castellón (archivo `castellon.RData`), con la información de mortalidad censurada (todos los datos son valores perdidos). De esta forma cualquier grupo interesado podrá consultar con detalle el formato exacto que se espera de cada ciudad y adaptar su información a dicho formato.
+
+En resumen, para cada ciudad los datos se guardarán en un objeto de clase lista dentro de un archivo `.RData` (propio de `R`) cuyo contenido será:
+
+* Objeto `cartografia`: contiene la cartografía correspondiente a la unión de secciones censales que conducen a una agrupación de secciones temporalmente estable. En caso de no agregar ninguna sección censal (p. ej., al disponer de información de poblaciones a nivel puntual), la cartografía de 2011 sin ninguna modificación sería perfectamente válida. En ese caso se podría hacer uso de la función `une_secciones`, limitando el número de años para realizar la unión del seccionado a simplemente el año 2011 (argumento: `years_union = 2011`), con lo que no se llevará a cabo ninguna unión sobre el seccionado de 2011.
+
+* Objeto `poblacion`: `array` 4-dimensional de dimensiones (en este orden): Año (20 niveles), Sexo (2 niveles), Edad (18 niveles) y Secciones (número de niveles depende de la ciudad). Cada una de las celdas contiene la población correspondiente a cada una de estas combinaciones de factores. En el archivo `castellon.RData` adjunto se puede consultar las etiquetas de las dimensiones del `array` generadas por `une_secciones`. El `array` de poblaciones para todas las ciudades debería tener esas mismas etiquetas, salvo obviamente las relativas a las secciones censales que variarán de ciudad en ciudad. Notar que el `array` de poblaciones, incluye las secciones censales resultantes del proceso de agregación que se ha llevado a cabo en la cartografía. Por tanto, cartografía y poblaciones (para todos los años del periodo de estudio) serán coherentes en este sentido.
+
+* Objeto `mortalidad`: `array` 5-dimensional. Las cuatro primeras dimensiones de este `array` serían las mismas que las del `array` de poblaciones. La quinta dimensión identifica las causas de mortalidad que se acordaron como objetivos generales del proyecto. Dichas causas de mortalidad, así como su definición, vienen reflejadas en la Tabla 1. Nuevamente, las etiquetas de las causas de muerte se pueden consultar en el objeto correspondiente al `array` de mortalidad del archivo `castellon.RData`.  
+
+* Objeto `socio`: Actualmente no implementado en la función `une_secciones` dado que nos disponemos de la información correspondiente. En cualquier caso se prevé que este objeto sea un `array` de dimensiones: Año (2 niveles: 2001 y 2011), Secciones (número de niveles depende de la ciudad) y Variables Socioeconómicas (7 niveles según dijimos en la última reunión). Por ahora no es necesario que os preocupéis de esta parte de la información requerida: cuando tengamos la información socioeconómica os daremos información más detallada sobre este objeto.
+
+Para aquellos nodos que no vayan a agregar ninguna sección censal para el periodo de estudio, aconsejamos lo siguiente: 
+
+1. Ejecutar la función `une_secciones` delimitando el periodo de unión de cartografía al año 2011 como hemos sugerido anteriormente (argumento: `years_union = 2011`). Esto generará la lista correspondiente con la cartografía adecuada (año 2011 sin ninguna unión entre secciones) y el `array` de mortalidad correspondiente a dicho seccionado. Además, el resto de elementos de la lista que hemos generado ya tendrán el formato final adecuado para su transmisión al nodo coordinador.
+
+2. La información sobre población (y en un futuro sobre la información socioeconómica) generada en el paso anterior estará vacía si el periodo de extracción de la información es distinto al periodo de agregación de secciones censales. En ese caso, esa información debería ser completada con la información disponible por cada nodo en la que se convierte la información puntual de cada año para poblaciones (y socioeconómica) al entramado censal del año 2011. Es muy aconsejable que se mantenga el formato del `array` de población (y en su caso socioeconómico) generado en el paso anterior.
+
+El primer paso de estos dos será descrito para cada ciudad en el siguiente apartado mientras que el segundo será labor propia de cada nodo que tenga que llevarlo a cabo. Los grupos que hayan seguido el protocolo de geocodificación en ningún caso será necesario que ejecuten el segundo paso.
+
+Agradeceríamos que nos hicierais llegar la información de vuestras ciudades exactamente en el formato descrito al inicio de este apartado. Si por algún motivo encontrarais problemático generar la información en ese formato poneros por favor en contacto con Carlos Vergara (vergara_car@gva.es) para que valoremos, si es posible, algún formato paralelo para transmitirnos la información.
+
+
+<table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 11px; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">Tabla 1: Causas de defunción consideradas en MEDEA3 (criterios de selección de causas tal y como fueron definidos, y transmitidos al nodo coordinador, por Lluis Cirera).</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;font-weight: bold;font-size: 14px;"> Causa </th>
+   <th style="text-align:left;font-weight: bold;font-size: 14px;"> Causa abreviada </th>
+   <th style="text-align:left;font-weight: bold;font-size: 14px;"> Short term </th>
+   <th style="text-align:center;font-weight: bold;font-size: 14px;"> Códigos CIE-9 </th>
+   <th style="text-align:center;font-weight: bold;font-size: 14px;"> Códigos CIE-10 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">SIDA</span> </td>
+   <td style="text-align:left;"> SIDA </td>
+   <td style="text-align:left;"> AIDS </td>
+   <td style="text-align:center;"> 279(.5.6) </td>
+   <td style="text-align:center;"> B20-B24 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno del estómago</span> </td>
+   <td style="text-align:left;"> Cáncer del estómago </td>
+   <td style="text-align:left;"> Gastric cancer </td>
+   <td style="text-align:center;"> 151 </td>
+   <td style="text-align:center;"> C16 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno del colon</span> </td>
+   <td style="text-align:left;"> Cáncer de colon </td>
+   <td style="text-align:left;"> Colon cancer </td>
+   <td style="text-align:center;"> 153 </td>
+   <td style="text-align:center;"> C18 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de recto, sigmoide y ano</span> </td>
+   <td style="text-align:left;"> Cáncer de recto </td>
+   <td style="text-align:left;"> Rectal cancer </td>
+   <td style="text-align:center;"> 154 </td>
+   <td style="text-align:center;"> C19-21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupación</span> </td>
+   <td style="text-align:left;"> Cáncer colorrectal </td>
+   <td style="text-align:left;"> Colorectal cancer </td>
+   <td style="text-align:center;"> 153-154 </td>
+   <td style="text-align:center;"> C18-C21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de laringe</span> </td>
+   <td style="text-align:left;"> Cáncer de laringe </td>
+   <td style="text-align:left;"> Laryngeal cancer </td>
+   <td style="text-align:center;"> 161 </td>
+   <td style="text-align:center;"> C32 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de tráquea, bronquios y pulmón</span> </td>
+   <td style="text-align:left;"> Cáncer de pulmón </td>
+   <td style="text-align:left;"> Lung cancer </td>
+   <td style="text-align:center;"> 162 </td>
+   <td style="text-align:center;"> C33-34 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de mama femenino</span> </td>
+   <td style="text-align:left;"> Cáncer de mama (mujer) </td>
+   <td style="text-align:left;"> Brest cancer (woman) </td>
+   <td style="text-align:center;"> 174 </td>
+   <td style="text-align:center;"> C50 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de próstata</span> </td>
+   <td style="text-align:left;"> Cáncer de próstata </td>
+   <td style="text-align:left;"> Prostate cancer </td>
+   <td style="text-align:center;"> 185 </td>
+   <td style="text-align:center;"> C61 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de vejiga</span> </td>
+   <td style="text-align:left;"> Cáncer de vejiga </td>
+   <td style="text-align:left;"> Bladder cancer </td>
+   <td style="text-align:center;"> 188 </td>
+   <td style="text-align:center;"> C67 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumores hematológicos malignos</span> </td>
+   <td style="text-align:left;"> Cáncer hematológico </td>
+   <td style="text-align:left;"> Hematologic cancer<sup>*</sup> </td>
+   <td style="text-align:center;"> 200-208, 273.3 </td>
+   <td style="text-align:center;"> C81-C96 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Diabetes Mellitus</span> </td>
+   <td style="text-align:left;"> Diabetes Mellitus </td>
+   <td style="text-align:left;"> Diabetes Mellitus </td>
+   <td style="text-align:center;"> 250 </td>
+   <td style="text-align:center;"> E10-E14 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Trastornos mentales orgánicos, senil y presenil</span> </td>
+   <td style="text-align:left;"> Trastornos mentales orgánicos </td>
+   <td style="text-align:left;"> Organic mental disorders </td>
+   <td style="text-align:center;"> 290 (excepto 290.1) </td>
+   <td style="text-align:center;"> F00-F09 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Enfermedad de Alzheimer</span> </td>
+   <td style="text-align:left;"> Enfermedad de Alzheimer </td>
+   <td style="text-align:left;"> Alzheimer's disease </td>
+   <td style="text-align:center;"> 290.1, 331.0 </td>
+   <td style="text-align:center;"> G30 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupación</span> </td>
+   <td style="text-align:left;"> Demencia </td>
+   <td style="text-align:left;"> Dementia </td>
+   <td style="text-align:center;"> 290, 331.0 </td>
+   <td style="text-align:center;"> F00-F09, G30 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Enfermedad isquémica del corazón</span> </td>
+   <td style="text-align:left;"> Enfermedad isquémica del corazón </td>
+   <td style="text-align:left;"> Ischemic heart disease<sup>&#8224;</sup> </td>
+   <td style="text-align:center;"> 410-414 </td>
+   <td style="text-align:center;"> I20-I25 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Enfermedad cerebrovascular</span> </td>
+   <td style="text-align:left;"> Ictus </td>
+   <td style="text-align:left;"> Ictus </td>
+   <td style="text-align:center;"> 430-434, 436-438 </td>
+   <td style="text-align:center;"> I60-I69 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Enfermedad pulmonar obstructiva crónica</span> </td>
+   <td style="text-align:left;"> EPOC </td>
+   <td style="text-align:left;"> COPD </td>
+   <td style="text-align:center;"> 490-492, 494-496 </td>
+   <td style="text-align:center;"> J40-J44, J47 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Cirrosis y enfermedades crónicas del hígado</span> </td>
+   <td style="text-align:left;"> Cirrosis del hígado </td>
+   <td style="text-align:left;"> Liver cirrhosis </td>
+   <td style="text-align:center;"> 571 </td>
+   <td style="text-align:center;"> K70, K72.1, K73, K74, K76.1.9 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Suicidios y lesiones autoinflingidas</span> </td>
+   <td style="text-align:left;"> Suicidios </td>
+   <td style="text-align:left;"> Suicide </td>
+   <td style="text-align:center;"> E950-E959 </td>
+   <td style="text-align:center;"> X60-X84 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Lesiones por accidentes de tráfico de vehículos de motor</span> </td>
+   <td style="text-align:left;"> Accidentes de tráfico </td>
+   <td style="text-align:left;"> Traffic accident </td>
+   <td style="text-align:center;"> <sup>&#8225;</sup> </td>
+   <td style="text-align:center;"> E810-E819 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupación</span> </td>
+   <td style="text-align:left;"> Todas las causas </td>
+   <td style="text-align:left;"> All causes </td>
+   <td style="text-align:center;"> 000-E999 </td>
+   <td style="text-align:center;"> A00-Z99 </td>
+  </tr>
+</tbody>
+<tfoot>
+<tr><td style="padding: 0; border: 0;" colspan="100%">
+<sup>*</sup> Haematologic in Br. English.</td></tr>
+<tr><td style="padding: 0; border: 0;" colspan="100%">
+<sup>&#8224;</sup> Ischaemic heart disease in Br. English.</td></tr>
+<tr><td style="padding: 0; border: 0;" colspan="100%">
+<sup>&#8225;</sup> Códigos: V02-V04(.1.9), V09(.2.3), V12-V14.(3.4.5.9), V19(.4.5.6.9), V20-V28(.3.4.5.9), V29(.4.5.6.9), V20-V28(.3.4.5.7.9), V29(.4.5.6.9), V30-V38(.3.4.5.7.9), V39(.4.5.6.9), V40-V48(.3.4.5.7.9), V49(.4.5.6.9), V50-V58(.3.4.5.7.9), V59(.4.5.6.9), V60-V68(.3.4.5.7.9), V69(.4.5.6.9), V70-V78(.3.4.5.7.9), V79(.4.5.6.9), V80(.3.4.5), V81-V82(.1), V83-V86(.0.1.2.3), V87(.0.1.2.3.4.5.6.7.8), V89(.2.9).</td></tr>
+</tfoot>
+</table>
+
+
+# Generación de la información del proyecto mediante `medear`
+
+
+## Común a todos los grupos
+
+En primer lugar deberíamos asegurarnos de disponer de la última versión del paquete `medear`, y cargarla. Para ello deberíamos hacer:
+```{r inicial, eval=FALSE}
+if (!"devtools" %in% installed.packages()) install.packages("devtools")
+devtools::install_github("fisabio/medear", build_vignettes = TRUE)
+library(medear)
+```
+
+Adicionalmente, deberíamos cargar los datos de cambios de secciones censales, la cartografía que viene junto con el paquete y los datos de poblaciones. Estos últimos se cargarán con la función `carga_datos`. Esta función debe llevar como argumento la contraseña que da acceso a los datos de poblaciones (de los años 1996-2003), si no no podremos disponer de dicha información (parcialmente de pago y por tanto protegida). En un futuro `carga_datos` también dará acceso a la información (protegida) socioeconómica del proyecto.
+
+```{r inicial2, eval=FALSE}
+data("cambios_seccion")
+data("cartografia")
+poblacion <- carga_datos("XXXXX")
+```
+En la última sentencia XXXXX se habrá de sustituir por la contraseña que da acceso a dicha información y que podéis conocer poniéndoos en contacto con Carlos Vergara (vergara_car@gva.es). 
+
+Finalmente, habrá que cargar la información individual de mortalidad geocodificada que, en caso de haber seguido el protocolo de geocodificación, se encontrará en el directorio de trabajo en un archivo denominado `mortalidad_geocodificada.RData` (habrá que ajustar su nombre en caso contrario). 
+```{r carga_mort, eval = FALSE}
+load("mortalidad_geocodificada.RData")
+```
+En principio, este archivo debería contener la información de todas las ciudades MEDEA3 correspondientes a cada grupo, o incluso más defunciones si se hubiera geocodificado la mortalidad de toda la comunidad autónoma correspondiente (esto no sería problema). Si tuviéramos la información de mortalidad de cada ciudad geocodificada en archivos distintos tampoco sería problema: simplemente habríamos de cargar la información de mortalidad de la ciudad para la que queramos generar la información.
+
+Aquellos grupos que no siguieran el protocolo de geocodificación de MEDEA3 y por tanto no tengan un archivo `mortalidad_geocodificada.RData`, deberían tener en su sustitución un `data.frame` en `R`, llamado `datosmort`, con registros individuales y al menos las siguientes columnas con exactamente estos nombres (**importante**), codificadas exactamente de la forma que se describe:
+
+* `year_defuncion`: año de defunción (clase numérica).
+* `sexo`: 0 = masculino, 1 = femenino (clase numérica).
+* `edad`: edad en años a la fecha de defunción (clase numérica).
+* `lat`: latitud según la geocodificación llevada a cabo (clase numérica).
+* `lng`: longitud según la geocodificación llevada a cabo (clase numérica).
+* `causa_defuncion`: campo de tipo carácter con el código CIE 9 o 10, según el año, de la defunción correspondiente. Todo registro de este campo debe tener al menos 3 caracteres. En los registros que tuvieran menos, probablemente haya que añadir ceros a la izquierda.
+
+A continuación se describe la llamada a la sentencia `une_secciones` tal y como debería ejecutarse para cada ciudad (a juicio del nodo coordinador), una vez ejecutadas las sentencias anteriores (y adaptado el formato de las bases de datos si así fuera el caso). Estas llamadas asumen que se han dado por buenas las uniones de seccionado propuestas en su día por el nodo coordinador a cada uno de los grupos del proyecto.
+
+## Andalucia
+
+### Almería
+
+```{r almeria, eval=FALSE}
+codigo  <- "04013"
+almeria <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("07040", "07040")),
+  sc2             = paste0(codigo, c("07023", "07024"))
+)
+save(almeria, file = "almeria.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Cádiz
+
+```{r cadiz, eval=FALSE}
+codigo          <- "11012"
+cambios_seccion <- elimina_cambios(cambios_seccion,  "1101208017", "1101209002")
+cadiz           <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("05003", "10014")),
+  sc2             = paste0(codigo, c("04006", "10006"))
+)
+save(cadiz, file = "cadiz.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Córdoba
+
+```{r cordoba, eval=FALSE}
+codigo          <- "14021"
+cambios_seccion <- elimina_cambios(cambios_seccion,  "1402109024", "1402109026")
+cordoba         <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("06047", "09035", "10041", "09014", "09003")),
+  sc2             = paste0(codigo, c("06024", "09003", "10045", "09020", "09032"))
+)
+save(cordoba, file = "cordoba.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Granada
+
+```{r granada, eval=FALSE}
+codigo  <- "18087"
+granada <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("06024")),
+  sc2             = paste0(codigo, c("06021"))
+)
+save(granada, file = "granada.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Huelva
+
+```{r huelva, eval=FALSE}
+codigo          <- "21041"
+cambios_seccion <- elimina_cambios(cambios_seccion,  "2104108001", "2104102005")
+huelva          <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("07018")),
+  sc2             = paste0(codigo, c("07013"))
+)
+save(huelva, file = "huelva.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Jaén
+
+```{r jaen, eval=FALSE}
+codigo <- "23050"
+jaen   <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("05011")),
+  sc2             = paste0(codigo, c("05012"))
+)
+save(jaen, file = "jaen.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Málaga
+
+```{r malaga, eval=FALSE}
+codigo          <- "29067"
+cambios_seccion <- elimina_cambios(cambios_seccion,  "2906702006", "2906710025")
+malaga          <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("08056", "09067")),
+  sc2             = paste0(codigo, c("08043", "09072"))
+)
+save(malaga, file = "malaga.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Sevilla
+
+```{r sevilla, eval=FALSE}
+## No disponible por el momento. Pendiente de la definición del seccionado unificado.
+```
+
+## Asturias
+
+### Avilés
+
+```{r aviles, eval=FALSE}
+codigo <- "33004"
+aviles <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5
+)
+save(aviles, file = "aviles.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Gijón
+
+Unión provisional a falta de incorporar la división de dos secciones.
+
+```{r gijon, eval=FALSE}
+codigo          <- "33024"
+cambios_seccion <- elimina_cambios(
+  cambios_seccion,
+  c("3302405013", "3302407034", "3302403024"),
+  c("3302405022", "3302403019", "3302403019")
+)
+gijon           <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("03013", "01020", "06013", "05016", "06016",
+                                     "08015", "09003", "04004", "07005")),
+  sc2             = paste0(codigo, c("03012", "01021", "06014", "05022", "06019",
+                                     "08021", "09015", "04010", "07047"))
+)
+save(gijon, file = "gijon.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Oviedo
+
+```{r oviedo, eval=FALSE}
+codigo <- "33044"
+oviedo <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("07003", "09015")),
+  sc2             = paste0(codigo, c("07002", "09017"))
+)
+save(oviedo, file = "oviedo.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+## Cantabria
+
+### Santander
+
+Solo se realizan uniones desde 2001 a 2011 para lograr la compatibilidad entre ambos censos. El resto de la información la disponen a nivel puntual. Esta circunstancia les obliga a adaptar la información de poblaciones al seccionado resultante de la llamada a `une_secciones` que se describe a continuación.
+
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo según se describe al inicio de este apartado.
+
+```{r santander, eval=FALSE}
+codigo   <- "39075"
+santander <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  years_union     = 2001:2011,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("02023", "08020", "08021")),
+  sc2             = paste0(codigo, c("02024", "08029", "08025"))
+)
+save(santander, file = "santander.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+## Cataluña
+
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un `array` de población vacío (todos los valores son `NA`'s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).
+
+### Barcelona
+
+```{r barcelona, eval=FALSE}
+codigo    <- "08019"
+barcelona <- une_secciones(
+  cambios         = NULL,
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  years_union     = 2011,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = FALSE
+)
+save(barcelona, file = "barcelona.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+## Comunidad de Madrid 
+
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un `array` de población vacío (todos los valores son `NA`'s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).
+
+### Madrid
+
+```{r madrid, eval=FALSE}
+codigo   <- "28079"
+madrid   <- une_secciones(
+  cambios         = NULL,
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  years_union     = 2011,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = FALSE
+)
+save(madrid, file = "madrid.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+## Comunidad Valenciana
+
+### Alicante
+
+```{r alicante, eval=FALSE}
+codigo          <- "03014"
+cambios_seccion <- elimina_cambios(cambios_seccion,  "0301403026", "0301403034")
+alicante        <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("04035", "04041")),
+  sc2             = paste0(codigo, c("04020", "04023"))
+)
+save(alicante, file = "alicante.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Castellón
+
+```{r castellon, eval=FALSE}
+codigo    <- "12040"
+castellon <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("06013")),
+  sc2             = paste0(codigo, c("01003"))
+)
+save(castellon, file = "castellon.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Valencia
+
+```{r valencia, eval=FALSE}
+codigo   <- "46250"
+valencia <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("12025")),
+  sc2             = paste0(codigo, c("12042"))
+)
+save(valencia, file = "valencia.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+## Galicia
+
+Para Galicia prescindimos de los años 1996 y 1997 dado el bajo nivel de geocodificación de la mortalidad para estos dos años. En fases anteriores de MEDEA también se excluyeron estos dos años del periodo de estudio.
+
+### A coruña
+
+```{r coruna, eval=FALSE}
+codigo <- "15030"
+coruna <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1998:2015,
+  years_union     = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("05017", "05018", "05019", "07042")),
+  sc2             = paste0(codigo, c("05015", "05011", "05011", "07027"))
+)
+save(coruna, file = "coruna.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Ferrol
+
+```{r ferrol, eval=FALSE}
+codigo <- "15036"
+ferrol <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1998:2015,
+  years_union     = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5
+)
+save(ferrol, file = "ferrol.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Santiago de Compostela
+
+```{r santiago, eval=FALSE}
+codigo          <- "15078"
+cambios_seccion <- elimina_cambios(cambios_seccion,  "1507802002", "1507805009")
+santiago        <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1998:2015,
+  years_union     = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("01005")),
+  sc2             = paste0(codigo, c("01008"))
+)
+save(santiago, file = "santiago.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Lugo
+
+```{r lugo, eval=FALSE}
+codigo <- "27028"
+lugo   <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1998:2015,
+  years_union     = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("07001")),
+  sc2             = paste0(codigo, c("07003"))
+)
+save(lugo, file = "lugo.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Ourense
+
+```{r ourense, eval=FALSE}
+codigo  <- "32054"
+ourense <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1998:2015,
+  years_union     = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("01016")),
+  sc2             = paste0(codigo, c("01008"))
+)
+save(ourense, file = "ourense.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Pontevedra
+
+```{r pontevedra, eval=FALSE}
+codigo     <- "36038"
+pontevedra <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1998:2015,
+  years_union     = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5
+)
+save(pontevedra, file = "pontevedra.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Vigo
+
+```{r vigo, eval=FALSE}
+codigo <- "36057"
+vigo   <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1998:2015,
+  years_union     = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("06023", "06023")),
+  sc2             = paste0(codigo, c("06003", "06022"))
+)
+save(vigo, file = "vigo.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+## Islas Baleares
+
+### Palma de Mallorca
+
+```{r mallorca, eval=FALSE}
+## No disponible por el momento. Pendiente de la definición del seccionado unificado.
+```
+
+## Islas Canarias
+
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo según se describe al inicio de este apartado.
+
+### Las Palmas de Gran Canaria
+```{r palmas, eval=FALSE}
+codigo          <- "35016"
+cambios_seccion <- elimina_cambios(
+  cambios_seccion,
+  c("3501605033", "3501605020", "3501605006",  "3501602018", rep("3501602032", 2),
+    "3501602012", "3501602026", "3501604078", "3501602042", "3501602038"),
+  c(rep("3501608013", 3), "3501602019", "3501602029", "3501602030", "3501602019",
+    "3501602024", "3501604058", "3501602038", "3501602042")
+)
+palmas_gc       <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = c("3501605023", "3501605019", "3501604074"),
+  sc2             = c("3501608013", "3501608018", "3501604062")
+)
+save(palmas_gc, file = "palmas_gc.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Santa Cruz de Tenerife
+
+```{r tenerife, eval=FALSE}
+codigo          <- "38038"
+cambios_seccion <- elimina_cambios(cambios_seccion,  "3803807002", "3803809020")
+tenerife        <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("03019", "03020", "09020")),
+  sc2             = paste0(codigo, c("03020", "03001", "09006"))
+)
+save(tenerife, file = "tenerife.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+## Navarra 
+
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un `array` de población vacío (todos los valores son `NA`'s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).
+
+### Pamplona
+
+```{r pamplona, eval=FALSE}
+codigo   <- "31201"
+pamplona <- une_secciones(
+  cambios         = NULL,
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  years_union     = 2011,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = FALSE
+)
+save(pamplona, file = "pamplona.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+## País Vasco 
+
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un `array` de población vacío (todos los valores son `NA`'s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).
+
+### Bilbao
+
+```{r bilbao, eval=FALSE}
+codigo   <- "48020"
+bilbao   <- une_secciones(
+  cambios         = NULL,
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  years_union     = 2011,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = FALSE
+)
+save(bilbao, file = "bilbao.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+### Vitoria
+
+```{r vitoria, eval=FALSE}
+codigo   <- "01059"
+vitoria  <- une_secciones(
+  cambios         = NULL,
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  years_union     = 2011,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = FALSE
+)
+save(vitoria, file = "vitoria.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+### San Sebastián
+
+```{r donostia, eval=FALSE}
+codigo   <- "20069"
+donostia <- une_secciones(
+  cambios         = NULL,
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  years_union     = 2011,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = FALSE
+)
+save(donostia, file = "donostia.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+## Región de Murcia
+
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo según se describe al inicio de este apartado.
+
+### Alcantarilla
+
+```{r alcantarilla, eval=FALSE}
+codigo       <- "30005"
+alcantarilla <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5
+)
+save(alcantarilla, file = "alcantarilla.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Cartagena
+
+```{r cartagena, eval=FALSE}
+codigo    <- "30016"
+cartagena <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("06003")),
+  sc2             = paste0(codigo, c("06004"))
+)
+save(cartagena, file = "cartagena.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### Murcia
+
+```{r murcia, eval=FALSE}
+codigo          <- "30030"
+cambios_seccion <- elimina_cambios(cambios_seccion,  "3003001009", "3003001011")
+murcia          <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == TRUE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("05024", "06015", "04021", "04022", "02024",
+                                     "02026", "04001", "02054", "04044", "07039")),
+  sc2             = paste0(codigo, c("05023", "06017", "04022", "04025", "02023",
+                                     "02024", "04073", "02053", "04062", "07040"))
+)
+save(murcia, file = "murcia.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
+### La Unión
+
+```{r la_union, eval=FALSE}
+codigo   <- "30041"
+la_union <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("03003")),
+  sc2             = paste0(codigo, c("03001"))
+)
+save(la_union, file = "la_union.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
