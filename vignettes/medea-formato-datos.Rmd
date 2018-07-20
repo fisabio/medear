@@ -873,20 +873,21 @@ save(tenerife, file = "tenerife.RData")
 
 ## Navarra 
 
-Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un `array` de población vacío (todos los valores son `NA`'s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al no disponer de información catastral no se puede hacer uso de dicho filtro.
 
 ### Pamplona
 
 ```{r pamplona, eval=FALSE}
 codigo   <- "31201"
 pamplona <- une_secciones(
-  cambios         = NULL,
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
   years_estudio   = 1996:2015,
-  years_union     = 2011,
   poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
-  mortalidad      = datosmort,
-  catastro        = FALSE
+  catastro        = FALSE,
+  modo            = "manual",
+  sc1             = c("3120107005", "3120104026", rep("3120105008", 6)),
+  sc2             = c("3120107018", "3120104013", paste0("312010800", 1:6))
 )
 save(pamplona, file = "pamplona.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
