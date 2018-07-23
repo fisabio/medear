@@ -441,9 +441,10 @@ save(malaga, file = "malaga.RData")
 ```{r aviles, eval=FALSE}
 codigo <- "33004"
 aviles <- une_secciones(
-  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo &
+                                      codigo_postal == FALSE & year2 == 2001, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
-  years_estudio   = 1996:2015,
+  years_estudio   = 2001:2011,
   poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
   mortalidad      = datosmort,
   catastro        = TRUE,
@@ -461,27 +462,19 @@ Unión provisional a falta de incorporar la división de dos secciones.
 
 ```{r gijon, eval=FALSE}
 codigo          <- "33024"
-cambios_seccion <- elimina_cambios(
-  cambios_seccion,
-  c("3302405013", "3302407034", "3302403024", "3302403019",
-    "3302403021", "3302403022", "3302403024", "3302406020"),
-  c("3302405022", "3302403019", "3302403019",
-    rep("3302403010", 4), "3302406010")
-  )
 gijon           <- une_secciones(
-  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo &
+                                      codigo_postal == FALSE & year2 == 2001, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
-  years_estudio   = 1996:2015,
+  years_estudio   = 2001:2011,
   poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
   mortalidad      = datosmort,
   catastro        = TRUE,
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("03013", "01020", "06013", "05016", "06016",
-                                     "08015", "09003", "04004", "07005")),
-  sc2             = paste0(codigo, c("03012", "01021", "06014", "05022", "06019",
-                                     "08021", "09015", "04010", "07047"))
+  sc1             = "3302407016",
+  sc2             = "3302407048"
 )
 save(gijon, file = "gijon.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -493,17 +486,15 @@ save(gijon, file = "gijon.RData")
 ```{r oviedo, eval=FALSE}
 codigo <- "33044"
 oviedo <- une_secciones(
-  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo &
+                                      codigo_postal == FALSE & year2 == 2001, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
-  years_estudio   = 1996:2015,
+  years_estudio   = 2001:2011,
   poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
   mortalidad      = datosmort,
   catastro        = TRUE,
   corte_edad      = 85,
-  umbral_vivienda = 5,
-  modo            = "manual",
-  sc1             = paste0(codigo, c("07003", "09015")),
-  sc2             = paste0(codigo, c("07002", "09017"))
+  umbral_vivienda = 5
 )
 save(oviedo, file = "oviedo.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
