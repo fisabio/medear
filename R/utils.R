@@ -254,7 +254,7 @@ carga_datos <- function(key) {
   )
   utils::data("poblacion", envir = environment(), package = "medear")
   poblacion <- data.table::rbindlist(
-    list(poblacion, cifrado), fill = TRUE
+    list(poblacion[substr(seccion, 1, 2) != "33"], cifrado), fill = TRUE
   )[order(year, sexo, seccion)]
   attributes(poblacion)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   class(poblacion) <- c(class(poblacion), "poblaciones_ine")
