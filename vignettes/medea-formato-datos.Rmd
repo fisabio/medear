@@ -504,25 +504,23 @@ save(oviedo, file = "oviedo.RData")
 
 ### Santander
 
-Solo se realizan uniones desde 2001 a 2011 para lograr la compatibilidad entre ambos censos. El resto de la información la disponen a nivel puntual. Esta circunstancia les obliga a adaptar la información de poblaciones al seccionado resultante de la llamada a `une_secciones` que se describe a continuación.
+Solo se realizan uniones desde 2011 a 2015. El resto de la información la disponen a nivel puntual. Esta circunstancia les obliga a adaptar la información de poblaciones al seccionado resultante de la llamada a `une_secciones` que se describe a continuación.
 
-Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo según se describe al inicio de este apartado.
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un `array` de población vacío (todos los valores son `NA`'s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado unido --objeto `santander$cartografia` tras haber ejecutado la función `une_secciones`--).
 
 ```{r santander, eval=FALSE}
-codigo   <- "39075"
+codigo    <- "39075"
+sc1       <- paste0(codigo, c("01011", "08012", "08011"))
+sc2       <- paste0(codigo, c("01009", "08027", "08010"))
 santander <- une_secciones(
-  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cambios         = cambios_seccion[sc_ref %in% sc1 & sc_new %in% sc2 & codigo_postal == FALSE, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
   years_estudio   = 1996:2015,
-  years_union     = 2001:2011,
+  years_union     = 2011:2015,
   poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
   mortalidad      = datosmort,
-  catastro        = TRUE,
-  corte_edad      = 85,
-  umbral_vivienda = 5,
-  modo            = "manual",
-  sc1             = paste0(codigo, c("02023", "08020", "08021")),
-  sc2             = paste0(codigo, c("02024", "08029", "08025"))
+  catastro        = FALSE,
+  corte_edad      = 85
 )
 save(santander, file = "santander.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
