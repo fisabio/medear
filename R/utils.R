@@ -615,7 +615,7 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   aglomeración de defunciones.
 #'
 #' @usage detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
-#'   limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE)
+#'   secciones = NULL, limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE)
 #'
 #' @param datos Base de datos con las coordenadas que ubican cada uno de los
 #'   fallecimientos. Debe contener, al menos, 3 columnas: \code{BOD.direccion},
@@ -640,6 +640,9 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'   paquete para las ciudades MEDEA3. Si el usuario desea consultar otros
 #'   municipios puede hacer uso de este argumento para tener el seccionado de
 #'   fondo.
+#' @param secciones Cadena de caracteres: secciones censales anómalas
+#'   (información facilitada por el nodo coordinador), para resaltarlas en el
+#'   mapa. Por defecto ninguna.
 #' @param limite Numérico con longitud 1 <= x <= 9: límites de probabilidad con
 #'   los que se identifican las agrupaciones sospechosas. Por defecto viene
 #'   fijado a 1e-10, 1e-15 y 1e-20.
@@ -692,7 +695,8 @@ descarga_segura <- function(x, tries = 10, ...) {
 #'
 #' @export
 detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
-                            limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE) {
+                            secciones = NULL, limite = c(1e-10, 1e-15, 1e-20),
+                            devuelve_datos = TRUE) {
 
   vars_ob <- c("BOD.direccion", "lng", "lat")
   vars_op <- c("province", "muni", "tip_via", "address", "portalNumber", "postalCode")
@@ -703,6 +707,8 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   stopifnot(is.numeric(vecinos) & length(vecinos) == 1)
   stopifnot(is.numeric(epsg) & length(epsg) == 1)
   stopifnot(is.numeric(limite) & length(limite) >= 1 & length(limite) <= 9)
+  if (!is.null(secciones))
+    stopifnot(is.character(secciones))
   if (!is.null(cartografia)) {
     if (!"SpatialPolygonsDataFrame" %in% class(cartografia)) {
       stop("\nEl objeto 'cartografia' debe ser un 'SpatialPolygonsDataFrame'")
@@ -864,6 +870,26 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     title     = "Pr(Esp >= Obs)",
     opacity   = 1
   )
+  if (!is.null(secciones)) {
+    carto_raras  <- carto_cl[carto_cl$seccion %in% secciones, ]
+    mapa_cluster <- leaflet::addPolygons(
+      map              = mapa_cluster,
+      data             = carto_raras,
+      popup            = paste0("Secci\u00f3n: ", carto_raras$seccion),
+      color            = "black",
+      fillColor        = "#F03B20",
+      weight           = 1.5,
+      smoothFactor     = 0.5,
+      opacity          = 0.5,
+      fillOpacity      = 0.3,
+      highlightOptions = leaflet::highlightOptions(
+        color        = "white",
+        weight       = 2,
+        bringToFront = TRUE
+      ),
+      group            = "Seccionado de referencia"
+    )
+  }
 
   if (devuelve_datos) {
     print(mapa_cluster)
