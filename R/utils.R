@@ -793,7 +793,7 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   mapa_cluster <- leaflet::addPolygons(
     map              = mapa_cluster,
     data             = carto_cl,
-    popup            = paste0("Secci\u00f3n (2011): ", carto_cl$seccion),
+    popup            = paste0("Secci\u00f3n: ", carto_cl$seccion),
     color            = "black",
     weight           = 1,
     smoothFactor     = .5,
