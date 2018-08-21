@@ -488,11 +488,13 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         cambios      <- cambios[incluido == TRUE]
       }
 
-      sc_pob_conservar <- cambios_copy[
-        (sc_ref %in% sc_pob_conservar | sc_new %in% sc_pob_conservar) &
-          year2 > 2011
-        ]
-      cambios <- unique(rbindlist(list(cambios, sc_pob_conservar)))
+      if (!is.null(poblacion)) {
+        sc_pob_conservar <- cambios_copy[
+          (sc_ref %in% sc_pob_conservar | sc_new %in% sc_pob_conservar) &
+            year2 > 2011
+          ]
+        cambios <- unique(rbindlist(list(cambios, sc_pob_conservar)))
+      }
 
       if (modo == "manual") {
         cambios_m <- cambios_copy[seq_len(length(sc1))]

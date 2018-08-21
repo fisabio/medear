@@ -6,7 +6,7 @@
 \title{Deteccion de agrupaciones de mortalidad a revisar manualmente}
 \usage{
 detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
-  limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE)
+  secciones = NULL, limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE)
 }
 \arguments{
 \item{datos}{Base de datos con las coordenadas que ubican cada uno de los
@@ -35,6 +35,10 @@ principio tiene valor nulo, lo que implica usar la cartografía asociada al
 paquete para las ciudades MEDEA3. Si el usuario desea consultar otros
 municipios puede hacer uso de este argumento para tener el seccionado de
 fondo.}
+
+\item{secciones}{Cadena de caracteres: secciones censales anómalas
+(información facilitada por el nodo coordinador), para resaltarlas en el
+mapa. Por defecto ninguna.}
 
 \item{limite}{Numérico con longitud 1 <= x <= 9: límites de probabilidad con
 los que se identifican las agrupaciones sospechosas. Por defecto viene
