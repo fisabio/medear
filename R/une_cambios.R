@@ -425,8 +425,6 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     secciones[tmp == TRUE, final := as.integer(year)]
     secciones[, tmp := NULL]
     sc_pob_conservar <- secciones[between(final, 2012, max(year) - 1), seccion]
-    secciones_2011   <- data.table(year = 2011, seccion = cartografia$seccion)
-    secciones_2011   <- secciones_2011[, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
   }
 
 
@@ -472,6 +470,8 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       cambios[, distan_T := (dista <= distancia | is.na(dista))]
 
       if (catastro) {
+        secciones_2011 <- data.table(year = 2011, seccion = cartografia$seccion)
+        secciones_2011 <- secciones_2011[, n_viv := cartografia@data[match(cartografia$seccion, seccion), "n_viv"]]
         for (i in seq_len(nrow(cambios))) {
           viv_r    <- secciones_2011[seccion == cambios[["sc_ref"]][i], n_viv]
           cambios[i, viv_ref := ifelse(length(viv_r) != 0, viv_r, NA_integer_)]
