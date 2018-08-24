@@ -479,7 +479,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         }
         cambios[, umbral := cambio_ref + tramo_por]
         cambios[, umbral_T := umbral >= umbral_vivienda]
-        cambios[, incluido := umbral_T == T & (no_11 | distan_T)]
+        cambios[, incluido := (umbral_T == T & (no_11 | distan_T)) | is.na(cambio_ref)]
         cambios_copy <- copy(cambios)
         cambios <- cambios[incluido == TRUE]
       } else {
@@ -519,14 +519,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         cambios      <- rbindlist(list(cambios, cambios_m), fill = TRUE)
       }
 
-      sc_unicas <- sort(
-        unique(
-          secciones[
-            year %in% years_union & seccion %in% c(cambios$sc_ref, cambios$sc_new),
-            seccion
-            ]
-        )
-      )
+      sc_unicas <- sort(unique(c(cambios$sc_ref, cambios$sc_new)))
       cluster_sc <- data.table(sc = sc_unicas, id_cluster = sc_unicas)
       for (i in seq_len(nrow(cambios))) {
         sc_select <- which(cluster_sc[, sc] %in% cambios[i, c(sc_ref, sc_new)])
