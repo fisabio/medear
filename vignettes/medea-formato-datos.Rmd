@@ -802,7 +802,22 @@ save(vigo, file = "vigo.RData")
 ### Palma de Mallorca
 
 ```{r mallorca, eval=FALSE}
-## No disponible por el momento. Pendiente de la definición del seccionado unificado.
+codigo <- "07040"
+mallorca <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = "0704004021",
+  sc2             = "0704004039"
+)
+save(mallorca, file = "mallorca.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
 ```
 
 ## Islas Canarias
