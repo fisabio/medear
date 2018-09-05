@@ -693,12 +693,10 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
 
       if (any(uno_vect)) {
         warning(
-          "\nEn el per\u00edodo seleccionado las secciones c('",
+          "\nNo hay datos de poblaci\u00f3n para algunos a\u00f1os en las secciones c('",
           paste0(unique(poblacion$seccion[uno_vect]), collapse = "', '"),
-          "') no sufrieron cambios pero aparecieron m\u00e1s tarde que el ",
-          "a\u00f1o de inicio elegido. Se asigna el valor 1 como poblaci\u00f3n ",
-          "a dichas secciones para los a\u00f1os previos (hasta el a\u00f1o de ",
-          "inicio fijado).\nPor favor, consulte la ayuda de la funci\u00f3n ",
+          "').\nSe asigna el valor 1 como poblaci\u00f3n ",
+          "a dichas secciones para esos a\u00f1os.\nPor favor, consulte la ayuda de la funci\u00f3n ",
           "para explorar este aspecto.",
           call. = FALSE
         )
