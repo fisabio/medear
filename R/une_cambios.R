@@ -479,7 +479,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         }
         cambios[, umbral := cambio_ref + tramo_por]
         cambios[, umbral_T := umbral >= umbral_vivienda]
-        cambios[, incluido := umbral_T == T & (no_11 | distan_T)]
+        cambios[, incluido := (umbral_T == T & (no_11 | distan_T)) | is.na(cambio_ref)]
         cambios_copy <- copy(cambios)
         cambios <- cambios[incluido == TRUE]
       } else {
@@ -519,14 +519,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         cambios      <- rbindlist(list(cambios, cambios_m), fill = TRUE)
       }
 
-      sc_unicas <- sort(
-        unique(
-          secciones[
-            year %in% years_union & seccion %in% c(cambios$sc_ref, cambios$sc_new),
-            seccion
-            ]
-        )
-      )
+      sc_unicas <- sort(unique(c(cambios$sc_ref, cambios$sc_new)))
       cluster_sc <- data.table(sc = sc_unicas, id_cluster = sc_unicas)
       for (i in seq_len(nrow(cambios))) {
         sc_select <- which(cluster_sc[, sc] %in% cambios[i, c(sc_ref, sc_new)])
@@ -700,12 +693,10 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
 
       if (any(uno_vect)) {
         warning(
-          "\nEn el per\u00edodo seleccionado las secciones c('",
+          "\nNo hay datos de poblaci\u00f3n para algunos a\u00f1os en las secciones c('",
           paste0(unique(poblacion$seccion[uno_vect]), collapse = "', '"),
-          "') no sufrieron cambios pero aparecieron m\u00e1s tarde que el ",
-          "a\u00f1o de inicio elegido. Se asigna el valor 1 como poblaci\u00f3n ",
-          "a dichas secciones para los a\u00f1os previos (hasta el a\u00f1o de ",
-          "inicio fijado).\nPor favor, consulte la ayuda de la funci\u00f3n ",
+          "').\nSe asigna el valor 1 como poblaci\u00f3n ",
+          "a dichas secciones para esos a\u00f1os.\nPor favor, consulte la ayuda de la funci\u00f3n ",
           "para explorar este aspecto.",
           call. = FALSE
         )
