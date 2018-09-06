@@ -409,7 +409,7 @@ filtra_tramero <- function(tramero, cambios) {
   cambios_tramero <- copy(cambios)
   res             <- vector("list", nrow(cambios_tramero))
   message("Filtrando el tramero...\n")
-  pb1             <- utils::txtProgressBar(min = 0, max = length(res), style = 3)
+  pb1             <- utils::txtProgressBar(min = 0, max = max(1, length(res)), style = 3)
 
   for (fila in seq_len(nrow(cambios_tramero))) {
     # Filtrar tramero por secciones de interes (referencia)
@@ -493,7 +493,7 @@ calcula_viviendas <- function(tramero_cambios, catastro_finca) {
 
   fincas  <- copy(catastro_finca)
   message("\nCalculando las viviendas afectadas en cada cambio...\n")
-  pb      <- utils::txtProgressBar(min = 0, max = length(tramero_cambios), style = 3)
+  pb      <- utils::txtProgressBar(min = 0, max = max(1, length(tramero_cambios)), style = 3)
   n_viv   <- vector("list", length(tramero_cambios))
   n_na    <- vector("list", length(tramero_cambios))
   fincas[, nvia2 := lapply(nvia, function(x) trimws(gsub("\\b\\w{1,2}\\b\\s?|\\(|\\)|\\bDEL\\b", "", gsub("[[:punct:]]", "", x))))]
