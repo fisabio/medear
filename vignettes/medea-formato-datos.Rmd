@@ -431,7 +431,22 @@ save(malaga, file = "malaga.RData")
 ### Sevilla
 
 ```{r sevilla, eval=FALSE}
-## No disponible por el momento. Pendiente de la definición del seccionado unificado.
+cambios_seccion <- elimina_cambios(cambios_seccion,  "4109110012", "4109105023")
+sevilla <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("05036", "08020", rep("09028", 4))),
+  sc2             = paste0(codigo, c("05033", "08051", "09003", "09048", "09051", "09053"))
+)
+save(sevilla, file = "sevilla.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
 ```
 
 ## Asturias
