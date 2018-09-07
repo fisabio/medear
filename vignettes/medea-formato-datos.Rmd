@@ -431,6 +431,7 @@ save(malaga, file = "malaga.RData")
 ### Sevilla
 
 ```{r sevilla, eval=FALSE}
+codigo <- "41091"
 cambios_seccion <- elimina_cambios(cambios_seccion,  "4109110012", "4109105023")
 sevilla <- une_secciones(
   cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
