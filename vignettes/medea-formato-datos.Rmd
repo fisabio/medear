@@ -79,21 +79,7 @@ Agradeceríamos que nos hicierais llegar la información de vuestras ciudades exac
    <td style="text-align:center;"> C16 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Tumor maligno del colon</span> </td>
-   <td style="text-align:left;"> Cáncer de colon </td>
-   <td style="text-align:left;"> Colon cancer </td>
-   <td style="text-align:center;"> 153 </td>
-   <td style="text-align:center;"> C18 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> <span style="     ">Tumor maligno de recto, sigmoide y ano</span> </td>
-   <td style="text-align:left;"> Cáncer de recto </td>
-   <td style="text-align:left;"> Rectal cancer </td>
-   <td style="text-align:center;"> 154 </td>
-   <td style="text-align:center;"> C19-21 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupación</span> </td>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno del colon, recto, sigmoide o ano</span> </td>
    <td style="text-align:left;"> Cáncer colorrectal </td>
    <td style="text-align:left;"> Colorectal cancer </td>
    <td style="text-align:center;"> 153-154 </td>
@@ -149,21 +135,7 @@ Agradeceríamos que nos hicierais llegar la información de vuestras ciudades exac
    <td style="text-align:center;"> E10-E14 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Trastornos mentales orgánicos, senil y presenil</span> </td>
-   <td style="text-align:left;"> Trastornos mentales orgánicos </td>
-   <td style="text-align:left;"> Organic mental disorders </td>
-   <td style="text-align:center;"> 290 (excepto 290.1) </td>
-   <td style="text-align:center;"> F00-F09 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;"> <span style="     ">Enfermedad de Alzheimer</span> </td>
-   <td style="text-align:left;"> Enfermedad de Alzheimer </td>
-   <td style="text-align:left;"> Alzheimer's disease </td>
-   <td style="text-align:center;"> 290.1, 331.0 </td>
-   <td style="text-align:center;"> G30 </td>
-  </tr>
-  <tr>
-   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupación</span> </td>
+   <td style="text-align:left;"> <span style="     ">Trastornos mentales orgánicos, senil y presenil y enfermedad de Alzheimer</span> </td>
    <td style="text-align:left;"> Demencia </td>
    <td style="text-align:left;"> Dementia </td>
    <td style="text-align:center;"> 290, 331.0 </td>
@@ -566,20 +538,41 @@ save(barcelona, file = "barcelona.RData")
 
 ## Comunidad de Madrid 
 
+
+
 Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un `array` de población vacío (todos los valores son `NA`'s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).
 
-### Madrid
+### Madrid (provisional)
 
 ```{r madrid, eval=FALSE}
-codigo   <- "28079"
+# Unión provisional para los 20 años
+codigo          <- "28079"
+cambios_seccion <- elimina_cambios(cambios_seccion,
+                                  paste0("28079", c("12103", "06016")),
+                                  paste0("28079", c("17044", "06012")))
 madrid   <- une_secciones(
-  cambios         = NULL,
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
   years_estudio   = 1996:2015,
-  years_union     = 2011,
   poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
   mortalidad      = datosmort,
-  catastro        = FALSE
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(
+    "28079", c("05050", "19030", "19031", "20030", "20060", "02098", "02098",
+               "03001", "08128", "08128", "09080", "09080", "11183", "12016",
+               "13204", "13204", "13127", "14089", "16092", "16092", "16111",
+               "17055", "18025", rep("19029", 7), rep("20067", 6), "14089")
+  ),
+  sc2             = paste0(
+    "28079", c("05058", "19001", "19001", "20029", "20043", "02052", "02106",
+               "03096", "08153", "08159", "09083", "09085", "11157", "12102",
+               "13208", "13209", "13215", "14081", "16106", "16093", "16091",
+               "17103", "18045", paste(19033:19039),
+               paste(c(20102:20104, 20106:20107, 20110)), "14090")
+  )
 )
 save(madrid, file = "madrid.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
