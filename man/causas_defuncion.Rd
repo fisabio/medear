@@ -10,7 +10,7 @@ causas_defuncion(datos, medea3 = TRUE, otras_causas = NULL)
 \arguments{
 \item{datos}{Datos de mortalidad ajustados al formato requerido por el paquete.}
 
-\item{medea3}{¿Se desea utilizar las 22 agrupaciones MEDEA3? Por defecto sí.}
+\item{medea3}{¿Se desea utilizar las 18 agrupaciones MEDEA3? Por defecto sí.}
 
 \item{otras_causas}{Véctor de caracteres que indica los nombres de las
 columnas (columnas con valor 0-1) en la base de datos de mortalidad que
@@ -18,7 +18,7 @@ identifican a dichas otras causas.}
 }
 \description{
 Esta función realiza una agrupación de causas de mortalidad
-  identificadas mediante códigos CIE 9 y CIE 10 en los 22 grupos usados en
+  identificadas mediante códigos CIE 9 y CIE 10 en los 18 grupos usados en
   MEDEA (véase la viñeta sobre el formato de los datos en MEDEA3). De forma
   adicional, se pueden incorporar otras causas manualmente empleando el
   argumento \code{otras_causas}.

@@ -3,21 +3,23 @@
 \encoding{UTF-8}
 \name{carga_datos}
 \alias{carga_datos}
-\title{Carga los datos privados de poblacion para el proyecto MEDEA3}
+\title{Carga los datos privados del proyecto MEDEA3}
 \usage{
-carga_datos(key)
+carga_datos(key, tipo = c("poblacion", "censo"))
 }
 \arguments{
 \item{key}{Cadena de carácteres con la contraseña.}
+
+\item{tipo}{Tipo de datos a cargar: población o censo.}
 }
 \value{
-No se devuelve nada.
+Un \code{data.frame} con los datos solicitados.
 }
 \description{
 Algunos datos del proyecto MEDEA3 están encriptados para poder
-  cumplir con la licencia INE (poblaciones desde 1998 a 2003). Esta función
-  los desencripta y añade a los datos públicos (resto de años), adjuntando el
-  resultado al entorno global.
+  cumplir con la licencia INE (poblaciones desde 1998 a 2003 o datos de los
+  censos 2001 y 2011). Esta función los desencripta y añade a los datos
+  públicos (resto de años).
 }
 \details{
 La contraseña no se almacena en el historial.
@@ -25,7 +27,8 @@ La contraseña no se almacena en el historial.
 \examples{
 
 \dontrun{
-  carga_datos(key = "contraseña")
+  # Carga de datos de población
+  carga_datos(key = "contraseña", tipo = "poblacion")
 }
 
 }
