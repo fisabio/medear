@@ -6,18 +6,22 @@
 \title{Implementar la cuarta fase del algoritmo de geocodificacion de
   direcciones de MEDEA3 (geocodificado con Google)}
 \usage{
-geocodificar_google(direc, poligono = NULL)
+geocodificar_google(direc, clave_google = NULL, aux.direc = NULL, poligono = NULL)
 }
 \arguments{
-\item{direc}{Cadena de carácteres con laa direcciones a georreferenciar.}
+\item{direc}{Cadena de carácteres con la dirección a geocodificar.}
 
-\item{poligono}{Opcional: objeto de clase
-\code{\link[sp]{SpatialPolygons}}.}
+\item{clave_google}{Obligatorio: Cadena de carácteres con la clave de uso de
+\href{https://cloud.google.com/maps-platform/user-guide/account-changes/}{Google}.}
+
+\item{aux.direc}{Opcional: Lista resultado de la función \code{\link{limpia_dir}}.}
+
+\item{poligono}{Opcional: Objeto de clase \code{\link[sp]{SpatialPolygons}}.}
 }
 \value{
-Un data.frame con tantas filas como direcciones se haya proporcionado
-  y 14 columnas: id, province, muni, tip_via, address, portalNumber,
-  refCatastral, postalCode, lat, lng, stateMsg, state, type y georef.
+Un data.frame con una fila y 14 columnas: id, province, muni, tip_via,
+  address, portalNumber, refCatastral, postalCode, lat, lng, stateMsg, state,
+  type y georef.
 }
 \description{
 Esta función implementa la cuarta fase del algoritmo de
