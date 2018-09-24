@@ -1,6 +1,6 @@
 Package: medear
 Title: Poblaciones y cartografia por seccion censal INE
-Version: 0.3.21
+Version: 0.4.0
 Date: 2018-07-16
 Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
@@ -21,7 +21,8 @@ Imports:
     caRtociudad (>= 0.5.5),
     data.table (>= 1.11.4),
     sp (>= 1.3-1),
-    ggmap (>= 2.6.1),
+    httr (>= 1.3.1),
+    jsonlite (>= 1.5),
     leaflet (>= 2.0.1),
     leaflet.extras (>= 1.0.0),
     nabor (>= 0.5.0),

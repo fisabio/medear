@@ -332,12 +332,12 @@ elige_corte <- function(datos, corte) {
 }
 
 
-llama_google <- function(direc, tries) {
+llama_google <- function(map_url, api.args, tries) {
   withRestarts(
     tryCatch(
       suppressWarnings(
         suppressMessages(
-          ggmap::geocode(direc, output = "all", override_limit = TRUE)
+          httr::GET(map_url, query = api.args)
         )
       ),
       error = function(e) {invokeRestart("retry")}
@@ -348,7 +348,7 @@ llama_google <- function(direc, tries) {
       }
       message("Failing to connect with server: retrying...")
       Sys.sleep(5)
-      llama_google(direc, tries - 1)
+      llama_google(map_url, api.args, tries - 1)
     }
   )
 }
@@ -1439,5 +1439,5 @@ utils::globalVariables(
     "tipo_reg", "tramo_por", "tvias", "tmp", "final", "distan_T", "dista",
     "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng",
     "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion", "address",
-    "direccion", "georef", "id_mort")
+    "direccion", "georef", "id_mort", "poblacion")
 )
