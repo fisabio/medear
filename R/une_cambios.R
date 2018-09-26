@@ -106,8 +106,8 @@
 #'   siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
 #'   'lng', y 'lat', respectivamente.
 #' @param censo Datos de los censos de 2001 y 2011 recuperados con la función
-#'   carga_datos. Argumento opcional a proporcionar en caso de querer calcular
-#'   el índice de privación.
+#'   \code{\link{carga_datos}}. Argumento opcional a proporcionar en caso de
+#'   querer calcular el índice de privación.
 #' @param otras_causas Véctor de caracteres que indica los nombres de las
 #'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 #'   identifican a dichas otras causas.
@@ -183,9 +183,9 @@
 #'      de defunción, sexo, grupo de edad (según corte establecido), sección
 #'      censal y causa de muerte.
 #'
-#'    \item censo: objeto de clase \code{data.frame} con el índice de privación
-#'      calculado independientemente para cada ciudad, según año (2001 y 2011) y
-#'      sección censal.
+#'    \item censo: objeto de clase \code{matrix} con el índice de privación
+#'      calculado independientemente para cada ciudad, según sección censal (filas)
+#'      y año (2001 y 2011, columnas).
 #'    }
 #'
 #' @examples
@@ -781,8 +781,16 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       return(indice)
     }
     censo_c <- censo_c[, indice := mi_fun(.SD), by = .(year, muni)][, -c(3:31)]
+    censo_c <- censo_c[order(year, seccion)]
+    n_years <- length(unique(censo_c$year))
+    indice  <- array(
+      dim      = c(length(unique(censo_c$seccion)), length(unique(censo_c$year))),
+      dimnames = list(unique(censo_c$seccion), unique(censo_c$year))
+    )
+    indice[, seq_len(n_years)] <- censo_c$indice
+
     res_attr        <- attributes(res)
-    res             <- append(res, list(censo = censo_c))
+    res             <- append(res, list(censo = indice))
     attributes(res) <- append(attributes(res), res_attr["names" != names(res_attr)])
   }
 

@@ -1042,8 +1042,9 @@ proyecta_secciones <- function(datos, cartografia, epsg = 4326) {
   }
   comprueba_datos(cartografia, "cartografia")
 
-  datos_c <- copy(as.data.table(datos))
+  datos_c        <- copy(as.data.table(datos))
   names(datos_c) <- tolower(names(datos_c))
+  datos_c        <- datos_c[!is.na(lng) & !is.na(lat)]
 
   for (i in seq_along(datos_c)) {
     set(datos_c, j = i, value = as.character(datos_c[[i]]))
