@@ -105,11 +105,14 @@
 #'   el par de coordenadas (longitud y latitud), y que tengan exactamente los
 #'   siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
 #'   'lng', y 'lat', respectivamente.
+#' @param censo Datos de los censos de 2001 y 2011 recuperados con la función
+#'   carga_datos. Argumento opcional a proporcionar en caso de querer calcular
+#'   el índice de privación.
 #' @param otras_causas Véctor de caracteres que indica los nombres de las
 #'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 #'   identifican a dichas otras causas.
 #' @param medea3 Valor lógico: ¿desea que se agrupen las causas de mortalidad
-#'   siguiendo el patron de 22 grandes causas de MEDEA3? Este argumento es
+#'   siguiendo el patrón de 22 grandes causas de MEDEA3? Este argumento es
 #'   compatible con \code{otras_causas}.
 #' @param years_estudio Vector numérico de longitud >= 1 con los años para los que se
 #'   desee construir el \code{array} de poblaciones o mortalidad.
@@ -148,14 +151,14 @@
 #'   manualmente, vacío por defecto. Si se proporciona debe tener la misma
 #'   longitud que \code{sc1}.
 #'
-#' @usage une_secciones(cambios = NULL, cartografia, poblacion = NULL, mortalidad = NULL,
-#' otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
-#' years_union = years_estudio, epsg = 4326, corte_edad = 85,
-#' catastro = FALSE, umbral_vivienda = 5, distancia = 100,
-#' modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
+#' @usage une_secciones(cambios = NULL, cartografia, poblacion = NULL,
+#'   mortalidad = NULL, censo = NULL, otras_causas = NULL, medea3 = TRUE,
+#'   years_estudio = 1996:2015, years_union = years_estudio, epsg = 4326,
+#'   corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia = 100,
+#'   modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
 #'
 #' @return El resultado devuelto varía en función de si se proporcionan datos de
-#'   poblaciones o mortalidad. Si no se proporciona ninguno se devuelve un
+#'   poblaciones, mortalidad o censo. Si no se proporciona ninguno se devuelve un
 #'   objeto de clase \code{\link[sp]{SpatialPolygons}} con la cartografía,
 #'   donde cada fila es una sección censal y que puede tener las columnas:
 #'   \describe{\item{seccion}{Cadena de 10 caracteres con el código
@@ -167,18 +170,23 @@
 #'   \item{cluster_id}{Código de identificación del cluster de
 #'   uniones.} \item{revision_manual}{Indica si debe revisarse esa unión.}}
 #'
-#'   En caso de proporcionar poblaciones, se devuelve una lista de longitud
-#'   igual a dos, donde el primer elemento es la cartografía descrita
-#'   anteriormente y el segundo elemento de la lista es un objeto de clase
-#'   \code{array} con cuatro dimensiones: año de defunción, sexo (0 =
-#'   masculino; 1 = femenino), grupo de edad (según corte establecido) y
-#'   sección censal.
+#'   En caso de proporcionar datos de población, mortalidad o censos, se devuelve
+#'    una lista donde el primer elemento es la cartografía anteriormente descrita,
+#'    y que puede incorporar los elementos:
 #'
-#'   En caso de proporcionar datos de mortalidad geocodificada, se devuelve una
-#'   lista de longitud igual a tres, donde los primeros elementos son los
-#'   anteriormente descritos y el tercer elemento es un objeto de clase
-#'   \code{array} con cinco dimensiones: año de defunción, sexo, grupo de edad
-#'   (según corte establecido), sección censal y causa de muerte.
+#'    \itemize{
+#'    \item poblacion: objeto de clase \code{array} con cuatro dimensiones: año
+#'      de defunción, sexo (0 = masculino; 1 = femenino), grupo de edad (según
+#'      corte establecido) y sección censal.
+#'
+#'    \item mortalidad: objeto de clase \code{array} con cinco dimensiones: año
+#'      de defunción, sexo, grupo de edad (según corte establecido), sección
+#'      censal y causa de muerte.
+#'
+#'    \item censo: objeto de clase \code{data.frame} con el índice de privación
+#'      calculado independientemente para cada ciudad, según año (2001 y 2011) y
+#'      sección censal.
+#'    }
 #'
 #' @examples
 #'
@@ -300,10 +308,11 @@
 #'   \code{\link{descarga_cartografia}}
 #'
 une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortalidad = NULL,
-                          otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
-                          years_union = years_estudio, epsg = 4326, corte_edad = 85,
-                          catastro = FALSE, umbral_vivienda = 5, distancia = 100,
-                          modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL) {
+                          censo = NULL, otras_causas = NULL, medea3 = TRUE,
+                          years_estudio = 1996:2015, years_union = years_estudio,
+                          epsg = 4326, corte_edad = 85, catastro = FALSE,
+                          umbral_vivienda = 5, distancia = 100, modo = c("auto", "manual"),
+                          sc1 = NULL, sc2 = NULL) {
 
   ##############################################################################
   ##  COMPROBACIONES INICIALES Y PREPARACION DE DATOS                         ##
@@ -729,6 +738,54 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     res             <- append(res, list(mortalidad = mort_array))
     attributes(res) <- append(attributes(res), res_attr["names" != names(res_attr)])
   }
+
+
+  ##############################################################################
+  ##  ASIGNACION DE SECCIONES EN CENSOS Y CALCULO DE INDICE                   ##
+  ##############################################################################
+
+  if (!is.null(censo)) {
+    censo_c <- copy(censo)
+    censo_c <- censo_c[muni %in% cartografia$CUMUN]
+
+    censo_c[, cluster := cluster_sc[match(seccion, sc), id_cluster]]
+    censo_c[is.na(cluster), cluster := seccion]
+    in_col <- names(censo_c)[
+      !names(censo_c) %in% c("seccion", "muni", "year", "cluster")
+    ]
+    censo_c <- censo_c[
+      ,
+      lapply(.SD, sum),
+      by      = .(cluster, year, muni),
+      .SDcols = in_col
+    ]
+    setnames(censo_c, "cluster", "seccion")
+    denom    <- paste0("IE0", c(1:3, 1:2, 6:8, 8, 8, 8), "_d")
+    vars_out <- c(paste0("i0", 1:9), paste0("i", c(10:11)))
+    vars_in  <- c(paste0("IE0", 1:8), paste0("IE", c(19:21)))
+    bdd      <- mapply(
+      function(x, y) x / y * 100,
+      censo_c[, ..vars_out],
+      censo_c[, ..denom],
+      USE.NAMES = FALSE
+    )
+    dimnames(bdd) <- list(c(), vars_in)
+    censo_c       <- cbind(censo_c, bdd)
+    mi_fun <- function(datos) {
+      vars     <- c("IE01", "IE03", "IE04", "IE06", "IE07")
+      mi_formu <- stats::as.formula(paste("~", paste(vars, collapse = " + ")))
+      indice   <- stats::prcomp(mi_formu, datos, center = TRUE, scale = TRUE)
+      indice   <- as.numeric(scale(indice$x[, 1]))
+      if (indice[which.max(rowSums(datos[, vars, with = FALSE]))] < 0)
+        indice <- -indice
+      return(indice)
+    }
+    censo_c <- censo_c[, indice := mi_fun(.SD), by = .(year, muni)][, -c(3:31)]
+    res_attr        <- attributes(res)
+    res             <- append(res, list(censo = censo_c))
+    attributes(res) <- append(attributes(res), res_attr["names" != names(res_attr)])
+  }
+
 
   return(res)
 }

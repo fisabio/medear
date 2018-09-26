@@ -79,7 +79,21 @@ Agradeceríamos que nos hicierais llegar la información de vuestras ciudades exac
    <td style="text-align:center;"> C16 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Tumor maligno del colon, recto, sigmoide o ano</span> </td>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno del colon</span> </td>
+   <td style="text-align:left;"> Cáncer de colon </td>
+   <td style="text-align:left;"> Colon cancer </td>
+   <td style="text-align:center;"> 153 </td>
+   <td style="text-align:center;"> C18 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de recto, sigmoide y ano</span> </td>
+   <td style="text-align:left;"> Cáncer de recto </td>
+   <td style="text-align:left;"> Rectal cancer </td>
+   <td style="text-align:center;"> 154 </td>
+   <td style="text-align:center;"> C19-21 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupación</span> </td>
    <td style="text-align:left;"> Cáncer colorrectal </td>
    <td style="text-align:left;"> Colorectal cancer </td>
    <td style="text-align:center;"> 153-154 </td>
@@ -135,7 +149,21 @@ Agradeceríamos que nos hicierais llegar la información de vuestras ciudades exac
    <td style="text-align:center;"> E10-E14 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Trastornos mentales orgánicos, senil y presenil y enfermedad de Alzheimer</span> </td>
+   <td style="text-align:left;"> <span style="     ">Trastornos mentales orgánicos, senil y presenil</span> </td>
+   <td style="text-align:left;"> Trastornos mentales orgánicos </td>
+   <td style="text-align:left;"> Organic mental disorders </td>
+   <td style="text-align:center;"> 290 (excepto 290.1) </td>
+   <td style="text-align:center;"> F00-F09 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> <span style="     ">Enfermedad de Alzheimer</span> </td>
+   <td style="text-align:left;"> Enfermedad de Alzheimer </td>
+   <td style="text-align:left;"> Alzheimer's disease </td>
+   <td style="text-align:center;"> 290.1, 331.0 </td>
+   <td style="text-align:center;"> G30 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupación</span> </td>
    <td style="text-align:left;"> Demencia </td>
    <td style="text-align:left;"> Dementia </td>
    <td style="text-align:center;"> 290, 331.0 </td>

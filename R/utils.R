@@ -1062,13 +1062,13 @@ proyecta_secciones <- function(datos, cartografia, epsg = 4326) {
 #' @title Agrupa las causas de mortalidad
 #'
 #' @description Esta función realiza una agrupación de causas de mortalidad
-#'   identificadas mediante códigos CIE 9 y CIE 10 en los 18 grupos usados en
+#'   identificadas mediante códigos CIE 9 y CIE 10 en los 22 grupos usados en
 #'   MEDEA (véase la viñeta sobre el formato de los datos en MEDEA3). De forma
 #'   adicional, se pueden incorporar otras causas manualmente empleando el
 #'   argumento \code{otras_causas}.
 #'
 #' @param datos Datos de mortalidad ajustados al formato requerido por el paquete.
-#' @param medea3 ¿Se desea utilizar las 18 agrupaciones MEDEA3? Por defecto sí.
+#' @param medea3 ¿Se desea utilizar las 22 agrupaciones MEDEA3? Por defecto sí.
 #' @param otras_causas Véctor de caracteres que indica los nombres de las
 #'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 #'   identifican a dichas otras causas.
@@ -1092,25 +1092,29 @@ causas_defuncion <- function(datos, medea3 = TRUE, otras_causas = NULL) {
   if (medea3) {
     causas_def[["01_sida"]]                    <- "^279[56]|^B2[0-4]"
     causas_def[["02_cancer_estomago"]]         <- "^151|^C16"
-    causas_def[["03_cancer_colorectal"]]       <- "^153|^C18|^154|^C(19|2[01])"
-    causas_def[["04_cancer_laringe"]]          <- "^161|^C32"
-    causas_def[["05_cancer_pulmon"]]           <- "^162|^C3[3-4]"
-    causas_def[["06_cancer_mama"]]             <- "^174|^C50"
-    causas_def[["07_cancer_prostata"]]         <- "^185|^C61"
-    causas_def[["08_cancer_vejiga"]]           <- "^188|^C67"
-    causas_def[["09_cancer_hemato"]]           <- "^20[0-8]|^2733|^C(8[1-9]|9[0-6])"
-    causas_def[["10_diabetes"]]                <- "^250|^E1[0-4]"
-    causas_def[["11_demencia"]]                <- "^F0[0-9]|^290|3310|^G30"
-    causas_def[["12_isquemica_corazon"]]       <- "^41[0-4]|^I2[0-5]"
-    causas_def[["13_ictus"]]                   <- "^43[0-46-8]|^I6[0-9]"
-    causas_def[["14_epoc"]]                    <- "^49[0-24-6]|^J4[0-47]"
-    causas_def[["15_cirrosis"]]                <- "^571|^K7[034]|^K721|^K76[19]"
-    causas_def[["16_suicidios"]]               <- "^E95[0-9]|^X([6-7][0-9]|8[0-4])"
-    causas_def[["17_accidente_trafico"]]       <- paste0(
+    causas_def[["03_cancer_colon"]]            <- "^153|^C18"
+    causas_def[["04_cancer_recto"]]            <- "^154|^C(19|2[01])"
+    causas_def[["05_cancer_colorectal"]]       <- "^153|^C18|^154|^C(19|2[01])"
+    causas_def[["06_cancer_laringe"]]          <- "^161|^C32"
+    causas_def[["07_cancer_pulmon"]]           <- "^162|^C3[3-4]"
+    causas_def[["08_cancer_mama"]]             <- "^174|^C50"
+    causas_def[["09_cancer_prostata"]]         <- "^185|^C61"
+    causas_def[["10_cancer_vejiga"]]           <- "^188|^C67"
+    causas_def[["11_cancer_hemato"]]           <- "^20[0-8]|^2733|^C(8[1-9]|9[0-6])"
+    causas_def[["12_diabetes"]]                <- "^250|^E1[0-4]"
+    causas_def[["13_ttos_mentales_organicos"]] <- "^290(?!1)|^F0[0-9]"
+    causas_def[["14_alzheimer"]]               <- "^2901|^3310|^G30"
+    causas_def[["15_demencia"]]                <- "^F0[0-9]|^290|3310|^G30"
+    causas_def[["16_isquemica_corazon"]]       <- "^41[0-4]|^I2[0-5]"
+    causas_def[["17_ictus"]]                   <- "^43[0-46-8]|^I6[0-9]"
+    causas_def[["18_epoc"]]                    <- "^49[0-24-6]|^J4[0-47]"
+    causas_def[["19_cirrosis"]]                <- "^571|^K7[034]|^K721|^K76[19]"
+    causas_def[["20_suicidios"]]               <- "^E95[0-9]|^X([6-7][0-9]|8[0-4])"
+    causas_def[["21_accidente_trafico"]]       <- paste0(
       "^E81[0-9]|^V(0[2-4][19]|09[23]|1[2-4][3-59]|[1-7]9[4-69]|2[0-8][3-59]|",
       "[3-7][0-8][4-79]|80[3-5]|8[12]1|8[3-6][0-3]|87[0-8]|89[29])"
     )
-    causas_def[["18_todas_causas"]]            <- "[[:alnum:]]"
+    causas_def[["22_todas_causas"]]            <- "[[:alnum:]]"
     causas_def <- lapply(causas_def, grep, x = datos$causa_defuncion, ignore.case = TRUE, perl = TRUE)
   }
 
@@ -1439,5 +1443,5 @@ utils::globalVariables(
     "tipo_reg", "tramo_por", "tvias", "tmp", "final", "distan_T", "dista",
     "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng",
     "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion", "address",
-    "direccion", "georef", "id_mort", "poblacion")
+    "direccion", "georef", "id_mort", "poblacion", "..vars_out", "..denom")
 )

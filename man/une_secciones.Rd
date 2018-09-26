@@ -5,11 +5,11 @@
 \alias{une_secciones}
 \title{Une los cambios del seccionado del INE}
 \usage{
-une_secciones(cambios = NULL, cartografia, poblacion = NULL, mortalidad = NULL,
-otras_causas = NULL, medea3 = TRUE, years_estudio = 1996:2015,
-years_union = years_estudio, epsg = 4326, corte_edad = 85,
-catastro = FALSE, umbral_vivienda = 5, distancia = 100,
-modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
+une_secciones(cambios = NULL, cartografia, poblacion = NULL,
+  mortalidad = NULL, censo = NULL, otras_causas = NULL, medea3 = TRUE,
+  years_estudio = 1996:2015, years_union = years_estudio, epsg = 4326,
+  corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia = 100,
+  modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
 }
 \arguments{
 \item{cambios}{Objeto de clase \code{cambios_ine}. Por defecto se le asigna
@@ -30,12 +30,16 @@ el par de coordenadas (longitud y latitud), y que tengan exactamente los
 siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
 'lng', y 'lat', respectivamente.}
 
+\item{censo}{Datos de los censos de 2001 y 2011 recuperados con la función
+carga_datos. Argumento opcional a proporcionar en caso de querer calcular
+el índice de privación.}
+
 \item{otras_causas}{Véctor de caracteres que indica los nombres de las
 columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 identifican a dichas otras causas.}
 
 \item{medea3}{Valor lógico: ¿desea que se agrupen las causas de mortalidad
-siguiendo el patron de 22 grandes causas de MEDEA3? Este argumento es
+siguiendo el patrón de 22 grandes causas de MEDEA3? Este argumento es
 compatible con \code{otras_causas}.}
 
 \item{years_estudio}{Vector numérico de longitud >= 1 con los años para los que se
@@ -86,7 +90,7 @@ longitud que \code{sc1}.}
 }
 \value{
 El resultado devuelto varía en función de si se proporcionan datos de
-  poblaciones o mortalidad. Si no se proporciona ninguno se devuelve un
+  poblaciones, mortalidad o censo. Si no se proporciona ninguno se devuelve un
   objeto de clase \code{\link[sp]{SpatialPolygons}} con la cartografía,
   donde cada fila es una sección censal y que puede tener las columnas:
   \describe{\item{seccion}{Cadena de 10 caracteres con el código
@@ -98,18 +102,23 @@ El resultado devuelto varía en función de si se proporcionan datos de
   \item{cluster_id}{Código de identificación del cluster de
   uniones.} \item{revision_manual}{Indica si debe revisarse esa unión.}}
 
-  En caso de proporcionar poblaciones, se devuelve una lista de longitud
-  igual a dos, donde el primer elemento es la cartografía descrita
-  anteriormente y el segundo elemento de la lista es un objeto de clase
-  \code{array} con cuatro dimensiones: año de defunción, sexo (0 =
-  masculino; 1 = femenino), grupo de edad (según corte establecido) y
-  sección censal.
+  En caso de proporcionar datos de población, mortalidad o censos, se devuelve
+   una lista donde el primer elemento es la cartografía anteriormente descrita,
+   y que puede incorporar los elementos:
 
-  En caso de proporcionar datos de mortalidad geocodificada, se devuelve una
-  lista de longitud igual a tres, donde los primeros elementos son los
-  anteriormente descritos y el tercer elemento es un objeto de clase
-  \code{array} con cinco dimensiones: año de defunción, sexo, grupo de edad
-  (según corte establecido), sección censal y causa de muerte.
+   \itemize{
+   \item poblacion: objeto de clase \code{array} con cuatro dimensiones: año
+     de defunción, sexo (0 = masculino; 1 = femenino), grupo de edad (según
+     corte establecido) y sección censal.
+
+   \item mortalidad: objeto de clase \code{array} con cinco dimensiones: año
+     de defunción, sexo, grupo de edad (según corte establecido), sección
+     censal y causa de muerte.
+
+   \item censo: objeto de clase \code{data.frame} con el índice de privación
+     calculado independientemente para cada ciudad, según año (2001 y 2011) y
+     sección censal.
+   }
 }
 \description{
 Une los cambios del seccionado del INE (tomando como referencia
