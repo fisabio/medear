@@ -561,32 +561,32 @@ geocodificar_google <- function(direc, clave_google = NULL, aux.direc = NULL, po
 
       if (length(resultados$address_components) > 0) {
         # province
-        ident <- grep("administrative_area_level_2", resultados$address_components[[1]]$types)
+        ident <- grep("\\badministrative_area_level_2\\b", resultados$address_components[[1]]$types)
         if (length(ident) != 0) {
           devuelve$province <- resultados$address_components[[1]][ident, "long_name"]
         }
 
         # muni
-        ident <- grep("locality", resultados$address_components[[1]]$types)
+        ident <- grep("\\blocality\\b", resultados$address_components[[1]]$types)
         if (length(ident) != 0) {
           devuelve$muni <- resultados$address_components[[1]][ident, "long_name"]
         }
 
         # tip_via y address
-        ident <- grep("route", resultados$address_components[[1]]$types)
+        ident <- grep("\\broute\\b", resultados$address_components[[1]]$types)
         if (length(ident) != 0) {
           devuelve$tip_via <- resultados$address_components[[1]][ident, "types"][[1]]
           devuelve$address <- resultados$address_components[[1]][ident, "long_name"]
         }
 
         # portalNumber
-        ident <- grep("street_number", resultados$address_components[[1]]$types)
+        ident <- grep("\\bstreet_number\\b", resultados$address_components[[1]]$types)
         if (length(ident) != 0) {
           devuelve$portalNumber <- resultados$address_components[[1]][ident, "long_name"]
         }
 
         # postalCode
-        ident <- grep("postal_code", resultados$address_components[[1]]$types)
+        ident <- grep("\\bpostal_code\\b", resultados$address_components[[1]]$types)
         if (length(ident) != 0) {
           devuelve$postalCode <- resultados$address_components[[1]][ident, "long_name"]
         }
