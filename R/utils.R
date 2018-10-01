@@ -1429,6 +1429,122 @@ elimina_cambios <- function(datos, sc_ref, sc_new) {
   }
 }
 
+
+jsonp_to_json <- function(text) {
+  text <- gsub("^\\w+\\(", "", text)
+  text <- gsub("\\)$", "", text)
+  return(text)
+}
+
+get_ntries <- function(url, query, tries) {
+  withRestarts(
+    tryCatch(httr::GET(url, query = query),
+             error = function(e) {invokeRestart("retry")}),
+    retry = function() {
+      if (tries <= 0) {
+        return(character())
+      }
+      message("Failing to connect with server: retrying...")
+      Sys.sleep(5)
+      get_ntries(url, query, tries - 1)
+    }
+  )
+}
+
+
+cartociudad_geocode <- function(full_address, version = c("current", "prev"),
+                                output_format = "JSON", on_error = c("warn", "fail"),
+                                ntries = 1) {
+
+  stopifnot(class(full_address) == "character")
+  stopifnot(length(full_address) >= 1)
+  version    <- match.arg(version)
+  on_error   <- match.arg(on_error)
+  no_geocode <- which(nchar(full_address) == 0)
+  total      <- length(full_address)
+  res_list   <- vector("list", total)
+  curr_names <- c("id", "province", "muni", "tip_via", "address", "portalNumber",
+                  "refCatastral", "postalCode", "lat", "lng", "stateMsg",
+                  "state", "type")
+  prev_names <- c("road_fid", "province", "municipality", "road_type", "road_name",
+                  "numpk_name", "numpk_fid", "zip", "latitude", "longitude",
+                  "comments", "status")
+  pb         <- utils::txtProgressBar(min = 0, max = total, style = 3)
+  empty_df   <- as.data.frame(
+    matrix(NA_character_, nrow = 0, ncol = length(curr_names), dimnames = list(c(), curr_names)),
+    stringsAsFactors = FALSE
+  )
+  con_out <- numeric()
+
+  for (i in seq_len(total)) {
+    res_list[[i]] <- empty_df
+    if (!i %in% no_geocode) {
+      if (version == "current") {
+        api.args <- list(q = full_address[i], outputformat = output_format)
+        get_url  <- "http://www.cartociudad.es/geocoder/api/geocoder/findJsonp"
+      } else {
+        api.args <- list(max_results = 1, address = full_address[i])
+        get_url  <- "http://www.cartociudad.es/CartoGeocoder/Geocode"
+      }
+      res        <- get_ntries(get_url, api.args, ntries)
+
+      if (length(res) == 0) {
+        warning("Failing to connect with server in query ", i,
+                ": try later with addressess in attr(results, 'rerun').")
+        res_list[[i]] <- plyr::rbind.fill(
+          res_list[[i]],
+          data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+        )
+        con_out <- c(con_out, i)
+      } else if (httr::http_error(res)) {
+        if (on_error == "fail")
+          stop("Call to cartociudad API failed with error code ", res$status_code)
+        warning("Error in query ", i, ": ", httr::http_status(res)$message)
+        res_list[[i]] <- plyr::rbind.fill(
+          res_list[[i]],
+          data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+        )
+      } else {
+        res <- jsonp_to_json(suppressMessages(httr::content(res, as = "text")))
+        res <- jsonlite::fromJSON(res)
+        res <- res[-which(names(res) %in% c("geom", "countryCode", "error", "success"))]
+        if (version == "current") {
+          res <- lapply(res, function(x) ifelse(is.null(x), NA_character_, x))
+        } else {
+          res <- res[[1]]
+        }
+        if (length(res) == 0) {
+          warning("The query ", i, " has 0 results.")
+          res_list[[i]] <- plyr::rbind.fill(
+            res_list[[i]],
+            data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+          )
+        } else {
+          if (version == "current") {
+            res_list[[i]] <- as.data.frame(t(unlist(res)), stringsAsFactors = FALSE)[, curr_names]
+            res_list[[i]] <- cbind(res_list[[i]], version = "current")
+          } else {
+            res_list[[i]] <- cbind(res[, prev_names], type = NA_character_, version = "prev")
+            names(res_list[[i]])     <- c(curr_names, "version")
+            row.names(res_list[[i]]) <- NULL
+          }
+        }
+      }
+    } else {
+      warning("Empty string as query in address ", i, ": NA returned.")
+      res_list[[i]] <- empty_df[1, ]
+    }
+    utils::setTxtProgressBar(pb, i)
+  }
+
+  cat("\n")
+  results <- plyr::rbind.fill(res_list)
+  results[, c("lat", "lng")] <- apply(results[, c("lat", "lng")], 2, as.numeric)
+  attributes(results)$rerun  <- full_address[con_out]
+  return(results)
+}
+
+
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
     "CUSEC", "idn", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",

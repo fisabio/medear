@@ -18,7 +18,6 @@ LazyData: true
 URL: https://github.com/fisabio/medear
 BugReports: https://github.com/fisabio/medear/issues
 Imports:
-    caRtociudad (>= 0.5.5),
     data.table (>= 1.11.4),
     sp (>= 1.3-1),
     httr (>= 1.3.1),
@@ -32,7 +31,6 @@ Imports:
     sodium (>= 1.1),
     utils (>= 3.3.0),
     stats (>= 3.3.0)
-Remotes: carlosvergara/caRtociudad
 RoxygenNote: 6.0.1
 ByteCompile: yes
 Suggests:
