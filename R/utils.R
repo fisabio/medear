@@ -358,25 +358,26 @@ lee_catastro <- function(archivo) {
   stopifnot(is.character(archivo))
 
   estructura_finca <- readr::fwf_positions(
-    start     = c(1, 26, 31, 51, 81, 154, 334, 343, 672),
-    end       = c(2, 28, 44, 52, 83, 158, 342, 352, 677),
+    start     = c(1, 26, 31, 51, 81, 124, 154, 241, 334, 343, 672),
+    end       = c(2, 28, 44, 52, 83, 153, 158, 245, 342, 352, 677),
     col_names = c("tipo_reg", "muni_dgc", "ref_cat", "prov_ine", "muni_ine",
-                  "via_dgc", "lng", "lat", "epsg")
+                  "entidad", "via_dgc", "codpost", "lng", "lat", "epsg")
   )
-  catastro_finca <- readr::read_fwf(
-    file          = archivo,
-    col_positions = estructura_finca,
-    col_types     = readr::cols(.default = "c"),
-    locale        = readr::locale(encoding = "latin1"),
-    progress      = FALSE
-  )
-
-  catastro_finca <- as.data.table(catastro_finca)[tipo_reg == "11"][, tipo_reg := NULL][]
+  catastro_finca <- as.data.table(
+    readr::read_fwf(
+      file          = archivo,
+      col_positions = estructura_finca,
+      col_types     = readr::cols(.default = "c"),
+      locale        = readr::locale(encoding = "latin1"),
+      progress      = FALSE
+    )
+  )[tipo_reg == "11"][, tipo_reg := NULL][]
 
   estructura_vivienda <- readr::fwf_positions(
-    start     = c(1, 31, 201, 206, 231, 428),
-    end       = c(2, 44, 205, 230, 234, 428),
-    col_names = c("tipo_reg", "ref_cat", "tvias", "vias", "npolis", "clave")
+    start     = c(1, 31, 201, 206, 231, 235, 241, 428),
+    end       = c(2, 44, 205, 230, 234, 235, 245, 428),
+    col_names = c("tipo_reg", "ref_cat", "tvias", "vias",
+                  "npolis", "letra", "km", "clave")
   )
   catastro_vivienda <- as.data.table(
     readr::read_fwf(
@@ -404,10 +405,8 @@ lee_catastro <- function(archivo) {
       tvia  = catastro_vivienda$tvia,
       nvia  = catastro_vivienda$nvia,
       npoli = catastro_vivienda$npoli)][]
-  catastro_finca[, c("lng", "lat") := lapply(.SD, function(x)
-    as.numeric(paste0(substr(x, 1, 2), gsub("^(.{2})", ".", x)))
-  ), .SDcols = c("lng", "lat")
-  ]
+  catastro_finca[, lng := as.numeric(paste0(substr(lng, 1, 7), gsub("^(.{7})", ".", lng)))]
+  catastro_finca[, lat := as.numeric(paste0(substr(lat, 1, 8), gsub("^(.{8})", ".", lat)))]
   attributes(catastro_finca)$epsg <- max(unique(catastro_finca$epsg))
   catastro_finca[, c("epsg") := NULL]
 
