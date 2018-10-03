@@ -24,7 +24,7 @@ Así pues, en líneas generales la combinación de servicios funciona de la siguien
 
 # Instalación y carga de paquetes de `R`
 
-El primer paso es asegurar que se tiene instalado `R`. El protocolo se ha probado con varias versiones de este software, y aunque es posible ejecutarlo con versiones a partir de la 3.1.0, es recomendable utilizar la última, que es la [3.4.3](https://cran.r-project.org/).
+El primer paso es asegurar que se tiene instalado `R`. El protocolo se ha probado con varias versiones de este software, y aunque es posible ejecutarlo con versiones a partir de la 3.1.0, es recomendable utilizar la última, que es la [3.5.1](https://cran.r-project.org/).
 
 Existen varios paquetes de `R` que permiten establecer una conexión con los servicios de geocodificación. Para facilitar este proceso, se ha creado el paquete [`medear`](https://github.com/fisabio/medear), el cual aglutina las funcionalidades de otros paquetes adaptándolas a nuestras necesidades. Para instalar este paquete y sus dependencias basta con ejecutar el siguiente código en la consola de `R`:
 
@@ -37,12 +37,10 @@ devtools::install_github("fisabio/medear", build_vignettes = TRUE)
 library(medear) # Carga del paquete medear
 ```
 
-Al instalar el paquete `medear` también se instalan todas sus dependencias, que incluyen a los paquetes `ggmap` y `caRtociudad`. Cuando hablamos de `caRtociudad` nos referimos a una [versión propia](https://github.com/carlosvergara/caRtociudad) de este paquete que hemos adaptado de la [versión principal](https://github.com/cjgb/caRtociudad) para este proyecto. Esta versión propia permite, a diferencia de la original, llamar a ambas versiones (antigua y nueva) del servicio de geocodificado de `CartoCiudad`. Las versiones de los paquetes implicados en este protocolo son:
+Al instalar el paquete `medear` también se instalan todas sus dependencias, incluyendo una función propia para llamar al servicio de `CartoCiudad` (adaptada del paquete  [`caRtociudad`](https://github.com/cjgb/caRtociudad) para este proyecto). Esta versión propia permite, a diferencia de la original, llamar a ambas versiones (antigua y nueva) del servicio de geocodificado de `CartoCiudad`. Las versiones de los paquetes implicados en este protocolo son:
 
-* `devtools`: Versión `r packageVersion("devtools")`.
-* `medear`: Versión `r packageVersion("medear")`.
-* `ggmap`: Versión `r packageVersion("ggmap")`.
-* `caRtociudad`: Versión `r packageVersion("caRtociudad")`.
+* `devtools`: versión `>= 1.13.6`.
+* `medear`: versión `>= 0.4.3`.
 
 Si así se desea, es posible consultar este protocolo desde la ayuda del paquete (útil si estás utilizando una interfaz tipo [RStudio](https://www.rstudio.com/)), pues está incorporado dentro del mismo como una viñeta, siendo accesible con la sentencia `vignette("medear-geocodificacion")`.
 
@@ -144,7 +142,7 @@ datosmort$type          <- ""
 
 # Geocodificación de direcciones con `CartoCiudad`
 
-Una vez disponemos de la base de datos de mortalidad en el formato adecuado, pasamos a intentar geocodificar todas las direcciones utilizando el paquete `caRtociudad`. Para ello haremos un uso intensivo de la función `geocodificar_cartociudad` de `medear`, la cual intenta geocodificar cada dirección atendiendo a las dos versiones de `caRtociudad` disponibles a día de hoy. Para más información del funcionamiento interno de dicha función se puede recurrir a la ayuda específica de la misma (`?geocodificar_cartociudad`). Además, en caso de que una dirección no pueda ser geocodificada se prueba si distintas variantes de la dirección pudieran dar algún resultado positivo. Las variantes contempladas son 5, aunque en este protocolo solo vamos a aplicar las dos siguientes:
+Una vez disponemos de la base de datos de mortalidad en el formato adecuado, pasamos a intentar geocodificar todas las direcciones utilizando el servicio de `CartoCiudad`. Para ello haremos un uso intensivo de la función `geocodificar_cartociudad` de `medear`, la cual intenta geocodificar cada dirección atendiendo a las dos versiones de `CartoCiudad` disponibles a día de hoy. Para más información del funcionamiento interno de dicha función se puede recurrir a la ayuda específica de la misma (`?geocodificar_cartociudad`). Además, en caso de que una dirección no pueda ser geocodificada se prueba si distintas variantes de la dirección pudieran dar algún resultado positivo. Las variantes contempladas son 5, aunque en este protocolo solo vamos a aplicar las dos siguientes:
 
 1. eliminar duplicidad de tipos de vía (ejemplo: calle camino ...-> camino ...).
 2. eliminar descripciones de vía (ejemplo: "Avenida rosa (Edificio azul)" -> "Avenida rosa").
@@ -199,7 +197,7 @@ for (i in 1:totno.geo) {
     
     direc <- datosmort$BOD.direccion[cont]
     
-    # Georreferenciación con caRtociudad con comprobación de que la 
+    # Georreferenciación con CartoCiudad con comprobación de que la 
     # geocodificación que hemos obtenido recae geográficamente dentro del 
     # límite geográfico correspondiente a la ciudad.
     aux <- geocodificar_cartociudad(
@@ -207,7 +205,7 @@ for (i in 1:totno.geo) {
       poligono = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
     )
     
-    # En caso de que quisiéramos geocodificar con caRtociudad sin más, 
+    # En caso de que quisiéramos geocodificar con CartoCiudad sin más, 
     # sin comprobar que el punto que obtenemos está incluido en una región 
     # geográfica concreta, ejecutaríamos simplemente: 
     # aux <- geocodificar_cartociudad(direc = direc)
@@ -252,7 +250,7 @@ for (i in 1:totno.geo) {
 }
 
 # Una vez finalizado el proceso guardamos una copia de los datos geocodificados por 
-# caRtociudad antes de pasar a google
+# CartoCiudad antes de pasar a google
 
 ###### Creamos el directorio (en caso de no existir) donde se guardarán los datos
 if (!dir.exists("datos/mortalidad"))
@@ -262,7 +260,7 @@ save(datosmort, file = "datos/mortalidad/mortalidad_geocodificada.RData")
 
 # Geocodificación de las direcciones restantes con `Google`
 
-En el apartado anterior se debería haber geocodificado una gran proporción de las direcciones (en nuestras pruebas, la cifra varía entre un 85 y 95 %), y ahora se hará uso del servicio de geocodificación de `Google` para tratar de geocodificar todos los registros que no hayan podido ser geocodificados con `caRtociudad`.
+En el apartado anterior se debería haber geocodificado una gran proporción de las direcciones (en nuestras pruebas, la cifra varía entre un 85 y 95 %), y ahora se hará uso del servicio de geocodificación de `Google` para tratar de geocodificar todos los registros que no hayan podido ser geocodificados con `CartoCiudad`.
 
 Debido al límite de consultas diarias que impone la versión gratuita del servicio de `Google` (teóricamente de 2500, aunque hemos observado que esta cifra puede variar mucho), es muy probable que tengamos que enviar algunas direcciones varias veces a este servicio, en días distintos, para poder completar el proceso. Para entender mejor el proceso que sigue a continuación, se debe tener en cuenta la respuesta que devuelve el servicio de `Google` al tratar de geocodificar un registro:
 

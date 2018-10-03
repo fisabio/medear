@@ -34,10 +34,16 @@ Un objeto de clase \code{tramero_ine} con 11 columnas:
   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
   \item{DIST}{Código del distrito.} \item{SECC}{Código de la sección censal
   reducido.} \item{CVIA}{Código de la vía reducido.} \item{EIN}{Primer portal
-  del tramo de vía.} \item{ESN}{Último portal del tramo de vía.}
+  del tramo de vía (incorpora decimales en caso de tener letra).}
+  \item{ESN}{Último portal del tramo de vía (incorpora decimales en caso de
+  tener letra).} \item{cod_upob}{Código de la entidad poblacional}
+  \item{ent_colectiva}{Nombre de la entidad colectiva.}
+  \item{ent_singular}{Nombre de la entidad singular.}
+  \item{diseminado}{Nombre del núcleo diseminado.}
   \item{NVIAC}{Nombre de la vía.} \item{seccion}{Código de la sección censal
   completo.} \item{year}{Año del tramero.} \item{via}{Código de la vía
-  completo.}
+  completo (el último dígito hace referencia a si el tramo de vía es sin
+  numeración, impar o par (0, 1, o 2, respectivamente).}
 
   Cada fila representa un tramo de vía, puediendo repetirse la misma vía en
   varias ocasiones en función de si su recorrido recae en varias secciones
