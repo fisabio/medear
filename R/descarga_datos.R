@@ -83,10 +83,10 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     mustWork = FALSE
   )
   estructura <- readr::fwf_positions(
-    start     = c(1, 3, 6, 8, 21, 43, 48, 49, 53, 54, 58, 79, 86, 111, 136, 166),
-    end       = c(2, 5, 7, 10, 25, 47, 48, 52, 53, 57, 58, 85, 110, 135, 160, 190),
-    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "CPOS", "TINUM", "EIN", "letra1",
-                  "ESN", "letra2", "cod_upob", "ent_colectiva", "ent_singular", "diseminado", "NVIAC")
+    start     = c(1, 3, 6, 8, 21, 43, 49, 54, 79, 86, 111, 136, 166),
+    end       = c(2, 5, 7, 10, 25, 47, 52, 57, 85, 110, 135, 160, 190),
+    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "CPOS", "EIN", "ESN",
+                  "cod_upob", "ent_colectiva", "ent_singular", "diseminado", "NVIAC")
   )
   y_2001 <- FALSE
   if (2001 %in% years) {
@@ -162,7 +162,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       if (!file.exists(ruta_tra[i, j])) {
         stop("No existe el archivo ", ruta_tra[i, j])
       }
-      tramero <-  as.data.table(
+      trameros[[paste0("p", i, j)]] <-  as.data.table(
         suppressWarnings(
           readr::read_fwf(
             file          = ruta_tra[i, j],
@@ -172,30 +172,11 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
             locale        = readr::locale(encoding = "latin1")
           )
         )
-      )
-      tramero[, `:=`(EIN = as.numeric(EIN), ESN = as.numeric(ESN))]
-      tramero$letra1 <- ifelse(
-        is.na(tramero$letra1) | (tramero$EIN == 0 & tramero$letra1 == "S"),
-        "",
-        tramero$letra1
-      )
-      tramero$letra2 <- ifelse(
-        is.na(tramero$letra2) | (tramero$EIN == 0 & tramero$letra2 == "S"),
-        "",
-        tramero$letra2
-      )
-      n_let <- (seq_along(LETTERS) / length(LETTERS)) - 1e-6
-      for (k in seq_along(n_let)) {
-        detectados <- which(tramero$letra1 == LETTERS[k])
-        tramero$EIN[detectados] <- tramero$EIN[detectados] + n_let[k]
-        detectados <- which(tramero$letra2 == LETTERS[k])
-        tramero$ESN[detectados] <- tramero$ESN[detectados] + n_let[k]
-      }
-      trameros[[paste0("p", i, j)]] <- tramero[, `:=`(
+      )[, `:=`(
         year    = years[j],
         seccion = paste0(CPRO, CMUM, DIST, SECC),
-        via     = paste0(CPRO, CMUM, CVIA, TINUM)
-      )][, c("TINUM", "letra1", "letra2") := NULL]
+        via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
+      )][]
     }
   }
   if (y_2001) {
@@ -205,18 +186,19 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     if (length(ruta_2001) == 0) {
       stop("No existe el tramero de 2001 en el directorio indicado (", ruta, ")")
     }
-    tramero <- suppressWarnings(
-      readr::read_fwf(
-        file          = list.files(
-          dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
-        ),
-        col_positions = estructura,
-        col_types     = readr::cols(.default = "c"),
-        progress      = FALSE,
-        locale        = readr::locale(encoding = "latin1")
+    trameros[["n_2001"]] <- as.data.table(
+      suppressWarnings(
+        readr::read_fwf(
+          file          = list.files(
+            dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
+          ),
+          col_positions = estructura,
+          col_types     = readr::cols(.default = "c"),
+          progress      = FALSE,
+          locale        = readr::locale(encoding = "latin1")
+        )
       )
-    )
-    trameros[["n_2001"]] <- as.data.table(tramero)[, `:=`(
+    )[, `:=`(
       year    = 2001,
       seccion = paste0(CPRO, CMUM, DIST, SECC),
       via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
@@ -224,7 +206,6 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   }
   if (!conservar)
     unlink(dirname(dir_dest), recursive = TRUE)
-
 
   trameros <- rbindlist(trameros)[order(year, seccion)]
   setkeyv(trameros, c("via", "CPOS", "seccion", "year", "CMUM"))
