@@ -157,7 +157,7 @@ aplica_filtros <- function(vias, datos, indice_nogeo, version_cc, nivel,
             ifelse(version_cc == "prev", "previa", "actual"), ")...")
     geo_res    <- data.table(
       suppressWarnings(
-        caRtociudad::cartociudad_geocode(
+        cartociudad_geocode(
           full_address = res[["via"]],
           version      = version_cc,
           ntries       = intentos
@@ -421,7 +421,7 @@ geocodificar <- function(direcciones, idn = NULL, codigos = NULL, cartografia = 
   message("Buscando en CartoCiudad (versi\u00f3n previa)...")
   geo_old      <- data.table(
     suppressWarnings(
-      caRtociudad::cartociudad_geocode(
+      cartociudad_geocode(
         full_address = datos[["direcciones"]],
         version      = "prev",
         ntries       = intentos
@@ -517,7 +517,7 @@ geocodificar <- function(direcciones, idn = NULL, codigos = NULL, cartografia = 
     message("\nBuscando en CartoCiudad (versi\u00f3n actual)...")
     geo_new     <- data.table(
       suppressWarnings(
-        caRtociudad::cartociudad_geocode(
+        cartociudad_geocode(
           full_address = datos[indice_nogeo_via][["direcciones"]],
           ntries       = intentos
         )

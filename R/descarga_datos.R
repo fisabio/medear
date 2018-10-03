@@ -35,10 +35,16 @@
 #'   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
 #'   \item{DIST}{Código del distrito.} \item{SECC}{Código de la sección censal
 #'   reducido.} \item{CVIA}{Código de la vía reducido.} \item{EIN}{Primer portal
-#'   del tramo de vía.} \item{ESN}{Último portal del tramo de vía.}
+#'   del tramo de vía (incorpora decimales en caso de tener letra).}
+#'   \item{ESN}{Último portal del tramo de vía (incorpora decimales en caso de
+#'   tener letra).} \item{cod_upob}{Código de la entidad poblacional}
+#'   \item{ent_colectiva}{Nombre de la entidad colectiva.}
+#'   \item{ent_singular}{Nombre de la entidad singular.}
+#'   \item{diseminado}{Nombre del núcleo diseminado.}
 #'   \item{NVIAC}{Nombre de la vía.} \item{seccion}{Código de la sección censal
 #'   completo.} \item{year}{Año del tramero.} \item{via}{Código de la vía
-#'   completo.}
+#'   completo (el último dígito hace referencia a si el tramo de vía es sin
+#'   numeración, impar o par (0, 1, o 2, respectivamente).}
 #'
 #'   Cada fila representa un tramo de vía, puediendo repetirse la misma vía en
 #'   varias ocasiones en función de si su recorrido recae en varias secciones
@@ -77,9 +83,10 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     mustWork = FALSE
   )
   estructura <- readr::fwf_positions(
-    start     = c(1, 3, 6, 8, 21, 43, 49, 54, 166),
-    end       = c(2, 5, 7, 10, 25, 47, 52, 57, 190),
-    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "CPOS", "EIN", "ESN", "NVIAC")
+    start     = c(1, 3, 6, 8, 21, 43, 49, 54, 79, 86, 111, 136, 166),
+    end       = c(2, 5, 7, 10, 25, 47, 52, 57, 85, 110, 135, 160, 190),
+    col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "CPOS", "EIN", "ESN",
+                  "cod_upob", "ent_colectiva", "ent_singular", "diseminado", "NVIAC")
   )
   y_2001 <- FALSE
   if (2001 %in% years) {
@@ -155,20 +162,21 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       if (!file.exists(ruta_tra[i, j])) {
         stop("No existe el archivo ", ruta_tra[i, j])
       }
-      tramero <- suppressWarnings(
-        readr::read_fwf(
-          file          = ruta_tra[i, j],
-          col_positions = estructura,
-          col_types     = readr::cols(.default = "c"),
-          progress      = FALSE,
-          locale        = readr::locale(encoding = "latin1")
+      trameros[[paste0("p", i, j)]] <-  as.data.table(
+        suppressWarnings(
+          readr::read_fwf(
+            file          = ruta_tra[i, j],
+            col_positions = estructura,
+            col_types     = readr::cols(.default = "c"),
+            progress      = FALSE,
+            locale        = readr::locale(encoding = "latin1")
+          )
         )
-      )
-      trameros[[paste0("p", i, j)]] <- as.data.table(tramero)[, `:=`(
+      )[, `:=`(
         year    = years[j],
         seccion = paste0(CPRO, CMUM, DIST, SECC),
         via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
-      )]
+      )][]
     }
   }
   if (y_2001) {
@@ -178,18 +186,19 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     if (length(ruta_2001) == 0) {
       stop("No existe el tramero de 2001 en el directorio indicado (", ruta, ")")
     }
-    tramero <- suppressWarnings(
-      readr::read_fwf(
-        file          = list.files(
-          dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
-        ),
-        col_positions = estructura,
-        col_types     = readr::cols(.default = "c"),
-        progress      = FALSE,
-        locale        = readr::locale(encoding = "latin1")
+    trameros[["n_2001"]] <- as.data.table(
+      suppressWarnings(
+        readr::read_fwf(
+          file          = list.files(
+            dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
+          ),
+          col_positions = estructura,
+          col_types     = readr::cols(.default = "c"),
+          progress      = FALSE,
+          locale        = readr::locale(encoding = "latin1")
+        )
       )
-    )
-    trameros[["n_2001"]] <- as.data.table(tramero)[, `:=`(
+    )[, `:=`(
       year    = 2001,
       seccion = paste0(CPRO, CMUM, DIST, SECC),
       via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
@@ -197,7 +206,6 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   }
   if (!conservar)
     unlink(dirname(dir_dest), recursive = TRUE)
-
 
   trameros <- rbindlist(trameros)[order(year, seccion)]
   setkeyv(trameros, c("via", "CPOS", "seccion", "year", "CMUM"))
