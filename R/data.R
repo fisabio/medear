@@ -1,57 +1,57 @@
 
-#' @title Datos de poblacion por seccion censal para las ciudades MEDEA3
-#'   (periodo 2004-2015)
+#' @title Datos de poblaci√≥n por secci√≥n censal para las ciudades MEDEA3
+#'   (per√≠odo 2004-2015)
 #'
-#' @description Datos de poblaciÛn por sexo (0=Hombres, 1=Mujeres), edad (grupos
-#'   quinquenales) y aÒo (periodo 2004-2015) a nivel de secciÛn censal para las
+#' @description Datos de poblaci√≥n por sexo (0=Hombres, 1=Mujeres), edad (grupos
+#'   quinquenales) y a√±o (periodo 2004-2015) a nivel de secci√≥n censal para las
 #'   ciudades de MEDEA3. Estos datos han sido descargados de la web del INE, que
-#'   los publica de forma libre, y se pueden obtener usando la funciÛn
+#'   los publica de forma libre, y se pueden obtener usando la funci√≥n
 #'   \code{\link{descarga_poblaciones}} de este paquete.
 #'
-#' @details Los cÛdigos de secciÛn censal (columna \code{seccion} del
+#' @details Los c√≥digos de secci√≥n censal (columna \code{seccion} del
 #'   \code{data.frame} \code{poblacion}) se corresponden con el identificador
-#'   habitual de secciones censales seg˙n el INE, es decir: los primeros dos
-#'   dÌgitos identifican la provincia, los siguientes tres dÌgitos el municipio,
-#'   los prÛximos dos dÌgitos el distrito y los ˙ltimos tres la secciÛn censal.
-#'   Los 5 primeros dÌgitos de este identificador se corresponden con el cÛdigo
+#'   habitual de secciones censales seg√∫n el INE, es decir: los primeros dos
+#'   d√≠gitos identifican la provincia, los siguientes tres d√≠gitos el municipio,
+#'   los pr√≥ximos dos d√≠gitos el distrito y los √∫ltimos tres la secci√≥n censal.
+#'   Los 5 primeros d√≠gitos de este identificador se corresponden con el c√≥digo
 #'   INE del respectivo municipio.
 #'
-#'   Hasta el aÒo 2010 (inclusive) el INE agrupa la ˙ltima categorÌa de edad
-#'   como 85 y m·s, mientras que desde el aÒo 2011 llega hasta 100 y m·s. Los
-#'   ˙ltimas columnas de \code{poblacion} tienen informaciÛn detallada de los
-#'   grupos de edad mayores para los aÒos posteriores a 2010, por si esta
-#'   pudiera ser de utilidad en alg˙n momento. En cualquier caso, la casilla
-#'   correspondiente al grupo de edad 85 y m·s para dichos aÒos tambiÈn tiene la
-#'   informaciÛn agregada para los grupos de edad mayores de 85, de la misma
-#'   forma que los aÒos anteriores.
+#'   Hasta el a√±o 2010 (inclusive) el INE agrupa la √∫ltima categor√≠a de edad
+#'   como 85 y m√°s, mientras que desde el a√±o 2011 llega hasta 100 y m√°s. Los
+#'   √∫ltimas columnas de \code{poblacion} tienen informaci√≥n detallada de los
+#'   grupos de edad mayores para los a√±os posteriores a 2010, por si esta
+#'   pudiera ser de utilidad en alg√∫n momento. En cualquier caso, la casilla
+#'   correspondiente al grupo de edad 85 y m√°s para dichos a√±os tambi√©n tiene la
+#'   informaci√≥n agregada para los grupos de edad mayores de 85, de la misma
+#'   forma que los a√±os anteriores.
 #'
-#'   El paquete \code{medear} dispone tambiÈn de los datos para todo el periodo
-#'   1996-2015 pero estos est·n encriptados ya que los datos para el periodo
+#'   El paquete \code{medear} dispone tambi√©n de los datos para todo el periodo
+#'   1996-2015 pero estos est√°n encriptados ya que los datos para el periodo
 #'   1996-2003 son propiedad del INE, que han sido adquiridos para uso exclusivo
-#'   del proyecto MEDEA3. Estos datos son accesibles mediante la funciÛn
-#'   \code{\link{carga_datos}} que necesita una contraseÒa de desencriptaciÛn,
-#'   que se har· disponible a todos los grupos del proyecto MEDEA. La llamada a
+#'   del proyecto MEDEA3. Estos datos son accesibles mediante la funci√≥n
+#'   \code{\link{carga_datos}} que necesita una contrase√±a de desencriptaci√≥n,
+#'   que se har√° disponible a todos los grupos del proyecto MEDEA. La llamada a
 #'   \code{\link{carga_datos}} produce un data.frame con exactamente el mismo
 #'   formato que \code{poblacion}, de hecho machaca dicho objeto, pero con la
-#'   informaciÛn adicional del periodo 1996-2005.
+#'   informaci√≥n adicional del periodo 1996-2005.
 #'
-#'   Notar que las poblaciones corresponden al seccionado censal de cada aÒo por
+#'   Notar que las poblaciones corresponden al seccionado censal de cada a√±o por
 #'   lo que algunas de las secciones censales consideradas pueden no tener
-#'   informaciÛn para todo el periodo 2004-2015 si es que dicha secciÛn no ha
-#'   existido durante todo este periodo. Este comentario tambiÈn aplica a la
-#'   funciÛn \code{\link{carga_datos}}.
+#'   informaci√≥n para todo el periodo 2004-2015 si es que dicha secci√≥n no ha
+#'   existido durante todo este periodo. Este comentario tambi√©n aplica a la
+#'   funci√≥n \code{\link{carga_datos}}.
 #'
 #' @name poblacion
 #'
 #' @docType data
 #'
 #' @format Un objeto de clase \code{poblaciones_ine} donde las filas representan
-#'   la combinaciÛn de las distintas secciones censales de MEDEA3, sexos y aÒos
+#'   la combinaci√≥n de las distintas secciones censales de MEDEA3, sexos y a√±os
 #'   del periodo de estudio. Las cuatro primeras columnas son: \describe{
-#'   \item{seccion}{CÛdigo de la secciÛn censal.} \item{sexo}{0 hombres; 1
-#'   mujeres.} \item{year}{AÒo.} \item{medea3}{Pertenencia de la secciÛn al
+#'   \item{seccion}{C√≥digo de la secci√≥n censal.} \item{sexo}{0 hombres; 1
+#'   mujeres.} \item{year}{A√±o.} \item{medea3}{Pertenencia de la secci√≥n al
 #'   proyecto MEDEA3.} } El resto de columnas representan los distintos grupos
-#'   de edad. Todo objeto de la clase \code{poblaciones_ine} deber· tener este
+#'   de edad. Todo objeto de la clase \code{poblaciones_ine} deber√° tener este
 #'   formato.
 #'
 #' @references \href{http://www.ine.es/}{ Sitio web del INE}.
@@ -71,18 +71,18 @@
 #'   library(medear)
 #'   data("poblacion")
 #'
-#'   # InformaciÛn de poblaciones de la secciÛn censal 01001 de Valencia (cÛdigo INE 46250)
+#'   # Informaci√≥n de poblaciones de la secci√≥n censal 01001 de Valencia (c√≥digo INE 46250)
 #'   poblacion[poblacion$seccion == "4625001001", ]
 #'
-#'   # InformaciÛn de poblaciones de toda la ciudad de Valencia
+#'   # Informaci√≥n de poblaciones de toda la ciudad de Valencia
 #'   poblacion[substring(poblacion$seccion, 1, 5) == "46250", ]
 #' }
 "poblacion"
 
 
-#' @title Cartografia por seccion censal para las ciudades MEDEA3
+#' @title Cartograf√≠a por secci√≥n censal para las ciudades MEDEA3
 #'
-#' @description Contiene la cartografÌa por secciÛn censal tal cual puede ser
+#' @description Contiene la cartograf√≠a por secci√≥n censal tal cual puede ser
 #'   utilizada por el paquete \code{sp}.
 #'
 #' @name cartografia
@@ -91,19 +91,19 @@
 #'
 #' @format Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
 #'   (\code{cartografia@data}) tienen clase \code{data.frame} y
-#'   \code{cartografia_ine}, donde cada fila es una secciÛn censal y que cuenta
-#'   con 7 columnas: \describe{ \item{seccion}{C·dena de 10 caracteres con el
-#'   cÛdigo de secciÛn censal (incluye provincia, municipio, distrito y
-#'   secciÛn).} \item{CUMUN}{C·dena de 5 caracteres con el cÛdigo INE del
-#'   municipio.} \item{CCA}{C·dena de 2 caracteres con el cÛdigo INE de la
-#'   comunidad autÛnoma} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
-#'   de la comunidad autÛnoma.} \item{NMUN}{Nombre del municipio.}
-#'   \item{n_viv}{N˙mero de viviendas por secciÛn censal (datos cruzados con
-#'   DirecciÛn General de Catastro).}}
+#'   \code{cartografia_ine}, donde cada fila es una secci√≥n censal y que cuenta
+#'   con 7 columnas: \describe{ \item{seccion}{C√°dena de 10 caracteres con el
+#'   c√≥digo de secci√≥n censal (incluye provincia, municipio, distrito y
+#'   secci√≥n).} \item{CUMUN}{C√°dena de 5 caracteres con el c√≥digo INE del
+#'   municipio.} \item{CCA}{C√°dena de 2 caracteres con el c√≥digo INE de la
+#'   comunidad aut√≥noma} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
+#'   de la comunidad aut√≥noma.} \item{NMUN}{Nombre del municipio.}
+#'   \item{n_viv}{N√∫mero de viviendas por secci√≥n censal (datos cruzados con
+#'   Direcci√≥n General de Catastro).}}
 #'
 #' @references \href{http://www.ine.es/}{ Sitio web del INE}.
 #'
-#'   \href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{CartografÌa}.
+#'   \href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartograf√≠a}.
 #'
 #'
 #' @encoding UTF-8
@@ -117,20 +117,20 @@
 #'   library(sp)
 #'   data("cartografia")
 #'
-#'   # RepresentaciÛn de los secciones censales de ¡lava
+#'   # Representaci√≥n de los secciones censales de √Ålava
 #'   plot(cartografia[substr(cartografia$seccion, 1, 5) == "01059", ])
 #'
-#'   # RepresentaciÛn de los secciones censales de ¡lava, seg˙n distritos.
+#'   # Representaci√≥n de los secciones censales de √Ålava, seg√∫n distritos.
 #'   distritos <- substr(cartografia[substr(cartografia$CUSEC, 1, 5) == "01059", "CUSEC"], 6, 7)
 #'   plot(cartografia[substr(cartografia$CUSEC, 1, 5) == "01059", ], col = as.numeric(distritos))
 #' }
 "cartografia"
 
 
-#' @title Nombres de municipios y provincias segun terminologia oficial del INE
+#' @title Nombres de municipios y provincias segun terminolog√≠a oficial del INE
 #'
-#' @description CodificaciÛn/nombres usados por el INE para las provincias y los
-#'   municipios. TambiÈn indica si se trata de un municipio participante en
+#' @description Codificaci√≥n/nombres usados por el INE para las provincias y los
+#'   municipios. Tambi√©n indica si se trata de un municipio participante en
 #'   MEDEA3 o no.
 #'
 #' @name codigos_ine
@@ -140,16 +140,16 @@
 #' @format Un objeto de clase \code{data.frame}, donde cada
 #'   fila es un municipio y que cuenta con 7 columnas:
 #'   \describe{
-#'     \item{cod_provincia}{C·dena de 2 caracteres con el cÛdigo de la provincia.}
-#'     \item{CUMUN}{C·dena de 3 caracteres con el cÛdigo del municipio.}
+#'     \item{cod_provincia}{C√°dena de 2 caracteres con el c√≥digo de la provincia.}
+#'     \item{CUMUN}{C√°dena de 3 caracteres con el c√≥digo del municipio.}
 #'     \item{nombre_municipio}{Nombre del municipio.}
-#'     \item{medea3}{Valor lÛgico: øparticipa en MEDEA3?}
+#'     \item{medea3}{Valor l√≥gico: ¬øparticipa en MEDEA3?}
 #'   }
 #'
 #' @references
 #'   \href{http://www.ine.es/}{ Sitio web del INE}.
 #'
-#'   \href{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{ CodificaciÛn INE}.
+#'   \href{http://www.ine.es/daco/daco42/codmun/codmunmapa.htm}{ Codificaci√≥n INE}.
 #'
 #' @keywords datasets
 #'
@@ -163,23 +163,24 @@
 #' }
 "codigos_ine"
 
+
 #' @title Cambios temporales de seccionado para todas las ciudades MEDEA3
-#'   (periodo 1996-2015)
+#'   (per√≠odo 1996-2015)
 #'
-#' @description RelaciÛn de secciones censales que interseccionan
-#'   geogr·ficamente con el seccionado de 2011, seg˙n la definiciÛn de dicha
-#'   secciÛn secciÛn censal en ambos aÒos siguiendo el tramero del INE. Este
+#' @description Relaci√≥n de secciones censales que interseccionan
+#'   geogr√°ficamente con el seccionado de 2011, seg√∫n la definici√≥n de dicha
+#'   secci√≥n secci√≥n censal en ambos a√±os siguiendo el tramero del INE. Este
 #'   objeto contiene todas las intersecciones entre secciones censales distintas
-#'   para el perÌodo 1996-2015 (tanto haciendo uso del cÛdigo postal como sin
-#'   el: campo \code{codigo_postal}). Esta informaciÛn es costosa de calcular y
-#'   se necesita para la funciÛn \code{\link{une_secciones}} por ello se ha
+#'   para el per√≠odo 1996-2015 (tanto haciendo uso del c√≥digo postal como sin
+#'   el: campo \code{codigo_postal}). Esta informaci√≥n es costosa de calcular y
+#'   se necesita para la funci√≥n \code{\link{une_secciones}} por ello se ha
 #'   considerado conveniente almacenar sus resultados dentro del paquete.
 #'
 #'   Salvo Vitoria-Gasteiz, Barcelona, Donostia, Madrid, Pamplona y Bilbao, el
-#'   resto de ciudades incorporan informaciÛn sobre el n˙mero de viviendas
-#'   afectadas por el cambio de secciÛn asÌ como el porcentaje de tramos, no
+#'   resto de ciudades incorporan informaci√≥n sobre el n√∫mero de viviendas
+#'   afectadas por el cambio de secci√≥n as√≠ como el porcentaje de tramos, no
 #'   detectados en catastro, de ese cambio con respecto al total de tramos que
-#'   contiene la secciÛn de 2011 (informaciÛn ˙til a la hora de unir las
+#'   contiene la secci√≥n de 2011 (informaci√≥n √∫til a la hora de unir las
 #'   secciones).
 #'
 #' @name cambios_seccion
@@ -187,16 +188,16 @@
 #' @docType data
 #'
 #' @format Un objeto de clase \code{cambios_ine}, donde cada fila es un un
-#'   cambio de secciÛn y que cuenta con 7 columnas: \describe{
-#'   \item{sc_ref}{C·dena de 10 caracteres con el cÛdigo de la secciÛn 2011.}
-#'   \item{sc_new}{C·dena de 10 caracteres con el cÛdigo de la secciÛn en aÒo ==
-#'   year2.} \item{year}{AÒo de referencia: 2011.} \item{year2}{AÒo de
-#'   comparacion.} \item{viviendas}{N˙mero de viviendas afectadas por el cambio
-#'   de secciÛn.} \item{tramo_por}{Porcentaje de tramos, no detectados en
-#'   catastro, afectados por el cambio de secciÛn, respecto al total de tramos
-#'   que incluye la secciÛn de 2011.} \item{codigo_postal}{øLa detecciÛn de los
-#'   cambios se hizo usando el cÛdigo postal?.}  \item{vias}{Lista con las vÌas
-#'   afectadas por el cambio de secciÛn.} }
+#'   cambio de secci√≥n y que cuenta con 7 columnas: \describe{
+#'   \item{sc_ref}{C√°dena de 10 caracteres con el c√≥digo de la secci√≥n 2011.}
+#'   \item{sc_new}{C√°dena de 10 caracteres con el c√≥digo de la secci√≥n en a√±o ==
+#'   year2.} \item{year}{A√±o de referencia: 2011.} \item{year2}{A√±o de
+#'   comparacion.} \item{viviendas}{N√∫mero de viviendas afectadas por el cambio
+#'   de secci√≥n.} \item{tramo_por}{Porcentaje de tramos, no detectados en
+#'   catastro, afectados por el cambio de secci√≥n, respecto al total de tramos
+#'   que incluye la secci√≥n de 2011.} \item{codigo_postal}{¬øLa detecci√≥n de los
+#'   cambios se hizo usando el c√≥digo postal?.}  \item{vias}{Lista con las v√≠as
+#'   afectadas por el cambio de secci√≥n.} }
 #'
 #' @keywords datasets
 #'
@@ -213,9 +214,9 @@
 "cambios_seccion"
 
 
-#' @title Secciones censales unicas por periodo (1996-2015)
+#' @title Secciones censales √∫nicas por per√≠odo (1996-2015)
 #'
-#' @description Listado con las secciones censales ˙nicas por aÒo (1996-2015) de
+#' @description Listado con las secciones censales √∫nicas por a√±o (1996-2015) de
 #'   ciudades MEDEA3.
 #'
 #' @name secciones
@@ -223,7 +224,7 @@
 #' @docType data
 #'
 #' @format Un objeto de clase \code{data.frame} y \code{data.table}, donde cada
-#'   fila es una secciÛn para un aÒo determinado.
+#'   fila es una secci√≥n para un a√±o determinado.
 #'
 #' @keywords datasets
 #'
@@ -237,10 +238,11 @@
 #' }
 "secciones"
 
+
 #' @title Censos de 2001 y 2011
 #'
 #' @description Datos de los censos de 2001 y 2011 necesarios para construir el
-#'   Ìndice de privaciÛn. Estos datos se cargan con la funciÛn
+#'   √≠ndice de privaci√≥n. Estos datos se cargan con la funci√≥n
 #'   \code{\link{carga_datos}}.
 #'
 #' @name censo
@@ -250,33 +252,33 @@
 #' @format Un objeto de clase \code{data.frame} con los siguientes campos:
 #'
 #'   \itemize{
-#'     \item seccion CÛdigo de secciÛn censal (10 caracteres).
-#'     \item muni CÛdigo INE del municipio.
-#'     \item year AÒo del censo.
-#'     \item i01 N˙mero de trabajadores manuales entre los ocupados o parados que
-#'       han trabajado antes, de 16 o m·s aÒos.
-#'     \item i02 N˙mero de trabajadores manuales entre los ocupados, de 16 o m·s aÒos.
-#'     \item i03 N˙mero de parados de 16 o m·s aÒos entre los activos.
-#'     \item i04 N˙mero de asalariados eventuales entre los ocupados o parados
-#'       que han trabajado antes de 16 o m·s aÒos.
-#'     \item i05 N˙mero de asalariados eventuales entre los ocupados de 16 o m·s aÒos.
-#'     \item i06 N˙mero de personas con instrucciÛn insuficiente de 16 o m·s aÒos.
-#'     \item i07 N˙mero de personas con instrucciÛn insuficiente de 16 a 29 aÒos.
-#'     \item i08 N˙mero de poblaciÛn de 65 o m·s aÒos.
-#'     \item i09 N˙mero de nacidos en paÌses de renta baja.
-#'     \item i10 N˙mero de nacidos en paÌses de renta baja llegados a EspaÒa
-#'       despuÈs de 2006.
-#'     \item i11 N˙mero de nacidos en paÌses de renta baja o nacidos en EspaÒa
-#'       cuyo padre o madre ha nacido en paÌses de renta baja.
-#'     \item IE01_d Total de poblaciÛn ocupada o parada que ha trabajado antes
-#'       de 16 o m·s aÒos.
-#'     \item IE02_d Total de poblaciÛn ocupada de 16 o m·s aÒos.
-#'     \item IE03_d Total de poblaciÛn de 16 o m·s aÒos en situaciÛn laboral = 1
+#'     \item seccion C√≥digo de secci√≥n censal (10 caracteres).
+#'     \item muni C√≥digo INE del municipio.
+#'     \item year A√±o del censo.
+#'     \item i01 N√∫mero de trabajadores manuales entre los ocupados o parados que
+#'       han trabajado antes, de 16 o m√°s a√±os.
+#'     \item i02 N√∫mero de trabajadores manuales entre los ocupados, de 16 o m√°s a√±os.
+#'     \item i03 N√∫mero de parados de 16 o m√°s a√±os entre los activos.
+#'     \item i04 N√∫mero de asalariados eventuales entre los ocupados o parados
+#'       que han trabajado antes de 16 o m√°s a√±os.
+#'     \item i05 N√∫mero de asalariados eventuales entre los ocupados de 16 o m√°s a√±os.
+#'     \item i06 N√∫mero de personas con instrucci√≥n insuficiente de 16 o m√°s a√±os.
+#'     \item i07 N√∫mero de personas con instrucci√≥n insuficiente de 16 a 29 a√±os.
+#'     \item i08 N√∫mero de poblaci√≥n de 65 o m√°s a√±os.
+#'     \item i09 N√∫mero de nacidos en pa√≠ses de renta baja.
+#'     \item i10 N√∫mero de nacidos en pa√≠ses de renta baja llegados a Espa√±a
+#'       despu√©s de 2006.
+#'     \item i11 N√∫mero de nacidos en pa√≠ses de renta baja o nacidos en Espa√±a
+#'       cuyo padre o madre ha nacido en pa√≠ses de renta baja.
+#'     \item IE01_d Total de poblaci√≥n ocupada o parada que ha trabajado antes
+#'       de 16 o m√°s a√±os.
+#'     \item IE02_d Total de poblaci√≥n ocupada de 16 o m√°s a√±os.
+#'     \item IE03_d Total de poblaci√≥n de 16 o m√°s a√±os en situaci√≥n laboral = 1
 #'       Ocupado/a + 2 Parado que ha trabajado antes + 3 Parado que busca
-#'       empleo (poblaciÛn activa).
-#'     \item IE06_d Total de poblaciÛn de 16 o m·s aÒos.
-#'     \item IE07_d Total de poblaciÛn de 16 a 29  aÒos.
-#'     \item IE08_d Total de poblaciÛn total.
+#'       empleo (poblaci√≥n activa).
+#'     \item IE06_d Total de poblaci√≥n de 16 o m√°s a√±os.
+#'     \item IE07_d Total de poblaci√≥n de 16 a 29  a√±os.
+#'     \item IE08_d Total de poblaci√≥n total.
 #'   }
 #'
 #' @keywords datasets
@@ -287,7 +289,7 @@
 #'
 #' \dontrun{
 #'   library(medear)
-#'   censo <- carga_datos("contraseÒa", tipo = "censo")
+#'   censo <- carga_datos("contrase√±a", tipo = "censo")
 #' }
 #'
 #' @seealso \code{\link{carga_datos}}

@@ -3,7 +3,8 @@
 \encoding{UTF-8}
 \name{comprueba_geocodificado}
 \alias{comprueba_geocodificado}
-\title{Comprobacion de asignacion de distintas coordenadas a misma direccion}
+\title{Comprobación de la asignación de distintas coordenadas a una misma
+  dirección}
 \usage{
 comprueba_geocodificado(mortalidad)
 }

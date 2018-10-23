@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{descarga_poblaciones}
 \alias{descarga_poblaciones}
-\title{Descarga poblaciones del INE por seccion censal, sexo, edad y periodo}
+\title{Descarga poblaciones del INE por sección censal, sexo, edad y año}
 \usage{
 descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
   = 2006:2015, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries = 10)

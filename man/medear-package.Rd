@@ -5,7 +5,7 @@
 \name{medear-package}
 \alias{medear}
 \alias{medear-package}
-\title{Poblaciones y cartografia por seccion censal del INE (proyecto MEDEA3)}
+\title{Poblaciones y cartografía por sección censal del INE (proyecto MEDEA3)}
 \description{
 Paquete que contiene las funciones y los datos utilizados para
   llevar a cabo el proyecto MEDEA3, incluyendo los datos de población por

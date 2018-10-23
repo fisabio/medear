@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{limpiadirecGoogle}
 \alias{limpiadirecGoogle}
-\title{Limpieza de caracteres para Google}
+\title{Limpieza de carácteres para Google}
 \usage{
 limpiadirecGoogle(cadena)
 }

@@ -1,76 +1,76 @@
 
-#' @title Poblaciones y cartografia por seccion censal del INE (proyecto MEDEA3)
+#' @title Poblaciones y cartografÃ­a por secciÃ³n censal del INE (proyecto MEDEA3)
 #'
 #' @description Paquete que contiene las funciones y los datos utilizados para
-#'   llevar a cabo el proyecto MEDEA3, incluyendo los datos de población por
+#'   llevar a cabo el proyecto MEDEA3, incluyendo los datos de poblaciÃ³n por
 #'   sexo y grupos de edad para las ciudades implicadas en el proyecto a nivel
-#'   de sección censal. Aunque algunos datos de población están encriptados por
-#'   tratarse de consultas específicas realizadas al Instituto Nacional de
-#'   Estadística -INE- (se puede acceder a ellos mediante contraseña), los datos
+#'   de secciÃ³n censal. Aunque algunos datos de poblaciÃ³n estÃ¡n encriptados por
+#'   tratarse de consultas especÃ­ficas realizadas al Instituto Nacional de
+#'   EstadÃ­stica -INE- (se puede acceder a ellos mediante contraseÃ±a), los datos
 #'   desde 2006 son de libre acceso siguiendo la licencia del INE.
 #'
-#' @details El uso habitual del paquete será la carga de datos o de la
-#'   cartografia (\code{\link[utils]{data}}) y su preparación para unir las
-#'   secciones según el rango de años que se desee (función
-#'   \code{\link{une_secciones}}), o la georreferenciación de la mortalidad
+#' @details El uso habitual del paquete serÃ¡ la carga de datos o de la
+#'   cartografia (\code{\link[utils]{data}}) y su preparaciÃ³n para unir las
+#'   secciones segÃºn el rango de aÃ±os que se desee (funciÃ³n
+#'   \code{\link{une_secciones}}), o la georreferenciaciÃ³n de la mortalidad
 #'   (\code{\link{geocodificar_cartociudad}} y
 #'   \code{\link{geocodificar_google}}). En todo caso, se ofrece la fecha de la
-#'   última actualización de los datos (siempre que esté disponible) como un
+#'   Ãºltima actualizaciÃ³n de los datos (siempre que estÃ© disponible) como un
 #'   atributo de los objetos.
 #'
-#'   Un uso potencial puede ser la preparación de consultas personalizadas para
+#'   Un uso potencial puede ser la preparaciÃ³n de consultas personalizadas para
 #'   ciudades o provincias completas, por lo que el paquete ofrece todas las
-#'   funciones necesarias para descargar los datos y la cartografía directamente
+#'   funciones necesarias para descargar los datos y la cartografÃ­a directamente
 #'   desde el INE y trabajarlos para obtener el producto final. En este sentido,
-#'   las funciones deberían ejecutarse en el siguiente orden:
+#'   las funciones deberÃ­an ejecutarse en el siguiente orden:
 #'
 #'   \describe{\item{\code{\link{descarga_cartografia}}}{Descarga de la
-#'   cartografía nacional por sección censal para el año 2011 en formato SHP.}
+#'   cartografÃ­a nacional por secciÃ³n censal para el aÃ±o 2011 en formato SHP.}
 #'   \item{\code{\link{descarga_poblaciones}}}{Descarga de la poblaciones por
-#'   sección censal, sexo y grupos de edad (disponibilidad desde 2006 en
+#'   secciÃ³n censal, sexo y grupos de edad (disponibilidad desde 2006 en
 #'   adelante).} \item{\code{\link{descarga_trameros}}}{Descarga de los trameros
-#'   para las provincias indicadas en los años marcados (disponible desde 2004
+#'   para las provincias indicadas en los aÃ±os marcados (disponible desde 2004
 #'   en adelante).} \item{\code{\link{detecta_cambios}}}{Identifica los cambios
-#'   de sección censal comparando el tramero de 2011 con el de otros años.}
+#'   de secciÃ³n censal comparando el tramero de 2011 con el de otros aÃ±os.}
 #'   \item{\code{\link{une_secciones}}}{Habiendo obtenido los cambios en el
-#'   seccionado, se realiza la unión de las secciones en la cartografía y en las
-#'   cifras de población.} }
+#'   seccionado, se realiza la uniÃ³n de las secciones en la cartografÃ­a y en las
+#'   cifras de poblaciÃ³n.} }
 #'
 #'   Por otra parte, el paquete incorpora una serie de funciones para efectuar
-#'   la georreferenciación de la mortalidad, siguiendo el protocolo disponible
-#'   como viñeta dentro del paquete (accesible mediante
+#'   la georreferenciaciÃ³n de la mortalidad, siguiendo el protocolo disponible
+#'   como viÃ±eta dentro del paquete (accesible mediante
 #'   \code{vignette("medear-georreferenciacion")}):
 #'
-#'   \describe{\item{\code{\link{geocodificar_cartociudad}}}{Implementación del
-#'   algoritmo de geocodificación de direcciones de MEDEA3 (geocodificado con
-#'   CartoCiudad).} \item{\code{\link{geocodificar_google}}}{Implementación del
-#'   algoritmo de geocodificación de direcciones de MEDEA3 (geocodificado con
+#'   \describe{\item{\code{\link{geocodificar_cartociudad}}}{ImplementaciÃ³n del
+#'   algoritmo de geocodificaciÃ³n de direcciones de MEDEA3 (geocodificado con
+#'   CartoCiudad).} \item{\code{\link{geocodificar_google}}}{ImplementaciÃ³n del
+#'   algoritmo de geocodificaciÃ³n de direcciones de MEDEA3 (geocodificado con
 #'   Google).} }
 #'
-#'   En último lugar, el paquete dispone de varios bancos de datos de uso
+#'   En Ãºltimo lugar, el paquete dispone de varios bancos de datos de uso
 #'   frecuente en el proyecto:
 #'
 #'   \describe{\item{\code{\link{cartografia}}}{Cartografia por seccion censal
 #'   para las ciudades MEDEA3.} \item{\code{\link{poblacion}}}{Datos de
 #'   poblacion por seccion censal para las ciudades MEDEA3 (periodo 2004-2015:
-#'   si desea cargarse el período 1996-2015, usar la función
+#'   si desea cargarse el perÃ­odo 1996-2015, usar la funciÃ³n
 #'   \code{\link{carga_datos}}).} \item{\code{\link{secciones}}}{Secciones
-#'   censales únicas por período (1996-2015).}
+#'   censales Ãºnicas por perÃ­odo (1996-2015).}
 #'   \item{\code{\link{cambios_seccion}}}{Cambios de seccionado para las
-#'   ciudades MEDEA3 (período 1996-2015).}
-#'   \item{\code{\link{codigos_ine}}}{Códigos y nombres de municipios y
-#'   provincias según terminología oficial del INE.} }
+#'   ciudades MEDEA3 (perÃ­odo 1996-2015).}
+#'   \item{\code{\link{codigos_ine}}}{CÃ³digos y nombres de municipios y
+#'   provincias segÃºn terminologÃ­a oficial del INE.} }
 #'
-#'   Fuente: Elaboración propia con datos extraídos del \href{www.ine.es}{sitio
+#'   Fuente: ElaboraciÃ³n propia con datos extraÃ­dos del \href{www.ine.es}{sitio
 #'   web del INE}.
 #'
-#'   Licencia: Los datos contenidos en este paquete han sido extraídos desde el
+#'   Licencia: Los datos contenidos en este paquete han sido extraÃ­dos desde el
 #'   \href{www.ine.es}{sitio web del INE} y modificados de acuerdo a las
 #'   necesidades del proyecto, quedando sujeto su uso a la
 #'   \href{www.ine.es/ss/Satellite?L=0&c=Page&cid=1254735849170&p=1254735849170&pagename=Ayuda\%2FINELayout#}{licencia
 #'    INE}.
 #'
-#'   Exención de responsabilidad: El INE no ha participado en la elaboración de
+#'   ExenciÃ³n de responsabilidad: El INE no ha participado en la elaboraciÃ³n de
 #'   este paquete.
 #'
 #' @seealso \code{\link{descarga_cartografia}},
@@ -82,9 +82,9 @@
 #'   \code{\link{codigos_ine}}
 #'
 #' @references \describe{\item{\href{www.ine.es/}{Sitio web del INE.}}{}
-#'   \item{\href{www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{Población
+#'   \item{\href{www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&secc=1254736195461&idp=1254734710990}{PoblaciÃ³n
 #'    por secciones censales.}}{}
-#'   \item{\href{http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip}{Cartografía
+#'   \item{\href{http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip}{CartografÃ­a
 #'    de secciones censales a 1 de noviembre de 2011 en formato SHP.}}{}}
 #'
 #' @name medear-package

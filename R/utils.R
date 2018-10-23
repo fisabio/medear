@@ -22,62 +22,62 @@ filtrar_ein_esn <- function(datos) {
 }
 
 
-#' @title Funcion para detectar cambios de seccionado en trameros
+#' @title FunciÃ³n para detectar cambios de seccionado en los callejeros INE
 #'
-#' @description Detecta cambios de sección censal para las provincias y el
-#'   período marcados.
+#' @description Detecta cambios de secciÃ³n censal para las provincias y el
+#'   perÃ­odo marcados.
 #'
-#' @param datos Objeto de clase \code{tramero_ine} (devuelto por la función
-#'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al año 2011.
-#' @param years Vector numérico de longitud >= 2 con los años para los que se
+#' @param datos Objeto de clase \code{tramero_ine} (devuelto por la funciÃ³n
+#'   \code{\link{descarga_trameros}}), incluyendo obligatoriamente al aÃ±o 2011.
+#' @param years Vector numÃ©rico de longitud >= 2 con los aÃ±os para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param cod_postal Valor lógico: ¿Debe añadirse el código postal a la vía? Por
-#'   defecto falso, aunque es útil en casos de ciudades con pedanías que tengan
-#'   nombres de vía comunes (a su vez suelen compartir mismo código de vía).
-#' @param catastro Carácter. Argumento opcional (nulo por defecto): ruta hasta
-#'   el archivo alfanumérico con la información catastral completa de un
+#' @param cod_postal Valor lÃ³gico: Â¿Debe aÃ±adirse el cÃ³digo postal a la vÃ­a? Por
+#'   defecto falso, aunque es Ãºtil en casos de ciudades con pedanÃ­as que tengan
+#'   nombres de vÃ­a comunes (a su vez suelen compartir mismo cÃ³digo de vÃ­a).
+#' @param catastro CarÃ¡cter. Argumento opcional (nulo por defecto): ruta hasta
+#'   el archivo alfanumÃ©rico con la informaciÃ³n catastral completa de un
 #'   municipio.
 #'
 #' @usage detecta_cambios(datos, years = c(1996, 2001, 2004:2015), cod_postal =
 #'   FALSE, catastro = NULL)
 #'
-#' @details El tiempo de ejecución de la función varía según el número de
-#'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
-#'   de computación es mediante la ejecución en paralelo de la función.
+#' @details El tiempo de ejecuciÃ³n de la funciÃ³n varÃ­a segÃºn el nÃºmero de
+#'   provincias y el rango de aÃ±os. La forma mÃ¡s sencilla de acelerar el proceso
+#'   de computaciÃ³n es mediante la ejecuciÃ³n en paralelo de la funciÃ³n.
 #'
-#'   Los códigos de sección censal siguen un orden preestablecido: los primeros
-#'   dos dígitos identifican la provincia, los siguientes tres dígitos el
-#'   municipio, los próximos dos dígitos el distrito y los últimos tres dígitos
-#'   hacen referencia a la sección censal.
+#'   Los cÃ³digos de secciÃ³n censal siguen un orden preestablecido: los primeros
+#'   dos dÃ­gitos identifican la provincia, los siguientes tres dÃ­gitos el
+#'   municipio, los prÃ³ximos dos dÃ­gitos el distrito y los Ãºltimos tres dÃ­gitos
+#'   hacen referencia a la secciÃ³n censal.
 #'
-#'   Si se proporciona un archivo alfanumérico con la información catastral de
-#'   un municipio, la función solo calcula y devuelve los cambios de ese
-#'   municipio, incorporando el número de viviendas y tramos detectados en la
-#'   información catastral.
+#'   Si se proporciona un archivo alfanumÃ©rico con la informaciÃ³n catastral de
+#'   un municipio, la funciÃ³n solo calcula y devuelve los cambios de ese
+#'   municipio, incorporando el nÃºmero de viviendas y tramos detectados en la
+#'   informaciÃ³n catastral.
 #'
 #'   El archivo de catastro se debe descargar de la
 #'   \href{https://www.sedecatastro.gob.es/OVCFrames.aspx?TIPO=TIT&a=masiv}{sede
-#'   electronica del catastro} (apartado denominado "Descarga de información
-#'   alfanumérica (formato CAT)"), paso que requiere de un certificado digital.
+#'   electronica del catastro} (apartado denominado "Descarga de informaciÃ³n
+#'   alfanumÃ©rica (formato CAT)"), paso que requiere de un certificado digital.
 #'
-#'   En cualquier caso, y como la finalidad de esta función es servir en la
-#'   unión de secciones (función \code{\link{une_secciones}}), aunque se trata
-#'   de un argumento opcional es muy recomendable aportar la información
+#'   En cualquier caso, y como la finalidad de esta funciÃ³n es servir en la
+#'   uniÃ³n de secciones (funciÃ³n \code{\link{une_secciones}}), aunque se trata
+#'   de un argumento opcional es muy recomendable aportar la informaciÃ³n
 #'   catastral, pues resulta imprescindible a la hora de decidir si ha de
-#'   realizarse la unión de dos o más secciones.
+#'   realizarse la uniÃ³n de dos o mÃ¡s secciones.
 #'
-#' @return Si no se proporciona un fichero con información catastral, la funcion
+#' @return Si no se proporciona un fichero con informaciÃ³n catastral, la funcion
 #'   devuelve un objeto de clase \code{cambios_ine} con 5 columnas:
-#'   \item{sc_ref}{Código de la sección censal en el primer año.}
-#'   \item{sc_new}{Código de la sección censal en el segundo año.}
-#'   \item{year}{Primer año.} \item{year2}{Segundo año.} \item{vias}{Lista con
-#'   el código de las vías que provocan el cambio de sección (incorporando un
-#'   dígito al final de la cadena indicando si se trata de numeración par (0) o
+#'   \item{sc_ref}{CÃ³digo de la secciÃ³n censal en el primer aÃ±o.}
+#'   \item{sc_new}{CÃ³digo de la secciÃ³n censal en el segundo aÃ±o.}
+#'   \item{year}{Primer aÃ±o.} \item{year2}{Segundo aÃ±o.} \item{vias}{Lista con
+#'   el cÃ³digo de las vÃ­as que provocan el cambio de secciÃ³n (incorporando un
+#'   dÃ­gito al final de la cadena indicando si se trata de numeraciÃ³n par (0) o
 #'   impar(1))}.
 #'
-#'   Si se proporciona un archivo con información catastral de un municipio, la
-#'   función solo calcula los cambios para ese municipio y devuelve, ademas de
-#'   los campos del anterior supuesto, el número de viviendas afectadas por cada
+#'   Si se proporciona un archivo con informaciÃ³n catastral de un municipio, la
+#'   funciÃ³n solo calcula los cambios para ese municipio y devuelve, ademas de
+#'   los campos del anterior supuesto, el nÃºmero de viviendas afectadas por cada
 #'   cambio y el porcentaje de tramos identificados en el archivo catastral.
 #'
 #'
@@ -86,11 +86,11 @@ filtrar_ein_esn <- function(datos) {
 #' \dontrun{
 #'   library(medear)
 #'   trameros <- descarga_trameros(cod_provincia = c("51", "52"))
-#'   # Sin información catastral
+#'   # Sin informaciÃ³n catastral
 #'   cambios  <- detecta_cambios(datos = trameros)
 #'   cambios
 #'
-#'   # Con información catastral para la ciudad de Castellón de la Plana
+#'   # Con informaciÃ³n catastral para la ciudad de CastellÃ³n de la Plana
 #'   # (el nombre del archivo puede variar)
 #'   trameros <- descarga_trameros(cod_provincia = "12")
 #'   cambios  <- detecta_cambios(datos = trameros, catastro = "12_900_U_2018-01-19.CAT")
@@ -219,15 +219,15 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2015),
 
 #' @title Carga los datos privados del proyecto MEDEA3
 #'
-#' @description Algunos datos del proyecto MEDEA3 están encriptados para poder
+#' @description Algunos datos del proyecto MEDEA3 estÃ¡n encriptados para poder
 #'   cumplir con la licencia INE (poblaciones desde 1998 a 2003 o datos de los
-#'   censos 2001 y 2011). Esta función los desencripta y añade a los datos
-#'   públicos (resto de años).
+#'   censos 2001 y 2011). Esta funciÃ³n los desencripta y aÃ±ade a los datos
+#'   pÃºblicos (resto de aÃ±os).
 #'
-#' @details La contraseña no se almacena en el historial.
+#' @details La contraseÃ±a no se almacena en el historial.
 #'
-#' @param key Cadena de carácteres con la contraseña.
-#' @param tipo Tipo de datos a cargar: población o censo.
+#' @param key Cadena de carÃ¡cteres con la contraseÃ±a.
+#' @param tipo Tipo de datos a cargar: poblaciÃ³n o censo.
 #'
 #' @return Un \code{data.frame} con los datos solicitados.
 #'
@@ -240,8 +240,8 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2015),
 #' @examples
 #'
 #' \dontrun{
-#'   # Carga de datos de población
-#'   carga_datos(key = "contraseña", tipo = "poblacion")
+#'   # Carga de datos de poblaciÃ³n
+#'   carga_datos(key = "contraseÃ±a", tipo = "poblacion")
 #' }
 #'
 #' @encoding UTF-8
@@ -620,14 +620,14 @@ descarga_segura <- function(x, tries = 10, ...) {
 }
 
 
-#' @title Deteccion de agrupaciones de mortalidad a revisar manualmente
+#' @title DetecciÃ³n de agrupaciones de mortalidad a revisar manualmente
 #'
-#' @description Esta función es útil a la hora de comprobar la geocodificación
+#' @description Esta funciÃ³n es Ãºtil a la hora de comprobar la geocodificaciÃ³n
 #'   de la mortalidad, pues devuelve aquellos puntos con un exceso de
-#'   fallecimientos en relación a la media de sus vecinos más próximos. Con esta
-#'   dinámica es fácil identificar los centros residenciales o errores
-#'   sistemáticos en la geocodificación, donde es de esperar una mayor
-#'   aglomeración de defunciones.
+#'   fallecimientos en relaciÃ³n a la media de sus vecinos mÃ¡s prÃ³ximos. Con esta
+#'   dinÃ¡mica es fÃ¡cil identificar los centros residenciales o errores
+#'   sistemÃ¡ticos en la geocodificaciÃ³n, donde es de esperar una mayor
+#'   aglomeraciÃ³n de defunciones.
 #'
 #' @usage detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
 #'   secciones = NULL, limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE)
@@ -635,69 +635,69 @@ descarga_segura <- function(x, tries = 10, ...) {
 #' @param datos Base de datos con las coordenadas que ubican cada uno de los
 #'   fallecimientos. Debe contener, al menos, 3 columnas: \code{BOD.direccion},
 #'   \code{lat} y \code{lng}, las cuales deben tener exactamente esos nombres.
-#'   De forma paralela la función tratará de buscar otras seis columnas fruto
-#'   del protocolo de geocodificación (\code{province}, \code{muni},
+#'   De forma paralela la funciÃ³n tratarÃ¡ de buscar otras seis columnas fruto
+#'   del protocolo de geocodificaciÃ³n (\code{province}, \code{muni},
 #'   \code{tip_via}, \code{address}, \code{portalNumber} y \code{postalCode})
 #'   (nuevamente deben tener exactamente esos nombres, que son los que resultan
-#'   del protocolo de geocodificación), con el propósito de mostrar, junto a las
+#'   del protocolo de geocodificaciÃ³n), con el propÃ³sito de mostrar, junto a las
 #'   direcciones del BOD, las direcciones devueltas por los servicios de
 #'   geocodificado. Si la base de datos tuviera otros nombres, seria trabajo del
-#'   usuario cambiárselos como paso previo al uso de la función.
-#' @param epsg Numérico con longitud igual a 1: código EPSG con la proyección de
+#'   usuario cambiÃ¡rselos como paso previo al uso de la funciÃ³n.
+#' @param epsg NumÃ©rico con longitud igual a 1: cÃ³digo EPSG con la proyecciÃ³n de
 #'   las coordenadas de la base de datos. Por defecto se usa el EPSG 4326
 #'   (longlat WGS 84).
-#' @param vecinos Numérico con longitud igual a 1: número de vecinos más
-#'   próximos con los que comparar la mortalidad de cada punto. Por defecto 10.
+#' @param vecinos NumÃ©rico con longitud igual a 1: nÃºmero de vecinos mÃ¡s
+#'   prÃ³ximos con los que comparar la mortalidad de cada punto. Por defecto 10.
 #' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}}. Con
 #'   ella se representa el seccionado oficial de 2011 a modo de referencia con
-#'   la que juzgar la geocodificación de un conjunto de defunciones anómalas. En
-#'   principio tiene valor nulo, lo que implica usar la cartografía asociada al
+#'   la que juzgar la geocodificaciÃ³n de un conjunto de defunciones anÃ³malas. En
+#'   principio tiene valor nulo, lo que implica usar la cartografÃ­a asociada al
 #'   paquete para las ciudades MEDEA3. Si el usuario desea consultar otros
 #'   municipios puede hacer uso de este argumento para tener el seccionado de
 #'   fondo.
-#' @param secciones Cadena de caracteres: secciones censales anómalas
-#'   (información facilitada por el nodo coordinador), para resaltarlas en el
+#' @param secciones Cadena de caracteres: secciones censales anÃ³malas
+#'   (informaciÃ³n facilitada por el nodo coordinador), para resaltarlas en el
 #'   mapa. Por defecto ninguna.
-#' @param limite Numérico con longitud 1 <= x <= 9: límites de probabilidad con
+#' @param limite NumÃ©rico con longitud 1 <= x <= 9: lÃ­mites de probabilidad con
 #'   los que se identifican las agrupaciones sospechosas. Por defecto viene
 #'   fijado a 1e-10, 1e-15 y 1e-20.
-#' @param devuelve_datos Valor lógico, por defecto TRUE. ¿La función debe
-#'   devolver un \code{data.frame} con los datos identificativos de los clústeres?
+#' @param devuelve_datos Valor lÃ³gico, por defecto TRUE. Â¿La funciÃ³n debe
+#'   devolver un \code{data.frame} con los datos identificativos de los clÃºsteres?
 #'
-#' @details La función comienza calculando el número de fallecimientos en cada
-#'   par único de coordenadas, identifica los \emph{n} vecinos más próximos a
+#' @details La funciÃ³n comienza calculando el nÃºmero de fallecimientos en cada
+#'   par Ãºnico de coordenadas, identifica los \emph{n} vecinos mÃ¡s prÃ³ximos a
 #'   cada punto y calcula la media de fallecimientos en los mismos. Considerando
-#'   que los fallecimientos en cada par de coordenadas siguen una distribución
-#'   de Poisson cuya media es la media de los fallecimientos en los puntos más
+#'   que los fallecimientos en cada par de coordenadas siguen una distribuciÃ³n
+#'   de Poisson cuya media es la media de los fallecimientos en los puntos mÃ¡s
 #'   cercanos, se calcula la probabilidad de superar esa media.
 #'
 #' @return Representa un objeto de clase \code{\link[leaflet]{leaflet}} en el
 #'   que se marcan los puntos a revisar. Por defecto los puntos se dividen en
-#'   tres colores en función de la mortalidad acontecida en las coordenadas
+#'   tres colores en funciÃ³n de la mortalidad acontecida en las coordenadas
 #'   vecinas: verde si la probabilidad de obtener ese resultado es inferior a
 #'   1e-10, azul si es inferior a 1e-15 y rojo si es inferior a 1e-20 (el caso
-#'   más evidente). Haciendo clic en cada uno de los puntos se puede consultar
-#'   las direcciones, tanto del BOD como las obtenidas en la geocodificación (se
-#'   puede cambiar entre una y otra en el menú del extremo superior derecho),
-#'   asociadas a cada punto. Al comienzo de cada dirección se indica el número
-#'   de fila al que hace referencia cada dirección en los datos que se
-#'   facilitaron, de forma que pueda recuperarse fácilmente dicha información
+#'   mÃ¡s evidente). Haciendo clic en cada uno de los puntos se puede consultar
+#'   las direcciones, tanto del BOD como las obtenidas en la geocodificaciÃ³n (se
+#'   puede cambiar entre una y otra en el menÃº del extremo superior derecho),
+#'   asociadas a cada punto. Al comienzo de cada direcciÃ³n se indica el nÃºmero
+#'   de fila al que hace referencia cada direcciÃ³n en los datos que se
+#'   facilitaron, de forma que pueda recuperarse fÃ¡cilmente dicha informaciÃ³n
 #'   para explorar los datos en profundidad.
 #'
-#'   Respecto al menú anteriormente mencionado, también permite cambiar la capa
-#'   de visualización de fondo, utilizando OpenStreetMap, Google Maps o Google
-#'   Satellite (de forma que pueda disponerse de información extra sin salir de
-#'   la aplicación).
+#'   Respecto al menÃº anteriormente mencionado, tambiÃ©n permite cambiar la capa
+#'   de visualizaciÃ³n de fondo, utilizando OpenStreetMap, Google Maps o Google
+#'   Satellite (de forma que pueda disponerse de informaciÃ³n extra sin salir de
+#'   la aplicaciÃ³n).
 #'
-#'   Si se desea efectuar el cálculo de distancias o áreas, en la esquina
-#'   inferior izquierda se dispone de un menú para realizarlas (en metros y en
+#'   Si se desea efectuar el cÃ¡lculo de distancias o Ã¡reas, en la esquina
+#'   inferior izquierda se dispone de un menÃº para realizarlas (en metros y en
 #'   metros cuadrados).
 #'
-#'   La función también devuelve los datos con las cooredenadas (campos
-#'   \code{lng} y \code{lat}), número de defunciones (campo \code{N}), límite
-#'   dentro del cual recae (campo \code{limite}, útil para filtrar resultados) y
+#'   La funciÃ³n tambiÃ©n devuelve los datos con las cooredenadas (campos
+#'   \code{lng} y \code{lat}), nÃºmero de defunciones (campo \code{N}), lÃ­mite
+#'   dentro del cual recae (campo \code{limite}, Ãºtil para filtrar resultados) y
 #'   direcciones asociadas a cada punto (campo \code{detalle}, de tipo lista
-#'   donde cada elemento contiene un data.frame con la información detallada).
+#'   donde cada elemento contiene un data.frame con la informaciÃ³n detallada).
 #'
 #' @examples
 #' \dontrun{
@@ -918,10 +918,11 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 }
 
 
-#' @title Comprobacion de asignacion de distintas coordenadas a misma direccion
+#' @title ComprobaciÃ³n de la asignaciÃ³n de distintas coordenadas a una misma
+#'   direcciÃ³n
 #'
 #' @description Aunque no es frecuente, en algunas situaciones, y frente a una
-#'   misma dirección, se obtienen distintas coordenadas. Esta función detecta
+#'   misma direcciÃ³n, se obtienen distintas coordenadas. Esta funciÃ³n detecta
 #'   estos casos para que pueda volver a lanzarse el algoritmo de geocodificado
 #'   sobre ellos. Concretamente se modifican estos registros de los datos de
 #'   mortalidad, sustituyendo los valores devueltos por el servicio de
@@ -929,17 +930,17 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
 #'   \code{georef == "repetir_geo_google"}.
 #'
 #' @param mortalidad Datos con la mortalidad geocodificada. Objeto de clase
-#'   \code{data.frame} que contenga, al menos, la siguiente información (los
-#'   nombres que deben tener las variables están entre paréntesis): longitud
-#'   (\code{lng}), latitud (\code{lat}), tipo de vía (\code{tip_via}),
-#'   dirección (\code{address}), número de portal (\code{portalNumber}),
+#'   \code{data.frame} que contenga, al menos, la siguiente informaciÃ³n (los
+#'   nombres que deben tener las variables estÃ¡n entre parÃ©ntesis): longitud
+#'   (\code{lng}), latitud (\code{lat}), tipo de vÃ­a (\code{tip_via}),
+#'   direcciÃ³n (\code{address}), nÃºmero de portal (\code{portalNumber}),
 #'   municipio (\code{muni}) y provincia (\code{province}) devueltos por el
 #'   servicio de geocodificado.
 #'
 #' @usage comprueba_geocodificado(mortalidad)
 #'
 #' @return Devuelve un \code{data.frame} con la mortalidad y los registros
-#'   problemáticos modificados a \code{NA}, fijando el campo \code{georef} de
+#'   problemÃ¡ticos modificados a \code{NA}, fijando el campo \code{georef} de
 #'   esos registros al valor \code{repetir_geo_google}.
 #'
 #' @encoding UTF-8
@@ -1004,21 +1005,21 @@ calcula_edad <- function(datos) {
 
 #' @title Proyecta pares de coordenadas en un mapa
 #'
-#' @description Esta función proyecta las coordenadas (latitud y longitud) en
+#' @description Esta funciÃ³n proyecta las coordenadas (latitud y longitud) en
 #'   un mapa, devolviendo la base de datos origina con una columna extra en la que
-#'   se indica la sección censal en la que recae el punto.
+#'   se indica la secciÃ³n censal en la que recae el punto.
 #'
 #' @param datos Objeto de clase \code{data.frame} con al menos dos columnas:
 #'   lat (latitud) y lng (longitud).
 #' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}}.
-#' @param epsg Vector numérico de longitud uno con el código EPSG del sistema de
+#' @param epsg Vector numÃ©rico de longitud uno con el cÃ³digo EPSG del sistema de
 #'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 #'   datum WGS84).
 #'
 #' @usage proyecta_secciones(datos, cartografia, epsg = 4326)
 #'
-#' @details Esta función es capaz de proyectar cualquier base de datos con
-#'   información puntual (mortalidad o población) en la cartografía.
+#' @details Esta funciÃ³n es capaz de proyectar cualquier base de datos con
+#'   informaciÃ³n puntual (mortalidad o poblaciÃ³n) en la cartografÃ­a.
 #'
 #' @return Se devuelve el \code{data.frame} con la columna extra \code{seccion}.
 #'
@@ -1061,15 +1062,15 @@ proyecta_secciones <- function(datos, cartografia, epsg = 4326) {
 
 #' @title Agrupa las causas de mortalidad
 #'
-#' @description Esta función realiza una agrupación de causas de mortalidad
-#'   identificadas mediante códigos CIE 9 y CIE 10 en los 22 grupos usados en
-#'   MEDEA (véase la viñeta sobre el formato de los datos en MEDEA3). De forma
+#' @description Esta funciÃ³n realiza una agrupaciÃ³n de causas de mortalidad
+#'   identificadas mediante cÃ³digos CIE 9 y CIE 10 en los 22 grupos usados en
+#'   MEDEA (vÃ©ase la viÃ±eta sobre el formato de los datos en MEDEA3). De forma
 #'   adicional, se pueden incorporar otras causas manualmente empleando el
 #'   argumento \code{otras_causas}.
 #'
 #' @param datos Datos de mortalidad ajustados al formato requerido por el paquete.
-#' @param medea3 ¿Se desea utilizar las 22 agrupaciones MEDEA3? Por defecto sí.
-#' @param otras_causas Véctor de caracteres que indica los nombres de las
+#' @param medea3 Â¿Se desea utilizar las 22 agrupaciones MEDEA3? Por defecto sÃ­.
+#' @param otras_causas VÃ©ctor de caracteres que indica los nombres de las
 #'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 #'   identifican a dichas otras causas.
 #'
@@ -1135,11 +1136,11 @@ causas_defuncion <- function(datos, medea3 = TRUE, otras_causas = NULL) {
 
 #' @title Comprobaciones de la clase de los datos
 #'
-#' @description Función para comprobar si los datos se ajustan al formato requerido.
+#' @description FunciÃ³n para comprobar si los datos se ajustan al formato requerido.
 #'
 #' @param datos Datos sobre los que lanzar comprobaciones.
 #' @param tipo Tipo de datos a comprobar.
-#' @param periodo Período de estudio: solo aplicable en \code{tipo == "mortalidad"}
+#' @param periodo PerÃ­odo de estudio: solo aplicable en \code{tipo == "mortalidad"}
 #'   o \code{tipo == "poblacion"}.
 #'
 #' @usage comprueba_datos(datos, tipo = c("cartografia", "mortalidad",
@@ -1219,27 +1220,27 @@ comprueba_datos <- function(datos, tipo = c("cartografia", "mortalidad", "poblac
 
 #' @title Crear la matriz 5-dimensional de mortalidad
 #'
-#' @description Esta función crea la matriz 5-dimensional de mortalidad (año de
-#'   defunción, sexo, grupo de edad quinquenal, sección censal y causa de
-#'   defunción).
+#' @description Esta funciÃ³n crea la matriz 5-dimensional de mortalidad (aÃ±o de
+#'   defunciÃ³n, sexo, grupo de edad quinquenal, secciÃ³n censal y causa de
+#'   defunciÃ³n).
 #'
 #' @param datos Objeto de clase \code{data.frame} con la mortalidad
 #'   geocodificada. Este objeto debe contener las variables \code{sexo},
 #'   \code{year_defuncion}, \code{edad}, \code{causa_defuncion} \code{lng} y
 #'   \code{lat}, con exactamente esos nombres.
 #' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}} con
-#'   proyección asignada (código EPSG).
-#' @param epsg Vector numérico de longitud uno con el código EPSG del sistema de
+#'   proyecciÃ³n asignada (cÃ³digo EPSG).
+#' @param epsg Vector numÃ©rico de longitud uno con el cÃ³digo EPSG del sistema de
 #'   referencia de coordenadas (CRS) empleado en los datos de mortalidad (por
 #'   defecto se usa el 4326 con datum WGS84).
-#' @param medea3 ¿Se desea utilizar las 22 agrupaciones MEDEA3? Por defecto sí.
-#' @param otras_causas Véctor de caracteres que indica los nombres de las
+#' @param medea3 Â¿Se desea utilizar las 22 agrupaciones MEDEA3? Por defecto sÃ­.
+#' @param otras_causas VÃ©ctor de caracteres que indica los nombres de las
 #'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 #'   identifican a dichas otras causas.
-#' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
+#' @param corte_edad NumÃ©rico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones o
 #'   mortalidad.
-#' @param periodo Vector numérico de longitud >= 1 con los años para los que se
+#' @param periodo Vector numÃ©rico de longitud >= 1 con los aÃ±os para los que se
 #'   desee construir el \code{array} de mortalidad.
 #'
 #' @usage crea_cubo_mortalidad(datos, cartografia, epsg = 4326, medea3 = TRUE,
@@ -1312,22 +1313,22 @@ crea_cubo_mortalidad <- function(datos, cartografia, epsg = 4326, medea3 = TRUE,
 
 #' @title Crear la matriz 4-dimensional de poblaciones
 #'
-#' @description Esta función crea la matriz 4-dimensional con las poblaciones
-#'   (año, sexo, grupo de edad quinquenal y sección censal).
+#' @description Esta funciÃ³n crea la matriz 4-dimensional con las poblaciones
+#'   (aÃ±o, sexo, grupo de edad quinquenal y secciÃ³n censal).
 #'
-#' @param datos Objeto de clase \code{data.frame} con las cifras de población.
+#' @param datos Objeto de clase \code{data.frame} con las cifras de poblaciÃ³n.
 #'   Este objeto debe contener las variables \code{seccion},
 #'   \code{sexo}, \code{year} y los grupos quinquenales desde \code{q_0_4}
 #'   hasta \code{q_85_plus} o \code{q_100_plus}, con exactamente esos nombres.
-#' @param corte_edad Numérico: punto de corte para los grupos de edad (85 o
+#' @param corte_edad NumÃ©rico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones o
 #'   mortalidad.
-#' @param periodo Vector numérico de longitud >= 1 con los años para los que se
+#' @param periodo Vector numÃ©rico de longitud >= 1 con los aÃ±os para los que se
 #'   desee construir el \code{array} de mortalidad.
-#' @param datos_propios Valor lógico. Indica si se dispone de datos de población
+#' @param datos_propios Valor lÃ³gico. Indica si se dispone de datos de poblaciÃ³n
 #'   a nivel puntual. Por defecto tiene tiene el valor \code{FALSE}. En caso
-#'   contrario la función devolvería el \code{array} de poblaciones pero con
-#'   \code{NA} en todos los conteos, con lo que el usuario será el encargado de
+#'   contrario la funciÃ³n devolverÃ­a el \code{array} de poblaciones pero con
+#'   \code{NA} en todos los conteos, con lo que el usuario serÃ¡ el encargado de
 #'   rellenar este \code{array} posteriormente.
 #'
 #' @usage crea_cubo_poblacion(datos, corte_edad = 85, periodo = 1996:2015,
@@ -1392,15 +1393,15 @@ crea_cubo_poblacion <- function(datos, corte_edad = 85, periodo = 1996:2015,
 
 #' @title Eliminar cambios manualmente de la base de datos cambios_seccion
 #'
-#' @description Esta función elimina los cambios especificados del listado de
-#'   cambios de sección detectados.
+#' @description Esta funciÃ³n elimina los cambios especificados del listado de
+#'   cambios de secciÃ³n detectados.
 #'
 #' @param datos Objeto de clase \code{cambios_ine} y \code{data.frame} con los
 #'   cambios de seccionado.
 #' @param sc_ref Cadena de caracteres de longitud >= 1 con las secciones de
 #'   2011 a eliminar.
 #' @param sc_new Cadena de caracteres de longitud >= 1 con las secciones del
-#'   resto de años a eliminar.
+#'   resto de aÃ±os a eliminar.
 #'
 #' @details Los argumentos sc_ref y sc_new deben hacer referencia a una misma
 #'   fila de la base de datos.
@@ -1490,18 +1491,24 @@ cartociudad_geocode <- function(full_address, version = c("current", "prev"),
       if (length(res) == 0) {
         warning("Failing to connect with server in query ", i,
                 ": try later with addressess in attr(results, 'rerun').")
-        res_list[[i]] <- plyr::rbind.fill(
-          res_list[[i]],
-          data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+        res_list[[i]] <- rbindlist(
+          list(
+            res_list[[i]],
+            data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+          ),
+          fill = TRUE
         )
         con_out <- c(con_out, i)
       } else if (httr::http_error(res)) {
         if (on_error == "fail")
           stop("Call to cartociudad API failed with error code ", res$status_code)
         warning("Error in query ", i, ": ", httr::http_status(res)$message)
-        res_list[[i]] <- plyr::rbind.fill(
-          res_list[[i]],
-          data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+        res_list[[i]] <- rbindlist(
+          list(
+            res_list[[i]],
+            data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+          ),
+          fill = TRUE
         )
       } else {
         res <- jsonp_to_json(suppressMessages(httr::content(res, as = "text")))
@@ -1514,9 +1521,12 @@ cartociudad_geocode <- function(full_address, version = c("current", "prev"),
         }
         if (length(res) == 0) {
           warning("The query ", i, " has 0 results.")
-          res_list[[i]] <- plyr::rbind.fill(
-            res_list[[i]],
-            data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+          res_list[[i]] <- rbindlist(
+            list(
+              res_list[[i]],
+              data.frame(address = full_address[i], version = version, stringsAsFactors = FALSE)
+            ),
+            fill = TRUE
           )
         } else {
           if (version == "current") {
@@ -1537,8 +1547,8 @@ cartociudad_geocode <- function(full_address, version = c("current", "prev"),
   }
 
   cat("\n")
-  results <- plyr::rbind.fill(res_list)
-  results[, c("lat", "lng")] <- apply(results[, c("lat", "lng")], 2, as.numeric)
+  results <- rbindlist(res_list, fill = TRUE)
+  results[, c("lat", "lng") := lapply(.SD, as.numeric), .SDcols = c("lat", "lng")]
   attributes(results)$rerun  <- full_address[con_out]
   return(results)
 }

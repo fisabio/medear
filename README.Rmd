@@ -13,16 +13,16 @@ knitr::opts_chunk$set(
 
 # medear
 
-El propÛsito del paquete `medear` es facilitar el trabajo con los datos utilizados en el proyecto MEDEA3, y  proporcionar las funciones con las que se obtuvieron dichos datos, asÌ como otras que simplifiquen nuestra labor.
+El prop√≥sito del paquete `medear` es facilitar el trabajo con los datos utilizados en el proyecto MEDEA3, y  proporcionar las funciones con las que se obtuvieron dichos datos, as√≠ como otras que simplifiquen nuestra labor.
 
-Concretamente, el paquete incluye los datos de poblaciÛn por sexo y grupos de edad a nivel de secciÛn censal para el periodo 1996-2016 asÌ como la cartografÌa para las ciudades implicadas en el proyecto, tambiÈn a nivel de secciÛn censal. Los datos para algunos aÒos est·n encriptados por tratarse de consultas especÌficas realizadas al INE y solo son accesibles mediante contraseÒa. Los datos desde 2004 hasta 2016 son de libre acceso siguiendo la licencia del INE, y se pueden obtener usando las funciones contenidas en este paquete.
+Concretamente, el paquete incluye los datos de poblaci√≥n por sexo y grupos de edad a nivel de secci√≥n censal para el periodo 1996-2016 as√≠ como la cartograf√≠a para las ciudades implicadas en el proyecto, tambi√©n a nivel de secci√≥n censal. Los datos para algunos a√±os est√°n encriptados por tratarse de consultas espec√≠ficas realizadas al INE y solo son accesibles mediante contrase√±a. Los datos desde 2004 hasta 2016 son de libre acceso siguiendo la licencia del INE, y se pueden obtener usando las funciones contenidas en este paquete.
 
-El paquete tambiÈn dispone de una serie de rutinas para geocodificar direcciones, de forma que no es necesario salir de `R` en ning˙n momento. En el apartado de viÒetas del paquete podr·s consultar los diversos protocolos que se vayan creando (actualmente ya est· disponible el protocolo de geocodificaciÛn.)
+El paquete tambi√©n dispone de una serie de rutinas para geocodificar direcciones, de forma que no es necesario salir de `R` en ning√∫n momento. En el apartado de vi√±etas del paquete podr√°s consultar los diversos protocolos que se vayan creando (actualmente ya est√° disponible el protocolo de geocodificaci√≥n.)
 
-Del mismo modo, y una vez ya se disponga de la mortalidad geocodificada, tambiÈn se incluye una funciÛn para la detecciÛn de agrupaciones anÛmalas de defunciones en comparaciÛn con los `n` puntos m·s prÛximos, lo que permite detectar errores sistem·ticos en la geocodificaciÛn y aborda el problema de la detecciÛn de centros residenciales.
+Del mismo modo, y una vez ya se disponga de la mortalidad geocodificada, tambi√©n se incluye una funci√≥n para la detecci√≥n de agrupaciones an√≥malas de defunciones en comparaci√≥n con los `n` puntos m√°s pr√≥ximos, lo que permite detectar errores sistem√°ticos en la geocodificaci√≥n y aborda el problema de la detecci√≥n de centros residenciales.
 
 
-## InstalaciÛn
+## Instalaci√≥n
 
 El paquete `medear` se puede instalar desde GitHub con:
 
@@ -32,7 +32,7 @@ if (!"devtools" %in% installed.packages())
 devtools::install_github("fisabio/medear", build_vignettes = TRUE)
 ```
 
-**IMPORTANTE**: si trabajas desde un ordenador conectado a la red a travÈs de un *proxy*, es muy importante que te asegures de que tu conexiÛn estÈ bien configurada. Para ello debes ejecutar esta serie de comandos (sustituyendo el texto por los valores apropiados de tu centro: pregunta al servicio de inform·tica):
+**IMPORTANTE**: si trabajas desde un ordenador conectado a la red a trav√©s de un *proxy*, es muy importante que te asegures de que tu conexi√≥n est√© bien configurada. Para ello debes ejecutar esta serie de comandos (sustituyendo el texto por los valores apropiados de tu centro: pregunta al servicio de inform√°tica):
 ```{r proxy, eval = FALSE}
 if (!"httr" %in% installed.packages())
   install.packages("httr")
@@ -48,21 +48,21 @@ httr::set_config(
 
 
 ## Otros usos del paquete
-Aunque el paquete surge como respuesta a una necesidad de un proyecto de investigaciÛn, consideramos que las herramientas pueden ser ˙tiles para todo aquel que:
+Aunque el paquete surge como respuesta a una necesidad de un proyecto de investigaci√≥n, consideramos que las herramientas pueden ser √∫tiles para todo aquel que:
 
 1. quiera extrapolar el proyecto MEDEA3 a otras ciudades,
-2. trabaje con secciones censales en un marco temporal que abarque varios aÒos,
+2. trabaje con secciones censales en un marco temporal que abarque varios a√±os,
 3. intente geocodificar direcciones y no quiera salir del entorno R,
-4. utilice poblaciones por secciÛn censal en sus c·lculos.
+4. utilice poblaciones por secci√≥n censal en sus c√°lculos.
 
-Es por ello que se ha intentado dejar bastante abiertos los argumentos de las funciones, con lo que no ser· difÌcil adaptar su uso a otros fines.
+Es por ello que se ha intentado dejar bastante abiertos los argumentos de las funciones, con lo que no ser√° dif√≠cil adaptar su uso a otros fines.
 
 
-## ParticipaciÛn: dudas y consultas
+## Participaci√≥n: dudas y consultas
 
 Para cualquier comentario, duda o consulta que se desee realizar, se puede abrir un [*Issue*](https://github.com/fisabio/medear/issues) en este repositorio de GitHub.
 
-Si deseases aportar algo al proyecto, puedes modificar el cÛdigo a tu antojo y abrir un [*Pull Request*](https://github.com/fisabio/medear/pulls) en el repositorio.
+Si deseases aportar algo al proyecto, puedes modificar el c√≥digo a tu antojo y abrir un [*Pull Request*](https://github.com/fisabio/medear/pulls) en el repositorio.
 
-Por ˙ltimo, y si quieres contactar directamente en caso de tener problemas para instalar el paquete o acerca de su uso, puedes dirigirte a Carlos Vergara en la direcciÛn de correo <vergara_car@gva.es>: Èl te orientar· acerca de los pasos a seguir.
+Por √∫ltimo, y si quieres contactar directamente en caso de tener problemas para instalar el paquete o acerca de su uso, puedes dirigirte a Carlos Vergara en la direcci√≥n de correo <vergara_car@gva.es>: √©l te orientar√° acerca de los pasos a seguir.
 

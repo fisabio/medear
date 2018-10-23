@@ -1,55 +1,55 @@
 
-#' @title Descarga los trameros del INE
+#' @title Descarga los callejeros del INE
 #'
-#' @description Descarga los trameros que ofrece al p鷅lico el INE para el a駉
-#'   2001 y desde 2004 en adelante.
+#' @description Descarga los callejeros (trameros) que ofrece al p煤blico el INE
+#'   para el a帽o 2001 y desde 2004 en adelante.
 #'
-#' @param cod_provincia Cadena de car醕teres de longitud >= 1 con el c骴igo de
+#' @param cod_provincia Cadena de car谩cteres de longitud >= 1 con el c贸digo de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
 #'   seccionado.
-#' @param years Vector num閞ico de longitud >= 2 con los a駉s para los que se
+#' @param years Vector num茅rico de longitud >= 2 con los a帽os para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param descarga Valor l骻ico: 縟ebe procederse a la descarga de los trameros?
-#' @param ruta Cadena de car醕teres indicando la ruta en la que se almacenan los
+#' @param descarga Valor l贸gico: 驴debe procederse a la descarga de los trameros?
+#' @param ruta Cadena de car谩cteres indicando la ruta en la que se almacenan los
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
-#' @param conservar Valor l骻ico: 縮e desea conservar los archivos descargados
+#' @param conservar Valor l贸gico: 驴se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.trameros/} dentro del directorio de
 #'   trabajo?
-#' @param ntries Valor num閞ico: n鷐ero de intentos en caso de mala conexi髇.
+#' @param ntries Valor num茅rico: n煤mero de intentos en caso de mala conexi贸n.
 #'
-#' @details El tiempo de ejecuci髇 de la funci髇 var韆 seg鷑 el n鷐ero de
-#'   provincias y el rango de a駉s. La forma m醩 sencilla de acelerar el proceso
-#'   de computaci髇 es mediante la ejecuci髇 en paralelo de la funci髇.
+#' @details El tiempo de ejecuci贸n de la funci贸n var铆a seg煤n el n煤mero de
+#'   provincias y el rango de a帽os. La forma m谩s sencilla de acelerar el proceso
+#'   de computaci贸n es mediante la ejecuci贸n en paralelo de la funci贸n.
 #'
-#'   Los c骴igos de secci髇 censal siguen un orden preestablecido: los primero
-#'   dos d韌itos identifican la provincia, los siguientes tres d韌itos el
-#'   municipio, los pr髕imos dos d韌itos el distrito y los 鷏timos tres d韌itos
-#'   la secci髇 censal.
+#'   Los c贸digos de secci贸n censal siguen un orden preestablecido: los primero
+#'   dos d铆gitos identifican la provincia, los siguientes tres d铆gitos el
+#'   municipio, los pr贸ximos dos d铆gitos el distrito y los 煤ltimos tres d铆gitos
+#'   la secci贸n censal.
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
 #'   c(2001, 2004:2015), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
 #'   = 10)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
-#'   \item{CPRO}{C骴igo de la provincia.} \item{CMUM}{C骴igo del municipio.}
-#'   \item{DIST}{C骴igo del distrito.} \item{SECC}{C骴igo de la secci髇 censal
-#'   reducido.} \item{CVIA}{C骴igo de la v韆 reducido.} \item{EIN}{Primer portal
-#'   del tramo de v韆 (incorpora decimales en caso de tener letra).}
-#'   \item{ESN}{趌timo portal del tramo de v韆 (incorpora decimales en caso de
-#'   tener letra).} \item{cod_upob}{C骴igo de la entidad poblacional}
+#'   \item{CPRO}{C贸digo de la provincia.} \item{CMUM}{C贸digo del municipio.}
+#'   \item{DIST}{C贸digo del distrito.} \item{SECC}{C贸digo de la secci贸n censal
+#'   reducido.} \item{CVIA}{C贸digo de la v铆a reducido.} \item{EIN}{Primer portal
+#'   del tramo de v铆a (incorpora decimales en caso de tener letra).}
+#'   \item{ESN}{脷ltimo portal del tramo de v铆a (incorpora decimales en caso de
+#'   tener letra).} \item{cod_upob}{C贸digo de la entidad poblacional}
 #'   \item{ent_colectiva}{Nombre de la entidad colectiva.}
 #'   \item{ent_singular}{Nombre de la entidad singular.}
-#'   \item{diseminado}{Nombre del n鷆leo diseminado.}
-#'   \item{NVIAC}{Nombre de la v韆.} \item{seccion}{C骴igo de la secci髇 censal
-#'   completo.} \item{year}{A駉 del tramero.} \item{via}{C骴igo de la v韆
-#'   completo (el 鷏timo d韌ito hace referencia a si el tramo de v韆 es sin
-#'   numeraci髇, impar o par (0, 1, o 2, respectivamente).}
+#'   \item{diseminado}{Nombre del n煤cleo diseminado.}
+#'   \item{NVIAC}{Nombre de la v铆a.} \item{seccion}{C贸digo de la secci贸n censal
+#'   completo.} \item{year}{A帽o del tramero.} \item{via}{C贸digo de la v铆a
+#'   completo (el 煤ltimo d铆gito hace referencia a si el tramo de v铆a es sin
+#'   numeraci贸n, impar o par (0, 1, o 2, respectivamente).}
 #'
-#'   Cada fila representa un tramo de v韆, puediendo repetirse la misma v韆 en
-#'   varias ocasiones en funci髇 de si su recorrido recae en varias secciones
-#'   censales, o si se trata de tramos de la v韆 con numeraci髇 par, impar o sin
-#'   numeraci髇 alguna.
+#'   Cada fila representa un tramo de v铆a, puediendo repetirse la misma v铆a en
+#'   varias ocasiones en funci贸n de si su recorrido recae en varias secciones
+#'   censales, o si se trata de tramos de la v铆a con numeraci贸n par, impar o sin
+#'   numeraci贸n alguna.
 #'
 #' @examples
 #' \dontrun{
@@ -215,18 +215,18 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 }
 
 
-#' @title Descarga la cartografia con el seccionado del INE para 2011
+#' @title Descarga la cartograf铆a con el seccionado del INE para 2011
 #'
-#' @description Descarga la cartograf韆 del seccionado censal ofrecida
-#'   p鷅licamente por el INE para el a駉 2011.
+#' @description Descarga la cartograf铆a del seccionado censal ofrecida
+#'   p煤blicamente por el INE para el a帽o 2011.
 #'
-#' @param epsg Vector num閞ico de longitud uno con el c骴igo EPSG del sistema de
+#' @param epsg Vector num茅rico de longitud uno con el c贸digo EPSG del sistema de
 #'   referencia de coordenadas (CRS) empleado (por defecto se usa el 4326 con
 #'   datum WGS84).
-#' @param conservar Valor l骻ico: 縮e desea conservar los archivos descargados
+#' @param conservar Valor l贸gico: 驴se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.cartografia/} dentro del directorio de
 #'   trabajo?
-#' @param ntries Valor num閞ico: n鷐ero de intentos en caso de mala conexi髇.
+#' @param ntries Valor num茅rico: n煤mero de intentos en caso de mala conexi贸n.
 #'
 #' @usage descarga_cartografia(epsg = 4326, conservar = TRUE, ntries = 10)
 #'
@@ -234,13 +234,13 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 #'   como elemento normalizado.
 #'
 #' @return Un objeto de clase \code{\link[sp]{SpatialPolygons}}, donde
-#'   cada fila es una secci髇 censal y que cuenta con 7 columnas:
-#'   \item{seccion}{Cadena de 10 car醕teres con el c骴igo de secci髇 censal
+#'   cada fila es una secci贸n censal y que cuenta con 7 columnas:
+#'   \item{seccion}{Cadena de 10 car谩cteres con el c贸digo de secci贸n censal
 #'   (incluye provincia, municipio y distrito).} \item{CUMUN}{Cadena de 5
-#'   car醕teres con el c骴igo del municipio (incluye provincia).}
-#'   \item{CCA}{Cadena de 2 car醕teres con el c骴igo de comunidad aut髇oma.}
+#'   car谩cteres con el c贸digo del municipio (incluye provincia).}
+#'   \item{CCA}{Cadena de 2 car谩cteres con el c贸digo de comunidad aut贸noma.}
 #'   \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la comunidad
-#'   aut髇oma.} \item{NMUN}{Nombre del municipio.}
+#'   aut贸noma.} \item{NMUN}{Nombre del municipio.}
 #'
 #' @examples
 #'
@@ -298,47 +298,47 @@ descarga_cartografia <- function(epsg = 4326, conservar = TRUE, ntries = 10) {
 }
 
 
-#' @title Descarga poblaciones del INE por seccion censal, sexo, edad y periodo
+#' @title Descarga poblaciones del INE por secci贸n censal, sexo, edad y a帽o
 #'
-#' @description Descarga o carga las poblaciones anuales del INE por secci髇
+#' @description Descarga o carga las poblaciones anuales del INE por secci贸n
 #'   censal, sexo y edad por grupos quinquenales (datos desde 2006 en adelante).
 #'
-#' @param cod_provincia Cadena de car醕teres de longitud >= 1 con el c骴igo de
+#' @param cod_provincia Cadena de car谩cteres de longitud >= 1 con el c贸digo de
 #'   la/s provincia/s en las que se desee obtener el listado de cambios de
 #'   seccionado.
-#' @param years Vector num閞ico de longitud >= 1 con los a駉s para los que se
+#' @param years Vector num茅rico de longitud >= 1 con los a帽os para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param descarga Valor l骻ico: 縟ebe procederse a la descarga de los datos?
-#' @param ruta Cadena de car醕teres indicando la ruta en la que se almacenan los
+#' @param descarga Valor l贸gico: 驴debe procederse a la descarga de los datos?
+#' @param ruta Cadena de car谩cteres indicando la ruta en la que se almacenan los
 #'   archivos tal cual se descargaron desde el INE, en caso de escoger
 #'   \code{descarga = FALSE}.
-#' @param conservar Valor l骻ico: 縮e desea conservar los archivos descargados
+#' @param conservar Valor l贸gico: 驴se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.poblaciones/} dentro del directorio de
 #'   trabajo?
-#' @param ntries Valor num閞ico: n鷐ero de intentos en caso de mala conexi髇.
+#' @param ntries Valor num茅rico: n煤mero de intentos en caso de mala conexi贸n.
 #'
-#' @details El tiempo de ejecuci髇 de la funci髇 var韆 seg鷑 el n鷐ero de
-#'   provincias y el rango de a駉s. La forma m醩 sencilla de acelerar el proceso
-#'   de computaci髇 es mediante la ejecuci髇 en paralelo de la funci髇.
+#' @details El tiempo de ejecuci贸n de la funci贸n var铆a seg煤n el n煤mero de
+#'   provincias y el rango de a帽os. La forma m谩s sencilla de acelerar el proceso
+#'   de computaci贸n es mediante la ejecuci贸n en paralelo de la funci贸n.
 #'
-#'   Los c骴igos de secci髇 censal siguen un orden preestablecido: los primeros
-#'   dos d韌itos identifican la provincia, los siguientes tres d韌itos el
-#'   municipio, los pr髕imos dos d韌itos el distrito y los 鷏timos tres a la
-#'   secci髇 censal.
+#'   Los c贸digos de secci贸n censal siguen un orden preestablecido: los primeros
+#'   dos d铆gitos identifican la provincia, los siguientes tres d铆gitos el
+#'   municipio, los pr贸ximos dos d铆gitos el distrito y los 煤ltimos tres a la
+#'   secci贸n censal.
 #'
-#'   Hasta el a駉 2011 el INE agrupa la 鷏tima categor韆 de edad como 85 y m醩,
-#'   mientras que desde el a駉 siguiente llega hasta 100 y m醩.
+#'   Hasta el a帽o 2011 el INE agrupa la 煤ltima categor铆a de edad como 85 y m谩s,
+#'   mientras que desde el a帽o siguiente llega hasta 100 y m谩s.
 #'
 #'   Si se desea acceder a las poblaciones desde 1996 (datos adquiridos al INE),
-#'   se debe utilizar la funci髇 \code{\link{carga_datos}}.
+#'   se debe utilizar la funci贸n \code{\link{carga_datos}}.
 #'
 #' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
 #'   = 2006:2015, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries = 10)
 #'
 #' @return Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
-#'   \item{seccion}{C骴igo de la secci髇 censal.} \item{sexo}{Codificado como 0
-#'   para hombres y 1 para mujeres.} \item{year}{A駉 al que se hace referencia.}
+#'   \item{seccion}{C贸digo de la secci贸n censal.} \item{sexo}{Codificado como 0
+#'   para hombres y 1 para mujeres.} \item{year}{A帽o al que se hace referencia.}
 #'   El resto de columnas representan los distintos grupos de edad.
 #'
 #' @examples
