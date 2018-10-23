@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{cartografia}
 \alias{cartografia}
-\title{Cartografia por seccion censal para las ciudades MEDEA3}
+\title{Cartografía por sección censal para las ciudades MEDEA3}
 \format{Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
   (\code{cartografia@data}) tienen clase \code{data.frame} y
   \code{cartografia_ine}, donde cada fila es una sección censal y que cuenta

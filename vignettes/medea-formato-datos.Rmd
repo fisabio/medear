@@ -11,56 +11,56 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-# IntroducciÛn
+# Introducci√≥n
 
-Este documento describe el formato en el que cada uno de los grupos deberÌa estructurar la informaciÛn del proyecto MEDEA3 para su transmisiÛn al nodo coordinador. De esta forma se pretende que el formato de la informaciÛn manejada, y transmitida, por todos los grupos sea completamente equivalente y por tanto el tratamiento estadÌstico que se le habrÌa de dar.
+Este documento describe el formato en el que cada uno de los grupos deber√≠a estructurar la informaci√≥n del proyecto MEDEA3 para su transmisi√≥n al nodo coordinador. De esta forma se pretende que el formato de la informaci√≥n manejada, y transmitida, por todos los grupos sea completamente equivalente y por tanto el tratamiento estad√≠stico que se le habr√≠a de dar.
 
-Cabe mencionar que el paquete `medear`, creado para dar cobertura al proyecto MEDEA3 en el entorno estadÌstico `R`, dispone de forma interna de:
+Cabe mencionar que el paquete `medear`, creado para dar cobertura al proyecto MEDEA3 en el entorno estad√≠stico `R`, dispone de forma interna de:
 
-* Los datos de poblaciones por edad, sexo, aÒo y secciÛn censal para todas las ciudades MEDEA3 en todo el perÌodo de estudio (1996-2015). Cabe seÒalar que para cada aÒo y ciudad el n˙mero de secciones censales puede cambiar por redefiniciÛn del seccionado censal. Como veremos, las utilidades del paquete MEDEA unificar·n dichas secciones a un entramado com˙n y modificar·n los datos de poblaciones adecu·ndolos a dicho entramado.
+* Los datos de poblaciones por edad, sexo, a√±o y secci√≥n censal para todas las ciudades MEDEA3 en todo el per√≠odo de estudio (1996-2015). Cabe se√±alar que para cada a√±o y ciudad el n√∫mero de secciones censales puede cambiar por redefinici√≥n del seccionado censal. Como veremos, las utilidades del paquete MEDEA unificar√°n dichas secciones a un entramado com√∫n y modificar√°n los datos de poblaciones adecu√°ndolos a dicho entramado.
 
-* La cartografÌa del seccionado censal para el aÒo 2011 para cada ciudad del proyecto (Fuente INE). Hemos considerado 2011 como aÒo de referencia dada su coincidencia con uno de los censos que manejamos. La funciÛn de modificaciÛn del seccionado censal propondr· una serie de uniones de esta cartografÌa, siendo la cartografÌa final una modificaciÛn (agregaciÛn) de la del aÒo 2011.
+* La cartograf√≠a del seccionado censal para el a√±o 2011 para cada ciudad del proyecto (Fuente INE). Hemos considerado 2011 como a√±o de referencia dada su coincidencia con uno de los censos que manejamos. La funci√≥n de modificaci√≥n del seccionado censal propondr√° una serie de uniones de esta cartograf√≠a, siendo la cartograf√≠a final una modificaci√≥n (agregaci√≥n) de la del a√±o 2011.
 
-* Aunque en la versiÛn actual del paquete todavÌa no se ha integrado, se pretende incluir en un futuro la informaciÛn socioeconÛmica de los censos de 2001 y 2011. Para esta informaciÛn ocurrir· tambiÈn que el n˙mero de secciones censales de ambos censos no coincidir· pero el propio paquete, mediante sus funciones, proporcionar· la informaciÛn de ambos censos seg˙n un seccionado unificado para ambos aÒos.
+* Aunque en la versi√≥n actual del paquete todav√≠a no se ha integrado, se pretende incluir en un futuro la informaci√≥n socioecon√≥mica de los censos de 2001 y 2011. Para esta informaci√≥n ocurrir√° tambi√©n que el n√∫mero de secciones censales de ambos censos no coincidir√° pero el propio paquete, mediante sus funciones, proporcionar√° la informaci√≥n de ambos censos seg√∫n un seccionado unificado para ambos a√±os.
 
-Asimismo, el paquete tambiÈn incorpora la funciÛn `une_secciones`, que se encarga de realizar las uniones de seccionado de las que hemos estado hablando. La base de informaciÛn de esa funciÛn son los callejeros que proporciona el INE para los distintos aÒos de estudio. Para el aÒo 1996 ha sido necesario adquirir dicho archivo. Estos callejeros proporcionan la secciÛn censal de cada tramo de vÌa para cada aÒo de estudio y asÌ, cruzando la informaciÛn de los distintos aÒos, podremos identificar quÈ tramos han cambiado de secciÛn y entre quÈ secciones. De esta forma identificamos las secciones censales que se solapan en el tiempo. Adicionalmente, adem·s de determinar quÈ secciones censales habrÌan de ser unidas para garantizar la estabilidad temporal de estas agrupaciones, `une_secciones` tambiÈn prepara la cartografÌa unificada, los datos de poblaciÛn y mortalidad (y en un futuro la informaciÛn socioeconÛmica) seg˙n el formato com˙n requerido. Por tanto, aconsejamos el uso de `une_secciones` para generar la informaciÛn en el formato unificado del proyecto, se haya seguido o no su protocolo de geocodificaciÛn.
+Asimismo, el paquete tambi√©n incorpora la funci√≥n `une_secciones`, que se encarga de realizar las uniones de seccionado de las que hemos estado hablando. La base de informaci√≥n de esa funci√≥n son los callejeros que proporciona el INE para los distintos a√±os de estudio. Para el a√±o 1996 ha sido necesario adquirir dicho archivo. Estos callejeros proporcionan la secci√≥n censal de cada tramo de v√≠a para cada a√±o de estudio y as√≠, cruzando la informaci√≥n de los distintos a√±os, podremos identificar qu√© tramos han cambiado de secci√≥n y entre qu√© secciones. De esta forma identificamos las secciones censales que se solapan en el tiempo. Adicionalmente, adem√°s de determinar qu√© secciones censales habr√≠an de ser unidas para garantizar la estabilidad temporal de estas agrupaciones, `une_secciones` tambi√©n prepara la cartograf√≠a unificada, los datos de poblaci√≥n y mortalidad (y en un futuro la informaci√≥n socioecon√≥mica) seg√∫n el formato com√∫n requerido. Por tanto, aconsejamos el uso de `une_secciones` para generar la informaci√≥n en el formato unificado del proyecto, se haya seguido o no su protocolo de geocodificaci√≥n.
 
-En este sentido, el documento de aquÌ en adelante se divide en dos secciones adicionales. La segunda secciÛn describe con cierto detalle el formato que deberÌan tener los datos para ser transmitidos al nodo coordinador. Esta secciÛn ser· de utilidad para aquellos nodos que no hayan seguido el protocolo de geocodificaciÛn del proyecto y quiz· tengan que adaptar su informaciÛn a la del resto del proyecto de forma m·s manual. Aquellos nodos que han seguido el protocolo de geocodificaciÛn del proyecto para geocodificar las defunciones de sus ciudades, pueden pasar directamente a la tercera secciÛn de este documento, en la que se describe, ciudad por ciudad, la sintaxis que se deberÌa ejecutar para obtener la informaciÛn de sus ciudades seg˙n los requerimientos unificados del proyecto. Para aquellos nodos que no hayan seguido el protocolo de geocodificaciÛn la tercera parte del documento describe cÛmo creemos, desde el nodo coordinador, que deberÌan proceder para estructurar sus datos de acuerdo con el resto del proyecto.
+En este sentido, el documento de aqu√≠ en adelante se divide en dos secciones adicionales. La segunda secci√≥n describe con cierto detalle el formato que deber√≠an tener los datos para ser transmitidos al nodo coordinador. Esta secci√≥n ser√° de utilidad para aquellos nodos que no hayan seguido el protocolo de geocodificaci√≥n del proyecto y quiz√° tengan que adaptar su informaci√≥n a la del resto del proyecto de forma m√°s manual. Aquellos nodos que han seguido el protocolo de geocodificaci√≥n del proyecto para geocodificar las defunciones de sus ciudades, pueden pasar directamente a la tercera secci√≥n de este documento, en la que se describe, ciudad por ciudad, la sintaxis que se deber√≠a ejecutar para obtener la informaci√≥n de sus ciudades seg√∫n los requerimientos unificados del proyecto. Para aquellos nodos que no hayan seguido el protocolo de geocodificaci√≥n la tercera parte del documento describe c√≥mo creemos, desde el nodo coordinador, que deber√≠an proceder para estructurar sus datos de acuerdo con el resto del proyecto.
 
 # Formato de las bases de datos
 
-A continuaciÛn detallamos el formato en el que se deberÌa estructurar la informaciÛn para transmitirla al nodo coordinador. Notar que el presente documento lleva adjunto, a modo de ejemplo, la informaciÛn estructurada, tal y como se describe a continuaciÛn, para la ciudad de CastellÛn (archivo `castellon.RData`), con la informaciÛn de mortalidad censurada (todos los datos son valores perdidos). De esta forma cualquier grupo interesado podr· consultar con detalle el formato exacto que se espera de cada ciudad y adaptar su informaciÛn a dicho formato.
+A continuaci√≥n detallamos el formato en el que se deber√≠a estructurar la informaci√≥n para transmitirla al nodo coordinador. Notar que el presente documento lleva adjunto, a modo de ejemplo, la informaci√≥n estructurada, tal y como se describe a continuaci√≥n, para la ciudad de Castell√≥n (archivo `castellon.RData`), con la informaci√≥n de mortalidad censurada (todos los datos son valores perdidos). De esta forma cualquier grupo interesado podr√° consultar con detalle el formato exacto que se espera de cada ciudad y adaptar su informaci√≥n a dicho formato.
 
-En resumen, para cada ciudad los datos se guardar·n en un objeto de clase lista dentro de un archivo `.RData` (propio de `R`) cuyo contenido ser·:
+En resumen, para cada ciudad los datos se guardar√°n en un objeto de clase lista dentro de un archivo `.RData` (propio de `R`) cuyo contenido ser√°:
 
-* Objeto `cartografia`: contiene la cartografÌa correspondiente a la uniÛn de secciones censales que conducen a una agrupaciÛn de secciones temporalmente estable. En caso de no agregar ninguna secciÛn censal (p. ej., al disponer de informaciÛn de poblaciones a nivel puntual), la cartografÌa de 2011 sin ninguna modificaciÛn serÌa perfectamente v·lida. En ese caso se podrÌa hacer uso de la funciÛn `une_secciones`, limitando el n˙mero de aÒos para realizar la uniÛn del seccionado a simplemente el aÒo 2011 (argumento: `years_union = 2011`), con lo que no se llevar· a cabo ninguna uniÛn sobre el seccionado de 2011.
+* Objeto `cartografia`: contiene la cartograf√≠a correspondiente a la uni√≥n de secciones censales que conducen a una agrupaci√≥n de secciones temporalmente estable. En caso de no agregar ninguna secci√≥n censal (p. ej., al disponer de informaci√≥n de poblaciones a nivel puntual), la cartograf√≠a de 2011 sin ninguna modificaci√≥n ser√≠a perfectamente v√°lida. En ese caso se podr√≠a hacer uso de la funci√≥n `une_secciones`, limitando el n√∫mero de a√±os para realizar la uni√≥n del seccionado a simplemente el a√±o 2011 (argumento: `years_union = 2011`), con lo que no se llevar√° a cabo ninguna uni√≥n sobre el seccionado de 2011.
 
-* Objeto `poblacion`: `array` 4-dimensional de dimensiones (en este orden): AÒo (20 niveles), Sexo (2 niveles), Edad (18 niveles) y Secciones (n˙mero de niveles depende de la ciudad). Cada una de las celdas contiene la poblaciÛn correspondiente a cada una de estas combinaciones de factores. En el archivo `castellon.RData` adjunto se puede consultar las etiquetas de las dimensiones del `array` generadas por `une_secciones`. El `array` de poblaciones para todas las ciudades deberÌa tener esas mismas etiquetas, salvo obviamente las relativas a las secciones censales que variar·n de ciudad en ciudad. Notar que el `array` de poblaciones, incluye las secciones censales resultantes del proceso de agregaciÛn que se ha llevado a cabo en la cartografÌa. Por tanto, cartografÌa y poblaciones (para todos los aÒos del periodo de estudio) ser·n coherentes en este sentido.
+* Objeto `poblacion`: `array` 4-dimensional de dimensiones (en este orden): A√±o (20 niveles), Sexo (2 niveles), Edad (18 niveles) y Secciones (n√∫mero de niveles depende de la ciudad). Cada una de las celdas contiene la poblaci√≥n correspondiente a cada una de estas combinaciones de factores. En el archivo `castellon.RData` adjunto se puede consultar las etiquetas de las dimensiones del `array` generadas por `une_secciones`. El `array` de poblaciones para todas las ciudades deber√≠a tener esas mismas etiquetas, salvo obviamente las relativas a las secciones censales que variar√°n de ciudad en ciudad. Notar que el `array` de poblaciones, incluye las secciones censales resultantes del proceso de agregaci√≥n que se ha llevado a cabo en la cartograf√≠a. Por tanto, cartograf√≠a y poblaciones (para todos los a√±os del periodo de estudio) ser√°n coherentes en este sentido.
 
-* Objeto `mortalidad`: `array` 5-dimensional. Las cuatro primeras dimensiones de este `array` serÌan las mismas que las del `array` de poblaciones. La quinta dimensiÛn identifica las causas de mortalidad que se acordaron como objetivos generales del proyecto. Dichas causas de mortalidad, asÌ como su definiciÛn, vienen reflejadas en la Tabla 1. Nuevamente, las etiquetas de las causas de muerte se pueden consultar en el objeto correspondiente al `array` de mortalidad del archivo `castellon.RData`.  
+* Objeto `mortalidad`: `array` 5-dimensional. Las cuatro primeras dimensiones de este `array` ser√≠an las mismas que las del `array` de poblaciones. La quinta dimensi√≥n identifica las causas de mortalidad que se acordaron como objetivos generales del proyecto. Dichas causas de mortalidad, as√≠ como su definici√≥n, vienen reflejadas en la Tabla 1. Nuevamente, las etiquetas de las causas de muerte se pueden consultar en el objeto correspondiente al `array` de mortalidad del archivo `castellon.RData`.  
 
-* Objeto `socio`: Actualmente no implementado en la funciÛn `une_secciones` dado que nos disponemos de la informaciÛn correspondiente. En cualquier caso se prevÈ que este objeto sea un `array` de dimensiones: AÒo (2 niveles: 2001 y 2011), Secciones (n˙mero de niveles depende de la ciudad) y Variables SocioeconÛmicas (7 niveles seg˙n dijimos en la ˙ltima reuniÛn). Por ahora no es necesario que os preocupÈis de esta parte de la informaciÛn requerida: cuando tengamos la informaciÛn socioeconÛmica os daremos informaciÛn m·s detallada sobre este objeto.
+* Objeto `socio`: Actualmente no implementado en la funci√≥n `une_secciones` dado que nos disponemos de la informaci√≥n correspondiente. En cualquier caso se prev√© que este objeto sea un `array` de dimensiones: A√±o (2 niveles: 2001 y 2011), Secciones (n√∫mero de niveles depende de la ciudad) y Variables Socioecon√≥micas (7 niveles seg√∫n dijimos en la √∫ltima reuni√≥n). Por ahora no es necesario que os preocup√©is de esta parte de la informaci√≥n requerida: cuando tengamos la informaci√≥n socioecon√≥mica os daremos informaci√≥n m√°s detallada sobre este objeto.
 
-Para aquellos nodos que no vayan a agregar ninguna secciÛn censal para el periodo de estudio, aconsejamos lo siguiente: 
+Para aquellos nodos que no vayan a agregar ninguna secci√≥n censal para el periodo de estudio, aconsejamos lo siguiente:
 
-1. Ejecutar la funciÛn `une_secciones` delimitando el periodo de uniÛn de cartografÌa al aÒo 2011 como hemos sugerido anteriormente (argumento: `years_union = 2011`). Esto generar· la lista correspondiente con la cartografÌa adecuada (aÒo 2011 sin ninguna uniÛn entre secciones) y el `array` de mortalidad correspondiente a dicho seccionado. Adem·s, el resto de elementos de la lista que hemos generado ya tendr·n el formato final adecuado para su transmisiÛn al nodo coordinador.
+1. Ejecutar la funci√≥n `une_secciones` delimitando el periodo de uni√≥n de cartograf√≠a al a√±o 2011 como hemos sugerido anteriormente (argumento: `years_union = 2011`). Esto generar√° la lista correspondiente con la cartograf√≠a adecuada (a√±o 2011 sin ninguna uni√≥n entre secciones) y el `array` de mortalidad correspondiente a dicho seccionado. Adem√°s, el resto de elementos de la lista que hemos generado ya tendr√°n el formato final adecuado para su transmisi√≥n al nodo coordinador.
 
-2. La informaciÛn sobre poblaciÛn (y en un futuro sobre la informaciÛn socioeconÛmica) generada en el paso anterior estar· vacÌa si el periodo de extracciÛn de la informaciÛn es distinto al periodo de agregaciÛn de secciones censales. En ese caso, esa informaciÛn deberÌa ser completada con la informaciÛn disponible por cada nodo en la que se convierte la informaciÛn puntual de cada aÒo para poblaciones (y socioeconÛmica) al entramado censal del aÒo 2011. Es muy aconsejable que se mantenga el formato del `array` de poblaciÛn (y en su caso socioeconÛmico) generado en el paso anterior.
+2. La informaci√≥n sobre poblaci√≥n (y en un futuro sobre la informaci√≥n socioecon√≥mica) generada en el paso anterior estar√° vac√≠a si el periodo de extracci√≥n de la informaci√≥n es distinto al periodo de agregaci√≥n de secciones censales. En ese caso, esa informaci√≥n deber√≠a ser completada con la informaci√≥n disponible por cada nodo en la que se convierte la informaci√≥n puntual de cada a√±o para poblaciones (y socioecon√≥mica) al entramado censal del a√±o 2011. Es muy aconsejable que se mantenga el formato del `array` de poblaci√≥n (y en su caso socioecon√≥mico) generado en el paso anterior.
 
-El primer paso de estos dos ser· descrito para cada ciudad en el siguiente apartado mientras que el segundo ser· labor propia de cada nodo que tenga que llevarlo a cabo. Los grupos que hayan seguido el protocolo de geocodificaciÛn en ning˙n caso ser· necesario que ejecuten el segundo paso.
+El primer paso de estos dos ser√° descrito para cada ciudad en el siguiente apartado mientras que el segundo ser√° labor propia de cada nodo que tenga que llevarlo a cabo. Los grupos que hayan seguido el protocolo de geocodificaci√≥n en ning√∫n caso ser√° necesario que ejecuten el segundo paso.
 
-AgradecerÌamos que nos hicierais llegar la informaciÛn de vuestras ciudades exactamente en el formato descrito al inicio de este apartado. Si por alg˙n motivo encontrarais problem·tico generar la informaciÛn en ese formato poneros por favor en contacto con Carlos Vergara (vergara_car@gva.es) para que valoremos, si es posible, alg˙n formato paralelo para transmitirnos la informaciÛn.
+Agradecer√≠amos que nos hicierais llegar la informaci√≥n de vuestras ciudades exactamente en el formato descrito al inicio de este apartado. Si por alg√∫n motivo encontrarais problem√°tico generar la informaci√≥n en ese formato poneros por favor en contacto con Carlos Vergara (vergara_car@gva.es) para que valoremos, si es posible, alg√∫n formato paralelo para transmitirnos la informaci√≥n.
 
 
 <table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 11px; margin-left: auto; margin-right: auto;">
-<caption style="font-size: initial !important;">Tabla 1: Causas de defunciÛn consideradas en MEDEA3 (criterios de selecciÛn de causas tal y como fueron definidos, y transmitidos al nodo coordinador, por Lluis Cirera).</caption>
+<caption style="font-size: initial !important;">Tabla 1: Causas de defunci√≥n consideradas en MEDEA3 (criterios de selecci√≥n de causas tal y como fueron definidos, y transmitidos al nodo coordinador, por Lluis Cirera).</caption>
  <thead>
   <tr>
    <th style="text-align:left;font-weight: bold;font-size: 14px;"> Causa </th>
    <th style="text-align:left;font-weight: bold;font-size: 14px;"> Causa abreviada </th>
    <th style="text-align:left;font-weight: bold;font-size: 14px;"> Short term </th>
-   <th style="text-align:center;font-weight: bold;font-size: 14px;"> CÛdigos CIE-9 </th>
-   <th style="text-align:center;font-weight: bold;font-size: 14px;"> CÛdigos CIE-10 </th>
+   <th style="text-align:center;font-weight: bold;font-size: 14px;"> C√≥digos CIE-9 </th>
+   <th style="text-align:center;font-weight: bold;font-size: 14px;"> C√≥digos CIE-10 </th>
   </tr>
  </thead>
 <tbody>
@@ -72,71 +72,71 @@ AgradecerÌamos que nos hicierais llegar la informaciÛn de vuestras ciudades exac
    <td style="text-align:center;"> B20-B24 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Tumor maligno del estÛmago</span> </td>
-   <td style="text-align:left;"> C·ncer del estÛmago </td>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno del est√≥mago</span> </td>
+   <td style="text-align:left;"> C√°ncer del est√≥mago </td>
    <td style="text-align:left;"> Gastric cancer </td>
    <td style="text-align:center;"> 151 </td>
    <td style="text-align:center;"> C16 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> <span style="     ">Tumor maligno del colon</span> </td>
-   <td style="text-align:left;"> C·ncer de colon </td>
+   <td style="text-align:left;"> C√°ncer de colon </td>
    <td style="text-align:left;"> Colon cancer </td>
    <td style="text-align:center;"> 153 </td>
    <td style="text-align:center;"> C18 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> <span style="     ">Tumor maligno de recto, sigmoide y ano</span> </td>
-   <td style="text-align:left;"> C·ncer de recto </td>
+   <td style="text-align:left;"> C√°ncer de recto </td>
    <td style="text-align:left;"> Rectal cancer </td>
    <td style="text-align:center;"> 154 </td>
    <td style="text-align:center;"> C19-21 </td>
   </tr>
   <tr>
-   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">AgrupaciÛn</span> </td>
-   <td style="text-align:left;"> C·ncer colorrectal </td>
+   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupaci√≥n</span> </td>
+   <td style="text-align:left;"> C√°ncer colorrectal </td>
    <td style="text-align:left;"> Colorectal cancer </td>
    <td style="text-align:center;"> 153-154 </td>
    <td style="text-align:center;"> C18-C21 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> <span style="     ">Tumor maligno de laringe</span> </td>
-   <td style="text-align:left;"> C·ncer de laringe </td>
+   <td style="text-align:left;"> C√°ncer de laringe </td>
    <td style="text-align:left;"> Laryngeal cancer </td>
    <td style="text-align:center;"> 161 </td>
    <td style="text-align:center;"> C32 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Tumor maligno de tr·quea, bronquios y pulmÛn</span> </td>
-   <td style="text-align:left;"> C·ncer de pulmÛn </td>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de tr√°quea, bronquios y pulm√≥n</span> </td>
+   <td style="text-align:left;"> C√°ncer de pulm√≥n </td>
    <td style="text-align:left;"> Lung cancer </td>
    <td style="text-align:center;"> 162 </td>
    <td style="text-align:center;"> C33-34 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> <span style="     ">Tumor maligno de mama femenino</span> </td>
-   <td style="text-align:left;"> C·ncer de mama (mujer) </td>
+   <td style="text-align:left;"> C√°ncer de mama (mujer) </td>
    <td style="text-align:left;"> Brest cancer (woman) </td>
    <td style="text-align:center;"> 174 </td>
    <td style="text-align:center;"> C50 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Tumor maligno de prÛstata</span> </td>
-   <td style="text-align:left;"> C·ncer de prÛstata </td>
+   <td style="text-align:left;"> <span style="     ">Tumor maligno de pr√≥stata</span> </td>
+   <td style="text-align:left;"> C√°ncer de pr√≥stata </td>
    <td style="text-align:left;"> Prostate cancer </td>
    <td style="text-align:center;"> 185 </td>
    <td style="text-align:center;"> C61 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> <span style="     ">Tumor maligno de vejiga</span> </td>
-   <td style="text-align:left;"> C·ncer de vejiga </td>
+   <td style="text-align:left;"> C√°ncer de vejiga </td>
    <td style="text-align:left;"> Bladder cancer </td>
    <td style="text-align:center;"> 188 </td>
    <td style="text-align:center;"> C67 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Tumores hematolÛgicos malignos</span> </td>
-   <td style="text-align:left;"> C·ncer hematolÛgico </td>
+   <td style="text-align:left;"> <span style="     ">Tumores hematol√≥gicos malignos</span> </td>
+   <td style="text-align:left;"> C√°ncer hematol√≥gico </td>
    <td style="text-align:left;"> Hematologic cancer<sup>*</sup> </td>
    <td style="text-align:center;"> 200-208, 273.3 </td>
    <td style="text-align:center;"> C81-C96 </td>
@@ -149,8 +149,8 @@ AgradecerÌamos que nos hicierais llegar la informaciÛn de vuestras ciudades exac
    <td style="text-align:center;"> E10-E14 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Trastornos mentales org·nicos, senil y presenil</span> </td>
-   <td style="text-align:left;"> Trastornos mentales org·nicos </td>
+   <td style="text-align:left;"> <span style="     ">Trastornos mentales org√°nicos, senil y presenil</span> </td>
+   <td style="text-align:left;"> Trastornos mentales org√°nicos </td>
    <td style="text-align:left;"> Organic mental disorders </td>
    <td style="text-align:center;"> 290 (excepto 290.1) </td>
    <td style="text-align:center;"> F00-F09 </td>
@@ -163,15 +163,15 @@ AgradecerÌamos que nos hicierais llegar la informaciÛn de vuestras ciudades exac
    <td style="text-align:center;"> G30 </td>
   </tr>
   <tr>
-   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">AgrupaciÛn</span> </td>
+   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupaci√≥n</span> </td>
    <td style="text-align:left;"> Demencia </td>
    <td style="text-align:left;"> Dementia </td>
    <td style="text-align:center;"> 290, 331.0 </td>
    <td style="text-align:center;"> F00-F09, G30 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Enfermedad isquÈmica del corazÛn</span> </td>
-   <td style="text-align:left;"> Enfermedad isquÈmica del corazÛn </td>
+   <td style="text-align:left;"> <span style="     ">Enfermedad isqu√©mica del coraz√≥n</span> </td>
+   <td style="text-align:left;"> Enfermedad isqu√©mica del coraz√≥n </td>
    <td style="text-align:left;"> Ischemic heart disease<sup>&#8224;</sup> </td>
    <td style="text-align:center;"> 410-414 </td>
    <td style="text-align:center;"> I20-I25 </td>
@@ -184,15 +184,15 @@ AgradecerÌamos que nos hicierais llegar la informaciÛn de vuestras ciudades exac
    <td style="text-align:center;"> I60-I69 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Enfermedad pulmonar obstructiva crÛnica</span> </td>
+   <td style="text-align:left;"> <span style="     ">Enfermedad pulmonar obstructiva cr√≥nica</span> </td>
    <td style="text-align:left;"> EPOC </td>
    <td style="text-align:left;"> COPD </td>
    <td style="text-align:center;"> 490-492, 494-496 </td>
    <td style="text-align:center;"> J40-J44, J47 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Cirrosis y enfermedades crÛnicas del hÌgado</span> </td>
-   <td style="text-align:left;"> Cirrosis del hÌgado </td>
+   <td style="text-align:left;"> <span style="     ">Cirrosis y enfermedades cr√≥nicas del h√≠gado</span> </td>
+   <td style="text-align:left;"> Cirrosis del h√≠gado </td>
    <td style="text-align:left;"> Liver cirrhosis </td>
    <td style="text-align:center;"> 571 </td>
    <td style="text-align:center;"> K70, K72.1, K73, K74, K76.1.9 </td>
@@ -205,14 +205,14 @@ AgradecerÌamos que nos hicierais llegar la informaciÛn de vuestras ciudades exac
    <td style="text-align:center;"> X60-X84 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> <span style="     ">Lesiones por accidentes de tr·fico de vehÌculos de motor</span> </td>
-   <td style="text-align:left;"> Accidentes de tr·fico </td>
+   <td style="text-align:left;"> <span style="     ">Lesiones por accidentes de tr√°fico de veh√≠culos de motor</span> </td>
+   <td style="text-align:left;"> Accidentes de tr√°fico </td>
    <td style="text-align:left;"> Traffic accident </td>
    <td style="text-align:center;"> <sup>&#8225;</sup> </td>
    <td style="text-align:center;"> E810-E819 </td>
   </tr>
   <tr>
-   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">AgrupaciÛn</span> </td>
+   <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupaci√≥n</span> </td>
    <td style="text-align:left;"> Todas las causas </td>
    <td style="text-align:left;"> All causes </td>
    <td style="text-align:center;"> 000-E999 </td>
@@ -225,52 +225,52 @@ AgradecerÌamos que nos hicierais llegar la informaciÛn de vuestras ciudades exac
 <tr><td style="padding: 0; border: 0;" colspan="100%">
 <sup>&#8224;</sup> Ischaemic heart disease in Br. English.</td></tr>
 <tr><td style="padding: 0; border: 0;" colspan="100%">
-<sup>&#8225;</sup> CÛdigos: V02-V04(.1.9), V09(.2.3), V12-V14.(3.4.5.9), V19(.4.5.6.9), V20-V28(.3.4.5.9), V29(.4.5.6.9), V20-V28(.3.4.5.7.9), V29(.4.5.6.9), V30-V38(.3.4.5.7.9), V39(.4.5.6.9), V40-V48(.3.4.5.7.9), V49(.4.5.6.9), V50-V58(.3.4.5.7.9), V59(.4.5.6.9), V60-V68(.3.4.5.7.9), V69(.4.5.6.9), V70-V78(.3.4.5.7.9), V79(.4.5.6.9), V80(.3.4.5), V81-V82(.1), V83-V86(.0.1.2.3), V87(.0.1.2.3.4.5.6.7.8), V89(.2.9).</td></tr>
+<sup>&#8225;</sup> C√≥digos: V02-V04(.1.9), V09(.2.3), V12-V14.(3.4.5.9), V19(.4.5.6.9), V20-V28(.3.4.5.9), V29(.4.5.6.9), V20-V28(.3.4.5.7.9), V29(.4.5.6.9), V30-V38(.3.4.5.7.9), V39(.4.5.6.9), V40-V48(.3.4.5.7.9), V49(.4.5.6.9), V50-V58(.3.4.5.7.9), V59(.4.5.6.9), V60-V68(.3.4.5.7.9), V69(.4.5.6.9), V70-V78(.3.4.5.7.9), V79(.4.5.6.9), V80(.3.4.5), V81-V82(.1), V83-V86(.0.1.2.3), V87(.0.1.2.3.4.5.6.7.8), V89(.2.9).</td></tr>
 </tfoot>
 </table>
 
 
-# GeneraciÛn de la informaciÛn del proyecto mediante `medear`
+# Generaci√≥n de la informaci√≥n del proyecto mediante `medear`
 
 
-## Com˙n a todos los grupos
+## Com√∫n a todos los grupos
 
-En primer lugar deberÌamos asegurarnos de disponer de la ˙ltima versiÛn del paquete `medear`, y cargarla. Para ello deberÌamos hacer:
+En primer lugar deber√≠amos asegurarnos de disponer de la √∫ltima versi√≥n del paquete `medear`, y cargarla. Para ello deber√≠amos hacer:
 ```{r inicial, eval=FALSE}
 if (!"devtools" %in% installed.packages()) install.packages("devtools")
 devtools::install_github("fisabio/medear", build_vignettes = TRUE)
 library(medear)
 ```
 
-Adicionalmente, deberÌamos cargar los datos de cambios de secciones censales, la cartografÌa que viene junto con el paquete y los datos de poblaciones. Estos ˙ltimos se cargar·n con la funciÛn `carga_datos`. Esta funciÛn debe llevar como argumento la contraseÒa que da acceso a los datos de poblaciones (de los aÒos 1996-2003), si no no podremos disponer de dicha informaciÛn (parcialmente de pago y por tanto protegida). En un futuro `carga_datos` tambiÈn dar· acceso a la informaciÛn (protegida) socioeconÛmica del proyecto.
+Adicionalmente, deber√≠amos cargar los datos de cambios de secciones censales, la cartograf√≠a que viene junto con el paquete y los datos de poblaciones. Estos √∫ltimos se cargar√°n con la funci√≥n `carga_datos`. Esta funci√≥n debe llevar como argumento la contrase√±a que da acceso a los datos de poblaciones (de los a√±os 1996-2003), si no no podremos disponer de dicha informaci√≥n (parcialmente de pago y por tanto protegida). En un futuro `carga_datos` tambi√©n dar√° acceso a la informaci√≥n (protegida) socioecon√≥mica del proyecto.
 
 ```{r inicial2, eval=FALSE}
 data("cambios_seccion")
 data("cartografia")
 poblacion <- carga_datos("XXXXX")
 ```
-En la ˙ltima sentencia XXXXX se habr· de sustituir por la contraseÒa que da acceso a dicha informaciÛn y que podÈis conocer poniÈndoos en contacto con Carlos Vergara (vergara_car@gva.es). 
+En la √∫ltima sentencia XXXXX se habr√° de sustituir por la contrase√±a que da acceso a dicha informaci√≥n y que pod√©is conocer poni√©ndoos en contacto con Carlos Vergara (vergara_car@gva.es).
 
-Finalmente, habr· que cargar la informaciÛn individual de mortalidad geocodificada que, en caso de haber seguido el protocolo de geocodificaciÛn, se encontrar· en el directorio de trabajo en un archivo denominado `mortalidad_geocodificada.RData` (habr· que ajustar su nombre en caso contrario). 
+Finalmente, habr√° que cargar la informaci√≥n individual de mortalidad geocodificada que, en caso de haber seguido el protocolo de geocodificaci√≥n, se encontrar√° en el directorio de trabajo en un archivo denominado `mortalidad_geocodificada.RData` (habr√° que ajustar su nombre en caso contrario).
 ```{r carga_mort, eval = FALSE}
 load("mortalidad_geocodificada.RData")
 ```
-En principio, este archivo deberÌa contener la informaciÛn de todas las ciudades MEDEA3 correspondientes a cada grupo, o incluso m·s defunciones si se hubiera geocodificado la mortalidad de toda la comunidad autÛnoma correspondiente (esto no serÌa problema). Si tuviÈramos la informaciÛn de mortalidad de cada ciudad geocodificada en archivos distintos tampoco serÌa problema: simplemente habrÌamos de cargar la informaciÛn de mortalidad de la ciudad para la que queramos generar la informaciÛn.
+En principio, este archivo deber√≠a contener la informaci√≥n de todas las ciudades MEDEA3 correspondientes a cada grupo, o incluso m√°s defunciones si se hubiera geocodificado la mortalidad de toda la comunidad aut√≥noma correspondiente (esto no ser√≠a problema). Si tuvi√©ramos la informaci√≥n de mortalidad de cada ciudad geocodificada en archivos distintos tampoco ser√≠a problema: simplemente habr√≠amos de cargar la informaci√≥n de mortalidad de la ciudad para la que queramos generar la informaci√≥n.
 
-Aquellos grupos que no siguieran el protocolo de geocodificaciÛn de MEDEA3 y por tanto no tengan un archivo `mortalidad_geocodificada.RData`, deberÌan tener en su sustituciÛn un `data.frame` en `R`, llamado `datosmort`, con registros individuales y al menos las siguientes columnas con exactamente estos nombres (**importante**), codificadas exactamente de la forma que se describe:
+Aquellos grupos que no siguieran el protocolo de geocodificaci√≥n de MEDEA3 y por tanto no tengan un archivo `mortalidad_geocodificada.RData`, deber√≠an tener en su sustituci√≥n un `data.frame` en `R`, llamado `datosmort`, con registros individuales y al menos las siguientes columnas con exactamente estos nombres (**importante**), codificadas exactamente de la forma que se describe:
 
-* `year_defuncion`: aÒo de defunciÛn (clase numÈrica).
-* `sexo`: 0 = masculino, 1 = femenino (clase numÈrica).
-* `edad`: edad en aÒos a la fecha de defunciÛn (clase numÈrica).
-* `lat`: latitud seg˙n la geocodificaciÛn llevada a cabo (clase numÈrica).
-* `lng`: longitud seg˙n la geocodificaciÛn llevada a cabo (clase numÈrica).
-* `causa_defuncion`: campo de tipo car·cter con el cÛdigo CIE 9 o 10, seg˙n el aÒo, de la defunciÛn correspondiente. Todo registro de este campo debe tener al menos 3 caracteres. En los registros que tuvieran menos, probablemente haya que aÒadir ceros a la izquierda.
+* `year_defuncion`: a√±o de defunci√≥n (clase num√©rica).
+* `sexo`: 0 = masculino, 1 = femenino (clase num√©rica).
+* `edad`: edad en a√±os a la fecha de defunci√≥n (clase num√©rica).
+* `lat`: latitud seg√∫n la geocodificaci√≥n llevada a cabo (clase num√©rica).
+* `lng`: longitud seg√∫n la geocodificaci√≥n llevada a cabo (clase num√©rica).
+* `causa_defuncion`: campo de tipo car√°cter con el c√≥digo CIE 9 o 10, seg√∫n el a√±o, de la defunci√≥n correspondiente. Todo registro de este campo debe tener al menos 3 caracteres. En los registros que tuvieran menos, probablemente haya que a√±adir ceros a la izquierda.
 
-A continuaciÛn se describe la llamada a la sentencia `une_secciones` tal y como deberÌa ejecutarse para cada ciudad (a juicio del nodo coordinador), una vez ejecutadas las sentencias anteriores (y adaptado el formato de las bases de datos si asÌ fuera el caso). Estas llamadas asumen que se han dado por buenas las uniones de seccionado propuestas en su dÌa por el nodo coordinador a cada uno de los grupos del proyecto.
+A continuaci√≥n se describe la llamada a la sentencia `une_secciones` tal y como deber√≠a ejecutarse para cada ciudad (a juicio del nodo coordinador), una vez ejecutadas las sentencias anteriores (y adaptado el formato de las bases de datos si as√≠ fuera el caso). Estas llamadas asumen que se han dado por buenas las uniones de seccionado propuestas en su d√≠a por el nodo coordinador a cada uno de los grupos del proyecto.
 
 ## Andalucia
 
-### AlmerÌa
+### Almer√≠a
 
 ```{r almeria, eval=FALSE}
 codigo  <- "04013"
@@ -292,7 +292,7 @@ save(almeria, file = "almeria.RData")
 ```
 
 
-### C·diz
+### C√°diz
 
 ```{r cadiz, eval=FALSE}
 codigo          <- "11012"
@@ -315,7 +315,7 @@ save(cadiz, file = "cadiz.RData")
 ```
 
 
-### CÛrdoba
+### C√≥rdoba
 
 ```{r cordoba, eval=FALSE}
 codigo          <- "14021"
@@ -383,7 +383,7 @@ save(huelva, file = "huelva.RData")
 ```
 
 
-### JaÈn
+### Ja√©n
 
 ```{r jaen, eval=FALSE}
 codigo <- "23050"
@@ -405,7 +405,7 @@ save(jaen, file = "jaen.RData")
 ```
 
 
-### M·laga
+### M√°laga
 
 ```{r malaga, eval=FALSE}
 codigo          <- "29067"
@@ -452,7 +452,7 @@ save(sevilla, file = "sevilla.RData")
 
 ## Asturias
 
-### AvilÈs
+### Avil√©s
 
 ```{r aviles, eval=FALSE}
 codigo <- "33004"
@@ -472,9 +472,9 @@ save(aviles, file = "aviles.RData")
 ```
 
 
-### GijÛn
+### Gij√≥n
 
-UniÛn provisional a falta de incorporar la divisiÛn de dos secciones.
+Uni√≥n provisional a falta de incorporar la divisi√≥n de dos secciones.
 
 ```{r gijon, eval=FALSE}
 codigo          <- "33024"
@@ -520,9 +520,9 @@ save(oviedo, file = "oviedo.RData")
 
 ### Santander
 
-Solo se realizan uniones desde 2011 a 2015. El resto de la informaciÛn la disponen a nivel puntual. Esta circunstancia les obliga a adaptar la informaciÛn de poblaciones al seccionado resultante de la llamada a `une_secciones` que se describe a continuaciÛn.
+Solo se realizan uniones desde 2011 a 2015. El resto de la informaci√≥n la disponen a nivel puntual. Esta circunstancia les obliga a adaptar la informaci√≥n de poblaciones al seccionado resultante de la llamada a `une_secciones` que se describe a continuaci√≥n.
 
-Al no haber seguido el protocolo de geocodificaciÛn tendr·n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo seg˙n se describe al inicio de este apartado. Asimismo, al disponer de las cifras de poblaciÛn a nivel puntual, la siguiente rutina generar· un `array` de poblaciÛn vacÌo (todos los valores son `NA`'s) que el nodo tendr· que rellenar con la informaciÛn correspondiente (proyecciÛn de poblaciones de cada aÒo sobre el seccionado unido --objeto `santander$cartografia` tras haber ejecutado la funciÛn `une_secciones`--).
+Al no haber seguido el protocolo de geocodificaci√≥n tendr√°n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo seg√∫n se describe al inicio de este apartado. Asimismo, al disponer de las cifras de poblaci√≥n a nivel puntual, la siguiente rutina generar√° un `array` de poblaci√≥n vac√≠o (todos los valores son `NA`'s) que el nodo tendr√° que rellenar con la informaci√≥n correspondiente (proyecci√≥n de poblaciones de cada a√±o sobre el seccionado unido --objeto `santander$cartografia` tras haber ejecutado la funci√≥n `une_secciones`--).
 
 ```{r santander, eval=FALSE}
 codigo    <- "39075"
@@ -542,9 +542,9 @@ save(santander, file = "santander.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
 ```
 
-## CataluÒa
+## Catalu√±a
 
-Al no haber seguido el protocolo de geocodificaciÛn tendr·n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, seg˙n se describe al inicio de este apartado. Asimismo, al disponer de las cifras de poblaciÛn a nivel puntual, la siguiente rutina generar· un `array` de poblaciÛn vacÌo (todos los valores son `NA`'s) que el nodo tendr· que rellenar con la informaciÛn correspondiente (proyecciÛn de poblaciones de cada aÒo sobre el seccionado de 2011).
+Al no haber seguido el protocolo de geocodificaci√≥n tendr√°n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, seg√∫n se describe al inicio de este apartado. Asimismo, al disponer de las cifras de poblaci√≥n a nivel puntual, la siguiente rutina generar√° un `array` de poblaci√≥n vac√≠o (todos los valores son `NA`'s) que el nodo tendr√° que rellenar con la informaci√≥n correspondiente (proyecci√≥n de poblaciones de cada a√±o sobre el seccionado de 2011).
 
 ### Barcelona
 
@@ -564,16 +564,16 @@ save(barcelona, file = "barcelona.RData")
 ```
 
 
-## Comunidad de Madrid 
+## Comunidad de Madrid
 
 
 
-Al no haber seguido el protocolo de geocodificaciÛn tendr·n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, seg˙n se describe al inicio de este apartado. Asimismo, al disponer de las cifras de poblaciÛn a nivel puntual, la siguiente rutina generar· un `array` de poblaciÛn vacÌo (todos los valores son `NA`'s) que el nodo tendr· que rellenar con la informaciÛn correspondiente (proyecciÛn de poblaciones de cada aÒo sobre el seccionado de 2011).
+Al no haber seguido el protocolo de geocodificaci√≥n tendr√°n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, seg√∫n se describe al inicio de este apartado. Asimismo, al disponer de las cifras de poblaci√≥n a nivel puntual, la siguiente rutina generar√° un `array` de poblaci√≥n vac√≠o (todos los valores son `NA`'s) que el nodo tendr√° que rellenar con la informaci√≥n correspondiente (proyecci√≥n de poblaciones de cada a√±o sobre el seccionado de 2011).
 
 ### Madrid (provisional)
 
 ```{r madrid, eval=FALSE}
-# UniÛn provisional para los 20 aÒos
+# Uni√≥n provisional para los 20 a√±os
 codigo          <- "28079"
 cambios_seccion <- elimina_cambios(cambios_seccion,
                                   paste0("28079", c("12103", "06016")),
@@ -631,7 +631,7 @@ save(alicante, file = "alicante.RData")
 ```
 
 
-### CastellÛn
+### Castell√≥n
 
 ```{r castellon, eval=FALSE}
 codigo    <- "12040"
@@ -676,9 +676,9 @@ save(valencia, file = "valencia.RData")
 
 ## Galicia
 
-Para Galicia prescindimos de los aÒos 1996 y 1997 dado el bajo nivel de geocodificaciÛn de la mortalidad para estos dos aÒos. En fases anteriores de MEDEA tambiÈn se excluyeron estos dos aÒos del periodo de estudio.
+Para Galicia prescindimos de los a√±os 1996 y 1997 dado el bajo nivel de geocodificaci√≥n de la mortalidad para estos dos a√±os. En fases anteriores de MEDEA tambi√©n se excluyeron estos dos a√±os del periodo de estudio.
 
-### A coruÒa
+### A coru√±a
 
 ```{r coruna, eval=FALSE}
 codigo <- "15030"
@@ -850,8 +850,8 @@ mallorca <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = c("0704004021", "0704002015"),
-  sc2             = c("0704004039", "0704002014")
+  sc1             = "0704004021",
+  sc2             = "0704004039"
 )
 save(mallorca, file = "mallorca.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -859,7 +859,7 @@ save(mallorca, file = "mallorca.RData")
 
 ## Islas Canarias
 
-Al no haber seguido el protocolo de geocodificaciÛn tendr·n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo seg˙n se describe al inicio de este apartado.
+Al no haber seguido el protocolo de geocodificaci√≥n tendr√°n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo seg√∫n se describe al inicio de este apartado.
 
 ### Las Palmas de Gran Canaria
 ```{r palmas, eval=FALSE}
@@ -912,9 +912,9 @@ save(tenerife, file = "tenerife.RData")
 ```
 
 
-## Navarra 
+## Navarra
 
-Al no haber seguido el protocolo de geocodificaciÛn tendr·n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, seg˙n se describe al inicio de este apartado. Asimismo, al no disponer de informaciÛn catastral no se puede hacer uso de dicho filtro.
+Al no haber seguido el protocolo de geocodificaci√≥n tendr√°n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, seg√∫n se describe al inicio de este apartado. Asimismo, al no disponer de informaci√≥n catastral no se puede hacer uso de dicho filtro.
 
 ### Pamplona
 
@@ -934,9 +934,9 @@ save(pamplona, file = "pamplona.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
 ```
 
-## PaÌs Vasco 
+## Pa√≠s Vasco
 
-Al no haber seguido el protocolo de geocodificaciÛn tendr·n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, seg˙n se describe al inicio de este apartado. Asimismo, al disponer de las cifras de poblaciÛn a nivel puntual, la siguiente rutina generar· un `array` de poblaciÛn vacÌo (todos los valores son `NA`'s) que el nodo tendr· que rellenar con la informaciÛn correspondiente (proyecciÛn de poblaciones de cada aÒo sobre el seccionado de 2011).
+Al no haber seguido el protocolo de geocodificaci√≥n tendr√°n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, seg√∫n se describe al inicio de este apartado. Asimismo, al disponer de las cifras de poblaci√≥n a nivel puntual, la siguiente rutina generar√° un `array` de poblaci√≥n vac√≠o (todos los valores son `NA`'s) que el nodo tendr√° que rellenar con la informaci√≥n correspondiente (proyecci√≥n de poblaciones de cada a√±o sobre el seccionado de 2011).
 
 ### Bilbao
 
@@ -972,7 +972,7 @@ save(vitoria, file = "vitoria.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
 ```
 
-### San Sebasti·n
+### San Sebasti√°n
 
 ```{r donostia, eval=FALSE}
 codigo   <- "20069"
@@ -989,9 +989,9 @@ save(donostia, file = "donostia.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
 ```
 
-## RegiÛn de Murcia
+## Regi√≥n de Murcia
 
-Al no haber seguido el protocolo de geocodificaciÛn tendr·n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo seg˙n se describe al inicio de este apartado.
+Al no haber seguido el protocolo de geocodificaci√≥n tendr√°n que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo seg√∫n se describe al inicio de este apartado.
 
 ### Alcantarilla
 
@@ -1059,7 +1059,7 @@ save(murcia, file = "murcia.RData")
 ```
 
 
-### La UniÛn
+### La Uni√≥n
 
 ```{r la_union, eval=FALSE}
 codigo   <- "30041"
@@ -1079,5 +1079,3 @@ la_union <- une_secciones(
 save(la_union, file = "la_union.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
 ```
-
-

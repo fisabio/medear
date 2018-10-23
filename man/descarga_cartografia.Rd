@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{descarga_cartografia}
 \alias{descarga_cartografia}
-\title{Descarga la cartografia con el seccionado del INE para 2011}
+\title{Descarga la cartografía con el seccionado del INE para 2011}
 \usage{
 descarga_cartografia(epsg = 4326, conservar = TRUE, ntries = 10)
 }

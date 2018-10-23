@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{descarga_trameros}
 \alias{descarga_trameros}
-\title{Descarga los trameros del INE}
+\title{Descarga los callejeros del INE}
 \usage{
 descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
   c(2001, 2004:2015), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
@@ -51,8 +51,8 @@ Un objeto de clase \code{tramero_ine} con 11 columnas:
   numeración alguna.
 }
 \description{
-Descarga los trameros que ofrece al público el INE para el año
-  2001 y desde 2004 en adelante.
+Descarga los callejeros (trameros) que ofrece al público el INE
+  para el año 2001 y desde 2004 en adelante.
 }
 \details{
 El tiempo de ejecución de la función varía según el número de

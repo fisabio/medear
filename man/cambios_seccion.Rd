@@ -5,7 +5,7 @@
 \name{cambios_seccion}
 \alias{cambios_seccion}
 \title{Cambios temporales de seccionado para todas las ciudades MEDEA3
-  (periodo 1996-2015)}
+  (período 1996-2015)}
 \format{Un objeto de clase \code{cambios_ine}, donde cada fila es un un
   cambio de sección y que cuenta con 7 columnas: \describe{
   \item{sc_ref}{Cádena de 10 caracteres con el código de la sección 2011.}

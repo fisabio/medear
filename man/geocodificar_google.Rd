@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{geocodificar_google}
 \alias{geocodificar_google}
-\title{Implementar la cuarta fase del algoritmo de geocodificacion de
+\title{Implementar la cuarta fase del algoritmo de geocodificación de
   direcciones de MEDEA3 (geocodificado con Google)}
 \usage{
 geocodificar_google(direc, clave_google = NULL, aux.direc = NULL, poligono = NULL)

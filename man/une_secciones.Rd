@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{une_secciones}
 \alias{une_secciones}
-\title{Une los cambios del seccionado del INE}
+\title{Unión de los cambios del seccionado del INE}
 \usage{
 une_secciones(cambios = NULL, cartografia, poblacion = NULL,
   mortalidad = NULL, censo = NULL, otras_causas = NULL, medea3 = TRUE,

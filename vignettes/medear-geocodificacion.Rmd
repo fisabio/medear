@@ -1,5 +1,5 @@
 ---
-title: "Protocolo de geocodificaciÛn (v2.1)"
+title: "Protocolo de geocodificaci√≥n (v2.1)"
 author: "Grupo MEDEA"
 date: "`r Sys.Date()`"
 output: 
@@ -11,25 +11,25 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-Todo el protocolo se vertebra alrededor del uso de herramientas gratuitas y que pueden funcionar en cualquier sistema operativo (de ahÌ la elecciÛn de `R` como software de referencia). Concretamente, y para el proceso de geocodificaciÛn, el protocolo se ha estructurado en 4 fases:
+Todo el protocolo se vertebra alrededor del uso de herramientas gratuitas y que pueden funcionar en cualquier sistema operativo (de ah√≠ la elecci√≥n de `R` como software de referencia). Concretamente, y para el proceso de geocodificaci√≥n, el protocolo se ha estructurado en 4 fases:
 
-1. InstalaciÛn y carga de paquetes de `R`.
-2. ImportaciÛn de datos y adaptaciÛn de su formato.
-3. GeocodificaciÛn de direcciones con `CartoCiudad`.
-4. GeocodificaciÛn de las direcciones restantes con `Google`.
+1. Instalaci√≥n y carga de paquetes de `R`.
+2. Importaci√≥n de datos y adaptaci√≥n de su formato.
+3. Geocodificaci√≥n de direcciones con `CartoCiudad`.
+4. Geocodificaci√≥n de las direcciones restantes con `Google`.
 
-Como puede verse, en el protocolo se contemplan dos servicios de geocodificaciÛn distintos: esto se debe a que ambos son completamente independientes, con lo que una direcciÛn que no pueda ser geocodificada por uno de ellos sÌ podrÌa serlo por el otro. No obstante, en nuestra experiencia el servicio de geocodificaciÛn de `CartoCiudad` ha resultado ser m·s fiable que el de `Google`, y es por ello que se ha propuesto como servicio primario. En este sentido, y seg˙n hemos podido comprobar, `Google` parece m·s aventurado a la hora de asignar unas coordenadas a cada direcciÛn; adem·s, en algunos casos las coordenadas devueltas por `Google` son menos precisas que las que ofrece `CartoCiudad` (lo cual se traduce en un mayor error alrededor del punto que deberÌa haberse asignado, incluyendo la posibilidad de un cambio de secciÛn censal) y, por ˙ltimo, la versiÛn gratuita tiene un lÌmite en el n˙mero de consultas por dÌa (lo cual es muy molesto dado el volumen de datos que manejamos). Sin embargo, el servicio de `Google` tiene una gran ventaja respecto al de `CartoCiudad`, y es que es capaz de geocodificar puntos de interÈs (como residencias de ancianos) adem·s de direcciones, siendo capaz de resolver direcciones del tipo `Residencia Costablanca, Alicante`, lo que aporta un matiz complementario para ubicar esa clase de direcciones que `CartoCiudad` no es capaz de ubicar, justificando su uso.
+Como puede verse, en el protocolo se contemplan dos servicios de geocodificaci√≥n distintos: esto se debe a que ambos son completamente independientes, con lo que una direcci√≥n que no pueda ser geocodificada por uno de ellos s√≠ podr√≠a serlo por el otro. No obstante, en nuestra experiencia el servicio de geocodificaci√≥n de `CartoCiudad` ha resultado ser m√°s fiable que el de `Google`, y es por ello que se ha propuesto como servicio primario. En este sentido, y seg√∫n hemos podido comprobar, `Google` parece m√°s aventurado a la hora de asignar unas coordenadas a cada direcci√≥n; adem√°s, en algunos casos las coordenadas devueltas por `Google` son menos precisas que las que ofrece `CartoCiudad` (lo cual se traduce en un mayor error alrededor del punto que deber√≠a haberse asignado, incluyendo la posibilidad de un cambio de secci√≥n censal) y, por √∫ltimo, la versi√≥n gratuita tiene un l√≠mite en el n√∫mero de consultas por d√≠a (lo cual es muy molesto dado el volumen de datos que manejamos). Sin embargo, el servicio de `Google` tiene una gran ventaja respecto al de `CartoCiudad`, y es que es capaz de geocodificar puntos de inter√©s (como residencias de ancianos) adem√°s de direcciones, siendo capaz de resolver direcciones del tipo `Residencia Costablanca, Alicante`, lo que aporta un matiz complementario para ubicar esa clase de direcciones que `CartoCiudad` no es capaz de ubicar, justificando su uso.
 
-AsÌ pues, en lÌneas generales la combinaciÛn de servicios funciona de la siguiente manera: en primer lugar se intenta geocodificar todas las direcciones mediante `CartoCiudad` y, una vez terminado ese proceso (en el que nos habremos quitado de encima buena parte de las direcciones que tenÌamos que geocodificar), se intentar· la geocodificaciÛn de las direcciones restantes a travÈs de `Google`.
+As√≠ pues, en l√≠neas generales la combinaci√≥n de servicios funciona de la siguiente manera: en primer lugar se intenta geocodificar todas las direcciones mediante `CartoCiudad` y, una vez terminado ese proceso (en el que nos habremos quitado de encima buena parte de las direcciones que ten√≠amos que geocodificar), se intentar√° la geocodificaci√≥n de las direcciones restantes a trav√©s de `Google`.
 
-# InstalaciÛn y carga de paquetes de `R`
+# Instalaci√≥n y carga de paquetes de `R`
 
-El primer paso es asegurar que se tiene instalado `R`. El protocolo se ha probado con varias versiones de este software, y aunque es posible ejecutarlo con versiones a partir de la 3.1.0, es recomendable utilizar la ˙ltima, que es la [3.5.1](https://cran.r-project.org/).
+El primer paso es asegurar que se tiene instalado `R`. El protocolo se ha probado con varias versiones de este software, y aunque es posible ejecutarlo con versiones a partir de la 3.1.0, es recomendable utilizar la √∫ltima, que es la [3.5.1](https://cran.r-project.org/).
 
-Existen varios paquetes de `R` que permiten establecer una conexiÛn con los servicios de geocodificaciÛn. Para facilitar este proceso, se ha creado el paquete [`medear`](https://github.com/fisabio/medear), el cual aglutina las funcionalidades de otros paquetes adapt·ndolas a nuestras necesidades. Para instalar este paquete y sus dependencias basta con ejecutar el siguiente cÛdigo en la consola de `R`:
+Existen varios paquetes de `R` que permiten establecer una conexi√≥n con los servicios de geocodificaci√≥n. Para facilitar este proceso, se ha creado el paquete [`medear`](https://github.com/fisabio/medear), el cual aglutina las funcionalidades de otros paquetes adapt√°ndolas a nuestras necesidades. Para instalar este paquete y sus dependencias basta con ejecutar el siguiente c√≥digo en la consola de `R`:
 
 ```{r, message=FALSE, warning=FALSE, eval = FALSE}
-# El paquete devtools facilita la instalaciÛn de medear
+# El paquete devtools facilita la instalaci√≥n de medear
 if (!"devtools" %in% installed.packages())
   install.packages("devtools")
 devtools::install_github("fisabio/medear", build_vignettes = TRUE)
@@ -37,55 +37,55 @@ devtools::install_github("fisabio/medear", build_vignettes = TRUE)
 library(medear) # Carga del paquete medear
 ```
 
-Al instalar el paquete `medear` tambiÈn se instalan todas sus dependencias, incluyendo una funciÛn propia para llamar al servicio de `CartoCiudad` (adaptada del paquete  [`caRtociudad`](https://github.com/cjgb/caRtociudad) para este proyecto). Esta versiÛn propia permite, a diferencia de la original, llamar a ambas versiones (antigua y nueva) del servicio de geocodificado de `CartoCiudad`. Las versiones de los paquetes implicados en este protocolo son:
+Al instalar el paquete `medear` tambi√©n se instalan todas sus dependencias, incluyendo una funci√≥n propia para llamar al servicio de `CartoCiudad` (adaptada del paquete  [`caRtociudad`](https://github.com/cjgb/caRtociudad) para este proyecto). Esta versi√≥n propia permite, a diferencia de la original, llamar a ambas versiones (antigua y nueva) del servicio de geocodificado de `CartoCiudad`. Las versiones de los paquetes implicados en este protocolo son:
 
-* `devtools`: versiÛn `>= 1.13.6`.
-* `medear`: versiÛn `>= 0.4.3`.
+* `devtools`: versi√≥n `>= 1.13.6`.
+* `medear`: versi√≥n `>= 0.4.3`.
 
-Si asÌ se desea, es posible consultar este protocolo desde la ayuda del paquete (˙til si est·s utilizando una interfaz tipo [RStudio](https://www.rstudio.com/)), pues est· incorporado dentro del mismo como una viÒeta, siendo accesible con la sentencia `vignette("medear-geocodificacion")`.
+Si as√≠ se desea, es posible consultar este protocolo desde la ayuda del paquete (√∫til si est√°s utilizando una interfaz tipo [RStudio](https://www.rstudio.com/)), pues est√° incorporado dentro del mismo como una vi√±eta, siendo accesible con la sentencia `vignette("medear-geocodificacion")`.
 
-# Carga o importaciÛn de datos y adaptaciÛn de su formato
+# Carga o importaci√≥n de datos y adaptaci√≥n de su formato
 
-## Carga y preparaciÛn de la cartografÌa
+## Carga y preparaci√≥n de la cartograf√≠a
 
-El proceso de geocodificaciÛn hace uso de la cartografÌa de cada municipio con el propÛsito de asegurar que cada una de las coordenadas obtenidas cae dentro del lÌmite territorial de la ciudad correspondiente. En caso contrario, la geocodificaciÛn se desecha por considerarse errÛnea (la direcciÛn se ha asignado a otro municipio).
+El proceso de geocodificaci√≥n hace uso de la cartograf√≠a de cada municipio con el prop√≥sito de asegurar que cada una de las coordenadas obtenidas cae dentro del l√≠mite territorial de la ciudad correspondiente. En caso contrario, la geocodificaci√≥n se desecha por considerarse err√≥nea (la direcci√≥n se ha asignado a otro municipio).
 
-Dentro del paquete `medear` se dispone de una cartografÌa (descargada de la [web del INE](http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip)) a nivel de secciÛn censal para el aÒo 2011 para todas las ciudades del proyecto MEDEA, la cual es accesible tras haber cargado el paquete. Concretamente, para poder acceder a dicha cartografÌa bastarÌa con ejecutar `data("cartografia")`, lo cual adjunta al entorno de trabajo un objeto con ese mismo nombre. El `data.frame` asociado a `cartografia` tiene como columnas: `seccion`, `CUMUN` (cÛdigo INE para cada municipio), `CCA` (cÛdigo INE para cada comunidad autÛnoma), y las variables `NPRO`, `NCA`  y `NMUN`, que hacen referencia a los nombres estandarizados de cada provincia, comunidad autÛnoma y municipio (respectivamente). Por otra parte, tambiÈn se dispone de una funciÛn para descargar la cartografÌa completa de toda EspaÒa de la web del INE (si asÌ se quisiera): `descarga_cartografia()`
+Dentro del paquete `medear` se dispone de una cartograf√≠a (descargada de la [web del INE](http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip)) a nivel de secci√≥n censal para el a√±o 2011 para todas las ciudades del proyecto MEDEA, la cual es accesible tras haber cargado el paquete. Concretamente, para poder acceder a dicha cartograf√≠a bastar√≠a con ejecutar `data("cartografia")`, lo cual adjunta al entorno de trabajo un objeto con ese mismo nombre. El `data.frame` asociado a `cartografia` tiene como columnas: `seccion`, `CUMUN` (c√≥digo INE para cada municipio), `CCA` (c√≥digo INE para cada comunidad aut√≥noma), y las variables `NPRO`, `NCA`  y `NMUN`, que hacen referencia a los nombres estandarizados de cada provincia, comunidad aut√≥noma y municipio (respectivamente). Por otra parte, tambi√©n se dispone de una funci√≥n para descargar la cartograf√≠a completa de toda Espa√±a de la web del INE (si as√≠ se quisiera): `descarga_cartografia()`
 
 ```{r, eval=FALSE}
 data("cartografia")
-# Si quisiÈramos descargar la cartografÌa completa, usarÌamos:
+# Si quisi√©ramos descargar la cartograf√≠a completa, usar√≠amos:
 # cartografia <- descarga_cartografia()
 
-# Filtramos la cartografÌa, en nuestro caso nos quedamos sÛlo con las ciudades de la 
-# Comunidad Valenciana, cuyo cÛdigo INE es "10" (adaptar en caso de otras CCAA)
+# Filtramos la cartograf√≠a, en nuestro caso nos quedamos s√≥lo con las ciudades de la 
+# Comunidad Valenciana, cuyo c√≥digo INE es "10" (adaptar en caso de otras CCAA)
 carto.munis <- cartografia[cartografia$CCA == "10", ]
 ``` 
 
-Dentro del paquete hay un conjunto de datos con los cÛdigos INE de todas las comunidades, provincias y municipios de EspaÒa, incluyendo una variable que indica si estos ˙ltimos participan en MEDEA3. Por ejemplo, podrÌamos consultar las ciudades participantes en MEDEA3 con
+Dentro del paquete hay un conjunto de datos con los c√≥digos INE de todas las comunidades, provincias y municipios de Espa√±a, incluyendo una variable que indica si estos √∫ltimos participan en MEDEA3. Por ejemplo, podr√≠amos consultar las ciudades participantes en MEDEA3 con
 
 ```{r, eval=FALSE}
 data("codigos_ine")
 codigos_ine[codigos_ine$medea3, ]
 ```
 
-obteniendo como resultado los cÛdigos que pudieran interesarnos.
+obteniendo como resultado los c√≥digos que pudieran interesarnos.
 
-**Solo en caso de querer cargar otro archivo de cartografÌa**
+**Solo en caso de querer cargar otro archivo de cartograf√≠a**
 
-Es posible cargar otra cartografÌa que no sea la incluida dentro del paquete `medear`. Si la cartografÌa estuviera en formato *ESRI Shapefile* (archivo con extensiÛn `.shp`) serÌa necesario que anexo a dicho archivo hubiera otro con la proyecciÛn empleada (archivo con extensiÛn `.prj`) con el mismo nombre que el archivo con la cartografÌa. Como decÌamos, el archivo con extensiÛn `.prj` contendr· la informaciÛn sobre la proyecciÛn utilizada para geocodificar la cartografÌa y por tanto para referenciar sus elementos exactamente dentro del globo terr·queo. Esta informaciÛn resulta necesaria para ciertas fases del proceso de geocodificaciÛn. Para ello, ejecutarÌamos las siguientes lÌneas
+Es posible cargar otra cartograf√≠a que no sea la incluida dentro del paquete `medear`. Si la cartograf√≠a estuviera en formato *ESRI Shapefile* (archivo con extensi√≥n `.shp`) ser√≠a necesario que anexo a dicho archivo hubiera otro con la proyecci√≥n empleada (archivo con extensi√≥n `.prj`) con el mismo nombre que el archivo con la cartograf√≠a. Como dec√≠amos, el archivo con extensi√≥n `.prj` contendr√° la informaci√≥n sobre la proyecci√≥n utilizada para geocodificar la cartograf√≠a y por tanto para referenciar sus elementos exactamente dentro del globo terr√°queo. Esta informaci√≥n resulta necesaria para ciertas fases del proceso de geocodificaci√≥n. Para ello, ejecutar√≠amos las siguientes l√≠neas
 
 ```{r, eval=FALSE}
-# No ejecutar este comando a menos que se quiera importar un archivo de cartografÌa
+# No ejecutar este comando a menos que se quiera importar un archivo de cartograf√≠a
 # El paquete rgdal se instala como dependencia del paquete medear
 library(rgdal)
 # Cambiar CartografiaDeseada por la ruta hasta el archivo oportuno
 carto.munis <- readOGR(dsn = "CartografiaDeseada.shp", layer = "CapaDeseada")
 ```
 
-## Carga y preparaciÛn de los datos de mortalidad
+## Carga y preparaci√≥n de los datos de mortalidad
 
-En esta secciÛn se cargar· y preparar· (para su an·lisis posterior) la informaciÛn de mortalidad con las direcciones a geocodificar. Los datos de la Comunidad Valenciana se encuentran en una base de datos llamada `datosmort`. El archivo `datosmort` se cargar· mediante alguna sentencia del tipo `load("datos/datosmort.RData")` o `read.csv("datos/datosmort.csv")` donde `datos/` hace referencia al directorio en el que tengamos el archivo correspondiente (en el caso de datos en formato CSV, quiz· se necesite alg˙n argumento extra). Si deseas ejecutar este protocolo de forma secuencial (sin cambiar nada), es importante que, una vez hayas importado tus datos en `R` uses el mismo nombre que nosotros (`datosmort`). Esto puedes hacerlo con la sentencia:
+En esta secci√≥n se cargar√° y preparar√° (para su an√°lisis posterior) la informaci√≥n de mortalidad con las direcciones a geocodificar. Los datos de la Comunidad Valenciana se encuentran en una base de datos llamada `datosmort`. El archivo `datosmort` se cargar√° mediante alguna sentencia del tipo `load("datos/datosmort.RData")` o `read.csv("datos/datosmort.csv")` donde `datos/` hace referencia al directorio en el que tengamos el archivo correspondiente (en el caso de datos en formato CSV, quiz√° se necesite alg√∫n argumento extra). Si deseas ejecutar este protocolo de forma secuencial (sin cambiar nada), es importante que, una vez hayas importado tus datos en `R` uses el mismo nombre que nosotros (`datosmort`). Esto puedes hacerlo con la sentencia:
 
 ```{r, eval=FALSE}
 load("datos/datosmort.RData") # Sustituir el entrecomillado por la ruta oportuna
@@ -104,26 +104,26 @@ colnames(datosmort)
 # [13]"NMUNIRES"   "NPROVRES"   "CODPST"     "CAUSABASIC"
 ```
 
-De esos campos los ˙nicos que vamos a utilizar de aquÌ en adelante son:
+De esos campos los √∫nicos que vamos a utilizar de aqu√≠ en adelante son:
 
-* `TVIA`, tipo de vÌa. 
-* `NVIA`, nombre de la vÌa.
-* `NPOLI`, n˙mero de policÌa del domicilio. 
-* `CODMUNIRES`, cÛdigo INE del municipio. 
+* `TVIA`, tipo de v√≠a. 
+* `NVIA`, nombre de la v√≠a.
+* `NPOLI`, n√∫mero de polic√≠a del domicilio. 
+* `CODMUNIRES`, c√≥digo INE del municipio. 
 * `NMUNIRES`, nombre del municipio de residencia.
 * `NPROVRES`, nombre de la provincia de residencia. 
-* `CODPST`, cÛdigo postal (si se tiene, si no contendr· un texto en blanco: "").
+* `CODPST`, c√≥digo postal (si se tiene, si no contendr√° un texto en blanco: "").
 
-Para que el resto de instrucciones contenidas en este protocolo funcionen sin ninguna modificaciÛn adicional, tu base de datos con la informaciÛn de mortalidad deber· tener (al menos) estos campos con **exactamente estos nombres**. Si los nombres de esos campos fueran distintos en tu base de datos, te aconsejamos que los renombres. Respecto al resto de columnas, si faltase o tuvieras alguna de m·s o con distinto nombre, y dado que no van a necesitarse, no tendr· ninguna importancia para el correcto funcionamiento del protocolo.
+Para que el resto de instrucciones contenidas en este protocolo funcionen sin ninguna modificaci√≥n adicional, tu base de datos con la informaci√≥n de mortalidad deber√° tener (al menos) estos campos con **exactamente estos nombres**. Si los nombres de esos campos fueran distintos en tu base de datos, te aconsejamos que los renombres. Respecto al resto de columnas, si faltase o tuvieras alguna de m√°s o con distinto nombre, y dado que no van a necesitarse, no tendr√° ninguna importancia para el correcto funcionamiento del protocolo.
 
-Una vez que te hayas asegurado que tu `data.frame` tenga la informaciÛn que acabamos de comentar y con ese formato exactamente, las siguientes sentencias completan dicho `data.frame`, creando nuevas columnas que ser·n utilizadas m·s adelante. Asimismo, se requiere que los campos que nos interesan sean cadenas de car·cteres, y como es probable que durante la importaciÛn `R` haya interpretado que algunos de ellos (o todos) son de clase factor, es necesario asegurar que la clase es correcta.
+Una vez que te hayas asegurado que tu `data.frame` tenga la informaci√≥n que acabamos de comentar y con ese formato exactamente, las siguientes sentencias completan dicho `data.frame`, creando nuevas columnas que ser√°n utilizadas m√°s adelante. Asimismo, se requiere que los campos que nos interesan sean cadenas de car√°cteres, y como es probable que durante la importaci√≥n `R` haya interpretado que algunos de ellos (o todos) son de clase factor, es necesario asegurar que la clase es correcta.
 
 ```{r, eval=FALSE}
-# Asegurar el tratamiento correcto de los datos como cadenas de car·cteres
+# Asegurar el tratamiento correcto de los datos como cadenas de car√°cteres
 datosmort <- as.data.frame(sapply(datosmort, as.character), stringsAsFactors = FALSE)
 
 # Crear nuevas columnas
-datosmort$BOD.direccion <- ""    # DirecciÛn tal cual ha sido intentada geocodificar
+datosmort$BOD.direccion <- ""    # Direcci√≥n tal cual ha sido intentada geocodificar
 datosmort$georef        <- "NO"  # Status del proceso de geocodificado
 datosmort$id            <- ""
 datosmort$province      <- ""
@@ -140,37 +140,37 @@ datosmort$state         <- ""
 datosmort$type          <- ""
 ```
 
-# GeocodificaciÛn de direcciones con `CartoCiudad`
+# Geocodificaci√≥n de direcciones con `CartoCiudad`
 
-Una vez disponemos de la base de datos de mortalidad en el formato adecuado, pasamos a intentar geocodificar todas las direcciones utilizando el servicio de `CartoCiudad`. Para ello haremos un uso intensivo de la funciÛn `geocodificar_cartociudad` de `medear`, la cual intenta geocodificar cada direcciÛn atendiendo a las dos versiones de `CartoCiudad` disponibles a dÌa de hoy. Para m·s informaciÛn del funcionamiento interno de dicha funciÛn se puede recurrir a la ayuda especÌfica de la misma (`?geocodificar_cartociudad`). Adem·s, en caso de que una direcciÛn no pueda ser geocodificada se prueba si distintas variantes de la direcciÛn pudieran dar alg˙n resultado positivo. Las variantes contempladas son 5, aunque en este protocolo solo vamos a aplicar las dos siguientes:
+Una vez disponemos de la base de datos de mortalidad en el formato adecuado, pasamos a intentar geocodificar todas las direcciones utilizando el servicio de `CartoCiudad`. Para ello haremos un uso intensivo de la funci√≥n `geocodificar_cartociudad` de `medear`, la cual intenta geocodificar cada direcci√≥n atendiendo a las dos versiones de `CartoCiudad` disponibles a d√≠a de hoy. Para m√°s informaci√≥n del funcionamiento interno de dicha funci√≥n se puede recurrir a la ayuda espec√≠fica de la misma (`?geocodificar_cartociudad`). Adem√°s, en caso de que una direcci√≥n no pueda ser geocodificada se prueba si distintas variantes de la direcci√≥n pudieran dar alg√∫n resultado positivo. Las variantes contempladas son 5, aunque en este protocolo solo vamos a aplicar las dos siguientes:
 
-1. eliminar duplicidad de tipos de vÌa (ejemplo: calle camino ...-> camino ...).
-2. eliminar descripciones de vÌa (ejemplo: "Avenida rosa (Edificio azul)" -> "Avenida rosa").
+1. eliminar duplicidad de tipos de v√≠a (ejemplo: calle camino ...-> camino ...).
+2. eliminar descripciones de v√≠a (ejemplo: "Avenida rosa (Edificio azul)" -> "Avenida rosa").
 
-La funciÛn `geocodificar_cartociudad` manda al servicio de geocodificaciÛn las direcciones de las defunciones una a una. Como resultado de estas consultas, se obtendr· una base de datos donde uno de los campos se llama `state`, haciendo referencia a la exactitud de la geocodificaciÛn que proporciona `CartoCiudad`. En este sentido, solo se retendr·n aquellas coordenadas cuyo campo `state` sea igual a
+La funci√≥n `geocodificar_cartociudad` manda al servicio de geocodificaci√≥n las direcciones de las defunciones una a una. Como resultado de estas consultas, se obtendr√° una base de datos donde uno de los campos se llama `state`, haciendo referencia a la exactitud de la geocodificaci√≥n que proporciona `CartoCiudad`. En este sentido, solo se retendr√°n aquellas coordenadas cuyo campo `state` sea igual a
 
-1. geolocalizaciÛn exacta,
-2. gelocalizaciÛn aproximada: el portal par consultado no existe en la base de datos de `CartoCiudad`, se devuelve el par m·s cercano,
-3. gelocalizaciÛn aproximada: el portal impar consultado no existe en la base de datos de `CartoCiudad`, se devuelve el impar m·s cercano,
-4. gelocalizaciÛn aproximada: el portal o punto kilomÈtrico consultado no existe en la base de datos de `CartoCiudad`, se devuelve el m·s cercano.
+1. geolocalizaci√≥n exacta,
+2. gelocalizaci√≥n aproximada: el portal par consultado no existe en la base de datos de `CartoCiudad`, se devuelve el par m√°s cercano,
+3. gelocalizaci√≥n aproximada: el portal impar consultado no existe en la base de datos de `CartoCiudad`, se devuelve el impar m√°s cercano,
+4. gelocalizaci√≥n aproximada: el portal o punto kilom√©trico consultado no existe en la base de datos de `CartoCiudad`, se devuelve el m√°s cercano.
 
-En caso de que la geocodificaciÛn llevada a cabo sea exitosa, completaremos los campos que hemos aÒadido a `datosmort` con la informaciÛn obtenida. En caso contrario simplemente actualizaremos el campo `georef` con informaciÛn que podrÌa ser de interÈs en relaciÛn al motivo por el que dicha defunciÛn no ha podido ser geocodificada.  
+En caso de que la geocodificaci√≥n llevada a cabo sea exitosa, completaremos los campos que hemos a√±adido a `datosmort` con la informaci√≥n obtenida. En caso contrario simplemente actualizaremos el campo `georef` con informaci√≥n que podr√≠a ser de inter√©s en relaci√≥n al motivo por el que dicha defunci√≥n no ha podido ser geocodificada.  
 
 ```{r, eval = FALSE}
 # Seleccionamos individuos a geocodificar, si se quisiera hacer una segunda 
-# ronda de geocodificaciÛn (como luego haremos con Google) una sentencia de selecciÛn 
-# de este tipo har· que sÛlo se aplique la nueva geocodificaciÛn a los registros 
+# ronda de geocodificaci√≥n (como luego haremos con Google) una sentencia de selecci√≥n 
+# de este tipo har√° que s√≥lo se aplique la nueva geocodificaci√≥n a los registros 
 # que nos parezca oportuno.
 
 no.geo    <- which(datosmort$georef == "NO")
 totno.geo <- length(no.geo)
 
-# Comenzamos bucle de geocodificaciÛn para los registros seleccionados
+# Comenzamos bucle de geocodificaci√≥n para los registros seleccionados
 for (i in 1:totno.geo) {
   
   cont <- no.geo[i]
   
-  # Preparamos la direcciÛn (normalizaciÛn y limpieza), gracias a la funciÛn limpia_dir
+  # Preparamos la direcci√≥n (normalizaci√≥n y limpieza), gracias a la funci√≥n limpia_dir
   aux.direc <- limpia_dir(
     tvia    = datosmort$TVIA[cont],
     nvia    = datosmort$NVIA[cont],
@@ -184,7 +184,7 @@ for (i in 1:totno.geo) {
     datosmort$georef[cont] <- "DIREC VACIA"
   } else {
     
-    # Guardamos en "BOD.direccion" la direcciÛn normalizada que vamos 
+    # Guardamos en "BOD.direccion" la direcci√≥n normalizada que vamos 
     # a mandar a CartoCiudad.
     datosmort$BOD.direccion[cont] <- paste0(
       aux.direc$tvia, " ",
@@ -197,17 +197,17 @@ for (i in 1:totno.geo) {
     
     direc <- datosmort$BOD.direccion[cont]
     
-    # GeorreferenciaciÛn con CartoCiudad con comprobaciÛn de que la 
-    # geocodificaciÛn que hemos obtenido recae geogr·ficamente dentro del 
-    # lÌmite geogr·fico correspondiente a la ciudad.
+    # Georreferenciaci√≥n con CartoCiudad con comprobaci√≥n de que la 
+    # geocodificaci√≥n que hemos obtenido recae geogr√°ficamente dentro del 
+    # l√≠mite geogr√°fico correspondiente a la ciudad.
     aux <- geocodificar_cartociudad(
       direc    = direc,
       poligono = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
     )
     
-    # En caso de que quisiÈramos geocodificar con CartoCiudad sin m·s, 
-    # sin comprobar que el punto que obtenemos est· incluido en una regiÛn 
-    # geogr·fica concreta, ejecutarÌamos simplemente: 
+    # En caso de que quisi√©ramos geocodificar con CartoCiudad sin m√°s, 
+    # sin comprobar que el punto que obtenemos est√° incluido en una regi√≥n 
+    # geogr√°fica concreta, ejecutar√≠amos simplemente: 
     # aux <- geocodificar_cartociudad(direc = direc)
     
     columnas_elegidas <- c(
@@ -219,16 +219,16 @@ for (i in 1:totno.geo) {
       datosmort[cont, columnas_elegidas] <- aux
     } else {
       datosmort$georef[cont] <- as.character(aux$georef)
-      # El resultado de la geocodificaciÛn puede ser NO.XXX adem·s de un simple NO 
-      # (donde XXX nos puede aportar informaciÛn adicional), ese es el motivo por 
+      # El resultado de la geocodificaci√≥n puede ser NO.XXX adem√°s de un simple NO 
+      # (donde XXX nos puede aportar informaci√≥n adicional), ese es el motivo por 
       # el que actualizamos el valor de la columna georef del registro correspondiente. 
       
-      # En caso de que la geocodificaciÛn de la direcciÛn no haya tenido Èxito,
-      #  probamos la geocodificaciÛn de algunas variantes de dicha direcciÛn.
+      # En caso de que la geocodificaci√≥n de la direcci√≥n no haya tenido √©xito,
+      #  probamos la geocodificaci√≥n de algunas variantes de dicha direcci√≥n.
       for (filtro in 1:2) {
         if (substr(aux$georef, 1, 2) == "NO") {
-          # Si alguno de los filtros ha funcionado no se reintentarÌa la geocodificaciÛn.
-          # FunciÛn que aplica los filtros:
+          # Si alguno de los filtros ha funcionado no se reintentar√≠a la geocodificaci√≥n.
+          # Funci√≥n que aplica los filtros:
           aux.direcf <- filtra_dir(vias = aux.direc, filtro) 
           if (aux.direcf != "") {
               direcf <- aux.direcf
@@ -252,30 +252,30 @@ for (i in 1:totno.geo) {
 # Una vez finalizado el proceso guardamos una copia de los datos geocodificados por 
 # CartoCiudad antes de pasar a google
 
-###### Creamos el directorio (en caso de no existir) donde se guardar·n los datos
+###### Creamos el directorio (en caso de no existir) donde se guardar√°n los datos
 if (!dir.exists("datos/mortalidad"))
   dir.create("datos/mortalidad", recursive = TRUE)
 save(datosmort, file = "datos/mortalidad/mortalidad_geocodificada.RData")
 ```
 
-# GeocodificaciÛn de las direcciones restantes con `Google`
+# Geocodificaci√≥n de las direcciones restantes con `Google`
 
-En el apartado anterior se deberÌa haber geocodificado una gran proporciÛn de las direcciones (en nuestras pruebas, la cifra varÌa entre un 85 y 95 %), y ahora se har· uso del servicio de geocodificaciÛn de `Google` para tratar de geocodificar todos los registros que no hayan podido ser geocodificados con `CartoCiudad`.
+En el apartado anterior se deber√≠a haber geocodificado una gran proporci√≥n de las direcciones (en nuestras pruebas, la cifra var√≠a entre un 85 y 95 %), y ahora se har√° uso del servicio de geocodificaci√≥n de `Google` para tratar de geocodificar todos los registros que no hayan podido ser geocodificados con `CartoCiudad`.
 
-Debido al lÌmite de consultas diarias que impone la versiÛn gratuita del servicio de `Google` (teÛricamente de 2500, aunque hemos observado que esta cifra puede variar mucho), es muy probable que tengamos que enviar algunas direcciones varias veces a este servicio, en dÌas distintos, para poder completar el proceso. Para entender mejor el proceso que sigue a continuaciÛn, se debe tener en cuenta la respuesta que devuelve el servicio de `Google` al tratar de geocodificar un registro:
+Debido al l√≠mite de consultas diarias que impone la versi√≥n gratuita del servicio de `Google` (te√≥ricamente de 2500, aunque hemos observado que esta cifra puede variar mucho), es muy probable que tengamos que enviar algunas direcciones varias veces a este servicio, en d√≠as distintos, para poder completar el proceso. Para entender mejor el proceso que sigue a continuaci√≥n, se debe tener en cuenta la respuesta que devuelve el servicio de `Google` al tratar de geocodificar un registro:
 
 * `state` igual a `"OK"` : registro geocodificado.
 * `state` distinto de `"OK"`:
     - `state` igual a `"ZERO_RESULTS"` indica que el registro no ha podido ser geocodificado por Google.
-    - `state` igual a `"OVER_QUERY_LIMIT"` indica que por alg˙n motivo (puede ser exceso de n˙mero de consultas diarias, o fallo de conexiÛn con el servidor de `Google` en un momento determinado, la direcciÛn no ha podido ser geocodificada. Estas direcciones son susceptibles de volver a ser enviadas a `Google` para lograr una geocodificaciÛn exitosa.
+    - `state` igual a `"OVER_QUERY_LIMIT"` indica que por alg√∫n motivo (puede ser exceso de n√∫mero de consultas diarias, o fallo de conexi√≥n con el servidor de `Google` en un momento determinado, la direcci√≥n no ha podido ser geocodificada. Estas direcciones son susceptibles de volver a ser enviadas a `Google` para lograr una geocodificaci√≥n exitosa.
 
-Por este motivo, cuando no tenemos Èxito al geocodificar con `Google` (`state != "OK"`) se guardar·, adem·s del campo `georef == "NO"`, el valor del campo `state` con el fin de volver a enviar aquellas direcciones en las que sea necesario una ejecuciÛn posterior (en dÌas posteriores) de esta parte del protocolo, seleccionando las direcciones cuyo estado de la variable `georef` sea `"NO"` o `"NO punto..."`, y cualquier estado de `Google` que indique que el individuo no est· geocodificado. En este sentido, es importante hacer hincapiÈ en este aspecto y distinguir entre los distintos tipos de direcciones no geocodificadas:
+Por este motivo, cuando no tenemos √©xito al geocodificar con `Google` (`state != "OK"`) se guardar√°, adem√°s del campo `georef == "NO"`, el valor del campo `state` con el fin de volver a enviar aquellas direcciones en las que sea necesario una ejecuci√≥n posterior (en d√≠as posteriores) de esta parte del protocolo, seleccionando las direcciones cuyo estado de la variable `georef` sea `"NO"` o `"NO punto..."`, y cualquier estado de `Google` que indique que el individuo no est√° geocodificado. En este sentido, es importante hacer hincapi√© en este aspecto y distinguir entre los distintos tipos de direcciones no geocodificadas:
 
-1. Enviados a `Google` con Èxito y que no han podido ser geocodificados: estos registros mantendr·n un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"ZERO_RESULTS"`. *Estos puntos NO deben volver a ser enviados a `Google` en una nueva ronda de geocodificaciÛn*, en caso de volver a ser mandados el resultado ser· exactamente el mismo.
-2. Enviados a `Google` con Èxito, geocodificados, pero con resultado de un punto que no est· en el polÌgono (lÌmite municipal) requerido: estos registros mantendr·n un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"NO punto google"`. *Estos puntos NO deben volver a ser enviados a `Google` en una nueva ronda de geocodificaciÛn*, en caso de volver a ser mandados el resultado que obtendremos ser· exactamente el mismo, resultado que no consideramos v·lido.
-3. Enviados a `Google` sin Èxito debido a alg˙n fallo, como por ejemplo que se ha excedido el lÌmite diario de geocodificaciones: estos registros mantendr·n un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"OVER_QUERY_LIMIT"` o cualquier otra circunstancia. *Estas direcciones SÕ deben volver a ser enviadas a `Google` en una nueva ronda de geocodificaciÛn* ya que en esa nueva ronda podrÌan ser geocodificadas.
+1. Enviados a `Google` con √©xito y que no han podido ser geocodificados: estos registros mantendr√°n un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"ZERO_RESULTS"`. *Estos puntos NO deben volver a ser enviados a `Google` en una nueva ronda de geocodificaci√≥n*, en caso de volver a ser mandados el resultado ser√° exactamente el mismo.
+2. Enviados a `Google` con √©xito, geocodificados, pero con resultado de un punto que no est√° en el pol√≠gono (l√≠mite municipal) requerido: estos registros mantendr√°n un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"NO punto google"`. *Estos puntos NO deben volver a ser enviados a `Google` en una nueva ronda de geocodificaci√≥n*, en caso de volver a ser mandados el resultado que obtendremos ser√° exactamente el mismo, resultado que no consideramos v√°lido.
+3. Enviados a `Google` sin √©xito debido a alg√∫n fallo, como por ejemplo que se ha excedido el l√≠mite diario de geocodificaciones: estos registros mantendr√°n un valor de la variable `georef` que empieza por `"NO"` y un valor en `state` que indica `"OVER_QUERY_LIMIT"` o cualquier otra circunstancia. *Estas direcciones S√ç deben volver a ser enviadas a `Google` en una nueva ronda de geocodificaci√≥n* ya que en esa nueva ronda podr√≠an ser geocodificadas.
 
-El proceso de geocodificaciÛn mediante `Google` se puede llevar a cabo mediante el siguiente cÛdigo. A partir del momento en que el proceso comience a devolver de forma repetida `"OVER_QUERY_LIMIT"` para, digamos 100 registros, podremos parar el proceso y reanudarlo otro dÌa, ya que habrÌamos alcanzado el lÌmite m·ximo diario de geocodificaciones permitidas. En ese caso, no olvides ejecutar la sentencia `save` del final del cÛdigo para guardar las geocodificaciones efectuadas durante dicha jornada. Al retomar el cÛdigo durante el dÌa siguiente, las sentencias iniciales seleccionan los registros que quedan por geocodificar o hayan tenido una geocodificaciÛn defectuosa previa y solo intenta la geocodificaciÛn de las direcciones correspondientes.
+El proceso de geocodificaci√≥n mediante `Google` se puede llevar a cabo mediante el siguiente c√≥digo. A partir del momento en que el proceso comience a devolver de forma repetida `"OVER_QUERY_LIMIT"` para, digamos 100 registros, podremos parar el proceso y reanudarlo otro d√≠a, ya que habr√≠amos alcanzado el l√≠mite m√°ximo diario de geocodificaciones permitidas. En ese caso, no olvides ejecutar la sentencia `save` del final del c√≥digo para guardar las geocodificaciones efectuadas durante dicha jornada. Al retomar el c√≥digo durante el d√≠a siguiente, las sentencias iniciales seleccionan los registros que quedan por geocodificar o hayan tenido una geocodificaci√≥n defectuosa previa y solo intenta la geocodificaci√≥n de las direcciones correspondientes.
 
 ```{r, eval=FALSE}
 load(file = "datos/mortalidad/mortalidad_geocodificada.RData")
@@ -290,14 +290,14 @@ no.geo <- which(substr(datosmort$georef, 1, 2) == "NO" &
                   datosmort$georef != "NO punto google")  
 totno.geo    <- length(no.geo)
 # Desde junio de 2018 debe proporcionarse una clave de los servicios de Google.
-# VÈase https://developers.google.com/maps/documentation/geocoding/get-api-key?hl=es-419
+# V√©ase https://developers.google.com/maps/documentation/geocoding/get-api-key?hl=es-419
 clave_google <- "CLAVE_DE_GOOGLE"
 
 for (i in 1:totno.geo) {
   cont  <- no.geo[i]
   
-  # PreparaciÛn las direcciones, eliminando caracteres extraÒos que Google no reconoce
-  # gracias a la funciÛn limpiadirecGoogle
+  # Preparaci√≥n las direcciones, eliminando caracteres extra√±os que Google no reconoce
+  # gracias a la funci√≥n limpiadirecGoogle
   aux.direc <- limpia_dir(
     tvia    = datosmort$TVIA[cont],
     nvia    = datosmort$NVIA[cont],
@@ -320,7 +320,7 @@ for (i in 1:totno.geo) {
   if (aux.direc$nvia == "") {
     datosmort$georef[cont] <- "DIREC VACIA"
   } else {
-    # Georreferencia con Google con comprobaciÛn de que es asignado al interior del polÌgono
+    # Georreferencia con Google con comprobaci√≥n de que es asignado al interior del pol√≠gono
     # correspondiente a la ciudad.
     aux <- geocodificar_google(
       direc        = direc,
@@ -329,8 +329,8 @@ for (i in 1:totno.geo) {
       poligono     = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
     )
   
-    # Para geocodificar con Google sin m·s, si no se quisiera cruzar 
-    # con los lÌmites geogr·ficos de la ciudad harÌamos:
+    # Para geocodificar con Google sin m√°s, si no se quisiera cruzar 
+    # con los l√≠mites geogr√°ficos de la ciudad har√≠amos:
     # aux <- geocodificar_google(direc)
     
     if (aux$georef == "NO punto") {

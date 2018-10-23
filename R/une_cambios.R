@@ -1,154 +1,154 @@
 
-#' @title Une los cambios del seccionado del INE
+#' @title Uni√≥n de los cambios del seccionado del INE
 #'
 #' @description Une los cambios del seccionado del INE (tomando como referencia
-#'   la cartografÌa INE 2011), adaptando a su vez las poblaciones por sexo,
-#'   aÒo, grupo de edad y secciÛn censal o la mortalidad por sexo, aÒo de
-#'   defunciÛn, grupo de edad, secciÛn censal y causa de defunciÛn (siempre que
+#'   la cartograf√≠a INE 2011), adaptando a su vez las poblaciones por sexo,
+#'   a√±o, grupo de edad y secci√≥n censal o la mortalidad por sexo, a√±o de
+#'   defunci√≥n, grupo de edad, secci√≥n censal y causa de defunci√≥n (siempre que
 #'   se desee, pues son argumentos opcionales). Si el archivo de cambios
-#'   incorpora informaciÛn catastral (n˙mero de viviendas afectada por cada
-#'   cambio de secciÛn), se puede fijar un umbral de cambio (\%) para rechazar
+#'   incorpora informaci√≥n catastral (n√∫mero de viviendas afectada por cada
+#'   cambio de secci√≥n), se puede fijar un umbral de cambio (\%) para rechazar
 #'   aquellos cambios que involucren a muy pocas viviendas.
 #'
-#' @details La funciÛn trabaja con la siguiente din·mica:
+#' @details La funci√≥n trabaja con la siguiente din√°mica:
 #'
-#'   \itemize{ \item Filtrado del archivo de cambios seg˙n el rango de aÒos
+#'   \itemize{ \item Filtrado del archivo de cambios seg√∫n el rango de a√±os
 #'   escogido. \item Para cada cambio, si ambas secciones existen en la
-#'   cartografÌa proporcionada se calculan las distancias (en metros) entre
+#'   cartograf√≠a proporcionada se calculan las distancias (en metros) entre
 #'   ellas. \item Si se ha decidido utilizar el filtro de catastro, se calcula
-#'   el porcentaje de viviendas implicadas en cada cambio (opciÛn no disponible
+#'   el porcentaje de viviendas implicadas en cada cambio (opci√≥n no disponible
 #'   para Euskadi y Navarra), y se procede al filtrado del archivo de cambios
-#'   seg˙n el umbral escogido en la llamada a la funciÛn, asegurando siempre la
+#'   seg√∫n el umbral escogido en la llamada a la funci√≥n, asegurando siempre la
 #'   presencia de aquellos cambios que implequen a secciones que no existan en
-#'   la cartografÌa proporcionada, y restringiendo el filtrado a secciones que
-#'   disten menos de 100 metros entre sÌ. \item  En caso de no utilizar el
+#'   la cartograf√≠a proporcionada, y restringiendo el filtrado a secciones que
+#'   disten menos de 100 metros entre s√≠. \item  En caso de no utilizar el
 #'   filtro de catastro, se filtra el archivo de cambios asegurando siempre la
 #'   presencia de aquellos cambios que implequen a secciones que no existan en
-#'   la cartografÌa proporcionada, y restringiendo el filtrado a secciones que
-#'   disten menos de 100 metros entre sÌ. \item Una vez que se dispone del
+#'   la cartograf√≠a proporcionada, y restringiendo el filtrado a secciones que
+#'   disten menos de 100 metros entre s√≠. \item Una vez que se dispone del
 #'   archivo de cambios definitivo, se crean las agrupaciones de secciones, y se
-#'   realiza la uniÛn de las mismas en la cartografÌa. \item Si se proporciona
-#'   un archivo de poblaciones, se agrega la poblaciÛn empleando las mismas
+#'   realiza la uni√≥n de las mismas en la cartograf√≠a. \item Si se proporciona
+#'   un archivo de poblaciones, se agrega la poblaci√≥n empleando las mismas
 #'   agrupaciones de secciones. \item Si se proporciona un archivo de
 #'   mortalidad geocodificada, se agregan las defunciones empleando las mismas
 #'   agrupaciones de secciones.}
 #'
-#'   No obstante, y dado que la funciÛn asume que el callejero, el archivo de
-#'   poblaciones y la cartografÌa est·n libres de errores. Como puede
-#'   imaginarse, esto no es asÌ, de modo que la funciÛn puede comportarse de
+#'   No obstante, y dado que la funci√≥n asume que el callejero, el archivo de
+#'   poblaciones y la cartograf√≠a est√°n libres de errores. Como puede
+#'   imaginarse, esto no es as√≠, de modo que la funci√≥n puede comportarse de
 #'   forma inestable en dos supuestos:
 #'
-#'   \enumerate{ \item Cuando se quiera unir cambios no solo en la cartografÌa
-#'   sino tambiÈn en los datos de poblaciÛn, puede aparecer un comportamiento
-#'   inestable de la funciÛn, debido a divergencias existentes en la informaciÛn
-#'   contenida en los datos de poblaciÛn y en los trameros (que es desde donde
-#'   se crea el listado de cambios de secciÛn), a pesar de que en ambos casos la
-#'   fuente de informaciÛn es el propio INE.
+#'   \enumerate{ \item Cuando se quiera unir cambios no solo en la cartograf√≠a
+#'   sino tambi√©n en los datos de poblaci√≥n, puede aparecer un comportamiento
+#'   inestable de la funci√≥n, debido a divergencias existentes en la informaci√≥n
+#'   contenida en los datos de poblaci√≥n y en los trameros (que es desde donde
+#'   se crea el listado de cambios de secci√≥n), a pesar de que en ambos casos la
+#'   fuente de informaci√≥n es el propio INE.
 #'
-#'   Lo anterior se traduce en que, para determinadas consultas, el n˙mero de
-#'   secciones contenidas en los datos de cartografÌa y poblaciones no ser· el
-#'   mismo. Cuando esto pase (si pasa) la funciÛn devolver· un aviso, indicando
-#'   quÈ secciones se ven afectadas y en quÈ aÒos, de forma que el usuario pueda
-#'   tratar de solucionarlo por su cuenta, aunque no hay una soluciÛn perfecta.
+#'   Lo anterior se traduce en que, para determinadas consultas, el n√∫mero de
+#'   secciones contenidas en los datos de cartograf√≠a y poblaciones no ser√° el
+#'   mismo. Cuando esto pase (si pasa) la funci√≥n devolver√° un aviso, indicando
+#'   qu√© secciones se ven afectadas y en qu√© a√±os, de forma que el usuario pueda
+#'   tratar de solucionarlo por su cuenta, aunque no hay una soluci√≥n perfecta.
 #'
-#'   Las dos soluciones m·s efectivas (aunque son soluciones \emph{ad hoc} y
-#'   recae en el usuario encontrar la m·s apropiada para su consulta concreta)
+#'   Las dos soluciones m√°s efectivas (aunque son soluciones \emph{ad hoc} y
+#'   recae en el usuario encontrar la m√°s apropiada para su consulta concreta)
 #'   que se han encontrado son:
 #'
 #'   \itemize{ \item modificar los criterios temporales de la consulta,
-#'   ampliando o reduciendo el marco temporal (p. ej., pasar de un perÌodo
+#'   ampliando o reduciendo el marco temporal (p. ej., pasar de un per√≠odo
 #'   2001:2015 a 1996:2015 o 2002:2014); \item consultar las secciones
-#'   problem·ticas (accesibles mediante la consulta \code{attr(objeto_devuelto,
-#'   "sc_not_in_cartografia")}) en los datos de poblaciÛn y, en base al archivo
-#'   de cambios de secciÛn, decidir con quÈ secciÛn se deberÌa realizar la
-#'   uniÛn.}
+#'   problem√°ticas (accesibles mediante la consulta \code{attr(objeto_devuelto,
+#'   "sc_not_in_cartografia")}) en los datos de poblaci√≥n y, en base al archivo
+#'   de cambios de secci√≥n, decidir con qu√© secci√≥n se deber√≠a realizar la
+#'   uni√≥n.}
 #'
-#'   \item Por otra parte, es posible encontrar vÌas que aparecen literalmente
-#'   "de la nada", especialmente en barrios de nueva creaciÛn o gran expansiÛn.
-#'   El proceso de detecciÛn de cambios de secciÛn (funciÛn
+#'   \item Por otra parte, es posible encontrar v√≠as que aparecen literalmente
+#'   "de la nada", especialmente en barrios de nueva creaci√≥n o gran expansi√≥n.
+#'   El proceso de detecci√≥n de cambios de secci√≥n (funci√≥n
 #'   \code{\link{detecta_cambios}}) compara las secciones a las que se asigna
 #'   cada tramo del callejero de 2011, con las secciones a las que se asignan
 #'   esos mismos tramos (u otros pero contengan portales asociados a los tramos
-#'   previos) en los callejeros del resto de aÒos.
+#'   previos) en los callejeros del resto de a√±os.
 #'
-#'   No obstante, esto plantea un problema en la detecciÛn de cambios al
-#'   considerar la apariciÛn de vÌas completamente nuevas, puesto que la
-#'   comparaciÛn 2011-otros aÒos no es posible. En esos casos, y siempre que no
-#'   haya uniones adicionales que resuelvan el problema por sÌ solo, el archivo
-#'   de poblaciones tras la uniÛn contendr· valores iguales a uno en todas las
-#'   categorÌas de edad para los aÒos anteriores a la creaciÛn de la vÌa.
-#'   Nuevamente, cuando esto pase (si pasa) la funciÛn devolver· un aviso,
-#'   indicando quÈ secciones se ven afectadas y en quÈ aÒos, de forma que el
+#'   No obstante, esto plantea un problema en la detecci√≥n de cambios al
+#'   considerar la aparici√≥n de v√≠as completamente nuevas, puesto que la
+#'   comparaci√≥n 2011-otros a√±os no es posible. En esos casos, y siempre que no
+#'   haya uniones adicionales que resuelvan el problema por s√≠ solo, el archivo
+#'   de poblaciones tras la uni√≥n contendr√° valores iguales a uno en todas las
+#'   categor√≠as de edad para los a√±os anteriores a la creaci√≥n de la v√≠a.
+#'   Nuevamente, cuando esto pase (si pasa) la funci√≥n devolver√° un aviso,
+#'   indicando qu√© secciones se ven afectadas y en qu√© a√±os, de forma que el
 #'   usuario pueda tratar de solucionarlo por su cuenta.
 #'
-#'   La soluciÛn a este problema es similar al lo anteriormente expuesto: por un
-#'   lado se puede variar el rango de aÒos, y por otro tratar de solucionarlo
-#'   manualmente consultando el archivo de cambios de secciÛn y el de
+#'   La soluci√≥n a este problema es similar al lo anteriormente expuesto: por un
+#'   lado se puede variar el rango de a√±os, y por otro tratar de solucionarlo
+#'   manualmente consultando el archivo de cambios de secci√≥n y el de
 #'   poblaciones, buscando las secciones que devuelva la consulta
 #'   \code{attr(resultado, "pob_igual_uno")}.}
 #'
-#'   En el apartado de ejemplos se desarrollar·n los abordajes a estos
-#'   problemas, con un tratamiento m·s extenso en la viÒeta de uniÛn de
-#'   seccionado (a˙n por elaborar).
+#'   En el apartado de ejemplos se desarrollar√°n los abordajes a estos
+#'   problemas, con un tratamiento m√°s extenso en la vi√±eta de uni√≥n de
+#'   seccionado (a√∫n por elaborar).
 #'
 #' @param cambios Objeto de clase \code{cambios_ine}. Por defecto se le asigna
-#'   el valor NULL para no realizar ninguna uniÛn y trabajar con la cartografÌa
+#'   el valor NULL para no realizar ninguna uni√≥n y trabajar con la cartograf√≠a
 #'   proporcionada.
 #' @param cartografia Objeto de clase \code{\link[sp]{SpatialPolygons}} con
-#'   proyecciÛn asignada (cÛdigo EPSG).
+#'   proyecci√≥n asignada (c√≥digo EPSG).
 #' @param poblacion Objeto de clase \code{poblaciones_ine}. Argumento opcional a
 #'   proporcionar en caso de querer agregar las poblaciones.
 #' @param mortalidad Objeto con los registros de mortalidad geocodificados. Este
 #'    es un argumento opcional a proporcionar en caso de querer agregar la
-#'   mortalidad por secciÛn censal. Se requiere que los datos tengan, como
-#'   mÌnimo, las variables sexo, aÒo de defunciÛn, edad, causa de defunciÛn y
+#'   mortalidad por secci√≥n censal. Se requiere que los datos tengan, como
+#'   m√≠nimo, las variables sexo, a√±o de defunci√≥n, edad, causa de defunci√≥n y
 #'   el par de coordenadas (longitud y latitud), y que tengan exactamente los
 #'   siguientes nombres: 'sexo', 'year_defuncion', 'edad', 'causa_defuncion',
 #'   'lng', y 'lat', respectivamente.
-#' @param censo Datos de los censos de 2001 y 2011 recuperados con la funciÛn
+#' @param censo Datos de los censos de 2001 y 2011 recuperados con la funci√≥n
 #'   \code{\link{carga_datos}}. Argumento opcional a proporcionar en caso de
-#'   querer calcular el Ìndice de privaciÛn.
-#' @param otras_causas VÈctor de caracteres que indica los nombres de las
+#'   querer calcular el √≠ndice de privaci√≥n.
+#' @param otras_causas V√©ctor de caracteres que indica los nombres de las
 #'   columnas (columnas con valor 0-1) en la base de datos de mortalidad que
 #'   identifican a dichas otras causas.
-#' @param medea3 Valor lÛgico: ødesea que se agrupen las causas de mortalidad
-#'   siguiendo el patrÛn de 22 grandes causas de MEDEA3? Este argumento es
+#' @param medea3 Valor l√≥gico: ¬ødesea que se agrupen las causas de mortalidad
+#'   siguiendo el patr√≥n de 22 grandes causas de MEDEA3? Este argumento es
 #'   compatible con \code{otras_causas}.
-#' @param years_estudio Vector numÈrico de longitud >= 1 con los aÒos para los que se
+#' @param years_estudio Vector num√©rico de longitud >= 1 con los a√±os para los que se
 #'   desee construir el \code{array} de poblaciones o mortalidad.
-#' @param years_union Vector numÈrico de longitud >= 1 con los aÒos para los que se
-#'   desee consultar las variaciones de seccionado. El aÒo 2011 debe figurar
-#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de m·s de un
-#'   aÒo).
-#' @param epsg Vector numÈrico de longitud uno con el cÛdigo EPSG del sistema de
+#' @param years_union Vector num√©rico de longitud >= 1 con los a√±os para los que se
+#'   desee consultar las variaciones de seccionado. El a√±o 2011 debe figurar
+#'   dentro del vector, cuyo rango debe ser continuo (sin saltos de m√°s de un
+#'   a√±o).
+#' @param epsg Vector num√©rico de longitud uno con el c√≥digo EPSG del sistema de
 #'   referencia de coordenadas (CRS) empleado en los datos de mortalidad (por
 #'   defecto se usa el 4326 con datum WGS84).
-#' @param corte_edad NumÈrico: punto de corte para los grupos de edad (85 o
+#' @param corte_edad Num√©rico: punto de corte para los grupos de edad (85 o
 #'   100). Argumento opcional en caso de proporcionar datos de poblaciones o
 #'   mortalidad.
-#' @param catastro LÛgico: En caso de realizar uniones ødebe aplicarse el filtro
-#'   de informaciÛn catastral? Por defecto \code{catastro = FALSE}.
-#' @param umbral_vivienda NumÈrico: porcentaje de viviendas afectadas en el
-#'   cambio de secciÛn. Solo se utiliza si \code{catastro = TRUE}. Por defecto
+#' @param catastro L√≥gico: En caso de realizar uniones ¬ødebe aplicarse el filtro
+#'   de informaci√≥n catastral? Por defecto \code{catastro = FALSE}.
+#' @param umbral_vivienda Num√©rico: porcentaje de viviendas afectadas en el
+#'   cambio de secci√≥n. Solo se utiliza si \code{catastro = TRUE}. Por defecto
 #'   se fija al 5 \%.
-#' @param distancia NumÈrico: En caso de realizar uniones, m·xima distancia (en
-#'   metros) de separaciÛn entre secciones. Por defecto se fija en 100 metros. En
-#'   algunos casos (principalmente en ciudades donde no haya problemas con pedanÌas
-#'   que compartan nombres de vÌa con el n˙cleo urbano principal) puede ser
-#'   conveniente aumentar este par·metro.
-#' @param modo Car·cter: En caso de realizar uniones, modalidad de la uniÛn
+#' @param distancia Num√©rico: En caso de realizar uniones, m√°xima distancia (en
+#'   metros) de separaci√≥n entre secciones. Por defecto se fija en 100 metros. En
+#'   algunos casos (principalmente en ciudades donde no haya problemas con pedan√≠as
+#'   que compartan nombres de v√≠a con el n√∫cleo urbano principal) puede ser
+#'   conveniente aumentar este par√°metro.
+#' @param modo Car√°cter: En caso de realizar uniones, modalidad de la uni√≥n
 #'   (\code{auto} o \code{manual}), por defecto \code{auto}. Si se escoge el modo
-#'   \code{auto} la funciÛn detectar· los cambios que conllevan una uniÛn de
-#'   secciones seg˙n los par·metros que el usuario haya elegido; si se escoge el
-#'   modo \code{manual}, adem·s de realizar todo el proceso que involucra el otro
+#'   \code{auto} la funci√≥n detectar√° los cambios que conllevan una uni√≥n de
+#'   secciones seg√∫n los par√°metros que el usuario haya elegido; si se escoge el
+#'   modo \code{manual}, adem√°s de realizar todo el proceso que involucra el otro
 #'   modo, se permite al usuario incluir uniones que el modo \code{auto} puede
 #'   haber pasado por alto, realizando uniones de seccionado 1-1 mediante los
 #'   argumentos \code{sc1} y \code{sc2}.
 #' @param sc1 Vector de caracteres: Primer bloque de secciones a unir
-#'   manualmente, vacÌo por defecto. Si se proporciona debe tener la misma
+#'   manualmente, vac√≠o por defecto. Si se proporciona debe tener la misma
 #'   longitud que \code{sc2}.
 #' @param sc2 Vector de caracteres: Segundo bloque de secciones a unir
-#'   manualmente, vacÌo por defecto. Si se proporciona debe tener la misma
+#'   manualmente, vac√≠o por defecto. Si se proporciona debe tener la misma
 #'   longitud que \code{sc1}.
 #'
 #' @usage une_secciones(cambios = NULL, cartografia, poblacion = NULL,
@@ -157,42 +157,42 @@
 #'   corte_edad = 85, catastro = FALSE, umbral_vivienda = 5, distancia = 100,
 #'   modo = c("auto", "manual"), sc1 = NULL, sc2 = NULL)
 #'
-#' @return El resultado devuelto varÌa en funciÛn de si se proporcionan datos de
+#' @return El resultado devuelto var√≠a en funci√≥n de si se proporcionan datos de
 #'   poblaciones, mortalidad o censo. Si no se proporciona ninguno se devuelve un
-#'   objeto de clase \code{\link[sp]{SpatialPolygons}} con la cartografÌa,
-#'   donde cada fila es una secciÛn censal y que puede tener las columnas:
-#'   \describe{\item{seccion}{Cadena de 10 caracteres con el cÛdigo
-#'   de secciÛn censal (incluye provincia, municipio y distrito).}
-#'   \item{CUMUN}{Cadena de 5 caracteres con el cÛdigo del municipio (incluye
-#'   provincia).} \item{CCA}{Cadena de 2 caracteres con el cÛdigo de comunidad
-#'   autÛnoma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
-#'   comunidad autÛnoma.} \item{NMUN}{Nombre del municipio.}
-#'   \item{cluster_id}{CÛdigo de identificaciÛn del cluster de
-#'   uniones.} \item{revision_manual}{Indica si debe revisarse esa uniÛn.}}
+#'   objeto de clase \code{\link[sp]{SpatialPolygons}} con la cartograf√≠a,
+#'   donde cada fila es una secci√≥n censal y que puede tener las columnas:
+#'   \describe{\item{seccion}{Cadena de 10 caracteres con el c√≥digo
+#'   de secci√≥n censal (incluye provincia, municipio y distrito).}
+#'   \item{CUMUN}{Cadena de 5 caracteres con el c√≥digo del municipio (incluye
+#'   provincia).} \item{CCA}{Cadena de 2 caracteres con el c√≥digo de comunidad
+#'   aut√≥noma.} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre de la
+#'   comunidad aut√≥noma.} \item{NMUN}{Nombre del municipio.}
+#'   \item{cluster_id}{C√≥digo de identificaci√≥n del cluster de
+#'   uniones.} \item{revision_manual}{Indica si debe revisarse esa uni√≥n.}}
 #'
-#'   En caso de proporcionar datos de poblaciÛn, mortalidad o censos, se devuelve
-#'    una lista donde el primer elemento es la cartografÌa anteriormente descrita,
+#'   En caso de proporcionar datos de poblaci√≥n, mortalidad o censos, se devuelve
+#'    una lista donde el primer elemento es la cartograf√≠a anteriormente descrita,
 #'    y que puede incorporar los elementos:
 #'
 #'    \itemize{
-#'    \item poblacion: objeto de clase \code{array} con cuatro dimensiones: aÒo
-#'      de defunciÛn, sexo (0 = masculino; 1 = femenino), grupo de edad (seg˙n
-#'      corte establecido) y secciÛn censal.
+#'    \item poblacion: objeto de clase \code{array} con cuatro dimensiones: a√±o
+#'      de defunci√≥n, sexo (0 = masculino; 1 = femenino), grupo de edad (seg√∫n
+#'      corte establecido) y secci√≥n censal.
 #'
-#'    \item mortalidad: objeto de clase \code{array} con cinco dimensiones: aÒo
-#'      de defunciÛn, sexo, grupo de edad (seg˙n corte establecido), secciÛn
+#'    \item mortalidad: objeto de clase \code{array} con cinco dimensiones: a√±o
+#'      de defunci√≥n, sexo, grupo de edad (seg√∫n corte establecido), secci√≥n
 #'      censal y causa de muerte.
 #'
-#'    \item censo: objeto de clase \code{matrix} con el Ìndice de privaciÛn
-#'      calculado independientemente para cada ciudad, seg˙n secciÛn censal (filas)
-#'      y aÒo (2001 y 2011, columnas).
+#'    \item censo: objeto de clase \code{matrix} con el √≠ndice de privaci√≥n
+#'      calculado independientemente para cada ciudad, seg√∫n secci√≥n censal (filas)
+#'      y a√±o (2001 y 2011, columnas).
 #'    }
 #'
 #' @examples
 #'
 #' \dontrun{
-#'   # En este ejemplo se trabaja con la ciudad de CÛrdoba (cÛdigo ine: 14021)
-#'   # en los aÒos 2004-2015, sin usar cÛdigos postales ni mortalidad.
+#'   # En este ejemplo se trabaja con la ciudad de C√≥rdoba (c√≥digo ine: 14021)
+#'   # en los a√±os 2004-2015, sin usar c√≥digos postales ni mortalidad.
 #'
 #'   library(medear)
 #'   data("poblacion")
@@ -220,29 +220,29 @@
 #'   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_co) * 100) #
 #'   Conserva el 88 \% de secciones
 #'
-#'   # La funciÛn avisa acerca de divergencias en el seccionado entre
-#'   cartografÌa y el archivo de poblaciones.
+#'   # La funci√≥n avisa acerca de divergencias en el seccionado entre
+#'   cartograf√≠a y el archivo de poblaciones.
 #'   # Las secciones afectadas son accesibles mediante la siguiente consulta:
-#'   attributes(union_sin_cat)$pob_igual_uno # 1 SC problem·tica
+#'   attributes(union_sin_cat)$pob_igual_uno # 1 SC problem√°tica
 #'
-#'   # En este caso, se resolver· la incidencia (SC 1402106047).
+#'   # En este caso, se resolver√° la incidencia (SC 1402106047).
 #'   sc_problematica <- attributes(union_sin_cat)$pob_igual_uno
 #'
-#'   # Hay que revisar el archivo de cambios para comprobar si esta SC est·
-#'   # involucrada en alg˙n otro cambio de secciÛn:
+#'   # Hay que revisar el archivo de cambios para comprobar si esta SC est√°
+#'   # involucrada en alg√∫n otro cambio de secci√≥n:
 #'   cambios_res <- attributes(union_sin_cat)$cambios
 #'   cambios_res[cambios_res$sc_ref == sc_problematica]
 #'   cambios_res[cambios_res$sc_new == sc_problematica]
 #'
-#'   # La SC deberÌa unirse con la SC 1402106024, aunque ambas est·n a 104.9
-#'   # metros. Comprobemos esa otra secciÛn:
+#'   # La SC deber√≠a unirse con la SC 1402106024, aunque ambas est√°n a 104.9
+#'   # metros. Comprobemos esa otra secci√≥n:
 #'   cambios_res[cambios_res$sc_ref == "1402106024"]
 #'   cambios_res[cambios_res$sc_new == "1402106024"]
 #'
-#'   # La SC 1402106024 se une con la SC 1402106050 (no est· en la cartografÌa
+#'   # La SC 1402106024 se une con la SC 1402106050 (no est√° en la cartograf√≠a
 #'   # de 2001) y con la 1402106038. Al representar estas SC (1402106047,
-#'   # y la uniÛn 1402106024-1402106038), vemos que colindan, asÌ que se puede
-#'   # realizar la uniÛn manual:
+#'   # y la uni√≥n 1402106024-1402106038), vemos que colindan, as√≠ que se puede
+#'   # realizar la uni√≥n manual:
 #'   plot(union_sin_cat$cartografia[union_sin_cat$cartografia$seccion %in%
 #'     c("1402106047", "1402106024"), ])
 #'   union_sin_cat <- une_secciones(
@@ -256,14 +256,14 @@
 #'     sc2           = "1402106024"
 #'   )
 #'
-#'   # El aviso ha desaparecido, aunque todavÌa se mantiene un aviso sobre
-#'   # secciones conformadas por varios polÌgonos. Vamos a ver quÈ secciones
-#'   # forman esta uniÛn:
+#'   # El aviso ha desaparecido, aunque todav√≠a se mantiene un aviso sobre
+#'   # secciones conformadas por varios pol√≠gonos. Vamos a ver qu√© secciones
+#'   # forman esta uni√≥n:
 #'   union_sin_cat$cartografia@data[union_sin_cat$cartografia$seccion == "1402101006", ]
 #'
-#'   # La secciÛn involucrada es 1402106010. Al representar ambas secciones
-#'   # vemos que sÌ se tocan, aunque solo en una esquina. A pesar del aviso,
-#'   # damos por buena la uniÛn.
+#'   # La secci√≥n involucrada es 1402106010. Al representar ambas secciones
+#'   # vemos que s√≠ se tocan, aunque solo en una esquina. A pesar del aviso,
+#'   # damos por buena la uni√≥n.
 #'   plot(union_sin_cat$cartografia[union_sin_cat$cartografia$seccion == "1402101006", ])
 #'
 #'   ##########################################################################
@@ -283,9 +283,9 @@
 #'   round(nrow(union_con_cat$cartografia) / nrow(cartografia_co) * 100)
 #'   # Conserva el 91 \% de secciones
 #'
-#'   # Al utilizar informaciÛn de catastro se ha aumentado de un 88 \% a un
-#'   # 91 \%, recuperando 8 secciones. Surgen los mismos avisos que antes, asÌ
-#'   # que procedemos de la misma forma, tras lo cual se da por cerrada la uniÛn:
+#'   # Al utilizar informaci√≥n de catastro se ha aumentado de un 88 \% a un
+#'   # 91 \%, recuperando 8 secciones. Surgen los mismos avisos que antes, as√≠
+#'   # que procedemos de la misma forma, tras lo cual se da por cerrada la uni√≥n:
 #'   union_con_cat <- une_secciones(
 #'     cambios         = cambios_co,
 #'     cartografia     = cartografia_co,

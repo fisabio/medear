@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{comprueba_punto_poligono}
 \alias{comprueba_punto_poligono}
-\title{Comprobacion de inclusion de una coordenada dentro de un poligono}
+\title{Comprobación de inclusión de una coordenada dentro de un polígono}
 \usage{
 comprueba_punto_poligono(punto, poligono)
 }

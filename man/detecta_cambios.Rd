@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{detecta_cambios}
 \alias{detecta_cambios}
-\title{Funcion para detectar cambios de seccionado en trameros}
+\title{Función para detectar cambios de seccionado en los callejeros INE}
 \usage{
 detecta_cambios(datos, years = c(1996, 2001, 2004:2015), cod_postal =
   FALSE, catastro = NULL)

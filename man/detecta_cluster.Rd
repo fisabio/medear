@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{detecta_cluster}
 \alias{detecta_cluster}
-\title{Deteccion de agrupaciones de mortalidad a revisar manualmente}
+\title{Detección de agrupaciones de mortalidad a revisar manualmente}
 \usage{
 detecta_cluster(datos, epsg = 4326, vecinos = 10, cartografia = NULL,
   secciones = NULL, limite = c(1e-10, 1e-15, 1e-20), devuelve_datos = TRUE)
