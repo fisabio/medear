@@ -406,15 +406,12 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
   if (!is.null(poligono))
     stopifnot(class(poligono) == "SpatialPolygonsDataFrame")
 
-  columnas_elegidas <- c("id", "province", "muni", "tip_via", "address",
-                         "portalNumber", "refCatastral", "postalCode",
-                         "lat", "lng", "stateMsg", "state", "type")
   devuelve <- data.frame(georef = "NO", stringsAsFactors = FALSE)
 
   # Llamamos a caRtociudad version previa (OLD)
   fcarto.old <- suppressWarnings(cartociudad_geocode(direc, version = "prev"))
   if (fcarto.old$state %in% 1:2) {
-    devuelve <- fcarto.old[, columnas_elegidas]
+    devuelve        <- fcarto.old[, -"version"]
     devuelve$georef <- "caRto.OLD"
 
     # Comprobacion de si el punto devuelto esta en el poligono (municipio)
@@ -435,7 +432,7 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
   if (substr(devuelve$georef, 1, 2) == "NO" | (devuelve$georef == "caRto.OLD" & fcarto.old$state == "2")) {
     fcarto.new <- suppressWarnings(cartociudad_geocode(direc,version = "current"))
     if (fcarto.new$state %in% 1:4) {
-      devuelve <- fcarto.new[, columnas_elegidas]
+      devuelve <- fcarto.new[, -"version"]
       devuelve$georef <- "caRto.NEW"
 
       # Compruebo si el punto devuelto esta en el poligono que corresponde
@@ -467,8 +464,13 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 #' \href{https://cloud.google.com/maps-platform/user-guide/account-changes/}{Google}.
 #' @param aux.direc Opcional: Lista resultado de la función \code{\link{limpia_dir}}.
 #' @param poligono Opcional: Objeto de clase \code{\link[sp]{SpatialPolygons}}.
+#' @param varios_resultados Valor lógico: En caso de encontrar varias coincidencia,
+#'   ¿desea que se devuelvan todas o solo la primera? Por defecto (FALSE) solo se
+#'   devuelve la primera, que es el comportamiento esperado en el protocolo de
+#'   geocodificación.
 #'
-#' @usage geocodificar_google(direc, clave_google = NULL, aux.direc = NULL, poligono = NULL)
+#' @usage geocodificar_google(direc, clave_google = NULL, aux.direc = NULL,
+#'   poligono = NULL, varios_resultados = FALSE)
 #'
 #' @return Un data.frame con una fila y 14 columnas: id, province, muni, tip_via,
 #'   address, portalNumber, refCatastral, postalCode, lat, lng, stateMsg, state,
@@ -482,14 +484,16 @@ geocodificar_cartociudad <- function(direc, poligono = NULL) {
 #'   fase del protocolo) y \code{vignette("medear-georreferenciacion")} para
 #'   visualizar el protocolo de georreferenciación.
 #'
-geocodificar_google <- function(direc, clave_google = NULL, aux.direc = NULL, poligono = NULL) {
+geocodificar_google <- function(direc, clave_google = NULL, aux.direc = NULL,
+                                poligono = NULL, varios_resultados = FALSE) {
 
   stopifnot(is.character(direc))
   if (is.null(clave_google))
     stop("Debe proporcionarse una clave de servicio de Google. Consulte la ayuda.")
 
-  devuelve <- data.frame(
+  df_vacio <- data.frame(
     id               = "",
+    id_geo           = "",
     province         = "",
     muni             = "",
     tip_via          = "",
@@ -505,104 +509,128 @@ geocodificar_google <- function(direc, clave_google = NULL, aux.direc = NULL, po
     georef           = "DIREC VACIA",
     stringsAsFactors = FALSE
   )
+  devuelve <- vector("list", length(direc))
 
-  if (nchar(direc) > 0) {
-    direc      <- limpiadirecGoogle(cadena = direc)
-    bounds     <- NULL
-    components <- NULL
-    if (!is.null(poligono)) {
-      stopifnot(class(poligono) == "SpatialPolygonsDataFrame")
-      bounds <- sp::bbox(poligono)
-      bounds <- paste0(
-        c(
-          paste0(bounds[2:1, 1], collapse = ","),
-          paste0(bounds[2:1, 2], collapse = ",")
-        ),
-        collapse = "|"
-      )
-    }
-    if (!is.null(aux.direc)) {
-      aux.direc  <- lapply(aux.direc, limpiadirecGoogle)
-      components <- paste0(
-        c(
-          paste0("route:", aux.direc[["nvia"]]),
-          paste0("locality:", aux.direc[["muni"]])
-        ),
-        collapse = "|"
-      )
-    }
-    api.args <- list(
-      address    = direc,
-      bounds     = bounds,
-      region     = "es",
-      components = components,
-      key        = clave_google
-    )
-    map_url  <- "https://maps.googleapis.com/maps/api/geocode/json?"
-    res      <- llama_google(map_url, api.args, 10)
-    if (httr::http_error(res))
-      warning("Error in query: ", httr::http_status(res)$message)
-    res <- jsonlite::fromJSON(httr::content(res, as = "text"))
-
-    if (res$status == "OK") {
-      devuelve$state  <- "OK"
-      devuelve$georef <- "google"
-      resultados      <- res$results
-
-      # lat y lng
-      devuelve$lat <- resultados$geometry$location$lat[[1]]
-      devuelve$lng <- resultados$geometry$location$lng[[1]]
-
-      # stateMsg
-      devuelve$stateMsg <- resultados$geometry$location_type[[1]]
-
-      # type
-      devuelve$type <- paste(resultados$types[[1]], collapse = " ")
-
-      if (length(resultados$address_components) > 0) {
-        # province
-        ident <- grep("\\badministrative_area_level_2\\b", resultados$address_components[[1]]$types)
-        if (length(ident) != 0) {
-          devuelve$province <- resultados$address_components[[1]][ident, "long_name"]
-        }
-
-        # muni
-        ident <- grep("\\blocality\\b", resultados$address_components[[1]]$types)
-        if (length(ident) != 0) {
-          devuelve$muni <- resultados$address_components[[1]][ident, "long_name"]
-        }
-
-        # tip_via y address
-        ident <- grep("\\broute\\b", resultados$address_components[[1]]$types)
-        if (length(ident) != 0) {
-          devuelve$tip_via <- resultados$address_components[[1]][ident, "types"][[1]]
-          devuelve$address <- resultados$address_components[[1]][ident, "long_name"]
-        }
-
-        # portalNumber
-        ident <- grep("\\bstreet_number\\b", resultados$address_components[[1]]$types)
-        if (length(ident) != 0) {
-          devuelve$portalNumber <- resultados$address_components[[1]][ident, "long_name"]
-        }
-
-        # postalCode
-        ident <- grep("\\bpostal_code\\b", resultados$address_components[[1]]$types)
-        if (length(ident) != 0) {
-          devuelve$postalCode <- resultados$address_components[[1]][ident, "long_name"]
-        }
-      }
-
-      # Compruebo si el punto devuelto esta en el poligono que corresponde
+  for (i in seq_along(direc)) {
+    if (nchar(direc[i]) > 0) {
+      direc[i]   <- limpiadirecGoogle(cadena = direc[i])
+      bounds     <- NULL
+      components <- NULL
       if (!is.null(poligono)) {
-        pto.in.poli <- comprueba_punto_poligono(punto = devuelve[, c("lat", "lng")], poligono)
-        if (!pto.in.poli) {
-          devuelve <- data.frame(georef = "NO punto", stringsAsFactors = FALSE)
+        stopifnot(class(poligono) == "SpatialPolygonsDataFrame")
+        bounds <- sp::bbox(poligono)
+        bounds <- paste0(
+          c(
+            paste0(bounds[2:1, 1], collapse = ","),
+            paste0(bounds[2:1, 2], collapse = ",")
+          ),
+          collapse = "|"
+        )
+      }
+      if (!is.null(aux.direc)) {
+        aux.direc  <- lapply(aux.direc, limpiadirecGoogle)
+        components <- paste0(
+          c(
+            paste0("route:", aux.direc[["nvia"]]),
+            paste0("locality:", aux.direc[["muni"]])
+          ),
+          collapse = "|"
+        )
+      }
+      api.args <- list(
+        address    = direc[i],
+        bounds     = bounds,
+        region     = "es",
+        components = components,
+        key        = clave_google
+      )
+      map_url  <- "https://maps.googleapis.com/maps/api/geocode/json?"
+      res      <- llama_google(map_url, api.args, 10)
+      if (httr::http_error(res))
+        warning("Error in query: ", httr::http_status(res)$message)
+      res <- jsonlite::fromJSON(httr::content(res, as = "text"))
+
+      if (res$status == "OK") {
+        resultados <- res$results
+        tmp <- vector("list", nrow(resultados))
+        for (j in seq_len(nrow(resultados))) {
+          tmp[[j]]          <- df_vacio
+          tmp[[j]]$id_geo   <- paste(i, j, sep = "-")
+          tmp[[j]]$id       <- paste(i)
+          tmp[[j]]$state    <- "OK"
+          tmp[[j]]$georef   <- "google"
+
+          # lat y lng
+          tmp[[j]]$lat <- resultados$geometry$location$lat[[j]]
+          tmp[[j]]$lng <- resultados$geometry$location$lng[[j]]
+
+          # stateMsg
+          tmp[[j]]$stateMsg <- resultados$geometry$location_type[[j]]
+
+          # type
+          tmp[[j]]$type <- paste(resultados$types[[j]], collapse = " ")
+
+          if (length(resultados$address_components[j]) > 0) {
+            # province
+            ident <- grep("\\badministrative_area_level_2\\b", resultados$address_components[[j]]$types)
+            if (length(ident) != 0) {
+              tmp[[j]]$province <- resultados$address_components[[j]][ident, "long_name"]
+            }
+
+            # muni
+            ident <- grep("\\blocality\\b", resultados$address_components[[j]]$types)
+            if (length(ident) != 0) {
+              tmp[[j]]$muni <- resultados$address_components[[j]][ident, "long_name"]
+            }
+
+            # tip_via y address
+            ident <- grep("\\broute\\b", resultados$address_components[[j]]$types)
+            if (length(ident) != 0) {
+              tmp[[j]]$tip_via <- paste(unlist(resultados$address_components[[j]][ident, "types"]), collapse = ", ")
+              tmp[[j]]$address <- resultados$address_components[[j]][ident, "long_name"]
+            }
+
+            # portalNumber
+            ident <- grep("\\bstreet_number\\b", resultados$address_components[[j]]$types)
+            if (length(ident) != 0) {
+              tmp[[j]]$portalNumber <- resultados$address_components[[j]][ident, "long_name"]
+            }
+
+            # postalCode
+            ident <- grep("\\bpostal_code\\b", resultados$address_components[[j]]$types)
+            if (length(ident) != 0) {
+              tmp[[j]]$postalCode <- resultados$address_components[[j]][ident, "long_name"]
+            }
+          }
+
+          # Compruebo si el punto devuelto esta en el poligono que corresponde
+          if (!is.null(poligono)) {
+            pto.in.poli <- comprueba_punto_poligono(punto = tmp[[j]][, c("lat", "lng")], poligono)
+            if (!pto.in.poli) {
+              tmp[[j]][, names(tmp[[j]]) != "georef"] <- NA
+              tmp[[j]]$georef                         <- "NO punto"
+            }
+          }
         }
+        if (varios_resultados) {
+          devuelve[[i]] <- rbindlist(tmp, fill = TRUE)
+        } else {
+          devuelve[[i]] <- tmp[[1]][, -2]
+        }
+      } else {
+        devuelve[[i]]        <- df_vacio[, -2]
+        devuelve[[i]]$id     <- paste(i)
+        devuelve[[i]]$state  <- res$status
+        devuelve[[i]]$georef <- "NO"
       }
     } else {
-      devuelve <- data.frame(georef = "NO", state = res$status, stringsAsFactors = FALSE)
+      devuelve[[i]]    <- df_vacio[, -2]
+      devuelve[[j]]$id <- paste(i)
     }
   }
+
+  devuelve <- rbindlist(devuelve, fill = TRUE)
+
 
   return(devuelve)
 }

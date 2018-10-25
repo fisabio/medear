@@ -850,8 +850,8 @@ mallorca <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = "0704004021",
-  sc2             = "0704004039"
+  sc1             = c("0704004021", "0704002015"),
+  sc2             = c("0704004039", "0704002014")
 )
 save(mallorca, file = "mallorca.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.

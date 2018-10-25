@@ -1,5 +1,5 @@
 ---
-title: "Protocolo de geocodificación (v2.1)"
+title: "Protocolo de geocodificación (v2.2)"
 author: "Grupo MEDEA"
 date: "`r Sys.Date()`"
 output: 
@@ -200,9 +200,11 @@ for (i in 1:totno.geo) {
     # Georreferenciación con CartoCiudad con comprobación de que la 
     # geocodificación que hemos obtenido recae geográficamente dentro del 
     # límite geográfico correspondiente a la ciudad.
-    aux <- geocodificar_cartociudad(
+    poli <- all(is.na(carto.munis$CUMUN == datosmort$CODMUNIRES[cont]))
+    poli <- if (poli) NULL else carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
+    aux  <- geocodificar_cartociudad(
       direc    = direc,
-      poligono = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
+      poligono = poli
     )
     
     # En caso de que quisiéramos geocodificar con CartoCiudad sin más, 
@@ -231,11 +233,11 @@ for (i in 1:totno.geo) {
           # Función que aplica los filtros:
           aux.direcf <- filtra_dir(vias = aux.direc, filtro) 
           if (aux.direcf != "") {
-              direcf <- aux.direcf
-              aux    <- geocodificar_cartociudad(
-                direc    = direcf,
-                poligono = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
-              )
+            direcf <- aux.direcf
+            aux    <- geocodificar_cartociudad(
+              direc    = direcf,
+              poligono = poli
+            )
           }
           if(substr(aux$georef, 1, 2) != "NO") {
             datosmort[cont, columnas_elegidas] <- aux
@@ -322,24 +324,22 @@ for (i in 1:totno.geo) {
   } else {
     # Georreferencia con Google con comprobación de que es asignado al interior del polígono
     # correspondiente a la ciudad.
+    poli <- all(is.na(carto.munis$CUMUN == datosmort$CODMUNIRES[cont]))
+    poli <- if (poli) NULL else carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
     aux <- geocodificar_google(
       direc        = direc,
       clave_google = clave_google,
       aux.direc    = aux.direc,
-      poligono     = carto.munis[carto.munis$CUMUN == datosmort$CODMUNIRES[cont], ]
+      poligono     = poli
     )
-  
-    # Para geocodificar con Google sin más, si no se quisiera cruzar 
-    # con los límites geográficos de la ciudad haríamos:
-    # aux <- geocodificar_google(direc)
-    
+
     if (aux$georef == "NO punto") {
       datosmort$georef[cont] <- "NO punto google"
-    }  
+    }
     if (aux$georef == "NO") {# Cuando NO se ha podido geocodificar con google 
       # recogemos el motivo: "ZERO_RESULTS", "OVER_QUERY_LIMIT", ...
       datosmort$state[cont] <- as.character(aux$state)
-    }  
+    }
     if(!aux$georef %in% c("NO", "NO punto")) {
       datosmort[cont, columnas_elegidas] <- aux
     }
