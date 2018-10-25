@@ -6,7 +6,8 @@
 \title{Implementar la cuarta fase del algoritmo de geocodificación de
   direcciones de MEDEA3 (geocodificado con Google)}
 \usage{
-geocodificar_google(direc, clave_google = NULL, aux.direc = NULL, poligono = NULL)
+geocodificar_google(direc, clave_google = NULL, aux.direc = NULL,
+  poligono = NULL, varios_resultados = FALSE)
 }
 \arguments{
 \item{direc}{Cadena de carácteres con la dirección a geocodificar.}
@@ -17,6 +18,11 @@ geocodificar_google(direc, clave_google = NULL, aux.direc = NULL, poligono = NUL
 \item{aux.direc}{Opcional: Lista resultado de la función \code{\link{limpia_dir}}.}
 
 \item{poligono}{Opcional: Objeto de clase \code{\link[sp]{SpatialPolygons}}.}
+
+\item{varios_resultados}{Valor lógico: En caso de encontrar varias coincidencia,
+¿desea que se devuelvan todas o solo la primera? Por defecto (FALSE) solo se
+devuelve la primera, que es el comportamiento esperado en el protocolo de
+geocodificación.}
 }
 \value{
 Un data.frame con una fila y 14 columnas: id, province, muni, tip_via,
