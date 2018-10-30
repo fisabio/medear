@@ -1,14 +1,15 @@
 ---
-title: "Protocolo de geocodificación (v2.2)"
+title: "Protocolo de geocodificación MEDEA 3"
+subtitle: "Versión 2.2"
 author: "Grupo MEDEA"
-date: "`r Sys.Date()`"
+date: "2018-10-25"
 output: 
   rmarkdown::html_vignette:
     number_sections: true
 vignette: >
   %\VignetteIndexEntry{Protocolo de geocodificacion MEDEA 3}
-  %\usepackage[utf8]{inputenc}
   %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
 Todo el protocolo se vertebra alrededor del uso de herramientas gratuitas y que pueden funcionar en cualquier sistema operativo (de ahí la elección de `R` como software de referencia). Concretamente, y para el proceso de geocodificación, el protocolo se ha estructurado en 4 fases:
