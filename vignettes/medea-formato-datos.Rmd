@@ -1,14 +1,15 @@
 ---
 title: "Formato de las bases de datos en el Proyecto MEDEA3"
-author: ""
-date: "17 de julio de 2018"
+subtitle: "Versión 1.1"
+author: "Grupo MEDEA"
+date: "2018-10-25"
 output:
   rmarkdown::html_vignette:
     number_sections: true
 vignette: >
   %\VignetteIndexEntry{Formato de las bases de datos en el Proyecto MEDEA3}
-  %\usepackage[utf8]{inputenc}
   %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
 # Introducción
