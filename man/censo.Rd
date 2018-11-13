@@ -11,30 +11,22 @@
     \item seccion Código de sección censal (10 caracteres).
     \item muni Código INE del municipio.
     \item year Año del censo.
-    \item i01 Número de trabajadores manuales entre los ocupados o parados que
-      han trabajado antes, de 16 o más años.
-    \item i02 Número de trabajadores manuales entre los ocupados, de 16 o más años.
-    \item i03 Número de parados de 16 o más años entre los activos.
-    \item i04 Número de asalariados eventuales entre los ocupados o parados
-      que han trabajado antes de 16 o más años.
-    \item i05 Número de asalariados eventuales entre los ocupados de 16 o más años.
-    \item i06 Número de personas con instrucción insuficiente de 16 o más años.
-    \item i07 Número de personas con instrucción insuficiente de 16 a 29 años.
-    \item i08 Número de población de 65 o más años.
-    \item i09 Número de nacidos en países de renta baja.
-    \item i10 Número de nacidos en países de renta baja llegados a España
-      después de 2006.
-    \item i11 Número de nacidos en países de renta baja o nacidos en España
-      cuyo padre o madre ha nacido en países de renta baja.
-    \item IE01_d Total de población ocupada o parada que ha trabajado antes
-      de 16 o más años.
-    \item IE02_d Total de población ocupada de 16 o más años.
-    \item IE03_d Total de población de 16 o más años en situación laboral = 1
+    \item i01 Numerador: Trabajadores manuales entre los ocupados, de 16 o más años (dividir por i01_d).
+    \item i02 Numerador: Parados de 16 o más años entre los activos (dividir por i02_d).
+    \item i03 Numerador: Asalariados eventuales entre los ocupados de 16 o más años (dividir por i02_d).
+    \item i04 Numerador: Personas con instrucción insuficiente de 16 o más años (dividir por i03_d).
+    \item i05 Numerador: Personas con instrucción insuficiente de 16 a 29 años (dividir por i04_d).
+    \item i06 Numerador: Población de 65 o más años (dividir por i05_d).
+    \item i07 Numerador: Nacidos en países de renta baja (dividir por i05_d).
+    \item i08 Numerador: Nacidos en países de renta baja llegados a España
+      después de 2006 (dividir por i05_d).
+    \item i01_d Denominador: Población ocupada de 16 o más años.
+    \item i02_d Denominador: Población de 16 o más años en situación laboral = 1
       Ocupado/a + 2 Parado que ha trabajado antes + 3 Parado que busca
       empleo (población activa).
-    \item IE06_d Total de población de 16 o más años.
-    \item IE07_d Total de población de 16 a 29  años.
-    \item IE08_d Total de población total.
+    \item i03_d Denominador: Población de 16 o más años.
+    \item i04_d Denominador: Población de 16 a 29  años.
+    \item i05_d Denominador: Población total.
   }}
 \description{
 Datos de los censos de 2001 y 2011 necesarios para construir el
