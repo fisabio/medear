@@ -491,6 +491,8 @@ geocodificar_google <- function(direc, clave_google = NULL, aux.direc = NULL,
   if (is.null(clave_google))
     stop("Debe proporcionarse una clave de servicio de Google. Consulte la ayuda.")
 
+  direc <- tolower(direc)
+
   df_vacio <- data.frame(
     id               = "",
     id_geo           = "",
