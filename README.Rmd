@@ -29,7 +29,7 @@ El paquete `medear` se puede instalar desde GitHub con:
 ```{r gh-installation, eval = FALSE}
 if (!"devtools" %in% installed.packages())
   install.packages("devtools")
-devtools::install_github("fisabio/medear", build_vignettes = TRUE)
+devtools::install_github("fisabio/medear", build_opts = c("--no-resave-data", "--no-manual"))
 ```
 
 **IMPORTANTE**: si trabajas desde un ordenador conectado a la red a través de un *proxy*, es muy importante que te asegures de que tu conexión esté bien configurada. Para ello debes ejecutar esta serie de comandos (sustituyendo el texto por los valores apropiados de tu centro: pregunta al servicio de informática):

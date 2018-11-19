@@ -34,7 +34,7 @@ El paquete `medear` se puede instalar desde GitHub con:
 ``` r
 if (!"devtools" %in% installed.packages())
   install.packages("devtools")
-devtools::install_github("fisabio/medear", build_vignettes = TRUE)
+devtools::install_github("fisabio/medear", build_opts = c("--no-resave-data", "--no-manual"))
 ```
 
 **IMPORTANTE**: si trabajas desde un ordenador conectado a la red a
