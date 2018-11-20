@@ -78,6 +78,6 @@ Los códigos de sección censal (columna \code{seccion} del
    Poblaciones}.
 }
 \seealso{
-\code{\link{descarga_poblaciones}}, \code{\link{carga_datos}}
+\code{\link{descarga_poblaciones}}, \code{\link{carga_datos}}.
 }
 \keyword{datasets}

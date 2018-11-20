@@ -46,4 +46,7 @@ cambios_sin_cp <- cambios_seccion[cambios_seccion$cp == FALSE, ]
 cambios_con_cp <- cambios_seccion[cambios_seccion$cp == TRUE, ]
 }
 }
+\seealso{
+\code{\link{detecta_cambios}} y \code{\link{descarga_trameros}}.
+}
 \keyword{datasets}
