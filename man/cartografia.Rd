@@ -43,4 +43,7 @@ Contiene la cartografía por sección censal tal cual puede ser
 
   \href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
 }
+\seealso{
+\code{\link{descarga_cartografia}}.
+}
 \keyword{datasets}
