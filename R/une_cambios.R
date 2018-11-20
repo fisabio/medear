@@ -760,19 +760,18 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       .SDcols = in_col
     ]
     setnames(censo_c, "cluster", "seccion")
-    denom    <- paste0("IE0", c(1:3, 1:2, 6:8, 8, 8, 8), "_d")
-    vars_out <- c(paste0("i0", 1:9), paste0("i", c(10:11)))
-    vars_in  <- c(paste0("IE0", 1:8), paste0("IE", c(19:21)))
+    denominador <- paste0("i0", c(1:2, 2:4, 5, 5, 5), "_d")
+    numerador   <- paste0("i0", 1:8)
+    vars_in     <- paste0("ind_", 1:8)
     bdd      <- mapply(
       function(x, y) x / y * 100,
-      censo_c[, ..vars_out],
-      censo_c[, ..denom],
+      censo_c[, ..numerador],
+      censo_c[, ..denominador],
       USE.NAMES = FALSE
     )
-    dimnames(bdd) <- list(c(), vars_in)
+    dimnames(bdd) <- list(censo_c$seccion, vars_in)
     censo_c       <- cbind(censo_c, bdd)
-    mi_fun <- function(datos) {
-      vars     <- c("IE01", "IE03", "IE04", "IE06", "IE07")
+    mi_fun <- function(datos, vars) {
       mi_formu <- stats::as.formula(paste("~", paste(vars, collapse = " + ")))
       indice   <- stats::prcomp(mi_formu, datos, center = TRUE, scale = TRUE)
       indice   <- as.numeric(scale(indice$x[, 1]))
@@ -780,7 +779,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         indice <- -indice
       return(indice)
     }
-    censo_c <- censo_c[, indice := mi_fun(.SD), by = .(year, muni)][, -c(3:31)]
+    censo_c <- censo_c[, indice := mi_fun(.SD, vars_in[1:5]), by = .(year, muni)]
     censo_c <- censo_c[order(year, seccion)]
     n_years <- length(unique(censo_c$year))
     indice  <- array(
