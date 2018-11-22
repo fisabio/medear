@@ -613,7 +613,6 @@ save(madrid, file = "madrid.RData")
 
 ```{r alicante, eval=FALSE}
 codigo          <- "03014"
-cambios_seccion <- elimina_cambios(cambios_seccion,  "0301403026", "0301403034")
 alicante        <- une_secciones(
   cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
@@ -624,8 +623,8 @@ alicante        <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("04035", "04041")),
-  sc2             = paste0(codigo, c("04020", "04023"))
+  sc1             = paste0(codigo, c("04035", "04041", "08022")),
+  sc2             = paste0(codigo, c("04020", "04023", "08012"))
 )
 save(alicante, file = "alicante.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -635,8 +634,9 @@ save(alicante, file = "alicante.RData")
 ### Castellón
 
 ```{r castellon, eval=FALSE}
-codigo    <- "12040"
-castellon <- une_secciones(
+codigo          <- "12040"
+cambios_seccion <- elimina_cambios(cambios_seccion, "1204009005", "1204009011")
+castellon       <- une_secciones(
   cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
   years_estudio   = 1996:2015,
