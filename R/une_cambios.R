@@ -579,7 +579,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         if (exists("islas_alerta")) {
           cartografia$revision_manual[cartografia$seccion %in% islas_alerta] <- "Revisar manualmente"
           warning(
-            "\nLas secciones de la cartograf\u00eda: c('", paste(islas_alerta, collapse = "', '"), "'),",
+            "Las secciones de la cartograf\u00eda: c('", paste(islas_alerta, collapse = "', '"), "'),",
             " est\u00e1n conformadas por varios pol\u00edgonos que no son colindantes.\n",
             "Por favor, rev\u00edselas manualmente (consulte la ayuda de la funci\u00f3n).",
             call. = FALSE
@@ -675,7 +675,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         not_in_carto <- unique(poblacion$seccion)[!unique(poblacion$seccion) %in% cartografia$seccion]
         if (length(not_in_pobla) > 0) {
           warning(
-            "\nTras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
+            "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
             paste0(not_in_pobla, collapse = "', '"),
             "') aparecen en la cartograf\u00eda pero no en los datos de poblaci\u00f3n.\n",
             "Por favor, consulte la ayuda de la funci\u00f3n para tratar de solucionarlo.",
@@ -686,7 +686,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         if (length(not_in_carto) > 0) {
           not_in_years <- unique(poblacion[seccion %in% not_in_carto, year])
           warning(
-            "\nTras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
+            "Tras realizar la uni\u00f3n con las opciones marcadas, las secciones c('",
             paste0(not_in_carto, collapse = "', '"),
             "') aparecen en los datos de poblaci\u00f3n pero no en la cartograf\u00eda, ",
             " para los a\u00f1os c(", paste0(not_in_years, collapse = ", "), ").\n",
@@ -702,7 +702,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
 
       if (any(uno_vect)) {
         warning(
-          "\nNo hay datos de poblaci\u00f3n para algunos a\u00f1os en las secciones c('",
+          "No hay datos de poblaci\u00f3n para algunos a\u00f1os en las secciones c('",
           paste0(unique(poblacion$seccion[uno_vect]), collapse = "', '"),
           "').\nSe asigna el valor 1 como poblaci\u00f3n ",
           "a dichas secciones para esos a\u00f1os.\nPor favor, consulte la ayuda de la funci\u00f3n ",
@@ -745,6 +745,8 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
   ##############################################################################
 
   if (!is.null(censo)) {
+    warning("El c\u00e1lculo del \u00edndice de privaci\u00f3n sigue la metodolog\u00eda MEDEA2.\n",
+            "V\u00e9ase: https://doi.org/10.1157/13123961", call. = FALSE)
     censo_c <- copy(censo)
     censo_c <- censo_c[muni %in% cartografia$CUMUN]
 
@@ -760,7 +762,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       .SDcols = in_col
     ]
     setnames(censo_c, "cluster", "seccion")
-    denominador <- paste0("i0", c(1:2, 2:4, 5, 5, 5), "_d")
+    denominador <- paste0("i0", c(1:2, 1, 3:4, 5, 5, 5), "_d")
     numerador   <- paste0("i0", 1:8)
     vars_in     <- paste0("ind_", 1:8)
     bdd      <- mapply(
