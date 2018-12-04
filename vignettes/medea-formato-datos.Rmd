@@ -209,8 +209,8 @@ Agradeceríamos que nos hicierais llegar la información de vuestras ciudades ex
    <td style="text-align:left;"> <span style="     ">Lesiones por accidentes de tráfico de vehículos de motor</span> </td>
    <td style="text-align:left;"> Accidentes de tráfico </td>
    <td style="text-align:left;"> Traffic accident </td>
-   <td style="text-align:center;"> <sup>&#8225;</sup> </td>
    <td style="text-align:center;"> E810-E819 </td>
+   <td style="text-align:center;"> <sup>&#8225;</sup> </td>
   </tr>
   <tr>
    <td style="text-align:left; padding-left: 2em;" indentlevel="1"> <span style=" font-weight: bold;    ">Agrupación</span> </td>
