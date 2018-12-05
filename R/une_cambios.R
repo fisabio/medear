@@ -745,8 +745,8 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
   ##############################################################################
 
   if (!is.null(censo)) {
-    warning("El c\u00e1lculo del \u00edndice de privaci\u00f3n sigue la metodolog\u00eda MEDEA2.\n",
-            "V\u00e9ase: https://doi.org/10.1157/13123961", call. = FALSE)
+    # warning("El c\u00e1lculo del \u00edndice de privaci\u00f3n sigue la metodolog\u00eda MEDEA2.\n",
+    #         "V\u00e9ase: https://doi.org/10.1157/13123961", call. = FALSE)
     censo_c <- copy(censo)
     censo_c <- censo_c[muni %in% cartografia$CUMUN]
 
@@ -762,36 +762,36 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       .SDcols = in_col
     ]
     setnames(censo_c, "cluster", "seccion")
-    denominador <- paste0("i0", c(1:2, 1, 3:4, 5, 5, 5), "_d")
-    numerador   <- paste0("i0", 1:8)
-    vars_in     <- paste0("ind_", 1:8)
-    bdd      <- mapply(
-      function(x, y) x / y * 100,
-      censo_c[, ..numerador],
-      censo_c[, ..denominador],
-      USE.NAMES = FALSE
-    )
-    dimnames(bdd) <- list(censo_c$seccion, vars_in)
-    censo_c       <- cbind(censo_c, bdd)
-    mi_fun <- function(datos, vars) {
-      mi_formu <- stats::as.formula(paste("~", paste(vars, collapse = " + ")))
-      indice   <- stats::prcomp(mi_formu, datos, center = TRUE, scale = TRUE)
-      indice   <- as.numeric(scale(indice$x[, 1]))
-      if (indice[which.max(rowSums(datos[, vars, with = FALSE]))] < 0)
-        indice <- -indice
-      return(indice)
-    }
-    censo_c <- censo_c[, indice := mi_fun(.SD, vars_in[1:5]), by = .(year, muni)]
-    censo_c <- censo_c[order(year, seccion)]
-    n_years <- length(unique(censo_c$year))
-    indice  <- array(
-      dim      = c(length(unique(censo_c$seccion)), length(unique(censo_c$year))),
-      dimnames = list(unique(censo_c$seccion), unique(censo_c$year))
-    )
-    indice[, seq_len(n_years)] <- censo_c$indice
+    # denominador <- paste0("i0", c(1:2, 1, 3:4, 5, 5, 5), "_d")
+    # numerador   <- paste0("i0", 1:8)
+    # vars_in     <- paste0("ind_", 1:8)
+    # bdd      <- mapply(
+    #   function(x, y) x / y * 100,
+    #   censo_c[, ..numerador],
+    #   censo_c[, ..denominador],
+    #   USE.NAMES = FALSE
+    # )
+    # dimnames(bdd) <- list(censo_c$seccion, vars_in)
+    # censo_c       <- cbind(censo_c, bdd)
+    # mi_fun <- function(datos, vars) {
+    #   mi_formu <- stats::as.formula(paste("~", paste(vars, collapse = " + ")))
+    #   indice   <- stats::prcomp(mi_formu, datos, center = TRUE, scale = TRUE)
+    #   indice   <- as.numeric(scale(indice$x[, 1]))
+    #   if (indice[which.max(rowSums(datos[, vars, with = FALSE]))] < 0)
+    #     indice <- -indice
+    #   return(indice)
+    # }
+    # censo_c <- censo_c[, indice := mi_fun(.SD, vars_in[1:5]), by = .(year, muni)]
+    # censo_c <- censo_c[order(year, seccion)]
+    # n_years <- length(unique(censo_c$year))
+    # indice  <- array(
+    #   dim      = c(length(unique(censo_c$seccion)), length(unique(censo_c$year))),
+    #   dimnames = list(unique(censo_c$seccion), unique(censo_c$year))
+    # )
+    # indice[, seq_len(n_years)] <- censo_c$indice
 
     res_attr        <- attributes(res)
-    res             <- append(res, list(censo = indice))
+    res             <- append(res, list(censo = censo_c))
     attributes(res) <- append(attributes(res), res_attr["names" != names(res_attr)])
   }
 
