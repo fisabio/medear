@@ -270,7 +270,6 @@ carga_datos <- function(key, tipo = c("poblacion", "censo")) {
     datos <- unserialize(
       sodium::data_decrypt(readRDS(cifrado), key)
     )
-    attributes(datos)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
     class(datos) <- c(class(datos), "censos_ine")
   }
   return(datos)

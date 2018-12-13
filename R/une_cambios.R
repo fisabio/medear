@@ -745,8 +745,8 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
   ##############################################################################
 
   if (!is.null(censo)) {
-    warning("El c\u00e1lculo del \u00edndice de privaci\u00f3n sigue la metodolog\u00eda MEDEA2.\n",
-            "V\u00e9ase: https://doi.org/10.1157/13123961", call. = FALSE)
+    # warning("El c\u00e1lculo del \u00edndice de privaci\u00f3n sigue la metodolog\u00eda MEDEA2.\n",
+    #         "V\u00e9ase: https://doi.org/10.1157/13123961", call. = FALSE)
     censo_c <- copy(censo)
     censo_c <- censo_c[muni %in% cartografia$CUMUN]
 

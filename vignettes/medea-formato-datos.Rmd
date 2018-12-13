@@ -40,7 +40,7 @@ En resumen, para cada ciudad los datos se guardarán en un objeto de clase lista
 
 * Objeto `mortalidad`: `array` 5-dimensional. Las cuatro primeras dimensiones de este `array` serían las mismas que las del `array` de poblaciones. La quinta dimensión identifica las causas de mortalidad que se acordaron como objetivos generales del proyecto. Dichas causas de mortalidad, así como su definición, vienen reflejadas en la Tabla 1. Nuevamente, las etiquetas de las causas de muerte se pueden consultar en el objeto correspondiente al `array` de mortalidad del archivo `castellon.RData`.  
 
-* Objeto `socio`: Actualmente no implementado en la función `une_secciones` dado que nos disponemos de la información correspondiente. En cualquier caso se prevé que este objeto sea un `array` de dimensiones: Año (2 niveles: 2001 y 2011), Secciones (número de niveles depende de la ciudad) y Variables Socioeconómicas (7 niveles según dijimos en la última reunión). Por ahora no es necesario que os preocupéis de esta parte de la información requerida: cuando tengamos la información socioeconómica os daremos información más detallada sobre este objeto.
+* Objeto `censo`: `data.frame` con tres columnas (sección censal, índice para el año 2001 e índice para el año 2011) y tantas filas como secciones censales haya. Por ahora no es necesario que os preocupéis de esta parte de la información requerida: más adelante os daremos información más detallada sobre este objeto.
 
 Para aquellos nodos que no vayan a agregar ninguna sección censal para el periodo de estudio, aconsejamos lo siguiente:
 
@@ -243,7 +243,7 @@ devtools::install_github("fisabio/medear", build_vignettes = TRUE)
 library(medear)
 ```
 
-Adicionalmente, deberíamos cargar los datos de cambios de secciones censales, la cartografía que viene junto con el paquete y los datos de poblaciones. Estos últimos se cargarán con la función `carga_datos`. Esta función debe llevar como argumento la contraseña que da acceso a los datos de poblaciones (de los años 1996-2003), si no no podremos disponer de dicha información (parcialmente de pago y por tanto protegida). En un futuro `carga_datos` también dará acceso a la información (protegida) socioeconómica del proyecto.
+Adicionalmente, deberíamos cargar los datos de cambios de secciones censales, la cartografía que viene junto con el paquete y los datos de poblaciones. Estos últimos se cargarán con la función `carga_datos`. Esta función debe llevar como argumento la contraseña que da acceso a los datos de poblaciones (de los años 1996-2003), si no no podremos disponer de dicha información (parcialmente de pago y por tanto protegida). Cabe mencionar que `carga_datos` también da acceso a la información (protegida) socioeconómica del proyecto.
 
 ```{r inicial2, eval=FALSE}
 data("cambios_seccion")
@@ -567,14 +567,11 @@ save(barcelona, file = "barcelona.RData")
 
 ## Comunidad de Madrid
 
+Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado.
 
-
-Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un `array` de población vacío (todos los valores son `NA`'s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).
-
-### Madrid (provisional)
+### Madrid
 
 ```{r madrid, eval=FALSE}
-# Unión provisional para los 20 años
 codigo          <- "28079"
 cambios_seccion <- elimina_cambios(cambios_seccion,
                                   paste0("28079", c("12103", "06016")),
