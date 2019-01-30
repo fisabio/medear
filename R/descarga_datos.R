@@ -271,15 +271,18 @@ descarga_cartografia <- function(epsg = 4326, conservar = TRUE, ntries = 10) {
   )
   if (!dir.exists(dir_dest))
     dir.create(dir_dest, recursive = TRUE)
-  descarga_segura(
-    x        = "http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip",
-    destfile = paste0(dir_dest, "/carto_2011.zip"),
-    tries    = ntries
-  )
-  utils::unzip(
-    zipfile = paste0(dir_dest, "/carto_2011.zip"),
-    exdir = dir_dest
-  )
+  if (!file.exists(paste0(dir_dest, "/SECC_CPV_E_20111101_01_R_INE.shp"))) {
+    descarga_segura(
+      x        = "http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip",
+      destfile = paste0(dir_dest, "/carto_2011.zip"),
+      tries    = ntries
+    )
+    utils::unzip(
+      zipfile = paste0(dir_dest, "/carto_2011.zip"),
+      exdir = dir_dest
+    )
+  }
+
   carto <- rgdal::readOGR(
     dsn              = paste0(dir_dest, "/SECC_CPV_E_20111101_01_R_INE.shp"),
     verbose          = FALSE,
@@ -308,14 +311,9 @@ descarga_cartografia <- function(epsg = 4326, conservar = TRUE, ntries = 10) {
 #'   seccionado.
 #' @param years Vector numérico de longitud >= 1 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param descarga Valor lógico: ¿debe procederse a la descarga de los datos?
-#' @param ruta Cadena de carácteres indicando la ruta en la que se almacenan los
-#'   archivos tal cual se descargaron desde el INE, en caso de escoger
-#'   \code{descarga = FALSE}.
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.poblaciones/} dentro del directorio de
 #'   trabajo?
-#' @param ntries Valor numérico: número de intentos en caso de mala conexión.
 #'
 #' @details El tiempo de ejecución de la función varía según el número de
 #'   provincias y el rango de años. La forma más sencilla de acelerar el proceso
@@ -333,7 +331,7 @@ descarga_cartografia <- function(epsg = 4326, conservar = TRUE, ntries = 10) {
 #'   se debe utilizar la función \code{\link{carga_datos}}.
 #'
 #' @usage descarga_poblaciones(cod_provincia = c(paste0("0", 1:9), 10:52), years
-#'   = 2006:2015, descarga = TRUE, ruta = NULL, conservar = TRUE, ntries = 10)
+#'   = 2004:2015, conservar = TRUE)
 #'
 #' @return Un objeto de clase \code{poblaciones_ine} donde las filas representan
 #'   las distintas secciones censales. Las tres primeras columnas son:
@@ -357,109 +355,94 @@ descarga_cartografia <- function(epsg = 4326, conservar = TRUE, ntries = 10) {
 #'   \code{\link{descarga_cartografia}}.
 #'
 descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
-                                 years = 2006:2015, descarga = TRUE, ruta = NULL,
-                                 conservar = TRUE, ntries = 10) {
+                                 years = 2004:2015, conservar = TRUE) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) >= 1 & years %in% 2006:(as.numeric(format(Sys.time(), "%Y")) - 1))
-  stopifnot(is.logical(descarga))
+  stopifnot(length(years) >= 1 & years %in% 2004:(as.numeric(format(Sys.time(), "%Y")) - 1))
   stopifnot(is.logical(conservar))
-  stopifnot(is.character(ruta) | is.null(ruta))
 
-  file_down <- matrix(ncol = length(years), nrow = length(cod_provincia))
-
-  if (descarga & is.null(ruta)) {
-    dir_dest <- normalizePath(
-      path     = paste0(getwd(), "/.poblaciones/prov_", cod_provincia),
-      winslash = "/",
-      mustWork = FALSE
-    )
-
-    for (i in seq_along(dir_dest)) {
-      for (j in seq_along(years)) {
-        if (!dir.exists(dir_dest[i]))
-          dir.create(dir_dest[i], recursive = TRUE)
-
-        file_down[i, j] <- paste0(dir_dest[i], "/", years[j], ".csv")
-        descarga_segura(
-          x = paste0(
-            "http://www.ine.es/jaxi/files/_px/es/csv_sc/t20/e245/p07/a",
-            years[j],
-            if (years[j] < 2011) {
-              paste0(
-                "/l0/0",
-                if (years[j] < 2008) {
-                  "2"
-                } else {
-                  "1"
-                }, cod_provincia[i])
-            } else {
-              paste0("/", cod_provincia[i], "01")
-            }, ".csv_sc?nocab=1"
-          ),
-          destfile = file_down[i, j],
-          tries    = ntries
-        )
-        Sys.sleep(1)
+  poblaciones <- vector("list", length(cod_provincia))
+  dir_dest <- normalizePath(
+    path     = paste0(getwd(), "/.poblaciones/prov_", cod_provincia),
+    winslash = "/",
+    mustWork = FALSE
+  )
+  for (i in seq_along(cod_provincia)) {
+    descarga <- TRUE
+    if (!dir.exists(dir_dest[i])) {
+      if (conservar)
+        dir.create(dir_dest[i], recursive = TRUE)
+    } else {
+      rutas <- paste0(dir_dest[i], "/", years, ".csv")
+      if (all(file.exists(rutas))) {
+        descarga    <- FALSE
+        poblaciones[[i]] <- lapply(rutas, fread)
       }
     }
-  } else {
-    if (!grepl("/$", ruta))
-      ruta <- paste0(ruta, "/")
-    dir_dest <- paste0(ruta, "prov_", cod_provincia)
-  }
-
-  poblaciones <- list()
-
-  for (i in seq_along(dir_dest)) {
-    for (j in seq_along(years)) {
-
-      file_down[i, j] <- paste0(dir_dest[i], "/", years[j], ".csv")
-      aux_file <- suppressWarnings(
-        readr::read_delim(
-          file      = file_down[i, j],
-          delim     = ";",
-          col_types = readr::cols(.default = "c"),
-          skip      = 5,
-          progress  = FALSE
+    if (descarga) {
+      poblaciones[[i]] <- vector("list", length(years))
+      for (j in seq_along(years)) {
+        ruta_tempus <- paste0(
+          "http://servicios.ine.es/wstempus/js/es/DATOS_TABLA//t20/e245/p07/a",
+          years[j],
+          if (years[j] < 2011) {
+            paste0(
+              "/l0/0",
+              if (years[j] < 2006) {
+                "2_."
+              } else if (years[j] < 2008) {
+                "2"
+              } else {
+                "1"
+              }, cod_provincia[i])
+          } else {
+            paste0("/", cod_provincia[i], "01")
+          },
+          ".px?tip=AM"
         )
-      )
-      anti_col    <- grep("^[X]|Total", colnames(aux_file))
-      names_df    <- c("seccion", paste0("q-", colnames(aux_file)[-anti_col]))
-      names_df    <- sub("05-09", "5-9", names_df)
-      names_df    <- sub(" y m\u00E1s", "-plus", names_df)
-      names_df    <- gsub("-", "_", names_df)
-      locate_rows <- grep("TOTAL|Nota", aux_file[[1]])
+        datos <- as.data.table(jsonlite::fromJSON(ruta_tempus))
 
-      hombres <- aux_file[(locate_rows[2] + 1):(locate_rows[3] - 2), ]
-      hombres <- as.data.table(hombres)
-      hombres[, c(2, ncol(hombres)) := NULL]
-      hombres[, c(2:ncol(hombres)) := lapply(.SD, as.integer), .SDcols = c(2:ncol(hombres))]
-      setnames(hombres, names_df)
-      hombres[, `:=`(sexo = 0, year = years[j])]
-      setcolorder(hombres, c("seccion", "sexo", "year",
-                             colnames(hombres)[2:(ncol(hombres) - 2)]))
+        datos$year    <- as.integer(years[j])
+        datos$pob     <- unlist(datos$Data, use.names = FALSE)
+        datos$sexo    <- sapply(datos$MetaData, function(x) x[1, 2])
+        datos$seccion <- sapply(datos$MetaData, function(x) x[2, 2])
+        datos$edad    <- sapply(datos$MetaData, function(x) x[3, 2])
+        datos         <- datos[, -c(1:3)]
+        setcolorder(datos, c(4, 3, 1, 5, 2))
 
-      mujeres <- aux_file[(locate_rows[3] + 1):(locate_rows[4] - 1), ]
-      mujeres <- as.data.table(mujeres)
-      mujeres[, c(2, ncol(mujeres)) := NULL]
-      mujeres[, c(2:ncol(mujeres)) := lapply(.SD, as.integer), .SDcols = c(2:ncol(mujeres))]
-      setnames(mujeres, names_df)
-      mujeres[, `:=`(sexo = 1, year = years[j])]
-      setcolorder(mujeres, c("seccion", "sexo", "year",
-                             colnames(mujeres)[2:(ncol(mujeres) - 2)]))
+        datos <- datos[grep("\\d+", seccion)]
+        datos <- datos[grep("hombr|masc|varo|mujer|feme", sexo, ignore.case = TRUE)]
+        datos <- datos[grep("\\d+", edad)]
 
-      poblaciones[[paste0("p", i, j)]] <- rbindlist(list(hombres, mujeres))
+        datos$edad <- paste0("q-", datos$edad)
+        datos$edad <- gsub(" y m\u00E1s", "-plus", datos$edad)
+        datos$edad <- gsub("05-09", "5-9", datos$edad)
+        datos$edad <- gsub("-", "_", datos$edad)
+        datos      <- dcast(datos, seccion + sexo + year ~ edad, value.var = "pob")
+        nombres <- colnames(datos)
+        nombres <- c(nombres[1:3], nombres[grep("q_0", nombres)], nombres[grep("q_5_", nombres)],
+                     nombres[grep("q_\\d{2}_[^p]", nombres)], nombres[grep("q_100|q_85_p", nombres)])
+        setcolorder(datos, nombres)
+
+        datos$sexo[grep("hombr|masc|varo", datos$sexo, ignore.case = TRUE)] <- "0"
+        datos$sexo[grep("mujer|feme", datos$sexo, ignore.case = TRUE)] <- "1"
+        datos$sexo <- as.integer(datos$sexo)
+        poblaciones[[i]][[paste0("p", i, j)]] <- datos
+
+        if (conservar) {
+          fwrite(x = datos, file = paste0(dir_dest[i], "/", years[j], ".csv"))
+        }
+      }
     }
+    poblaciones[[i]] <- rbindlist(poblaciones[[i]], fill = TRUE)
   }
-  if (descarga && !conservar)
-    unlink(dirname(dir_dest), recursive = TRUE)
 
   poblaciones <- rbindlist(poblaciones, fill = TRUE)
   poblaciones[, seccion := trimws(seccion)]
   setkey(poblaciones, seccion, sexo, year)
   attributes(poblaciones)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   class(poblaciones) <- c(class(poblaciones), "poblaciones_ine")
+
   return(poblaciones)
 }
