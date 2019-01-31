@@ -451,7 +451,6 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
            "Por favor, revise que los datos de cambios de seccionado hacen ",
            "referencia a secciones contenidas en los datos de cartograf\u00eda")
     }
-    cartografia <- cartografia[cartografia$CUMUN %in% substr(cambios$sc_ref, 1, 5), ]
 
     if ("vias" %in% names(cambios)) cambios$vias <- NULL
 

@@ -527,17 +527,18 @@ Al no haber seguido el protocolo de geocodificación tendrán que adaptar su bas
 
 ```{r santander, eval=FALSE}
 codigo    <- "39075"
-sc1       <- paste0(codigo, c("01011", "08012", "08011"))
-sc2       <- paste0(codigo, c("01009", "08027", "08010"))
 santander <- une_secciones(
-  cambios         = cambios_seccion[sc_ref %in% sc1 & sc_new %in% sc2 & codigo_postal == FALSE, ],
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
   years_estudio   = 1996:2015,
-  years_union     = 2011:2015,
   poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
   mortalidad      = datosmort,
-  catastro        = FALSE,
-  corte_edad      = 85
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("02023", "08020", "08021")),
+  sc2             = paste0(codigo, c("02024", "08029", "08025"))
 )
 save(santander, file = "santander.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.

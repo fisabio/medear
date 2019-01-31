@@ -9,10 +9,6 @@
 #'   seccionado.
 #' @param years Vector numérico de longitud >= 2 con los años para los que se
 #'   desee consultar las variaciones de seccionado.
-#' @param descarga Valor lógico: ¿debe procederse a la descarga de los trameros?
-#' @param ruta Cadena de carácteres indicando la ruta en la que se almacenan los
-#'   archivos tal cual se descargaron desde el INE, en caso de escoger
-#'   \code{descarga = FALSE}.
 #' @param conservar Valor lógico: ¿se desea conservar los archivos descargados
 #'   en el directorio oculto \code{./.trameros/} dentro del directorio de
 #'   trabajo?
@@ -28,8 +24,7 @@
 #'   la sección censal.
 #'
 #' @usage descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-#'   c(2001, 2004:2015), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
-#'   = 10)
+#'   c(2001, 2004:2015), conservar = TRUE, ntries = 10)
 #'
 #' @return Un objeto de clase \code{tramero_ine} con 11 columnas:
 #'   \item{CPRO}{Código de la provincia.} \item{CMUM}{Código del municipio.}
@@ -66,15 +61,12 @@
 #'   \code{\link{descarga_poblaciones}}.
 #'
 descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
-                              years = c(2001, 2004:2015), descarga = TRUE, ruta = NULL,
-                              conservar = TRUE, ntries = 10) {
+                              years = c(2001, 2004:2015), conservar = TRUE, ntries = 10) {
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
   stopifnot(length(years) > 0 & years %in% c(2001, 2004:(as.numeric(format(Sys.time(), "%Y")) - 1)))
-  stopifnot(is.logical(descarga))
   stopifnot(is.logical(conservar))
-  stopifnot(is.character(ruta) | is.null(ruta))
 
   trameros <- list()
   dir_dest <- normalizePath(
@@ -93,14 +85,23 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     y_2001 <- TRUE
     years  <- years[-(years == 2001)]
   }
-  if (!is.null(ruta)) {
-    descarga  <- FALSE
-    conservar <- TRUE
+
+  descarga <- TRUE
+  for (i in seq_along(dir_dest)) {
+    if (!dir.exists(dir_dest[i])) {
+      dir.create(dir_dest[i], recursive = TRUE)
+    }
   }
+  rutas <- paste0(dir_dest, "/year_", rep(substr(years, 3, 4), each = length(dir_dest)))
+  if (y_2001) {
+    rutas <- c(rutas, file.path(unique(dirname(dir_dest)), "TRAMG010831"))
+  }
+  if (all(file.exists(rutas))) {
+    descarga <- FALSE
+  }
+
   if (descarga) {
     if (y_2001) {
-      if (!dir.exists(unique(dirname(dir_dest))))
-        dir.create(unique(dirname(dir_dest)), recursive = TRUE)
       file_down <- paste0(unique(dirname(dir_dest)), "/nacional_2001.zip")
       descarga_segura(
         x        = "http://www.ine.es/prodyser/callejero/caj_esp/caj_esp_072001.zip",
@@ -116,8 +117,6 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     }
     for (i in seq_along(dir_dest)) {
       for (j in seq_along(years)) {
-        if (!dir.exists(dir_dest[i]))
-          dir.create(dir_dest[i], recursive = TRUE)
         file_down <- paste0(dir_dest[i], "/", substr(years, 3, 4)[j], ".zip")
         descarga_segura(
           x        = paste0("http://www.ine.es/prodyser/callejero/caj1",
@@ -149,10 +148,6 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         Sys.sleep(1)
       }
     }
-  } else {
-    if (!grepl("/$", ruta))
-      ruta <- paste0(ruta, "/")
-    dir_dest <- paste0(ruta, "prov_", cod_provincia)
   }
 
   ruta_tra <- matrix(NA, nrow = length(cod_provincia), ncol = length(years))
@@ -181,17 +176,12 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   }
   if (y_2001) {
     ruta_2001 <- list.files(
-      dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
+      unique(dirname(dir_dest)), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
     )
-    if (length(ruta_2001) == 0) {
-      stop("No existe el tramero de 2001 en el directorio indicado (", ruta, ")")
-    }
     trameros[["n_2001"]] <- as.data.table(
       suppressWarnings(
         readr::read_fwf(
-          file          = list.files(
-            dirname(dir_dest[1]), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
-          ),
+          file          = ruta_2001,
           col_positions = estructura,
           col_types     = readr::cols(.default = "c"),
           progress      = FALSE,

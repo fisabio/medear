@@ -6,8 +6,7 @@
 \title{Descarga los callejeros del INE}
 \usage{
 descarga_trameros(cod_provincia = c(paste0("0", 1:9), 10:52), years =
-  c(2001, 2004:2015), descarga = TRUE, ruta = NULL, conservar = TRUE, ntries
-  = 10)
+  c(2001, 2004:2015), conservar = TRUE, ntries = 10)
 }
 \arguments{
 \item{cod_provincia}{Cadena de carácteres de longitud >= 1 con el código de
@@ -16,12 +15,6 @@ seccionado.}
 
 \item{years}{Vector numérico de longitud >= 2 con los años para los que se
 desee consultar las variaciones de seccionado.}
-
-\item{descarga}{Valor lógico: ¿debe procederse a la descarga de los trameros?}
-
-\item{ruta}{Cadena de carácteres indicando la ruta en la que se almacenan los
-archivos tal cual se descargaron desde el INE, en caso de escoger
-\code{descarga = FALSE}.}
 
 \item{conservar}{Valor lógico: ¿se desea conservar los archivos descargados
 en el directorio oculto \code{./.trameros/} dentro del directorio de
