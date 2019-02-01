@@ -74,7 +74,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     winslash = "/",
     mustWork = FALSE
   )
-  estructura <- readr::fwf_positions(
+  estructura <- list(
     start     = c(1, 3, 6, 8, 21, 43, 49, 54, 79, 86, 111, 136, 166),
     end       = c(2, 5, 7, 10, 25, 47, 52, 57, 85, 110, 135, 160, 190),
     col_names = c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "CPOS", "EIN", "ESN",
@@ -157,42 +157,42 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       if (!file.exists(ruta_tra[i, j])) {
         stop("No existe el archivo ", ruta_tra[i, j])
       }
-      trameros[[paste0("p", i, j)]] <-  as.data.table(
-        suppressWarnings(
-          readr::read_fwf(
-            file          = ruta_tra[i, j],
-            col_positions = estructura,
-            col_types     = readr::cols(.default = "c"),
-            progress      = FALSE,
-            locale        = readr::locale(encoding = "latin1")
-          )
-        )
-      )[, `:=`(
-        year    = years[j],
-        seccion = paste0(CPRO, CMUM, DIST, SECC),
-        via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
+
+
+
+      tmp <- data.table(
+        iconv(readLines(ruta_tra[i, j], skipNul = TRUE), "latin1", "utf8")
+      )[, lapply(seq_along(estructura$start),
+                 function(x)
+                   stringi::stri_sub(V1, estructura$start[x], estructura$end[x]))
+        ]
+      colnames(tmp) <- estructura$col_names
+      tmp[, `:=`(
+        year          = years[j],
+        seccion       = paste0(CPRO, CMUM, DIST, SECC),
+        via           = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2),
+        ent_colectiva = gsub("", NA_character_, trimws(tmp$ent_colectiva))
       )][]
+      trameros[[paste0("p", i, j)]] <- copy(tmp)
     }
   }
   if (y_2001) {
     ruta_2001 <- list.files(
       unique(dirname(dir_dest)), pattern = "TRAM.*[^\\.zip]$", full.names = TRUE
     )
-    trameros[["n_2001"]] <- as.data.table(
-      suppressWarnings(
-        readr::read_fwf(
-          file          = ruta_2001,
-          col_positions = estructura,
-          col_types     = readr::cols(.default = "c"),
-          progress      = FALSE,
-          locale        = readr::locale(encoding = "latin1")
-        )
-      )
-    )[, `:=`(
-      year    = 2001,
-      seccion = paste0(CPRO, CMUM, DIST, SECC),
-      via     = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)
+    tmp <- data.table(
+      iconv(readLines(ruta_2001, skipNul = TRUE), "Windows-1252", "utf8")
+    )[, lapply(seq_along(estructura$start),
+               function(x) stringi::stri_sub(V1, estructura$start[x], estructura$end[x]))
+      ]
+    colnames(tmp) <- estructura$col_names
+    tmp <- tmp[, `:=`(
+      year          = 2001,
+      seccion       = paste0(CPRO, CMUM, DIST, SECC),
+      via           = paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2),
+      ent_colectiva = gsub("", NA_character_, trimws(ent_colectiva))
     )][CPRO %in% cod_provincia]
+    trameros[["n_2001"]] <- copy(tmp)
   }
   if (!conservar)
     unlink(dirname(dir_dest), recursive = TRUE)
@@ -201,6 +201,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   setkeyv(trameros, c("via", "CPOS", "seccion", "year", "CMUM"))
   attributes(trameros)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
   class(trameros)             <- c(class(trameros), "tramero_ine")
+
   return(trameros)
 }
 

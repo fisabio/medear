@@ -356,37 +356,37 @@ llama_google <- function(map_url, api.args, tries) {
 lee_catastro <- function(archivo) {
   stopifnot(is.character(archivo))
 
-  estructura_finca <- readr::fwf_positions(
+  estructura_finca <- list(
     start     = c(1, 26, 31, 51, 81, 124, 154, 241, 334, 343, 672),
     end       = c(2, 28, 44, 52, 83, 153, 158, 245, 342, 352, 677),
     col_names = c("tipo_reg", "muni_dgc", "ref_cat", "prov_ine", "muni_ine",
                   "entidad", "via_dgc", "codpost", "lng", "lat", "epsg")
   )
-  catastro_finca <- as.data.table(
-    readr::read_fwf(
-      file          = archivo,
-      col_positions = estructura_finca,
-      col_types     = readr::cols(.default = "c"),
-      locale        = readr::locale(encoding = "latin1"),
-      progress      = FALSE
-    )
-  )[tipo_reg == "11"][, tipo_reg := NULL][]
 
-  estructura_vivienda <- readr::fwf_positions(
+
+  catastro_finca <- data.table(
+    iconv(readLines(archivo, skipNul = TRUE), "latin1", "utf8")
+  )[, lapply(seq_along(estructura_finca$start),
+             function(x) stringi::stri_sub(V1, estructura_finca$start[x], estructura_finca$end[x]))
+    ]
+  colnames(catastro_finca) <- estructura_finca$col_names
+  catastro_finca           <- catastro_finca[tipo_reg == "11"][, tipo_reg := NULL][, lapply(.SD, trimws)]
+
+  estructura_vivienda <- list(
     start     = c(1, 31, 201, 206, 231, 235, 241, 428),
     end       = c(2, 44, 205, 230, 234, 235, 245, 428),
     col_names = c("tipo_reg", "ref_cat", "tvias", "vias",
                   "npolis", "letra", "km", "clave")
   )
-  catastro_vivienda <- as.data.table(
-    readr::read_fwf(
-      file          = archivo,
-      col_positions = estructura_vivienda,
-      col_types     = readr::cols(.default = "c"),
-      locale        = readr::locale(encoding = "latin1"),
-      progress      = FALSE
-    )
-  )[tipo_reg == "15" & clave == "V"][, c("tipo_reg", "clave") := NULL][order(ref_cat)]
+  catastro_vivienda <- data.table(
+    iconv(readLines(archivo, skipNul = TRUE), "latin1", "utf8")
+  )[, lapply(seq_along(estructura_vivienda$start),
+             function(x) stringi::stri_sub(V1, estructura_vivienda$start[x], estructura_vivienda$end[x]))
+    ]
+  colnames(catastro_vivienda) <- estructura_vivienda$col_names
+  catastro_vivienda           <- catastro_vivienda[
+    tipo_reg == "15" & clave == "V"
+    ][, c("tipo_reg", "clave") := NULL][, lapply(.SD, trimws)][order(ref_cat)]
 
   # Agregar informacion de cada finca en columnas tipo lista
   catastro_vivienda <- catastro_vivienda[, `:=`(
@@ -1568,5 +1568,5 @@ utils::globalVariables(
     "tipo_reg", "tramo_por", "tvias", "tmp", "final", "distan_T", "dista",
     "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng",
     "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion", "address",
-    "direccion", "georef", "id_mort", "poblacion", "..vars_out", "..denom")
+    "direccion", "georef", "id_mort", "poblacion", "..vars_out", "..denom", "ent_colectiva")
 )
