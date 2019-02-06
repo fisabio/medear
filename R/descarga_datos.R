@@ -164,7 +164,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         iconv(readLines(ruta_tra[i, j], skipNul = TRUE), "latin1", "utf8")
       )[, lapply(seq_along(estructura$start),
                  function(x)
-                   stringi::stri_sub(V1, estructura$start[x], estructura$end[x]))
+                   trimws(stringi::stri_sub(V1, estructura$start[x], estructura$end[x])))
         ]
       colnames(tmp) <- estructura$col_names
       tmp[, `:=`(
@@ -183,7 +183,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     tmp <- data.table(
       iconv(readLines(ruta_2001, skipNul = TRUE), "Windows-1252", "utf8")
     )[, lapply(seq_along(estructura$start),
-               function(x) stringi::stri_sub(V1, estructura$start[x], estructura$end[x]))
+               function(x) trimws(stringi::stri_sub(V1, estructura$start[x], estructura$end[x])))
       ]
     colnames(tmp) <- estructura$col_names
     tmp <- tmp[, `:=`(

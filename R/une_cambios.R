@@ -549,6 +549,18 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       cartografia$cluster_id <- cluster_sc$id_cluster[match(cartografia$seccion, cluster_sc$sc)]
       cartografia$cluster_id[is.na(cartografia$cluster_id)] <-
         cartografia$seccion[is.na(cartografia$cluster_id)]
+
+      if (!is.null(cartografia$n_viv)) {
+        nviv_sum <- as.data.table(
+          stats::aggregate(
+            x   = cartografia$n_viv,
+            by  = list(cartografia$cluster_id),
+            FUN = sum
+          )
+        )
+        setnames(nviv_sum, names(nviv_sum), c("seccion", "n_viv"))
+      }
+
       cartografia <- stats::aggregate(
         x   = cartografia,
         by  = list(cartografia$cluster_id),
@@ -560,6 +572,11 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         cartografia$cluster_id[cartografia$seccion == sc_ini[i]] <- id_cluster[i]
       }
       cartografia$Group.1 <- NULL
+
+      if (!is.null(cartografia$n_viv)) {
+        cartografia$n_viv[match(cartografia$seccion, nviv_sum$seccion)] <-
+          nviv_sum$n_viv[match(nviv_sum$seccion, cartografia$seccion)]
+      }
 
       islas_union    <- which(sapply(cartografia@polygons, function(x) length(x@Polygons)) != 1)
       sc_islas_union <- cartografia@data[islas_union, "seccion"]
