@@ -368,7 +368,14 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
       rutas <- paste0(dir_dest[i], "/", years, ".csv")
       if (all(file.exists(rutas))) {
         descarga    <- FALSE
-        poblaciones[[i]] <- lapply(rutas, fread)
+        poblaciones[[i]] <- lapply(rutas, fread, colClasses = "character")
+        columnas         <- sapply(poblaciones[[i]], ncol)
+        for (j in seq_along(columnas)) {
+          poblaciones[[i]][[j]] <- fread(
+            file = rutas[j],
+            colClasses = c("character", rep("numeric", 2), rep("integer", columnas[j] - 3))
+          )
+        }
       }
     }
     if (descarga) {
@@ -394,8 +401,8 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         )
         datos <- as.data.table(jsonlite::fromJSON(ruta_tempus))
 
-        datos$year    <- as.integer(years[j])
-        datos$pob     <- unlist(datos$Data, use.names = FALSE)
+        datos$year    <- as.numeric(years[j])
+        datos$pob     <- as.integer(unlist(datos$Data, use.names = FALSE))
         datos$sexo    <- sapply(datos$MetaData, function(x) x[1, 2])
         datos$seccion <- sapply(datos$MetaData, function(x) x[2, 2])
         datos$edad    <- sapply(datos$MetaData, function(x) x[3, 2])
@@ -411,14 +418,14 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         datos$edad <- gsub("05-09", "5-9", datos$edad)
         datos$edad <- gsub("-", "_", datos$edad)
         datos      <- dcast(datos, seccion + sexo + year ~ edad, value.var = "pob")
-        nombres <- colnames(datos)
-        nombres <- c(nombres[1:3], nombres[grep("q_0", nombres)], nombres[grep("q_5_", nombres)],
-                     nombres[grep("q_\\d{2}_[^p]", nombres)], nombres[grep("q_100|q_85_p", nombres)])
+        nombres    <- colnames(datos)
+        nombres    <- c(nombres[1:3], nombres[grep("q_0", nombres)], nombres[grep("q_5_", nombres)],
+                        nombres[grep("q_\\d{2}_[^p]", nombres)], nombres[grep("q_100|q_85_p", nombres)])
         setcolorder(datos, nombres)
 
         datos$sexo[grep("hombr|masc|varo", datos$sexo, ignore.case = TRUE)] <- "0"
         datos$sexo[grep("mujer|feme", datos$sexo, ignore.case = TRUE)] <- "1"
-        datos$sexo <- as.integer(datos$sexo)
+        datos$sexo <- as.numeric(datos$sexo)
         poblaciones[[i]][[paste0("p", i, j)]] <- datos
 
         if (conservar) {

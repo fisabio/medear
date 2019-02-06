@@ -255,7 +255,7 @@ filtra_dir <- function(vias, nivel) {
 #'   recuperadas con las funciones de este paquete
 #'   (\code{\link{geocodificar_cartociudad}}, \code{\link{geocodificar_google}})
 #'   o tras llamar directamente a
-#'   \code{\link[caRtociudad]{cartociudad_geocode}}, habrá que transformar la
+#'   \code{\link{geocodificar_cartociudad}}, habrá que transformar la
 #'   proyección.
 #'
 #' @param punto Un data.frame con dos columnas: lng y lat.

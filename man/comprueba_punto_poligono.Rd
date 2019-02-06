@@ -28,7 +28,7 @@ Con el fin de asegurar que el resultado de la geocodificación
   recuperadas con las funciones de este paquete
   (\code{\link{geocodificar_cartociudad}}, \code{\link{geocodificar_google}})
   o tras llamar directamente a
-  \code{\link[caRtociudad]{cartociudad_geocode}}, habrá que transformar la
+  \code{\link{geocodificar_cartociudad}}, habrá que transformar la
   proyección.
 }
 \seealso{
