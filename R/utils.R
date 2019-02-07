@@ -113,6 +113,9 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2015),
                   "DIST", "SECC", "CPOS", "year") %in% names(datos)))
   stopifnot(2011 %in% unique(datos$year))
   stopifnot(years %in% unique(datos$year))
+  n_cores <- data.table::getDTthreads(verbose = FALSE)
+  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
+  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
 
   datos[, via := paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)]
 
@@ -355,6 +358,9 @@ llama_google <- function(map_url, api.args, tries) {
 
 lee_catastro <- function(archivo) {
   stopifnot(is.character(archivo))
+  n_cores <- data.table::getDTthreads(verbose = FALSE)
+  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
+  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
 
   estructura_finca <- list(
     start     = c(1, 26, 31, 51, 81, 124, 154, 241, 334, 343, 672),
@@ -418,6 +424,9 @@ lee_catastro <- function(archivo) {
 filtra_tramero <- function(tramero, cambios) {
   stopifnot("tramero_ine" %in% class(tramero))
   stopifnot("cambios_ine" %in% class(cambios))
+  n_cores <- data.table::getDTthreads(verbose = FALSE)
+  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
+  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
 
   tramero_copia   <- copy(tramero)
   cambios_tramero <- copy(cambios)
@@ -504,6 +513,9 @@ filtra_tramero <- function(tramero, cambios) {
 calcula_viviendas <- function(tramero_cambios, catastro_finca) {
   stopifnot("catastro" %in% class(catastro_finca))
   stopifnot(is.list(tramero_cambios))
+  n_cores <- data.table::getDTthreads(verbose = FALSE)
+  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
+  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
 
   fincas  <- copy(catastro_finca)
   message("\nCalculando las viviendas afectadas en cada cambio...\n")
@@ -733,6 +745,10 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
   } else {
     utils::data("cartografia", envir = environment(), package = "medear")
   }
+  n_cores <- data.table::getDTthreads(verbose = FALSE)
+  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
+  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
+
   cartografia <- sp::spTransform(cartografia, sp::CRS(paste0("+init=epsg:", epsg)))
   datos_c     <- copy(as.data.table(datos))
   limite      <- sort(limite, decreasing = TRUE)
@@ -961,6 +977,9 @@ comprueba_geocodificado <- function(mortalidad) {
          "'muni', 'province' y 'tip_via' est\u00e1n presentes y tienen exactamente esos ",
          "nombres (todas ellas se crean tras aplicar el algoritmo de geocodificado).")
   }
+  n_cores <- data.table::getDTthreads(verbose = FALSE)
+  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
+  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
 
   mortalidad_1 <- copy(as.data.table(mortalidad))[, id_mort := as.integer(seq_len(.N))]
   mortalidad_c <- mortalidad_1[!is.na(lng) & !is.na(lat)]
