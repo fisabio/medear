@@ -1105,7 +1105,8 @@ causas_defuncion <- function(datos, medea3 = TRUE, otras_causas = NULL) {
     stopifnot(is.character(otras_causas))
   }
   comprueba_datos(datos, "mortalidad")
-  datos$causa_defuncion <- gsub("\\.|,|\\s", "",  datos$causa_defuncion)
+  datos$causa_defuncion <- trimws(gsub("\\.|,|\\s", "",  datos$causa_defuncion))
+  datos$causa_defuncion <- gsub("^0(?=[a-zA-Z])", "",  datos$causa_defuncion, perl = TRUE)
   causas_def <- list()
 
   if (medea3) {
