@@ -779,7 +779,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       lapply(.SD, sum),
       by      = .(cluster, year, muni),
       .SDcols = in_col
-    ]
+    ][order(cluster, year)]
     setnames(censo_c, "cluster", "seccion")
     # denominador <- paste0("i0", c(1:2, 1, 3:4, 5, 5, 5), "_d")
     # numerador   <- paste0("i0", 1:8)
