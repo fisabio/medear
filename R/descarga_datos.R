@@ -98,6 +98,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   rutas <- paste0(dir_dest, "/year_", rep(substr(years, 3, 4), each = length(dir_dest)))
   if (y_2001) {
     rutas <- c(rutas, file.path(unique(dirname(dir_dest)), "TRAMG010831"))
+    rutas <- rutas[-grep("_$", rutas)]
   }
   if (all(file.exists(rutas))) {
     descarga <- FALSE
@@ -161,8 +162,6 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         stop("No existe el archivo ", ruta_tra[i, j])
       }
 
-
-
       tmp <- data.table(
         iconv(readLines(ruta_tra[i, j], skipNul = TRUE), "latin1", "utf8")
       )[, lapply(seq_along(estructura$start),
@@ -202,7 +201,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 
   trameros <- rbindlist(trameros)[order(year, seccion)]
   setkeyv(trameros, c("via", "CPOS", "seccion", "year", "CMUM"))
-  attributes(trameros)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
+  setattr(trameros, "fuente", "Fuente: Sitio web del INE: www.ine.es")
   class(trameros)             <- c(class(trameros), "tramero_ine")
 
   return(trameros)
@@ -365,6 +364,7 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     winslash = "/",
     mustWork = FALSE
   )
+
   for (i in seq_along(cod_provincia)) {
     descarga <- TRUE
     if (!dir.exists(dir_dest[i])) {
@@ -386,41 +386,47 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     }
     if (descarga) {
       poblaciones[[i]] <- vector("list", length(years))
+
       for (j in seq_along(years)) {
-        ruta_tempus <- paste0(
-          "http://servicios.ine.es/wstempus/js/es/DATOS_TABLA//t20/e245/p07/a",
+        ruta_des <- paste0(
+          "http://www.ine.es/pcaxisdl/t20/e245/p07/a",
           years[j],
-          if (years[j] < 2011) {
-            paste0(
-              "/l0/0",
-              if (years[j] < 2006) {
-                "2_."
-              } else if (years[j] < 2008) {
-                "2"
-              } else {
-                "1"
-              }, cod_provincia[i])
-          } else {
-            paste0("/", cod_provincia[i], "01")
-          },
-          ".px?tip=AM"
+          "/l0/",
+          ifelse(
+            years[j] < 2006,
+            paste0("02_.", cod_provincia[i]),
+            ifelse(
+              years[j] < 2008,
+              paste0("02", cod_provincia[i]),
+              ifelse(
+                years[j] < 2011,
+                paste0("01", cod_provincia[i]),
+                paste0(cod_provincia[i], "01")
+              )
+            )
+          ),
+          ".px"
         )
-        datos <- as.data.table(jsonlite::fromJSON(ruta_tempus))
-
+        tmp <- tempfile()
+        utils::download.file(ruta_des, tmp, quiet = TRUE)
+        bruto <- paste0(iconv(readLines(tmp, encoding = "latin1"), "latin1", to = "ascii//translit"), collapse = "\n")
+        bruto <- unlist(strsplit(bruto, ";"))
+        nombres <- sapply(strsplit(bruto, split = "="), `[`, 1)
+        valores <- sapply(strsplit(bruto, split = "="), `[`, 2)
+        corte_pars <- valores[grep("values", nombres, ignore.case = T)]
+        params <- lapply(corte_pars, function(x) trimws(strsplit(trimws(gsub("\\\"|\n", "", x)), ",")[[1]]))
+        datos <- valores[grep("data", nombres, ignore.case = T)]
+        datos <- as.integer(strsplit(trimws(gsub("\n|\\s+", " ", datos)), " ")[[1]])
+        conjunto    <- data.table(do.call(expand.grid, params[c(3:1)]))
+        conjunto <- conjunto[, lapply(.SD, as.character)]
+        datos <- data.table(conjunto, datos)
+        colnames(datos) <- c("edad", "seccion", "sexo", "pob")
         datos$year    <- as.numeric(years[j])
-        datos$pob     <- as.integer(unlist(datos$Data, use.names = FALSE))
-        datos$sexo    <- sapply(datos$MetaData, function(x) x[1, 2])
-        datos$seccion <- sapply(datos$MetaData, function(x) x[2, 2])
-        datos$edad    <- sapply(datos$MetaData, function(x) x[3, 2])
-        datos         <- datos[, -c(1:3)]
-        setcolorder(datos, c(4, 3, 1, 5, 2))
-
         datos <- datos[grep("\\d+", seccion)]
         datos <- datos[grep("hombr|masc|varo|mujer|feme", sexo, ignore.case = TRUE)]
         datos <- datos[grep("\\d+", edad)]
-
         datos$edad <- paste0("q-", datos$edad)
-        datos$edad <- gsub(" y m\u00E1s", "-plus", datos$edad)
+        datos$edad <- gsub(" y m.s", "-plus", datos$edad)
         datos$edad <- gsub("05-09", "5-9", datos$edad)
         datos$edad <- gsub("-", "_", datos$edad)
         datos      <- dcast(datos, seccion + sexo + year ~ edad, value.var = "pob")
@@ -428,12 +434,11 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         nombres    <- c(nombres[1:3], nombres[grep("q_0", nombres)], nombres[grep("q_5_", nombres)],
                         nombres[grep("q_\\d{2}_[^p]", nombres)], nombres[grep("q_100|q_85_p", nombres)])
         setcolorder(datos, nombres)
-
         datos$sexo[grep("hombr|masc|varo", datos$sexo, ignore.case = TRUE)] <- "0"
         datos$sexo[grep("mujer|feme", datos$sexo, ignore.case = TRUE)] <- "1"
         datos$sexo <- as.numeric(datos$sexo)
         poblaciones[[i]][[paste0("p", i, j)]] <- datos
-
+        invisible(file.remove(tmp))
         if (conservar) {
           fwrite(x = datos, file = paste0(dir_dest[i], "/", years[j], ".csv"))
         }
@@ -441,83 +446,11 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
     }
     poblaciones[[i]] <- rbindlist(poblaciones[[i]], fill = TRUE)
   }
-
   poblaciones <- rbindlist(poblaciones, fill = TRUE)
   poblaciones[, seccion := trimws(seccion)]
   setkey(poblaciones, seccion, sexo, year)
-  attributes(poblaciones)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
+  setattr(poblaciones, "fuente", "Fuente: Sitio web del INE: www.ine.es")
   class(poblaciones) <- c(class(poblaciones), "poblaciones_ine")
 
   return(poblaciones)
-
-
-
-  # library(data.table)
-  # years <- 2004:2015
-  # cod_provincia <- c(paste0("0", 1:9), 10:52)[1:3]
-  # i <- j <- 1
-  #
-  # destino <- tempdir()
-  # poblaciones <- vector("list", length(cod_provincia))
-  # for (i in seq_along(cod_provincia)) {
-  #   for (j in seq_along(years)) {
-  #     ruta_des <- paste0(
-  #       "http://www.ine.es/pcaxisdl/t20/e245/p07/a",
-  #       years[j],
-  #       "/l0/",
-  #       ifelse(
-  #         years[j] < 2006,
-  #         paste0("02_.", cod_provincia[i]),
-  #         ifelse(
-  #           years[j] < 2008,
-  #           paste0("02", cod_provincia[i]),
-  #           ifelse(
-  #             years[j] < 2011,
-  #             paste0("01", cod_provincia[i]),
-  #             paste0(cod_provincia[i], "01")
-  #           )
-  #         )
-  #       ),
-  #       ".px"
-  #     )
-  #     tmp <- tempfile()
-  #     download.file(ruta_des, tmp, quiet = TRUE)
-  #     bruto <- paste0(iconv(readLines(tmp, encoding = "latin1", ), "latin1", to = "ascii//translit"), collapse = "\n")
-  #     bruto <- unlist(strsplit(bruto, ";"))
-  #     nombres <- sapply(strsplit(bruto, split = "="), `[`, 1)
-  #     valores <- sapply(strsplit(bruto, split = "="), `[`, 2)
-  #     corte_pars <- valores[grep("values", nombres, ignore.case = T)]
-  #     params <- lapply(corte_pars, function(x) trimws(strsplit(trimws(gsub("\\\"|\n", "", x)), ",")[[1]]))
-  #     datos <- valores[grep("data", nombres, ignore.case = T)]
-  #     datos <- as.integer(strsplit(trimws(gsub("\n|\\s+", " ", datos)), " ")[[1]])
-  #     conjunto    <- data.table(do.call(expand.grid, params[c(3:1)]))
-  #     conjunto <- conjunto[, lapply(.SD, as.character)]
-  #     datos <- data.table(conjunto, datos)
-  #     colnames(datos) <- c("edad", "seccion", "sexo", "pob")
-  #     datos$year    <- as.numeric(years[j])
-  #     datos <- datos[grep("\\d+", seccion)]
-  #     datos <- datos[grep("hombr|masc|varo|mujer|feme", sexo, ignore.case = TRUE)]
-  #     datos <- datos[grep("\\d+", edad)]
-  #     datos$edad <- paste0("q-", datos$edad)
-  #     datos$edad <- gsub(" y m.s", "-plus", datos$edad)
-  #     datos$edad <- gsub("05-09", "5-9", datos$edad)
-  #     datos$edad <- gsub("-", "_", datos$edad)
-  #     datos      <- dcast(datos, seccion + sexo + year ~ edad, value.var = "pob")
-  #     nombres    <- colnames(datos)
-  #     nombres    <- c(nombres[1:3], nombres[grep("q_0", nombres)], nombres[grep("q_5_", nombres)],
-  #                     nombres[grep("q_\\d{2}_[^p]", nombres)], nombres[grep("q_100|q_85_p", nombres)])
-  #     setcolorder(datos, nombres)
-  #     datos$sexo[grep("hombr|masc|varo", datos$sexo, ignore.case = TRUE)] <- "0"
-  #     datos$sexo[grep("mujer|feme", datos$sexo, ignore.case = TRUE)] <- "1"
-  #     datos$sexo <- as.numeric(datos$sexo)
-  #     poblaciones[[i]][[paste0("p", i, j)]] <- datos
-  #   }
-  #   poblaciones[[i]] <- rbindlist(poblaciones[[i]], fill = TRUE)
-  # }
-  #
-  # poblaciones <- rbindlist(poblaciones, fill = TRUE)
-  # poblaciones[, seccion := trimws(seccion)]
-  # setkey(poblaciones, seccion, sexo, year)
-  # attributes(poblaciones)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
-  # class(poblaciones) <- c(class(poblaciones), "poblaciones_ine")
 }

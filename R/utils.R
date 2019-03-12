@@ -265,7 +265,7 @@ carga_datos <- function(key, tipo = c("poblacion", "censo")) {
     datos <- data.table::rbindlist(
       list(poblacion, cifrado), fill = TRUE
     )[order(year, sexo, seccion)]
-    attributes(datos)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
+    setattr(datos, "fuente", "Fuente: Sitio web del INE: www.ine.es")
     class(datos) <- c(class(datos), "poblaciones_ine")
   } else {
     cifrado <- system.file("data_encrypted", "censo.rds",
@@ -412,7 +412,7 @@ lee_catastro <- function(archivo) {
       npoli = catastro_vivienda$npoli)][]
   catastro_finca[, lng := as.numeric(paste0(substr(lng, 1, 7), gsub("^(.{7})", ".", lng)))]
   catastro_finca[, lat := as.numeric(paste0(substr(lat, 1, 8), gsub("^(.{8})", ".", lat)))]
-  attributes(catastro_finca)$epsg <- max(unique(catastro_finca$epsg))
+  setattr(catastro_finca, "epsg", max(unique(catastro_finca$epsg)))
   catastro_finca[, c("epsg") := NULL]
 
   class(catastro_finca) <- c(class(catastro_finca), "catastro")
@@ -1568,7 +1568,8 @@ cartociudad_geocode <- function(full_address, version = c("current", "prev"),
   cat("\n")
   results <- rbindlist(res_list, fill = TRUE)
   results[, c("lat", "lng") := lapply(.SD, as.numeric), .SDcols = c("lat", "lng")]
-  attributes(results)$rerun  <- full_address[con_out]
+  setattr(results, "rerun", full_address[con_out])
+
   return(results)
 }
 
