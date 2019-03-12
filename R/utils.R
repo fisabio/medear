@@ -114,8 +114,8 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2015),
   stopifnot(2011 %in% unique(datos$year))
   stopifnot(years %in% unique(datos$year))
   n_cores <- data.table::getDTthreads(verbose = FALSE)
-  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
-  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
+  data.table::setDTthreads(threads = min(n_cores, 4L))
+  on.exit(data.table::setDTthreads(threads = n_cores))
 
   datos[, via := paste0(CPRO, CMUM, CVIA, as.numeric(EIN) %% 2)]
 
@@ -265,7 +265,7 @@ carga_datos <- function(key, tipo = c("poblacion", "censo")) {
     datos <- data.table::rbindlist(
       list(poblacion, cifrado), fill = TRUE
     )[order(year, sexo, seccion)]
-    setattr(datos, "fuente", "Fuente: Sitio web del INE: www.ine.es")
+    attributes(datos)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
     class(datos) <- c(class(datos), "poblaciones_ine")
   } else {
     cifrado <- system.file("data_encrypted", "censo.rds",
@@ -359,8 +359,8 @@ llama_google <- function(map_url, api.args, tries) {
 lee_catastro <- function(archivo) {
   stopifnot(is.character(archivo))
   n_cores <- data.table::getDTthreads(verbose = FALSE)
-  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
-  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
+  data.table::setDTthreads(threads = min(n_cores, 4L))
+  on.exit(data.table::setDTthreads(threads = n_cores))
 
   estructura_finca <- list(
     start     = c(1, 26, 31, 51, 81, 124, 154, 241, 334, 343, 672),
@@ -412,7 +412,7 @@ lee_catastro <- function(archivo) {
       npoli = catastro_vivienda$npoli)][]
   catastro_finca[, lng := as.numeric(paste0(substr(lng, 1, 7), gsub("^(.{7})", ".", lng)))]
   catastro_finca[, lat := as.numeric(paste0(substr(lat, 1, 8), gsub("^(.{8})", ".", lat)))]
-  setattr(catastro_finca, "epsg", max(unique(catastro_finca$epsg)))
+  attributes(catastro_finca)$epsg <- max(unique(catastro_finca$epsg))
   catastro_finca[, c("epsg") := NULL]
 
   class(catastro_finca) <- c(class(catastro_finca), "catastro")
@@ -425,8 +425,8 @@ filtra_tramero <- function(tramero, cambios) {
   stopifnot("tramero_ine" %in% class(tramero))
   stopifnot("cambios_ine" %in% class(cambios))
   n_cores <- data.table::getDTthreads(verbose = FALSE)
-  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
-  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
+  data.table::setDTthreads(threads = min(n_cores, 4L))
+  on.exit(data.table::setDTthreads(threads = n_cores))
 
   tramero_copia   <- copy(tramero)
   cambios_tramero <- copy(cambios)
@@ -514,8 +514,8 @@ calcula_viviendas <- function(tramero_cambios, catastro_finca) {
   stopifnot("catastro" %in% class(catastro_finca))
   stopifnot(is.list(tramero_cambios))
   n_cores <- data.table::getDTthreads(verbose = FALSE)
-  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
-  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
+  data.table::setDTthreads(threads = min(n_cores, 4L))
+  on.exit(data.table::setDTthreads(threads = n_cores))
 
   fincas  <- copy(catastro_finca)
   message("\nCalculando las viviendas afectadas en cada cambio...\n")
@@ -746,8 +746,8 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
     utils::data("cartografia", envir = environment(), package = "medear")
   }
   n_cores <- data.table::getDTthreads(verbose = FALSE)
-  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
-  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
+  data.table::setDTthreads(threads = min(n_cores, 4L))
+  on.exit(data.table::setDTthreads(threads = n_cores))
 
   cartografia <- sp::spTransform(cartografia, sp::CRS(paste0("+init=epsg:", epsg)))
   datos_c     <- copy(as.data.table(datos))
@@ -978,8 +978,8 @@ comprueba_geocodificado <- function(mortalidad) {
          "nombres (todas ellas se crean tras aplicar el algoritmo de geocodificado).")
   }
   n_cores <- data.table::getDTthreads(verbose = FALSE)
-  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
-  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
+  data.table::setDTthreads(threads = min(n_cores, 4L))
+  on.exit(data.table::setDTthreads(threads = n_cores))
 
   mortalidad_1 <- copy(as.data.table(mortalidad))[, id_mort := as.integer(seq_len(.N))]
   mortalidad_c <- mortalidad_1[!is.na(lng) & !is.na(lat)]
@@ -1104,7 +1104,16 @@ causas_defuncion <- function(datos, medea3 = TRUE, otras_causas = NULL) {
   if (!is.null(otras_causas)) {
     stopifnot(is.character(otras_causas))
   }
-  comprueba_datos(datos, "mortalidad")
+  if (!"causa_defuncion" %in% names(datos)) {
+    stop("\nLas variable 'causa_defuncion' no est\u00e1 presente en los datos",
+         " proporcionados o tiene otro nombre.\n",
+         "Por favor, revise los datos de mortalidad.")
+  }
+  if (!all(nchar(datos$causa_defuncion) >= 3)) {
+    stop("\nTodas las causas de mortalidad (sin importar si se codificaron ",
+         "siguiendo CIE-9 o CIE-10) deben tener un m\u00ednimo de tres caracteres.",
+         "\nPor favor, revise que este aspecto se cumple en su base de datos.")
+  }
   datos$causa_defuncion <- trimws(gsub("\\.|,|\\s", "",  datos$causa_defuncion))
   datos$causa_defuncion <- gsub("^0(?=[a-zA-Z])", "",  datos$causa_defuncion, perl = TRUE)
   causas_def <- list()
@@ -1308,7 +1317,7 @@ crea_cubo_mortalidad <- function(datos, cartografia, epsg = 4326, medea3 = TRUE,
 
   mort_array <- array(
     dim      = c(length(periodo), 2, length(grupo_edad),
-                 length(unique(datos_c$seccion)), length(causas_def)),
+                 length(unique(cartografia$seccion)), length(causas_def)),
     dimnames = list(
       paste(periodo),
       levels(datos_c$sexo),
@@ -1568,8 +1577,7 @@ cartociudad_geocode <- function(full_address, version = c("current", "prev"),
   cat("\n")
   results <- rbindlist(res_list, fill = TRUE)
   results[, c("lat", "lng") := lapply(.SD, as.numeric), .SDcols = c("lat", "lng")]
-  setattr(results, "rerun", full_address[con_out])
-
+  attributes(results)$rerun  <- full_address[con_out]
   return(results)
 }
 
