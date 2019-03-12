@@ -320,8 +320,8 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
 
   modo    <- match.arg(modo)
   n_cores <- data.table::getDTthreads(verbose = FALSE)
-  data.table::setDTthreads(threads = 4L, restore_after_fork = FALSE)
-  on.exit(data.table::setDTthreads(threads = n_cores, restore_after_fork = FALSE))
+  data.table::setDTthreads(threads = min(n_cores, 4L))
+  on.exit(data.table::setDTthreads(threads = n_cores))
   if (!is.numeric(years_estudio) & length(years_estudio) < 0)
     stop("\nEl objeto 'years_estudio' debe ser un vector num\u00e9rico de longitud >= 1.")
   if (!is.numeric(years_union) & length(years_union) < 0)
