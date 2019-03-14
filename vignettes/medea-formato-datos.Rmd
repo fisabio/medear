@@ -475,8 +475,6 @@ save(aviles, file = "aviles.RData")
 
 ### Gijón
 
-Unión provisional a falta de incorporar la división de dos secciones.
-
 ```{r gijon, eval=FALSE}
 codigo          <- "33024"
 gijon           <- une_secciones(
@@ -490,8 +488,8 @@ gijon           <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = "3302407016",
-  sc2             = "3302407048"
+  sc1             = paste0(codigo, c("07016", "06021", "06021", "09016")),
+  sc2             = paste0(codigo, c("07048", "06022", "06012", "09012"))
 )
 save(gijon, file = "gijon.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -511,7 +509,10 @@ oviedo <- une_secciones(
   mortalidad      = datosmort,
   catastro        = TRUE,
   corte_edad      = 85,
-  umbral_vivienda = 5
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("05015", "06020", "09015", "09017")),
+  sc2             = paste0(codigo, c("05014", "06017", "09011", "09011"))
 )
 save(oviedo, file = "oviedo.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
