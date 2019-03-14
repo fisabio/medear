@@ -1104,7 +1104,16 @@ causas_defuncion <- function(datos, medea3 = TRUE, otras_causas = NULL) {
   if (!is.null(otras_causas)) {
     stopifnot(is.character(otras_causas))
   }
-  comprueba_datos(datos, "mortalidad")
+  if (!"causa_defuncion" %in% names(datos)) {
+    stop("\nLas variable 'causa_defuncion' no est\u00e1 presente en los datos",
+         " proporcionados o tiene otro nombre.\n",
+         "Por favor, revise los datos de mortalidad.")
+  }
+  if (!all(nchar(datos$causa_defuncion) >= 3)) {
+    stop("\nTodas las causas de mortalidad (sin importar si se codificaron ",
+         "siguiendo CIE-9 o CIE-10) deben tener un m\u00ednimo de tres caracteres.",
+         "\nPor favor, revise que este aspecto se cumple en su base de datos.")
+  }
   datos$causa_defuncion <- trimws(gsub("\\.|,|\\s", "",  datos$causa_defuncion))
   datos$causa_defuncion <- gsub("^0(?=[a-zA-Z])", "",  datos$causa_defuncion, perl = TRUE)
   causas_def <- list()
@@ -1308,7 +1317,7 @@ crea_cubo_mortalidad <- function(datos, cartografia, epsg = 4326, medea3 = TRUE,
 
   mort_array <- array(
     dim      = c(length(periodo), 2, length(grupo_edad),
-                 length(unique(datos_c$seccion)), length(causas_def)),
+                 length(unique(cartografia$seccion)), length(causas_def)),
     dimnames = list(
       paste(periodo),
       levels(datos_c$sexo),

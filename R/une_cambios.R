@@ -741,7 +741,6 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     mortalidad_c <- mortalidad_c[
       !is.na(year_defuncion) & !is.na(sexo) & !is.na(edad) & !is.na(causa_defuncion)
     ]
-    mortalidad_c <- proyecta_secciones(mortalidad_c, cartografia, epsg)
 
     mort_array <- crea_cubo_mortalidad(
       mortalidad_c,
