@@ -839,11 +839,17 @@ save(vigo, file = "vigo.RData")
 ### Palma de Mallorca
 
 ```{r mallorca, eval=FALSE}
-codigo <- "07040"
+codigo          <- "07040"
+cambios_seccion <- elimina_cambios(
+  cambios_seccion,
+  paste0(codigo, c("02017", "02057", "02049", "02062", "04053")),
+  paste0(codigo, c("02016", "02030", "02056", "02049", "04043"))
+)
 mallorca <- une_secciones(
   cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
   cartografia     = cartografia[cartografia$CUMUN == codigo, ],
-  years_estudio   = 1996:2015,
+  years_estudio   = 1998:2015,
+  years_union     = 1996:2015,
   poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
   mortalidad      = datosmort,
   catastro        = TRUE,
