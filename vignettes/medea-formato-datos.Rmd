@@ -630,6 +630,28 @@ save(alicante, file = "alicante.RData")
 ```
 
 
+### Elche
+
+```{r elche, eval=FALSE}
+codigo          <- "03065"
+elche        <- une_secciones(
+  cambios         = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio   = 1996:2015,
+  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad      = datosmort,
+  catastro        = TRUE,
+  corte_edad      = 85,
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("02005", "01017", rep("07006", 2))),
+  sc2             = paste0(codigo, c("02006", "07019", "07017", "07020"))
+)
+save(elche, file = "elche.RData")
+# En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
+```
+
+
 ### Castellón
 
 ```{r castellon, eval=FALSE}

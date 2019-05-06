@@ -1582,6 +1582,88 @@ cartociudad_geocode <- function(full_address, version = c("current", "prev"),
 }
 
 
+#' @title Preparar datos para su uso en WinBUGS
+#'
+#' @description Esta función crea los elementos necesarios para ejecutar los modelos
+#'   multivariantes MEDEA3 en WinBUGS.
+#'
+#' @param datos Lista con (al menos) la cartografía, poblacion y mortalidad, tal
+#'   y como se produce al emplear la función \code{\link{une_secciones}}.
+#'  return(list(carto = carto, carto.nb = carto.nb, carto.wb = carto.wb, Obs = Obs, Exp = Exp))
+
+#' @return Devuelve una lista con los siguientes elementos:
+#'   \item{carto}{Cartografía: Objeto de clase \code{\link{une_secciones}} empleando
+#'     proyección WGS84 (EPSG: 4326)}
+#'   \item{carto.nb}{Vecindades: Lista con las vecindades de cada área.}
+#'   \item{carto.wb}{Vecindades WB: Lista con los datos de vecindad necesarios para WinBUGS.}
+#'   \item{Obs}{Matriz tetradimensional (año, sexo, sección censal y causa de defunción)
+#'      de muertes observadas.}
+#'   \item{Exp}{Matriz tetradimensional (año, sexo, sección censal y causa de defunción)
+#'      de muertes esperadas}
+#'
+#' @encoding UTF-8
+#'
+#' @seealso \code{\link{une_secciones}}.
+#'
+#' @export
+procesa_datos <- function(datos) {
+  if (!all(c("cartografia", "poblacion", "mortalidad") %in% names(datos))) {
+    stop("\nEl objeto 'datos' debe ser una lista que contenga la cartograf\u00eda y los arrays\n",
+         " de poblaci\u00f3n y mortalidad, tal y como devuelve la funci\u00f3n medear::une_secciones.")
+  }
+  cubo_mort <- datos$mortalidad
+  cubo_pob  <- datos$poblacion
+  carto     <- datos$cartografia
+  stopifnot(length(dim(cubo_mort)) == 5)
+  stopifnot(length(dim(cubo_pob)) == 4)
+  stopifnot(class(carto) == "SpatialPolygonsDataFrame")
+
+  carto <- carto[order(carto@data$seccion), ]
+  Obs   <- apply(cubo_mort, c(1, 2, 4, 5), sum)
+  Exp   <- array(dim = dim(Obs), dimnames = dimnames(Obs))
+
+  for (s in seq_len(dim(Exp)[2])) {
+    for (cau in seq_len(dim(Exp)[4])) {
+      r.aux <- apply(cubo_mort[ , s, , , cau], 2, sum) / apply(cubo_pob[ , s, , ], 2, sum)
+      for (a in seq_len(dim(Exp)[1])) {
+        Exp[a, s, , cau] <- apply(cubo_pob[a, s, , ], 2, function(v) sum(v * r.aux))
+      }
+    }
+  }
+  if (sum(Obs) != sum(Exp))
+    stop("Algo ha ido mal al generar el cubo de esperados. Revisa los datos.")
+
+  carto.nb        <- rgeos::gTouches(carto, byid = T, returnDense = F)
+  names(carto.nb) <- NULL
+  tmp             <- sapply(carto.nb, is.null)
+
+  if (any(tmp)) {
+    warning(
+      "Los pol\u00edgonos c(", paste(which(tmp), collapse = ", "), ") de la cartograf\u00eda son islas.\n",
+      "Se asigna como vecinos a los pol\u00edgonos m\u00e1s pr\u00f3ximos.",
+      call. = FALSE
+    )
+    carto_tmp <- sp::spTransform(carto, sp::CRS("+init=epsg:23030"))
+    cual_isla <- which(tmp)
+    distancia <- rgeos::gDistance(carto_tmp[cual_isla, ], carto_tmp, byid = TRUE)
+    nuevos_vecinos <- sapply(seq_along(cual_isla), function(x) which.min(distancia[-cual_isla[x], x]))
+
+    for (i in seq_along(cual_isla)) {
+      carto.nb[[cual_isla[i]]] <- sort(c(carto.nb[[cual_isla[i]]], as.integer(nuevos_vecinos[i])))
+      carto.nb[[as.integer(nuevos_vecinos[i])]] <- sort(c(cual_isla[i], carto.nb[[as.integer(nuevos_vecinos[i])]]))
+    }
+  }
+  tmp      <- unlist(carto.nb)
+  carto.wb <- list(
+    adj     = tmp,
+    weights = rep(1, length(tmp)),
+    num     = sapply(carto.nb, length)
+  )
+
+  return(list(carto = carto, carto.nb = carto.nb, carto.wb = carto.wb, Obs = Obs, Exp = Exp))
+}
+
+
 utils::globalVariables(
   c("CPRO", "CMUM", "DIST", "SECC", "CVIA", "EIN", "ESN", "via", "seccion",
     "CUSEC", "idn", ".", "sc_unida", "geometry", "CUSEC2", "cluster_id",
