@@ -1434,6 +1434,8 @@ crea_cubo_poblacion <- function(datos, corte_edad = 85, periodo = 1996:2015,
 #' @details Los argumentos sc_ref y sc_new deben hacer referencia a una misma
 #'   fila de la base de datos.
 #'
+#' @usage elimina_cambios(datos, sc_ref, sc_new)
+#'
 #' @return Un \code{data.frame} sin los cambios seleccionados.
 #'
 #' @encoding UTF-8
@@ -1600,6 +1602,8 @@ cartociudad_geocode <- function(full_address, version = c("current", "prev"),
 #'      de muertes observadas.}
 #'   \item{Exp}{Matriz tetradimensional (año, sexo, sección censal y causa de defunción)
 #'      de muertes esperadas}
+#'
+#' @usage procesa_datos(datos)
 #'
 #' @encoding UTF-8
 #'

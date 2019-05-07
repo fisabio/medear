@@ -243,6 +243,37 @@
 "secciones"
 
 
+#' @title Ponderación de las vecindades de las ciudades MEDEA3 (1996-2015)
+#'
+#' @description Datos con la ponderación de la vecindad de cada una de las secciones
+#'    censales que componen las ciudades MEDEA3 (1996-2015).
+#'
+#' @name vecindad_ponderada
+#'
+#' @docType data
+#'
+#' @format Un objeto de clase \code{data.frame}, donde cada
+#'   fila es una sección censal, ofreciendo un valor \code{c} para hombres y mujeres:
+#'   \describe{
+#'     \item{seccion}{Cádena de 10 caracteres con el código INE de la sección censal.}
+#'     \item{muni}{Cádena de 5 caracteres con el código INE del municipio.}
+#'     \item{vecindad_hombres}{Valor de la vecindad en hombres.}
+#'     \item{vecindad_mujeres}{Valor de la vecindad en mujeres.}
+#'   }
+#'
+#' @keywords datasets
+#'
+#' @encoding UTF-8
+#'
+#' @examples
+#'
+#' \dontrun{
+#'   library(medear)
+#'   data("vecindad_ponderada")
+#' }
+"vecindad_ponderada"
+
+
 #' @title Censos de 2001 y 2011
 #'
 #' @description Datos de los censos de 2001 y 2011 necesarios para construir el
