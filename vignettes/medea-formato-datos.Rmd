@@ -1,8 +1,8 @@
 ---
 title: "Formato de las bases de datos en el Proyecto MEDEA3"
-subtitle: "Versión 1.1"
+subtitle: "Versión 1.2"
 author: "Grupo MEDEA"
-date: "2018-10-25"
+date: "2019-06-04"
 output:
   rmarkdown::html_vignette:
     number_sections: true
@@ -826,7 +826,12 @@ pontevedra <- une_secciones(
   mortalidad      = datosmort,
   catastro        = TRUE,
   corte_edad      = 85,
-  umbral_vivienda = 5
+  umbral_vivienda = 5,
+  modo            = "manual",
+  sc1             = paste0(codigo, c("03002", "04005", "04006", "05001",
+                                     "05004", "06001", "06002", "06003")), 
+  sc2             = paste0(codigo, c("03001", "04002", "04002", "05003",
+                                     "05006", "05006", "04003", "04003"))
 )
 save(pontevedra, file = "pontevedra.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
