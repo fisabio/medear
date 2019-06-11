@@ -321,3 +321,39 @@
 #'
 #' @seealso \code{\link{carga_datos}}
 NULL
+
+
+#' @title Índices de privación por sección censal para ciudades MEDEA3
+#'
+#' @description Índices de privación por sección censal según los censos INE 2001 y 2011,
+#'   calculados siguiendo metodología MEDEA3 (publicación metodológica pendiente) y
+#'    ajustados al seccionado MEDEA3 (tras realizar uniones de secciones 1996-2015).
+#'
+#' @details El índice es comparable entre ciudades y períodos.
+#'
+#' @name privacion
+#'
+#' @docType data
+#'
+#' @format Un objeto de clase \code{data.frame}, donde cada
+#'   fila es una sección censal, ofreciendo un valor del índice de privación para 2001 y 2011:
+#'   \describe{
+#'     \item{seccion}{Cádena de 10 caracteres con el código INE de la sección censal.}
+#'     \item{cod_municipio}{Cádena de 5 caracteres con el código INE del municipio.}
+#'     \item{nom_municipio}{Cádena caracteres con el nombre del municipio.}
+#'     \item{privacion_2001}{Valor del índice de privación MEDEA3 en 2001.}
+#'     \item{privacion_2011}{Valor del índice de privación MEDEA3 en 2011.}
+#'   }
+#'
+#' @encoding UTF-8
+#'
+#' @keywords datasets
+#'
+#' @examples
+#'
+#' \dontrun{
+#'   library(medear)
+#'   data("privacion")
+#' }
+"privacion"
+

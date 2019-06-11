@@ -15,13 +15,15 @@ return(list(carto = carto, carto.nb = carto.nb, carto.wb = carto.wb, Obs = Obs, 
 \value{
 Devuelve una lista con los siguientes elementos:
   \item{carto}{Cartografía: Objeto de clase \code{\link{une_secciones}} empleando
-    proyección WGS84 (EPSG: 4326)}
+    proyección WGS84 (EPSG: 4326).}
   \item{carto.nb}{Vecindades: Lista con las vecindades de cada área.}
   \item{carto.wb}{Vecindades WB: Lista con los datos de vecindad necesarios para WinBUGS.}
   \item{Obs}{Matriz tetradimensional (año, sexo, sección censal y causa de defunción)
      de muertes observadas.}
   \item{Exp}{Matriz tetradimensional (año, sexo, sección censal y causa de defunción)
-     de muertes esperadas}
+     de muertes esperadas.}
+  \item{privacion}{objeto de clase \code{data.frame} con el índice de privación MEDEA3
+    para las ciudades a exportar (solo se devuelve si se trabaja con ciudades MEDEA3).}
 }
 \description{
 Esta función crea los elementos necesarios para ejecutar los modelos

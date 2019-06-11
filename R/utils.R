@@ -1096,6 +1096,8 @@ proyecta_secciones <- function(datos, cartografia, epsg = 4326) {
 #'
 #' @encoding UTF-8
 #'
+#' @export
+#'
 #' @seealso \code{\link{une_secciones}} y \code{\link{crea_cubo_mortalidad}}.
 #'
 causas_defuncion <- function(datos, medea3 = TRUE, otras_causas = NULL) {
@@ -1595,13 +1597,15 @@ cartociudad_geocode <- function(full_address, version = c("current", "prev"),
 
 #' @return Devuelve una lista con los siguientes elementos:
 #'   \item{carto}{Cartografía: Objeto de clase \code{\link{une_secciones}} empleando
-#'     proyección WGS84 (EPSG: 4326)}
+#'     proyección WGS84 (EPSG: 4326).}
 #'   \item{carto.nb}{Vecindades: Lista con las vecindades de cada área.}
 #'   \item{carto.wb}{Vecindades WB: Lista con los datos de vecindad necesarios para WinBUGS.}
 #'   \item{Obs}{Matriz tetradimensional (año, sexo, sección censal y causa de defunción)
 #'      de muertes observadas.}
 #'   \item{Exp}{Matriz tetradimensional (año, sexo, sección censal y causa de defunción)
-#'      de muertes esperadas}
+#'      de muertes esperadas.}
+#'   \item{privacion}{objeto de clase \code{data.frame} con el índice de privación MEDEA3
+#'     para las ciudades a exportar (solo se devuelve si se trabaja con ciudades MEDEA3).}
 #'
 #' @usage procesa_datos(datos)
 #'
@@ -1664,7 +1668,17 @@ procesa_datos <- function(datos) {
     num     = sapply(carto.nb, length)
   )
 
-  return(list(carto = carto, carto.nb = carto.nb, carto.wb = carto.wb, Obs = Obs, Exp = Exp))
+  res <- list(carto = carto, carto.nb = carto.nb, carto.wb = carto.wb, Obs = Obs, Exp = Exp)
+
+  utils::data("privacion", envir = environment(), package = "medear")
+  munis <- unique(substr(carto$seccion, 1, 5))
+  if (any(muni %in% privacion$cod_municipio)) {
+    indice_privacion        <- privacion[privacion$cod_municipio %in% munis, ]
+    res                     <- append(res, list(indice_privacion))
+    names(res)[length(res)] <- "privacion"
+  }
+
+  return(res)
 }
 
 
@@ -1682,6 +1696,6 @@ utils::globalVariables(
     "year_new", "year_ref", "yy", "zz", "CPOS", "clave", "npolis", "ref_cat",
     "tipo_reg", "tramo_por", "tvias", "tmp", "final", "distan_T", "dista",
     "umbral", "umbral_T", "incluido", "N", "geo_dir", "pr", "tr", "prob", "lng",
-    "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion", "address",
+    "lat", "g_edad", "edad", "year_defuncion", "causa_defuncion", "address", "privacion",
     "direccion", "georef", "id_mort", "poblacion", "..vars_out", "..denom", "ent_colectiva")
 )
