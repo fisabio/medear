@@ -98,7 +98,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   rutas <- paste0(dir_dest, "/year_", rep(substr(years, 3, 4), each = length(dir_dest)))
   if (y_2001) {
     rutas <- c(rutas, file.path(unique(dirname(dir_dest)), "TRAMG010831"))
-    rutas <- rutas[-grep("_$", rutas)]
+    rutas <- rutas[!grepl("_$", rutas)]
   }
   if (all(file.exists(rutas))) {
     descarga <- FALSE
