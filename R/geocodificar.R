@@ -576,32 +576,32 @@ geocodificar_google <- function(direc, clave_google = NULL, aux.direc = NULL,
             # province
             ident <- grep("\\badministrative_area_level_2\\b", resultados$address_components[[j]]$types)
             if (length(ident) != 0) {
-              tmp[[j]]$province <- resultados$address_components[[j]][ident, "long_name"]
+              tmp[[j]]$province <- resultados$address_components[[j]][ident, "long_name"][1]
             }
 
             # muni
             ident <- grep("\\blocality\\b", resultados$address_components[[j]]$types)
             if (length(ident) != 0) {
-              tmp[[j]]$muni <- resultados$address_components[[j]][ident, "long_name"]
+              tmp[[j]]$muni <- resultados$address_components[[j]][ident, "long_name"][1]
             }
 
             # tip_via y address
             ident <- grep("\\broute\\b", resultados$address_components[[j]]$types)
             if (length(ident) != 0) {
-              tmp[[j]]$tip_via <- paste(unlist(resultados$address_components[[j]][ident, "types"]), collapse = ", ")
-              tmp[[j]]$address <- resultados$address_components[[j]][ident, "long_name"]
+              tmp[[j]]$tip_via <- paste(unlist(resultados$address_components[[j]][ident, "types"]), collapse = ", ")[1]
+              tmp[[j]]$address <- resultados$address_components[[j]][ident, "long_name"][1]
             }
 
             # portalNumber
             ident <- grep("\\bstreet_number\\b", resultados$address_components[[j]]$types)
             if (length(ident) != 0) {
-              tmp[[j]]$portalNumber <- resultados$address_components[[j]][ident, "long_name"]
+              tmp[[j]]$portalNumber <- resultados$address_components[[j]][ident, "long_name"][1]
             }
 
             # postalCode
             ident <- grep("\\bpostal_code\\b", resultados$address_components[[j]]$types)
             if (length(ident) != 0) {
-              tmp[[j]]$postalCode <- resultados$address_components[[j]][ident, "long_name"]
+              tmp[[j]]$postalCode <- resultados$address_components[[j]][ident, "long_name"][1]
             }
           }
 

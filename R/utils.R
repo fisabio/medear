@@ -1672,7 +1672,7 @@ procesa_datos <- function(datos) {
 
   utils::data("privacion", envir = environment(), package = "medear")
   munis <- unique(substr(carto$seccion, 1, 5))
-  if (any(muni %in% privacion$cod_municipio)) {
+  if (any(munis %in% privacion$cod_municipio)) {
     indice_privacion        <- privacion[privacion$cod_municipio %in% munis, ]
     res                     <- append(res, list(indice_privacion))
     names(res)[length(res)] <- "privacion"
