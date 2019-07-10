@@ -1,5 +1,5 @@
 
-#' @title Datos de población por sección censal para las ciudades MEDEA3
+#' @title Datos de Población por Sección Censal para las Ciudades MEDEA3
 #'   (período 2004-2015)
 #'
 #' @description Datos de población por sexo (0=Hombres, 1=Mujeres), edad (grupos
@@ -80,7 +80,7 @@
 "poblacion"
 
 
-#' @title Cartografía por sección censal para las ciudades MEDEA3
+#' @title Cartografía por Sección Censal para las Ciudades MEDEA3
 #'
 #' @description Contiene la cartografía por sección censal tal cual puede ser
 #'   utilizada por el paquete \code{sp}.
@@ -129,7 +129,7 @@
 "cartografia"
 
 
-#' @title Nombres de municipios y provincias segun terminología oficial del INE
+#' @title Nombres de Municipios y Provincias según Terminología Oficial del INE
 #'
 #' @description Codificación/nombres usados por el INE para las provincias y los
 #'   municipios. También indica si se trata de un municipio participante en
@@ -166,7 +166,7 @@
 "codigos_ine"
 
 
-#' @title Cambios temporales de seccionado para todas las ciudades MEDEA3
+#' @title Cambios Temporales de Seccionado para todas las Ciudades MEDEA3
 #'   (período 1996-2015)
 #'
 #' @description Relación de secciones censales que interseccionan
@@ -218,7 +218,7 @@
 "cambios_seccion"
 
 
-#' @title Secciones censales únicas por período (1996-2015)
+#' @title Secciones Censales Únicas por Período (1996-2015)
 #'
 #' @description Listado con las secciones censales únicas por año (1996-2015) de
 #'   ciudades MEDEA3.
@@ -243,7 +243,7 @@
 "secciones"
 
 
-#' @title Ponderación de las vecindades de las ciudades MEDEA3 (1996-2015)
+#' @title Ponderación de las Vecindades de las Ciudades MEDEA3 (1996-2015)
 #'
 #' @description Datos con la ponderación de la vecindad de cada una de las secciones
 #'    censales que componen las ciudades MEDEA3 (1996-2015).
@@ -323,7 +323,7 @@
 NULL
 
 
-#' @title Índices de privación por sección censal para ciudades MEDEA3
+#' @title Índices de Privación por Sección Censal para Ciudades MEDEA3
 #'
 #' @description Índices de privación por sección censal según los censos INE 2001 y 2011,
 #'   calculados siguiendo metodología MEDEA3 (publicación metodológica pendiente) y
@@ -357,3 +357,27 @@ NULL
 #' }
 "privacion"
 
+
+#' @title Límites (\code{bbox}) para los Mapas en MEDEA3
+#'
+#' @description Lista con los \code{\link[sp]{bbox}} para las ciudades MEDEA3.
+#'
+#' @name bboxm3
+#'
+#' @docType data
+#'
+#' @format Una lista donde el primer elemento es el código de municipio INE, el
+#'   segundo es una lista con los bbox por ciudad y el tercero un vector
+#'   definiendo la posición de la leyenda.
+#'
+#' @encoding UTF-8
+#'
+#' @keywords datasets
+#'
+#' @examples
+#'
+#' \dontrun{
+#'   library(medear)
+#'   data("bboxm3")
+#' }
+"bboxm3"

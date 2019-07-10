@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{codigos_ine}
 \alias{codigos_ine}
-\title{Nombres de municipios y provincias segun terminología oficial del INE}
+\title{Nombres de Municipios y Provincias según Terminología Oficial del INE}
 \format{Un objeto de clase \code{data.frame}, donde cada
   fila es un municipio y que cuenta con 7 columnas:
   \describe{

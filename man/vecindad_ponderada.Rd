@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{vecindad_ponderada}
 \alias{vecindad_ponderada}
-\title{Ponderación de las vecindades de las ciudades MEDEA3 (1996-2015)}
+\title{Ponderación de las Vecindades de las Ciudades MEDEA3 (1996-2015)}
 \format{Un objeto de clase \code{data.frame}, donde cada
   fila es una sección censal, ofreciendo un valor \code{c} para hombres y mujeres:
   \describe{

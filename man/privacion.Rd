@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{privacion}
 \alias{privacion}
-\title{Índices de privación por sección censal para ciudades MEDEA3}
+\title{Índices de Privación por Sección Censal para Ciudades MEDEA3}
 \format{Un objeto de clase \code{data.frame}, donde cada
   fila es una sección censal, ofreciendo un valor del índice de privación para 2001 y 2011:
   \describe{

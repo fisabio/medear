@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{poblacion}
 \alias{poblacion}
-\title{Datos de población por sección censal para las ciudades MEDEA3
+\title{Datos de Población por Sección Censal para las Ciudades MEDEA3
   (período 2004-2015)}
 \format{Un objeto de clase \code{poblaciones_ine} donde las filas representan
   la combinación de las distintas secciones censales de MEDEA3, sexos y años
