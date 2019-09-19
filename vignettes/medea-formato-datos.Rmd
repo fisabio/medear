@@ -1,6 +1,6 @@
 ---
 title: "Formato de las bases de datos en el Proyecto MEDEA3"
-subtitle: "Versión 1.2"
+subtitle: "Versión 1.3"
 author: "Grupo MEDEA"
 date: "2019-06-04"
 output:
@@ -22,7 +22,7 @@ Cabe mencionar que el paquete `medear`, creado para dar cobertura al proyecto ME
 
 * La cartografía del seccionado censal para el año 2011 para cada ciudad del proyecto (Fuente INE). Hemos considerado 2011 como año de referencia dada su coincidencia con uno de los censos que manejamos. La función de modificación del seccionado censal propondrá una serie de uniones de esta cartografía, siendo la cartografía final una modificación (agregación) de la del año 2011.
 
-* Aunque en la versión actual del paquete todavía no se ha integrado, se pretende incluir en un futuro la información socioeconómica de los censos de 2001 y 2011. Para esta información ocurrirá también que el número de secciones censales de ambos censos no coincidirá pero el propio paquete, mediante sus funciones, proporcionará la información de ambos censos según un seccionado unificado para ambos años.
+* La información socioeconómica de los censos de 2001 y 2011. Al igual que antes, el número de secciones censales de ambos censos no coincidirá, por lo que habrá que emplear las utilidades del paquete para unificar el seccionado de ambos años.
 
 Asimismo, el paquete también incorpora la función `une_secciones`, que se encarga de realizar las uniones de seccionado de las que hemos estado hablando. La base de información de esa función son los callejeros que proporciona el INE para los distintos años de estudio. Para el año 1996 ha sido necesario adquirir dicho archivo. Estos callejeros proporcionan la sección censal de cada tramo de vía para cada año de estudio y así, cruzando la información de los distintos años, podremos identificar qué tramos han cambiado de sección y entre qué secciones. De esta forma identificamos las secciones censales que se solapan en el tiempo. Adicionalmente, además de determinar qué secciones censales habrían de ser unidas para garantizar la estabilidad temporal de estas agrupaciones, `une_secciones` también prepara la cartografía unificada, los datos de población y mortalidad (y en un futuro la información socioeconómica) según el formato común requerido. Por tanto, aconsejamos el uso de `une_secciones` para generar la información en el formato unificado del proyecto, se haya seguido o no su protocolo de geocodificación.
 
@@ -40,7 +40,7 @@ En resumen, para cada ciudad los datos se guardarán en un objeto de clase lista
 
 * Objeto `mortalidad`: `array` 5-dimensional. Las cuatro primeras dimensiones de este `array` serían las mismas que las del `array` de poblaciones. La quinta dimensión identifica las causas de mortalidad que se acordaron como objetivos generales del proyecto. Dichas causas de mortalidad, así como su definición, vienen reflejadas en la Tabla 1. Nuevamente, las etiquetas de las causas de muerte se pueden consultar en el objeto correspondiente al `array` de mortalidad del archivo `castellon.RData`.  
 
-* Objeto `censo`: `data.frame` con tres columnas (sección censal, índice para el año 2001 e índice para el año 2011) y tantas filas como secciones censales haya. Por ahora no es necesario que os preocupéis de esta parte de la información requerida: más adelante os daremos información más detallada sobre este objeto.
+* Objeto `censo`: `data.frame` con el valor de los indicadores (numeradores y denominadores) por sección censal para los años 2001 y 2011.
 
 Para aquellos nodos que no vayan a agregar ninguna sección censal para el periodo de estudio, aconsejamos lo siguiente:
 
@@ -248,9 +248,12 @@ Adicionalmente, deberíamos cargar los datos de cambios de secciones censales, l
 ```{r inicial2, eval=FALSE}
 data("cambios_seccion")
 data("cartografia")
-poblacion <- carga_datos("XXXXX")
+key_pobla <- "clave_poblacion"
+key_censo <- "clave_censo"
+poblacion <- carga_datos(key_pobla, tipo = "poblacion")
+censo     <- carga_datos(key_censo, tipo = "censo")
 ```
-En la última sentencia XXXXX se habrá de sustituir por la contraseña que da acceso a dicha información y que podéis conocer poniéndoos en contacto con Carlos Vergara (vergara_car@gva.es).
+Para poder emplear los datos de población y los indicadores del censo para el cálculo del índice de privación, es necesario disponer de dos contraseñas, las cuales podéis obtener poniéndoos en contacto con Carlos Vergara (vergara_car@gva.es).
 
 Finalmente, habrá que cargar la información individual de mortalidad geocodificada que, en caso de haber seguido el protocolo de geocodificación, se encontrará en el directorio de trabajo en un archivo denominado `mortalidad_geocodificada.RData` (habrá que ajustar su nombre en caso contrario).
 ```{r carga_mort, eval = FALSE}
@@ -554,13 +557,16 @@ Al no haber seguido el protocolo de geocodificación tendrán que adaptar su bas
 ```{r barcelona, eval=FALSE}
 codigo    <- "08019"
 barcelona <- une_secciones(
-  cambios         = NULL,
-  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
-  years_estudio   = 1996:2015,
-  years_union     = 2011,
-  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
-  mortalidad      = datosmort,
-  catastro        = FALSE
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigo, ],
+  cartografia   = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio = 1996:2015,
+  years_union   = 2001:2011,
+  poblacion     = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad    = datosmort,
+  corte_edad    = 85,
+  catastro      = FALSE,
+  distancia     = 10000,
+  modo          = "auto"
 )
 save(barcelona, file = "barcelona.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -914,8 +920,8 @@ palmas_gc       <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = c("3501605023", "3501605019", "3501604074"),
-  sc2             = c("3501608013", "3501608018", "3501604062")
+  sc1             = paste0(codigo, c("05023", "05019", "04074", "01062", "01063", "01011", "01011")),
+  sc2             = paste0(codigo, c("08013", "08018", "04062", "01061", "01061", "01013", "01014"))
 )
 save(palmas_gc, file = "palmas_gc.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -937,8 +943,8 @@ tenerife        <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("03019", "03020", "09020")),
-  sc2             = paste0(codigo, c("03020", "03001", "09006"))
+  sc1             = paste0(codigo, c("03019", "03020", "09020", "07004")),
+  sc2             = paste0(codigo, c("03020", "03001", "09006", "07007"))
 )
 save(tenerife, file = "tenerife.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
