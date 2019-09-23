@@ -920,8 +920,8 @@ palmas_gc       <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("05023", "05019", "04074", "01062", "01063", "01011", "01011")),
-  sc2             = paste0(codigo, c("08013", "08018", "04062", "01061", "01061", "01013", "01014"))
+  sc1             = paste0(codigo, c("05023", "05019", "04074", "01062", "01063", "01011", "01011", "02013")),
+  sc2             = paste0(codigo, c("08013", "08018", "04062", "01061", "01061", "01013", "01014", "02014"))
 )
 save(palmas_gc, file = "palmas_gc.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.

@@ -459,6 +459,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
 
     cambios      <- cambios[between(year2, years_union[1], years_union[length(years_union)])]
     cambios$modo <- "auto"
+    attr_cambios <- attributes(cambios)
     cambios_copy <- copy(cambios)
 
     if (nrow(cambios) > 0) {
@@ -773,7 +774,7 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       !names(censo_c) %in% c("seccion", "muni", "year", "cluster")
       ]
     if (!is.null(cambios)) {
-      tmp <- attributes(cambios_copy)$equivalencia_barcelona$cluster_01
+      tmp <- attr_cambios$equivalencia_barcelona$cluster_01
       if (substr(tmp$sc, 1, 5)[1] == substr(cambios$sc_ref, 1, 5)[1]) {
         for (i in seq_along(tmp$sc)) {
           censo_c[
