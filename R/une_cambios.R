@@ -680,7 +680,13 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     }
     poblacion <- poblacion[order(seccion, sexo, year)]
     if (datos_propios) {
-      poblacion <- poblacion[poblacion$year == 2011 & poblacion$seccion %in% cartografia$seccion]
+      poblacion <- poblacion[seq_len(length(cartografia$seccion) * 2), ]
+      poblacion$seccion <- c(cartografia$seccion, cartografia$seccion)
+      poblacion$year <- 2011
+      poblacion$sexo <- rep(0:1, each = length(cartografia$seccion))
+      for (j in seq_len(ncol(poblacion) - 3L)) {
+        set(poblacion, j = j + 3L, value = NA_integer_)
+      }
     }
     pob_array <- crea_cubo_poblacion(
       poblacion,
@@ -690,10 +696,6 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     res <- list(cartografia = cartografia, poblacion = pob_array)
 
     if (!datos_propios) {
-      if (exists("cluster_sc")) {
-        attributes(res)$cluster <- cluster_sc
-        attributes(res)$cambios <- cambios_copy
-      }
       if (!identical(sort(cartografia$seccion), sort(unique(poblacion$seccion)))) {
         not_in_pobla <- cartografia$seccion[!cartografia$seccion %in% unique(poblacion$seccion)]
         not_in_carto <- unique(poblacion$seccion)[!unique(poblacion$seccion) %in% cartografia$seccion]
@@ -799,6 +801,11 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
     res_attr        <- attributes(res)
     res             <- append(res, list(censo = censo_c))
     attributes(res) <- append(attributes(res), res_attr["names" != names(res_attr)])
+  }
+
+  if (exists("cluster_sc")) {
+    attributes(res)$cluster <- cluster_sc
+    attributes(res)$cambios <- cambios_copy
   }
 
 

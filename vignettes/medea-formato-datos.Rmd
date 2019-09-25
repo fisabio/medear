@@ -1,8 +1,8 @@
 ---
 title: "Formato de las bases de datos en el Proyecto MEDEA3"
-subtitle: "Versión 1.3"
+subtitle: "Versión 1.4"
 author: "Grupo MEDEA"
-date: "2019-06-04"
+date: "2019-09-25"
 output:
   rmarkdown::html_vignette:
     number_sections: true
@@ -982,13 +982,16 @@ Al no haber seguido el protocolo de geocodificación tendrán que adaptar su bas
 ```{r bilbao, eval=FALSE}
 codigo   <- "48020"
 bilbao   <- une_secciones(
-  cambios         = NULL,
-  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
-  years_estudio   = 1996:2015,
-  years_union     = 2011,
-  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
-  mortalidad      = datosmort,
-  catastro        = FALSE
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia   = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio = 1996:2015,
+  years_union   = 2001:2011,
+  poblacion     = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad    = datosmort,
+  catastro      = FALSE,
+  modo          = "manual",
+  sc1           = paste0(codigo, c("08003", "04001", "04023", "06014", "08011", "05042")),
+  sc2           = paste0(codigo, c("08004", "04002", "04024", "06015", "08010", "05030"))
 )
 save(bilbao, file = "bilbao.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -999,13 +1002,16 @@ save(bilbao, file = "bilbao.RData")
 ```{r vitoria, eval=FALSE}
 codigo   <- "01059"
 vitoria  <- une_secciones(
-  cambios         = NULL,
-  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
-  years_estudio   = 1996:2015,
-  years_union     = 2011,
-  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
-  mortalidad      = datosmort,
-  catastro        = FALSE
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia   = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio = 1996:2015,
+  years_union   = 2001:2011,
+  poblacion     = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad    = datosmort,
+  catastro      = FALSE, 
+  modo          = "manual", 
+  sc1           = paste0(codigo, c("03002", "05027", "05028", "05029", "05030")),
+  sc2           = paste0(codigo, c("03003", rep("05010", 4)))
 )
 save(vitoria, file = "vitoria.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -1016,13 +1022,16 @@ save(vitoria, file = "vitoria.RData")
 ```{r donostia, eval=FALSE}
 codigo   <- "20069"
 donostia <- une_secciones(
-  cambios         = NULL,
-  cartografia     = cartografia[cartografia$CUMUN == codigo, ],
-  years_estudio   = 1996:2015,
-  years_union     = 2011,
-  poblacion       = poblacion[substr(seccion, 1, 5) == codigo, ],
-  mortalidad      = datosmort,
-  catastro        = FALSE
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigo & codigo_postal == FALSE, ],
+  cartografia   = cartografia[cartografia$CUMUN == codigo, ],
+  years_estudio = 1996:2015,
+  years_union   = 2001:2011,
+  poblacion     = poblacion[substr(seccion, 1, 5) == codigo, ],
+  mortalidad    = datosmort,
+catastro      = FALSE, 
+  modo          = "manual", 
+  sc1           = paste0(codigo, c("06017", "03031", "03032", "06026")),
+  sc2           = paste0(codigo, c("06011", "03019", "03019", "06006"))
 )
 save(donostia, file = "donostia.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
