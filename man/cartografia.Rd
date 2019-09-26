@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{cartografia}
 \alias{cartografia}
-\title{Cartografía por Sección Censal para las Ciudades MEDEA3}
+\title{Cartografía por Sección Censal para las Ciudades MEDEA3 (INE 2011)}
 \format{Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
   (\code{cartografia@data}) tienen clase \code{data.frame} y
   \code{cartografia_ine}, donde cada fila es una sección censal y que cuenta
@@ -21,7 +21,9 @@ cartografia
 }
 \description{
 Contiene la cartografía por sección censal tal cual puede ser
-  utilizada por el paquete \code{sp}.
+  utilizada por el paquete \code{sp}. El seccionado es el del año de 2011,
+  tal y como se descarga desde el \href{http://www.ine.es/}{sitio web del
+  INE}.
 }
 \examples{
 

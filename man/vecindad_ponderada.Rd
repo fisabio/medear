@@ -18,7 +18,7 @@ vecindad_ponderada
 }
 \description{
 Datos con la ponderación de la vecindad de cada una de las secciones
-   censales que componen las ciudades MEDEA3 (1996-2015).
+   censales que componen las ciudades MEDEA3 (cartografía unificada 1996-2015).
 }
 \examples{
 
@@ -26,5 +26,8 @@ Datos con la ponderación de la vecindad de cada una de las secciones
   library(medear)
   data("vecindad_ponderada")
 }
+}
+\seealso{
+\code{\link{carto_medea3}}
 }
 \keyword{datasets}

@@ -32,4 +32,7 @@ El índice es comparable entre ciudades y períodos.
   data("privacion")
 }
 }
+\seealso{
+\code{\link{carto_medea3}}
+}
 \keyword{datasets}

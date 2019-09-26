@@ -80,10 +80,12 @@
 "poblacion"
 
 
-#' @title Cartografía por Sección Censal para las Ciudades MEDEA3
+#' @title Cartografía por Sección Censal para las Ciudades MEDEA3 (INE 2011)
 #'
 #' @description Contiene la cartografía por sección censal tal cual puede ser
-#'   utilizada por el paquete \code{sp}.
+#'   utilizada por el paquete \code{sp}. El seccionado es el del año de 2011,
+#'   tal y como se descarga desde el \href{http://www.ine.es/}{sitio web del
+#'   INE}.
 #'
 #' @name cartografia
 #'
@@ -246,7 +248,7 @@
 #' @title Ponderación de las Vecindades de las Ciudades MEDEA3 (1996-2015)
 #'
 #' @description Datos con la ponderación de la vecindad de cada una de las secciones
-#'    censales que componen las ciudades MEDEA3 (1996-2015).
+#'    censales que componen las ciudades MEDEA3 (cartografía unificada 1996-2015).
 #'
 #' @name vecindad_ponderada
 #'
@@ -262,6 +264,8 @@
 #'   }
 #'
 #' @keywords datasets
+#'
+#' @seealso \code{\link{carto_medea3}}
 #'
 #' @encoding UTF-8
 #'
@@ -349,6 +353,8 @@ NULL
 #'
 #' @keywords datasets
 #'
+#' @seealso \code{\link{carto_medea3}}
+#'
 #' @examples
 #'
 #' \dontrun{
@@ -381,3 +387,70 @@ NULL
 #'   data("bboxm3")
 #' }
 "bboxm3"
+
+
+#' @title Datos para construir las viñetas MEDEA3
+#'
+#' @description Lista con el índice de privación e I de Moran
+#'   del mismo para las ciudades MEDEA3 (siguiendo cartografía unificada MEDEA3).
+#'
+#' @name data_vignette
+#'
+#' @docType data
+#'
+#' @encoding UTF-8
+#'
+#' @keywords datasets
+#'
+#' @examples
+#'
+#' \dontrun{
+#'   library(medear)
+#'   data("data_vignette")
+#' }
+"data_vignette"
+
+
+#' @title Cartografía por Sección Censal para las Ciudades MEDEA3 (1996-2015)
+#'
+#' @description Contiene la cartografía de secciones censales unificada para el
+#'   proyecto MEDEA3 (período 1996-2015), tomando como cartografía de referencia
+#'   la proporcionada
+#'   \href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{por
+#'   el INE para el año 2011}.
+#'
+#' @name carto_medea3
+#'
+#' @docType data
+#'
+#' @format Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
+#'   (\code{carto_medea3@data}) tienen clase \code{data.frame}, donde cada fila
+#'   es una sección censal y que cuenta con 3 columnas: \describe{
+#'   \item{seccion}{Cádena de 10 caracteres con el código de sección censal
+#'   (incluye provincia, municipio, distrito y sección).} \item{CUMUN}{Cádena de
+#'   5 caracteres con el código INE del municipio.} \item{NMUN}{Nombre del
+#'   municipio.}}
+#'
+#' @references \href{http://www.ine.es/}{Sitio web del INE}.
+#'
+#'   \href{http://www.ine.es/censos2011_datos/cen11_datos_resultados_seccen.htm}{Cartografía}.
+#'
+#' @encoding UTF-8
+#'
+#' @keywords datasets
+#'
+#' @examples
+#'
+#' \dontrun{
+#'   library(medear)
+#'   library(sp)
+#'   data("carto_medea3")
+#'
+#'   # Representación de los secciones censales de Álava
+#'   plot(carto_medea3[substr(carto_medea3$seccion, 1, 5) == "01059", ])
+#'
+#'   # Representación de los secciones censales de Álava, según distritos.
+#'   distritos <- substr(carto_medea3[substr(carto_medea3$CUSEC, 1, 5) == "01059", "CUSEC"], 6, 7)
+#'   plot(carto_medea3[substr(carto_medea3$CUSEC, 1, 5) == "01059", ], col = as.numeric(distritos))
+#' }
+"carto_medea3"
