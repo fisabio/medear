@@ -1,7 +1,7 @@
 Package: medear
-Title: Poblaciones y cartografia por seccion censal INE
-Version: 0.7.8
-Date: 2019-09-26
+Title: Poblaciones y Cartografia por Seccion Censal INE
+Version: 0.7.10
+Date: 2019-10-17
 Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
     person("Carlos", "Vergara-Hernandez", email = "vergara_car@gva.es", role = c("aut", "cre"))
