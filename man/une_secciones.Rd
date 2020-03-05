@@ -242,7 +242,7 @@ La función trabaja con la siguiente dinámica:
 
   nrow(union_sin_cat$cartografia) # 215 secciones
   round(nrow(union_sin_cat$cartografia) / nrow(cartografia_co) * 100) #
-  Conserva el 88 \\\% de secciones
+  Conserva el 88 \\% de secciones
 
   # La función avisa acerca de divergencias en el seccionado entre
   cartografía y el archivo de poblaciones.
@@ -305,10 +305,10 @@ La función trabaja con la siguiente dinámica:
 
   nrow(union_con_cat$cartografia) # 223 secciones
   round(nrow(union_con_cat$cartografia) / nrow(cartografia_co) * 100)
-  # Conserva el 91 \\\% de secciones
+  # Conserva el 91 \\% de secciones
 
-  # Al utilizar información de catastro se ha aumentado de un 88 \\\% a un
-  # 91 \\\%, recuperando 8 secciones. Surgen los mismos avisos que antes, así
+  # Al utilizar información de catastro se ha aumentado de un 88 \\% a un
+  # 91 \\%, recuperando 8 secciones. Surgen los mismos avisos que antes, así
   # que procedemos de la misma forma, tras lo cual se da por cerrada la unión:
   union_con_cat <- une_secciones(
     cambios         = cambios_co,

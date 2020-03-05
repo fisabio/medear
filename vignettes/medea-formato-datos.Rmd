@@ -356,8 +356,10 @@ granada <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("06024")),
-  sc2             = paste0(codigo, c("06021"))
+  sc1             = paste0(codigo, c("06024", "07026", "07020", "06011", "03013",
+                                     "02039", "03004", "02021", "02038", "02038", "02006")),
+  sc2             = paste0(codigo, c("06021", "07019", "07018", "06018", "03010",
+                                     "02031", "03006", "06015", "02048", "02022", "02013"))
 )
 save(granada, file = "granada.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -401,8 +403,8 @@ jaen   <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("05011")),
-  sc2             = paste0(codigo, c("05012"))
+  sc1             = paste0(codigo, c("05011", rep("03009", 3), "04008")),
+  sc2             = paste0(codigo, c("05012", "03006", "03008", "03005", "04006"))
 )
 save(jaen, file = "jaen.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -424,8 +426,8 @@ malaga          <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("08056", "09067")),
-  sc2             = paste0(codigo, c("08043", "09072"))
+  sc1             = paste0(codigo, c("08056", "09067", "11003", "08032", "10028", "06038", "07031")),
+  sc2             = paste0(codigo, c("08043", "09072", "11006", "08001", "10014", "06040", "07017"))
 )
 save(malaga, file = "malaga.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -447,8 +449,12 @@ sevilla <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("05036", "08020", rep("09028", 4))),
-  sc2             = paste0(codigo, c("05033", "08051", "09003", "09048", "09051", "09053"))
+  sc1             = paste0(codigo, c("05036", "08020", rep("09028", 4),
+                                     "08017", "05047", "04016", "08046", 
+                                     "09050", "05032", "05018", rep("07028", 4))),
+  sc2             = paste0(codigo, c("05033", "08051", "09003", "09048", "09051", "09053",
+                                     "08018", "05031", "04044", "08045", "09016", "05033",
+                                     "05013", "07027", "07008", "07007", "07006"))
 )
 save(sevilla, file = "sevilla.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -1074,8 +1080,8 @@ cartagena <- une_secciones(
   corte_edad      = 85,
   umbral_vivienda = 5,
   modo            = "manual",
-  sc1             = paste0(codigo, c("06003")),
-  sc2             = paste0(codigo, c("06004"))
+  sc1             = paste0(codigo, c("06003", "10020", "08012", "06003")),
+  sc2             = paste0(codigo, c("06004", "10004", "08013", "06005"))
 )
 save(cartagena, file = "cartagena.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
@@ -1098,9 +1104,11 @@ murcia          <- une_secciones(
   umbral_vivienda = 5,
   modo            = "manual",
   sc1             = paste0(codigo, c("05024", "06015", "04021", "04022", "02024",
-                                     "02026", "04001", "02054", "04044", "07039")),
+                                     "02026", "04001", "02054", "04044", "07039",
+                                     "04033", "01041", "05018")),
   sc2             = paste0(codigo, c("05023", "06017", "04022", "04025", "02023",
-                                     "02024", "04073", "02053", "04062", "07040"))
+                                     "02024", "04073", "02053", "04062", "07040",
+                                     "04035", "01042", "05019"))
 )
 save(murcia, file = "murcia.RData")
 # En el argumento 'file' se puede escoger otra ruta para guardar el archivo.
