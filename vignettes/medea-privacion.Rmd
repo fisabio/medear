@@ -1,0 +1,1077 @@
+---
+title: "Cálculo del Índice de Privación en el Proyecto MEDEA3"
+subtitle: "Versión 1, 2020-03-06"
+author: "Grupo MEDEA"
+output:
+  rmarkdown::html_vignette:
+    self_contained: true
+vignette: >
+  %\VignetteIndexEntry{Cálculo del Índice de Privación en el Proyecto MEDEA3}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+bibliography: referencias.bib
+---
+
+<style type="text/css">
+.main-container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<style>
+body {
+  text-align: justify;
+  max-width: 100%
+}
+img {
+  border: 1px solid transparent;
+}
+</style>
+
+# Introducción
+
+La privación socioeconómica es un determinante de la salud bien conocido, cuya cuantificación puede aproximarse con medidas indirectas de variables que supuestamente dependen o tienen un efecto en la privación. En este sentido, el proyecto MEDEA construyó un índice de privación empleando como fuente de información el censo de población y viviendas de 2001 [@Dominguez-Berjon2008], siendo sus principales características:
+
+1. Construido sobre datos del censo exhaustivo del 2001.
+2. Se realizó un análisis de componentes principales (ACP) sobre la matriz de correlaciones de 5 indicadores por sección censal.
+    - trabajadores manuales entre los ocupados de 16 o más años,
+    - parados de 16 o más años entre los activos,
+    - asalariados eventuales entre los ocupados de 16 o más años.
+    - personas con instrucción insuficiente de 16 o más años.
+    - personas con instrucción insuficiente de 16 a 29 años.
+3. El índice de privación propuesto fue el resultado de estandarizar las puntuaciones de la primera dimensión del ACP.
+
+No obstante, desde la publicación del índice se publicaron los resultados del censo de 2011, de modo que uno de los objetivos de MEDEA3 era calcular un índice de privación, comparable al índice de 2001, usando el censo de 2011, el cual presenta notables diferencias respecto al de 2001:
+
+1. No fue un censo exhaustivo: se combinó un muestreo clúster por hogar (fracción de muestreo de alrededor del 9 % de la población) con datos administrativos de varias fuentes para elevar la muestra,
+2. Las peticiones de datos sufren alteración respecto a los datos originales:
+    - se redondean todas las cifras de las peticiones a 5 (p.ej., en lugar de indicar que en una sección hay 327 o 322 sujetos, se indica que hay 330 o 320, respectivamente),
+    - se suprime la información por un cero si no se alcanza un umbral de muestra.
+3. No se dispone de la fracción de muestreo para cada sección censal.
+
+Como es lógico, el primer abordaje para calcular un índice de privación para el censo de 2011 fue reutilizar el mismo proceso empleado en el cálculo del índice de 2001, lo cual dio lugar a los siguientes mapas de privación en Alcantarilla-Murcia, A Coruña, Barcelona, Gijón, Granada, Oviedo y Vigo.
+
+
+```{r fig1, echo=FALSE, out.width="100%", dpi=600, fig.width=10, fig.height=6, dev="png", eval=FALSE}
+library(medear)
+library(data.table)
+library(sp)
+library(stats)
+library(utils)
+library(kableExtra)
+utils::data("data_vignette", envir = environment(), package = "medear")
+utils::data("bboxm3", envir = environment(), package = "medear")
+utils::data("carto_medea3", envir = environment(), package = "medear")
+ciudades      <- data_vignette$moran_i$ciudad
+ciudades_name <- c(
+  "Alcantarilla - Murcia", "Alicante",   "Almería",           "Avilés",
+  "Barcelona",             "Bilbao",     "Cádiz",             "Cartagena - La Unión",
+  "Castellón",             "Córdoba",    "A Coruña",          "Donostia",
+  "Elche",                 "Ferrol",     "Gijón",             "Granada",
+  "Huelva",                "Jaén",       "Las Palmas de GC",  "Lugo",
+  "Madrid",                "Málaga",     "Palma de Mallorca", "Ourense",
+  "Oviedo",                "Pamplona",   "Pontevedra",        "Santander",
+  "Santiago",              "Sevilla",    "Tenerife",          "Valencia",
+  "Vigo",                  "Vitoria"
+)
+numero_sc  <- data_vignette$indices[, .N, by = muni][[2]]
+carto_medea3 <- carto_medea3[match(data_vignette$indices$seccion, carto_medea3$seccion), ]
+numero_sc2 <- numero_sc[-c(2, 10)]
+numero_sc2[c(1, 8)] <- c(sum(numero_sc[1:2]), sum(numero_sc[9:10]))
+pos_inicio <- c(1, cumsum(numero_sc2)[-length(numero_sc2)] + 1)
+pos_final  <- cumsum(numero_sc2)
+paleta     <- c("#01665E", "#5AB4AC", "#C7EAE5", "#F5F5F5", "#F6E8C3", "#D8B365", "#8C510A")
+mi_corte   <- function(x) {
+  as.numeric(cut(x, stats::quantile(x, probs = seq(0, 1, length.out = 8)), include.lowest = TRUE))
+}
+ciudades_elegidas <- c(1, 5, 11, 15:16, 25, 33)
+for (i in seq_along(ciudades_elegidas)) {
+  posiciones <- pos_inicio[which(ciudades == ciudades[ciudades_elegidas[i]])]:pos_final[which(ciudades == ciudades[ciudades_elegidas[i]])]
+  mi_bbox <- which(sapply(bboxm3$codigo, function(x) all(x %in% unique(carto_medea3[posiciones,]$CUMUN))))
+  layout(matrix(c(1, 2, 3, 3), ncol = 2, byrow = TRUE), heights = c(15, 1.5))
+  opar <- par(mai = rep(.5, 4)) 
+  plot(
+    x        = carto_medea3[posiciones,],
+    col      = paleta[mi_corte(data_vignette$indices$medea_01)[posiciones]],
+    xlim     = bboxm3$bbox[[mi_bbox]][1,],
+    ylim     = bboxm3$bbox[[mi_bbox]][2,]
+  )
+  title(main = paste("Índice MEDEA: censo 2001", paste0("\nI de Moran = ", data_vignette$moran_i[ciudades_elegidas[i], 1])))
+  plot(
+    x        = carto_medea3[posiciones,],
+    col      = paleta[mi_corte(data_vignette$indices$medea_11)[posiciones]],
+    xlim     = bboxm3$bbox[[mi_bbox]][1,],
+    ylim     = bboxm3$bbox[[mi_bbox]][2,]
+  )
+  title(main = paste("Índice MEDEA: censo 2011", paste0("\nI de Moran = ", data_vignette$moran_i[ciudades_elegidas[i], 3])))
+  par(mai = rep(0, 4), font = 2)
+  plot.new()
+  legend(
+    x         = "center",
+    ncol      = 7,
+    legend    = paste("Nivel", 1:7),
+    title     = paste("Nivel de privación en",  ciudades_name[ciudades_elegidas[i]]),
+    fill      = paleta,
+    bty       = "n",
+    text.font = 1
+  )
+  par(opar)
+}
+```
+
+
+En todos estos mapas se aprecia un mayor ruido en el índice de 2011 que en el de 2001, y su procedencia no es otra que el propio censo de 2011, dado que este:
+
+- realiza un muestreo clúster en variables muy clusterizadas (p. ej., inmigración reciente): aparecen ceros en algunas secciones como artefacto muestral, induciendo extravariabilidad en los indicadores del índice.
+    - Un ejemplo: en el censo de 2011 en Valencia hubo 453 hogares con inmigrantes que llegaron en los 5 años previos al censo a Valencia, pero al existir 531 secciones censales, por diseño habrá (al menos) 78 secciones con cero inmigrantes (en los datos hay 259 secciones con 0 inmigrantes). En el censo 2001 solo hubo una sección censal con 0 inmigrantes en esas condiciones.
+- no ofrece una medida del error al elevar los datos de una muestra a nivel de la población, como podrían ser las fracciones de muestreo por sección censal, lo que lleva a asumir que se trata de una muestra exhaustiva.
+
+Todo esto implica que aplicar la metodología MEDEA para el cálculo de un índice de privación con los datos del censo 2011 producirá una combinación lineal de variables ruidosas resultando en un índice ruidoso (p. ej., las variables con ceros recibirán más importancia de la debida en el ACP, lo cual encaja con las reducciones en el patrón espacial que se apreciaban en los mapas previos).
+
+Por otra parte, cabe recordar una de las críticas más fuertes al índice de privación MEDEA sobre el censo de 2001, que no es otra que la comparabilidad del mismo entre ciudades, puesto que cada ciudad calcula su propio índice. En este sentido, y ante la disyuntiva de agravar el problema al añadir una nueva fuente de datos (cada ciudad tendría dos índices no comparables entre sí), se ha decidido abordar el problema para poder comparar la desigualdad de las ciudades en términos de privación y conocer su evolución.
+
+Por todo ello, la confección de un índice de privación para el proyecto MEDEA3 se divide en dos apartados diferenciados:
+
+1. Generar un modelo estadístico que aborde adecuadamente el ruido inherente a los datos del censo de 2011, estimando la fracción de muestreo por sección censal (permitiendo estimar a su vez la variabilidad de los indicadores en cada sección censal) así como la dependencia espacio-temporal y multivariante de los datos.
+2. Proponer una única combinación lineal de los indicadores para ofrecer estimaciones del índice de privación comparables por ciudad y período.
+
+# Propuesta de análisis estadístico
+
+## Modelización de los indicadores
+
+Dada una proporción poblacional $\pi$ y una muestra de tamaño $n$, la proporción muestral correspondiente se distribuye como
+
+\[p \sim \mathcal{N}\left(\pi, \frac{\pi(1-\pi)}{n}\right)\]
+
+
+o, para poblaciones finitas, de tamaño $N$:
+
+\[p \sim \mathcal{N}\left(\pi, \frac{\pi(1-\pi)}{n}\frac{N-n}{N-1}\right)\approx \mathcal{N}\left(\pi, \frac{\pi(1-\pi)}{N}\frac{1-f}{f}\right)\]
+
+donde $f$ es la fracción de muestreo. Sin embargo, y aunque es posible utilizar esta última expresión como verosimilitud para estimar $\pi$ como sustituto de $p$, se sabe que no es conveniente si $\pi$ es próximo a 0 o a 1, siendo mejor asumir Normalidad sobre el logit de $p$ (incluyendo así el ruido implícito a su carácter muestral) de la siguiente forma [@Fleiss2003]
+
+\[logit(p) \sim \mathcal{N}\left(logit(\pi), \frac{1}{\pi(1-\pi)N} \frac{1-f}{f}\right)\]
+
+con lo que, y en base al trabajo de Mercer et al. [-@Mercer2014], hemos considerado que la verosimilitud del modelo para la $i$-ésima sección censal de cada ciudad ($j=1,\ldots,I$) y el $j$-ésimo indicador que compondría el índice ($j=1,\ldots,5$) es
+
+$$logit(p^{2011}_{ij}) \sim \mathcal{N}\left(logit(\pi_{ij}),\frac{1}{\pi_{ij}(1-\pi_{ij})N_{ij}} \frac{1-f_i}{f_i} \right)$$
+
+siendo $f_i$ la fracción de muestreo para la $i$-ésima sección censal (a estimar en el propio modelo), y $N_{ij}$ es el tamaño de la población por indicador y sección en 2011.
+
+
+Dicho esto, y dado que se desea modelar los $\pi_{ij}$ de forma que tengan dependencia temporal, espacial y multivariante, se utiliza como término lineal
+
+$$logit(\pi_{ij}) = \alpha_j + \beta_j \cdot logit(p^{2001}_{ij}) + \Theta_{ij}$$
+
+donde
+
+$$\Theta_{ij} = \mathbf{S_i}\cdot\mathbf{M_j}$$
+
+De este modo:
+
+- $\alpha$ indica un valor promedio para cada indicador,
+- $\beta$ introduce la dependencia temporal de cada indicador con respecto a 2001,
+- $\Theta$ combina la dependencia espacial $\mathbf{S}$ (distribución de Leroux [@Leroux2000]) con la multivariante entre indicadores expresada en la matriz $\mathbf{M}$ [@Botella-Rocamora2015; @Martinez-Beneito2013], que a su vez se estimará en el propio modelo.
+
+Finalmente, al modelar el vector de fracciones de muestreo por sección censal ($f$) con una estructura espacial siguiendo la propuesta de  @Leroux2000, se consigue que cada una de estas tenga una cantidad de ruido distinta en función de los datos disponibles.
+
+
+## ACP conjunto sobre los indicadores modelados
+
+Una vez que se ha realizado una estimación paralela de los indicadores de 2011, queda afrontar el segundo reto en la confección de un índice de privación para el proyecto MEDEA3, y es la propuesta de una única combinación lineal de los indicadores que permita realizar comparaciones del índice entre ciudades y períodos.
+
+El punto de partida es la matriz de indicadores para la ciudad $k$ y el período $l$, a la que denominaremos $\mathbf{X}_{kl}$. El ACP por separado para cada ciudad se plantea la búsqueda de $\mathbf{\alpha}$ de forma que se maximice $Var(\mathbf{X}_{kl}\cdot \mathbf{\alpha})$. La primera opción de análisis conjunto podría ser
+\[\mathbf{X}=[\mathbf{X}'_{11}:\mathbf{X}_{12}:...:\mathbf{X}'_{K2}]'\] 
+buscando un $\mathbf{\alpha}$ que maximice $Var(\mathbf{X}\mathbf{\alpha})$. No obstante, el principal problema de esta propuesta es que este procedimiento podría dar con la combinación lineal de variables que maximizara la varianza entre períodos, ciudades o una combinación de ambos. 
+
+Para tratar de solventar este problema, si $N_k$ es el número de secciones de la ciudad $k$, se plantea maximizar la varianza dentro de cada ciudad y período con
+\[\frac{N_1}{\sum N_k}Var(\mathbf{X}_{11}\cdot \mathbf{\alpha})+\frac{N_1}{\sum N_k}Var(\mathbf{X}_{12}\cdot \mathbf{\alpha})+...+\frac{N_K}{\sum N_k}Var(\mathbf{X}_{K2}\cdot \mathbf{\alpha})\] 
+
+pudiéndose demostrar que la solución a este problema equivale a la primera dimensión del ACP de \(\mathbf{X}=[\mathbf{X^*}'_{11}:\mathbf{X^*}_{12}:...:\mathbf{X^*}'_{K2}]'\), donde $\mathbf{X^*}$ contiene las variables de $\mathbf{X}$ centradas para cada ciudad. 
+
+
+# Resultados
+
+
+```{r fig2, echo=FALSE, out.width="100%", dpi=600, fig.width=10, fig.height=6, dev="png", eval=FALSE}
+for (i in seq_along(ciudades_elegidas)) {
+  posiciones <- pos_inicio[which(ciudades == ciudades[ciudades_elegidas[i]])]:pos_final[which(ciudades == ciudades[ciudades_elegidas[i]])]
+  mi_bbox <- which(sapply(bboxm3$codigo, function(x) all(x %in% unique(carto_medea3[posiciones,]$CUMUN))))
+  layout(matrix(c(1, 2, 3, 4, 4, 4), ncol = 3, byrow = TRUE), heights = c(15, 1.5))
+  opar <- par(mai = rep(.5, 4)) 
+  plot(
+    x        = carto_medea3[posiciones,],
+    col      = paleta[mi_corte(data_vignette$indices$medea_01)[posiciones]],
+    xlim     = bboxm3$bbox[[mi_bbox]][1,],
+    ylim     = bboxm3$bbox[[mi_bbox]][2,]
+  )
+  title(main = paste("Índice MEDEA: censo 2001", paste0("\nI de Moran = ", data_vignette$moran_i[ciudades_elegidas[i], 1])))
+  plot(
+    x        = carto_medea3[posiciones,],
+    col      = paleta[mi_corte(data_vignette$indices$medea_11)[posiciones]],
+    xlim     = bboxm3$bbox[[mi_bbox]][1,],
+    ylim     = bboxm3$bbox[[mi_bbox]][2,]
+  )
+  title(main = paste("Índice MEDEA: censo 2011", paste0("\nI de Moran = ", data_vignette$moran_i[ciudades_elegidas[i], 3])))
+  plot(
+    x        = carto_medea3[posiciones,],
+    col      = paleta[mi_corte(data_vignette$indices$medea3_11)[posiciones]],
+    xlim     = bboxm3$bbox[[mi_bbox]][1,],
+    ylim     = bboxm3$bbox[[mi_bbox]][2,]
+  )
+  title(main = paste("Nueva propuesta: censo 2011", paste0("\nI de Moran = ", data_vignette$moran_i[ciudades_elegidas[i], 2])))
+  par(mai = rep(0, 4), font = 2)
+  plot.new()
+  legend(
+    x         = "center",
+    ncol      = 7,
+    legend    = paste("Nivel", 1:7),
+    title     = paste("Nivel de privación en",  ciudades_name[ciudades_elegidas[i]]),
+    fill      = paleta,
+    bty       = "n",
+    text.font = 1
+  )
+  par(opar)
+}
+```
+
+Los valores de las I de Moran de la nueva propuesta de índice de privación en ciudades MEDEA3 es sistemáticamente superior a los del índice MEDEA 2011, acercándose a los valores del índice 2001 (se recupera el patrón espacial).
+
+Por otra parte, y gracias a realizar un ACP conjunto para ciudades y períodos, resulta posible (y muy fácil) comparar la varianza de los índices en 2001 y 2011, evaluando si esta aumenta o disminuye.
+
+```{r var1, echo=FALSE, results='asis', eval=FALSE}
+variabilidad_indice <- t(
+  sapply(seq_along(pos_inicio), function(i)
+    round(apply(data_vignette$indices[pos_inicio[i]:pos_final[i], ], 2, var)[c(2, 4)], 3)
+  )
+)
+variabilidad_indice <- data.table(variabilidad_indice)
+setnames(variabilidad_indice, c("in_2001", "in_2011"))
+variabilidad_indice$ciudad <- ciudades_name
+variabilidad_indice$diferencia_01_11 <- round(variabilidad_indice$in_2001 - variabilidad_indice$in_2011, 3)
+setcolorder(variabilidad_indice, c(3, 1:2, 4))
+variabilidad_indice$diferencia_01_11 <- cell_spec(
+  variabilidad_indice$diferencia_01_11,
+  "html",
+  color = ifelse(variabilidad_indice$diferencia_01_11 > 0, "green", "red"),
+  align = "c"
+)
+kable(
+  x         = variabilidad_indice,
+  row.names = FALSE,
+  format    = "html",
+  booktabs  = TRUE,
+  escape    = FALSE,
+  caption   = "Varianza de los índices de privación MEDEA3 en 2001 y 2011 y su diferencia.",
+  linesep   = "",
+  col.names = c("", "Varianza en 2001", "Varianza en 2011", "Diferencia (2001-2011)"),
+  align     = c("l", "c", "c", "c")
+) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    position      = "center",
+    font_size     = 14,
+    full_width    = FALSE,
+    fixed_thead   = TRUE
+  ) %>% 
+  row_spec(0, bold = TRUE) %>% 
+  column_spec(1, italic = TRUE, width = "2in") %>%
+  print()
+```
+
+En líneas generales, al comparar la varianza por ciudad del índice de 2001 con el de 2011, se aprecia que en 2011 esta es menor, lo que indicaría que en 2011 disminuye la desigualdad en la privación respecto a 2001.
+
+
+# Implementación desde R
+
+Para poder ejecutar el siguiente código será necesario tener instalado el software [WinBUGS](https://www.mrc-bsu.cam.ac.uk/software/bugs/the-bugs-project-winbugs/), bien directamente en sistemas operativos Windows o a través de [Wine](https://www.winehq.org) en sistemas Unix (Linux o Mac). Una vez instalado, bastará con ejecutar las siguientes líneas de código, si bien será necesario disponer e introducir las contraseñas del proyecto MEDEA3 que protegen algunos datos de difusión limitada (población y censos 2001 y 2011), las cuales se pueden obtener escribiendo un correo a [Carlos Vergara](mailto:vergara_car@gva.es).
+
+
+```{r privacion_analisis, eval=FALSE}
+# Introducción de las claves para los datos de población y de censo -------
+clave_poblacion <- "UNA_CONTRASEÑA"
+clave_censo     <- "UNA_CONTRASEÑA"
+
+
+# Instalar y cargar los paquetes necesarios -------------------------------
+if (!"remotes" %in% installed.packages()) install.packages("remotes")
+pkgs <- c("pbugs", "medear")
+sapply(pkgs, function(x) remotes::install_github(paste0("fisabio/", x), build_vignettes = TRUE))
+library(medear)
+
+
+# Definir funciones propias y valores de uso común ------------------------
+mi_corte       <- function(x) {
+  as.numeric(cut(x, stats::quantile(x, probs = seq(0, 1, length.out = 8)), include.lowest = TRUE))
+}
+mi_escala      <- function(mat) {
+  apply(mat, 2, function(x) (x - mean(x)) / sqrt(mean(x) * (1 - mean(x))))
+}
+vecindades     <- function(carto_v) {
+  carto.vecinos        <- rgeos::gTouches(carto_v, byid = TRUE, returnDense = FALSE)
+  names(carto.vecinos) <- NULL
+  tmp                  <- sapply(carto.vecinos, is.null)
+  if (any(tmp)) {
+    warning(
+      "Los pol\u00edgonos c(", paste(which(tmp), collapse = ", "), ") de la cartograf\u00eda son islas.\n",
+      "Se asigna como vecinos a los pol\u00edgonos m\u00e1s pr\u00f3ximos.",
+      call. = FALSE
+    )
+    carto_tmp <- sp::spTransform(carto_v, sp::CRS("+init=epsg:23030"))
+    cual_isla <- which(tmp)
+    distancia <- rgeos::gDistance(carto_tmp[cual_isla, ], carto_tmp, byid = TRUE)
+    nuevos_vecinos <- sapply(seq_along(cual_isla), function(x) which.min(distancia[-cual_isla[x], x]))
+
+    for (i in seq_along(cual_isla)) {
+      carto.vecinos[[cual_isla[i]]] <- sort(c(carto.vecinos[[cual_isla[i]]], as.integer(nuevos_vecinos[i])))
+      carto.vecinos[[as.integer(nuevos_vecinos[i])]] <- sort(c(cual_isla[i], carto.vecinos[[as.integer(nuevos_vecinos[i])]]))
+    }
+  }
+
+  attr(carto.vecinos, "class") <- "nb"
+  attr(carto.vecinos, "region.id") <- paste(seq_along(carto.vecinos))
+  attr(carto.vecinos, "type") <- "queen"
+  attr(carto.vecinos, "sym") <- TRUE
+
+  return(carto.vecinos)
+}
+
+
+# Cargar datos ------------------------------------------------------------
+data("cartografia")
+data("cambios_seccion")
+cambios_seccion <- elimina_cambios(
+  datos  = cambios_seccion,
+  sc_ref = c(
+    "3003001009", "1101208017", "1402109024", "2104108001", "2906702006", "4109110012",
+    "1507802002", "3803807002", paste0("28079", c("12103", "06016")), "4802004038",
+    paste0("35016", c("05033", "05020", "05006",  "02018", rep("02032", 2),
+                      "02012", "02026", "04078", "02042", "02038")),
+    paste0("07040", c("02017", "02057", "02049", "02062", "04053")), "1204009005"
+  ),
+  sc_new = c(
+    "3003001011", "1101209002", "1402109026", "2104102005", "2906710025", "4109105023",
+    "1507805009", "3803809020", paste0("28079", c("17044", "06012")), "4802003022",
+    paste0("35016", c(rep("08013", 3), "02019", "02029", "02030", "02019",
+                      "02024", "04058", "02038", "02042")),
+    paste0("07040", c("02016", "02030", "02056", "02049", "04043")), "1204009011"
+  )
+)
+codigos        <- codigos_ine[(medea3), paste0(cod_provincia, cod_municipio)]
+poblacion      <- carga_datos(key = clave_poblacion)
+censo          <- carga_datos(key = clave_censo, tipo = "censo")
+years_estudio  <- 1996:2015
+mi_config      <- vector("list", length(codigos))
+mi_config[[1]] <- list(
+  years_estudio = years_estudio,
+  years_union   = 2001:2011,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[1] & codigo_postal == FALSE, ],
+  codigo        = codigos[1],
+  modo          = "manual",
+  catastro      = FALSE,
+  distancia     = 100,
+  sc1           = paste0(codigos[1], c("03002", "05027", "05028", "05029", "05030")),
+  sc2           = paste0(codigos[1], c("03003", rep("05010", 4))),
+  ciudad        = "vitoria"
+)
+
+mi_config[[2]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[2] & codigo_postal == FALSE, ],
+  codigo        = codigos[2],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[2], c("04035", "04041", "08022")),
+  sc2           = paste0(codigos[2], c("04020", "04023", "08012")),
+  ciudad        = "alicante"
+)
+
+mi_config[[3]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[3] & codigo_postal == FALSE, ],
+  codigo        = codigos[3],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[3], c("02005", "01017", rep("07006", 2))),
+  sc2           = paste0(codigos[3], c("02006", "07019", "07017", "07020")),
+  ciudad        = "elche"
+)
+
+mi_config[[4]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[4] & codigo_postal == FALSE, ],
+  codigo        = codigos[4],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[4], c("07040", "07040")),
+  sc2           = paste0(codigos[4], c("07023", "07024")),
+  ciudad        = "almeria"
+)
+
+mi_config[[5]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[5] & codigo_postal == FALSE, ],
+  codigo        = codigos[5],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[5], c("04021", "02015")),
+  sc2           = paste0(codigos[5], c("04039", "02014")),
+  ciudad        = "mallorca"
+)
+
+mi_config[[6]] <- list(
+  years_estudio = years_estudio,
+  years_union   = 2001:2011,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[6], ],
+  codigo        = codigos[6],
+  modo          = "auto",
+  catastro      = FALSE,
+  distancia     = 10000,
+  sc1           = NULL,
+  sc2           = NULL,
+  ciudad        = "barcelona"
+)
+
+mi_config[[7]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[7] & codigo_postal == FALSE, ],
+  codigo        = codigos[7],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[7], c("05003", "10014")),
+  sc2           = paste0(codigos[7], c("04006", "10006")),
+  ciudad        = "cadiz"
+)
+
+mi_config[[8]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[8] & codigo_postal == FALSE, ],
+  codigo        = codigos[8],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[8], c("06013")),
+  sc2           = paste0(codigos[8], c("01003")),
+  ciudad        = "castellon"
+)
+
+mi_config[[9]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[9] & codigo_postal == FALSE, ],
+  codigo        = codigos[9],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[9],c("06047", "09035", "10041", "09014", "09003")),
+  sc2           = paste0(codigos[9], c("06024", "09003", "10045", "09020", "09032")),
+  ciudad        = "cordoba"
+)
+
+mi_config[[10]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[10] & codigo_postal == FALSE, ],
+  codigo        = codigos[10],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[10], c("05017", "05018", "05019", "07042")),
+  sc2           = paste0(codigos[10], c("05015", "05011", "05011", "07027")),
+  ciudad        = "coruna"
+)
+
+mi_config[[11]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[11] & codigo_postal == FALSE, ],
+  codigo        = codigos[11],
+  modo          = "auto",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = NULL,
+  sc2           = NULL,
+  ciudad        = "ferrol"
+)
+
+mi_config[[12]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[12] & codigo_postal == FALSE, ],
+  codigo        = codigos[12],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[12], c("01005")),
+  sc2           = paste0(codigos[12], c("01008")),
+  ciudad        = "santiago"
+)
+
+mi_config[[13]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[13] & codigo_postal == FALSE, ],
+  codigo        = codigos[13],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(
+    codigos[13],
+    c(
+      "06024", "07026", "07020", "06011", "03013", "02039",
+      "03004", "02021", "02038", "02038", "02006"
+    )
+  ),
+  sc2           = paste0(
+    codigos[13],
+    c(
+      "06021", "07019", "07018", "06018", "03010", "02031",
+      "03006", "06015", "02048", "02022", "02013"
+    )
+  ),
+  ciudad        = "granada"
+)
+
+mi_config[[14]] <- list(
+  years_estudio = years_estudio,
+  years_union   = 2001:2011,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[14] & codigo_postal == FALSE, ],
+  codigo        = codigos[14],
+  modo          = "manual",
+  catastro      = FALSE,
+  distancia     = 100,
+  sc1           = paste0(codigos[14], c("06017", "03031", "03032", "06026")),
+  sc2           = paste0(codigos[14], c("06011", "03019", "03019", "06006")),
+  ciudad        = "donostia"
+)
+
+mi_config[[15]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[15] & codigo_postal == FALSE, ],
+  codigo        = codigos[15],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[15], c("07018")),
+  sc2           = paste0(codigos[15], c("07013")),
+  ciudad        = "huelva"
+)
+
+mi_config[[16]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[16] & codigo_postal == FALSE, ],
+  codigo        = codigos[16],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[16], c("05011", rep("03009", 3), "04008")),
+  sc2           = paste0(codigos[16], c("05012", "03006", "03008", "03005", "04006")),
+  ciudad        = "jaen"
+)
+
+mi_config[[17]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[17] & codigo_postal == FALSE, ],
+  codigo        = codigos[17],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[17], c("07001")),
+  sc2           = paste0(codigos[17], c("07003")),
+  ciudad        = "lugo"
+)
+
+mi_config[[18]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[18] & codigo_postal == FALSE, ],
+  codigo        = codigos[18],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[18], c("05050", "19030", "19031", "20030", "20060", "02098", "02098",
+                                        "03001", "08128", "08128", "09080", "09080", "11183", "12016",
+                                        "13204", "13204", "13127", "14089", "16092", "16092", "16111",
+                                        "17055", "18025", rep("19029", 7), rep("20067", 6), "14089")),
+  sc2           = paste0(codigos[18], c("05058", "19001", "19001", "20029", "20043", "02052", "02106",
+                                        "03096", "08153", "08159", "09083", "09085", "11157", "12102",
+                                        "13208", "13209", "13215", "14081", "16106", "16093", "16091",
+                                        "17103", "18045", paste(19033:19039),
+                                        paste(c(20102:20104, 20106:20107, 20110)), "14090")),
+  ciudad        = "madrid"
+)
+
+mi_config[[19]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[19] & codigo_postal == FALSE, ],
+  codigo        = codigos[19],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[19], c("08056", "09067", "11003", "08032", "10028", "06038", "07031")),
+  sc2           = paste0(codigos[19], c("08043", "09072", "11006", "08001", "10014", "06040", "07017")),
+  ciudad        = "malaga"
+)
+
+mi_config[[20]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[20] & codigo_postal == FALSE, ],
+  codigo        = codigos[20],
+  modo          = "auto",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = NULL,
+  sc2           = NULL,
+  ciudad        = "alcantarilla"
+)
+
+mi_config[[21]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[21] & codigo_postal == FALSE, ],
+  codigo        = codigos[21],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[21], c("06003", "10020", "08012", "06003")),
+  sc2           = paste0(codigos[21], c("06004", "10004", "08013", "06005")),
+  ciudad        = "cartagena"
+)
+
+mi_config[[22]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[22] & codigo_postal == TRUE, ],
+  codigo        = codigos[22],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[22], c("05024", "06015", "04021", "04022", "02024",
+                                        "02026", "04001", "02054", "04044", "07039",
+                                        "04033", "01041", "05018")),
+  sc2           = paste0(codigos[22], c("05023", "06017", "04022", "04025", "02023",
+                                        "02024", "04073", "02053", "04062", "07040",
+                                        "04035", "01042", "05019")),
+  ciudad        = "murcia"
+)
+
+mi_config[[23]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[23] & codigo_postal == FALSE, ],
+  codigo        = codigos[23],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[23], "03003"),
+  sc2           = paste0(codigos[23], "03001"),
+  ciudad        = "la_union"
+)
+
+mi_config[[24]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[24] & codigo_postal == FALSE, ],
+  codigo        = codigos[24],
+  modo          = "manual",
+  catastro      = FALSE,
+  distancia     = 100,
+  sc1           = paste0(codigos[24], c("07005", "04026", rep("05008", 6))),
+  sc2           = paste0(codigos[24], c("07018", "04013", paste0("0800", 1:6))),
+  ciudad        = "pamplona"
+)
+
+mi_config[[25]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[25] & codigo_postal == FALSE, ],
+  codigo        = codigos[25],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[25], c("01016")),
+  sc2           = paste0(codigos[25], c("01008")),
+  ciudad        = "ourense"
+)
+
+mi_config[[26]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[26] & codigo_postal == FALSE & year2 == 2001, ],
+  codigo        = codigos[26],
+  modo          = "auto",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = NULL,
+  sc2           = NULL,
+  ciudad        = "aviles"
+)
+
+mi_config[[27]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[27] & codigo_postal == FALSE & year2 == 2001, ],
+  codigo        = codigos[27],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[27], c("07016", "06021", "06021", "09016")),
+  sc2           = paste0(codigos[27], c("07048", "06022", "06012", "09012")),
+  ciudad        = "gijon"
+)
+
+mi_config[[28]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[28] & codigo_postal == FALSE & year2 == 2001, ],
+  codigo        = codigos[28],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[28], c("05015", "06020", "09015", "09017")),
+  sc2           = paste0(codigos[28], c("05014", "06017", "09011", "09011")),
+  ciudad        = "oviedo"
+)
+
+mi_config[[29]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[29] & codigo_postal == FALSE, ],
+  codigo        = codigos[29],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[29], c("05023", "05019", "04074", "01062", "01063", "01011", "01011", "02013")),
+  sc2           = paste0(codigos[29], c("08013", "08018", "04062", "01061", "01061", "01013", "01014", "02014")),
+  ciudad        = "las_palmas"
+)
+
+mi_config[[30]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[30] & codigo_postal == FALSE, ],
+  codigo        = codigos[30],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[30], c("03002", "04005", "04006", "05001",
+                                        "05004", "06001", "06002", "06003")),
+  sc2           = paste0(codigos[30], c("03001", "04002", "04002", "05003",
+                                        "05006", "05006", "04003", "04002")),
+  ciudad        = "pontevedra"
+)
+
+mi_config[[31]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[31] & codigo_postal == FALSE, ],
+  codigo        = codigos[31],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[31], c("06023", "06023")),
+  sc2           = paste0(codigos[31], c("06003", "06022")),
+  ciudad        = "vigo"
+)
+
+mi_config[[32]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[32] & codigo_postal == FALSE, ],
+  codigo        = codigos[32],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[32], c("03019", "03020", "09020", "07004")),
+  sc2           = paste0(codigos[32], c("03020", "03001", "09006", "07007")),
+  ciudad        = "tenerife"
+)
+
+mi_config[[33]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[33] & codigo_postal == FALSE, ],
+  codigo        = codigos[33],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[33], c("02023", "08020", "08021")),
+  sc2           = paste0(codigos[33], c("02024", "08029", "08025")),
+  ciudad        = "santander"
+)
+
+mi_config[[34]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[34] & codigo_postal == FALSE, ],
+  codigo        = codigos[34],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[34], c("05036", "08020", rep("09028", 4),
+                                        "08017", "05047", "04016", "08046", 
+                                        "09050", "05032", "05018", rep("07028", 4))),
+  sc2           = paste0(codigos[34], c("05033", "08051", "09003", "09048", "09051", "09053",
+                                        "08018", "05031", "04044", "08045", "09016", "05033",
+                                        "05013", "07027", "07008", "07007", "07006")),
+  ciudad        = "sevilla"
+)
+
+mi_config[[35]] <- list(
+  years_estudio = years_estudio,
+  years_union   = years_estudio,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[35] & codigo_postal == FALSE, ],
+  codigo        = codigos[35],
+  modo          = "manual",
+  catastro      = TRUE,
+  distancia     = 100,
+  sc1           = paste0(codigos[35], c("12025")),
+  sc2           = paste0(codigos[35], c("12042")),
+  ciudad        = "valencia"
+)
+
+mi_config[[36]] <- list(
+  years_estudio = years_estudio,
+  years_union   = 2001:2011,
+  cambios       = cambios_seccion[substr(sc_ref, 1, 5) == codigos[36] & codigo_postal == FALSE, ],
+  codigo        = codigos[36],
+  modo          = "manual",
+  catastro      = FALSE,
+  distancia     = 100,
+  sc1           = paste0(codigos[36], c("08003", "04001", "04023", "06014", "08011", "05042")),
+  sc2           = paste0(codigos[36], c("08004", "04002", "04024", "06015", "08010", "05030")),
+  ciudad        = "bilbao"
+)
+
+
+# Definir el modelo -------------------------------------------------------
+modelo_privacion_m3 <- function() {
+  # Verosimilitud
+  for (j in 1:nvar) {
+    for (i in 1:nsec) {
+      logit.p11[i, j]       ~ dnorm(logit.p11.pred[i, j], prec.p11.pred[i, j])%_%I(, logit.P.max[i,j])
+      logit.p11.pred[i, j] <- alfa[j] + beta[j] * (logit.p01[i, j] - mean(logit.p01[, j])) + sd.change * change[i, j]
+      change[i, j]         <- inprod2(epsilon[i, ], M[, j])
+      p11.pred[i, j]       <- exp(logit.p11.pred[i, j]) / (1 + exp(logit.p11.pred[i, j]))
+      prec.p11.pred[i, j]  <- frac.mues[i] / (1 - frac.mues[i]) * n11[i, j] * p11.pred[i, j] * (1 - p11.pred[i, j])
+    }
+    # Matrix M
+    for (k in 1:ndim) {
+      M[k, j] ~ dnorm(0, 1)
+    }
+    
+    # Previas
+    alfa[j] ~ dflat()
+    beta[j] ~ dflat()
+  }
+
+  # Leroux para frac.mues
+  for (i in 1:nsec) {
+    logit(frac.mues[i]) <- mu + sd.theta * theta[i]
+    theta[i]             ~ dnorm(media.theta[i], prec.theta[i])
+    prec.theta[i]       <- 1 - lambda.theta + lambda.theta * nvec[i]
+    media.theta[i]      <- (lambda.theta / (1 - lambda.theta + lambda.theta * nvec[i])) *
+      sum(theta.map[(indice[i] + 1):indice[i + 1]])
+
+  # Leroux para epsilon
+    for (k in 1:ndim) {
+      epsilon[i, k]       ~ dnorm(media.epsilon[i, k], prec.epsilon[i, k])
+      prec.epsilon[i, k]  <- 1 - lambda.epsilon[k] + lambda.epsilon[k] * nvec[i]
+      media.epsilon[i, k] <- (lambda.epsilon[k] / (1 - lambda.epsilon[k] + lambda.epsilon[k] * nvec[i])) *
+        sum(epsilon.map[(indice[i] + 1):indice[i + 1], k])
+    }
+  }
+  for (i in 1:nvec.tot) {
+    theta.map[i]   <- theta[map[i]]
+    for (k in 1:ndim) {
+      epsilon.map[i, k] <- epsilon[map[i], k]
+    }
+  }
+  for (i in 1:ndim) {
+    lambda.epsilon[i] ~ dunif(0, 1)
+    for (j in 1:ndim) {
+      corr.m[i, j] <- inprod2(M[,i], M[,j])
+    }
+  }
+  
+  # Previas
+  mu           ~ dflat()
+  sd.change    ~ dunif(0, 10)
+  sd.theta     ~ dunif(0, 10)
+  lambda.theta ~ dunif(0, 1)
+}
+
+
+# Lanzar el modelo en bucle para todas las ciudades -----------------------
+if (!dir.exists("resultados")) dir.create("resultados")
+uniones <- carto <- censo.tot <- censo.2001 <- censo.2011 <- p01 <- p11 <-
+  mmodelos <- vector("list", length(mi_config))
+for (i in seq_along(mi_config)) {
+  if (!i %in% c(22, 23)) {
+    seleccion    <- if (i == 20) c(20, 22) else if (i == 21) c(21, 23) else i
+    ciudad       <- paste0(unlist(lapply(mi_config[seleccion], `[`, "ciudad")), collapse = "_")
+    uniones[[i]] <- list()
+    if (length(seleccion) > 1) {
+      uniones[[i]] <- list()
+      for (j in seq_along(seleccion)) {
+        uniones[[i]][[j]]     <- une_secciones(
+          cambios         = mi_config[[seleccion[j]]]$cambios,
+          cartografia     = cartografia[cartografia$CUMUN == mi_config[[seleccion[j]]]$codigo, ],
+          years_estudio   = mi_config[[seleccion[j]]]$years_estudio,
+          years_union     = mi_config[[seleccion[j]]]$years_union,
+          censo           = censo,
+          poblacion       = poblacion[substr(seccion, 1, 5) == mi_config[[seleccion[j]]]$codigo, ],
+          catastro        = mi_config[[seleccion[[j]]]]$catastro,
+          distancia       = mi_config[[seleccion[j]]]$distancia,
+          corte_edad      = 85,
+          umbral_vivienda = 5,
+          modo            = mi_config[[seleccion[j]]]$modo,
+          sc1             = mi_config[[seleccion[j]]]$sc1,
+          sc2             = mi_config[[seleccion[j]]]$sc2
+        )
+      }
+      tmp <- list()
+      tmp[["cartografia"]] <- do.call("rbind", unlist(lapply(uniones[[i]], `[`, 1), recursive = FALSE))
+      tmp[["censo"]]       <- do.call("rbind", unlist(lapply(uniones[[i]], `[`, 3), recursive = FALSE))
+      uniones[[i]]         <- tmp
+    } else {
+      uniones[[i]] <- une_secciones(
+        cambios         = mi_config[[seleccion]]$cambios,
+        cartografia     = cartografia[cartografia$CUMUN == mi_config[[seleccion]]$codigo, ],
+        years_estudio   = mi_config[[seleccion]]$years_estudio,
+        years_union     = mi_config[[seleccion]]$years_union,
+        censo           = censo,
+        poblacion       = poblacion[substr(seccion, 1, 5) == mi_config[[seleccion]]$codigo, ],
+        catastro        = mi_config[[seleccion]]$catastro,
+        distancia       = mi_config[[seleccion]]$distancia,
+        corte_edad      = 85,
+        umbral_vivienda = 5,
+        modo            = mi_config[[seleccion]]$modo,
+        sc1             = mi_config[[seleccion]]$sc1,
+        sc2             = mi_config[[seleccion]]$sc2
+      )
+    }
+    carto[[i]]    <- uniones[[i]]$cartografia
+    carto.vecinos <- vecindades(carto[[i]])
+    tmp           <- unlist(carto.vecinos)
+    carto.wb      <- list(
+      adj     = tmp,
+      weights = rep(1, length(tmp)),
+      num     = sapply(carto.vecinos, length)
+    )
+    
+    censo.tot[[i]]  <- as.data.frame(uniones[[i]]$censo)
+    censo.2001[[i]] <- censo.tot[[i]][censo.tot[[i]][[2]] == "2001", ]
+    censo.2011[[i]] <- censo.tot[[i]][censo.tot[[i]][[2]] == "2011", ]
+    censo.2011[[i]][, 11 + 1:5][censo.2011[[i]][, 11 + 1:5] == 0] <- 1e-4
+    p01[[i]]        <- as.matrix(
+      censo.2001[[i]][, 4:11] / censo.2001[[i]][, 11 + c(1, 2, 1, 3, 4, 5, 5, 5)]
+    )[, 1:5]
+    den_2011        <- censo.2011[[i]][, 11 + c(1, 2, 1, 3, 4, 5, 5, 5)]
+    p11[[i]]        <- as.matrix(censo.2011[[i]][, 4:11] / den_2011)[, 1:5]
+    
+    aux.p11    <- stats::qlogis(p11[[i]])
+    aux.p11[is.infinite(aux.p11)] <- NA
+    aux.p01    <- stats::qlogis(p01[[i]])
+    aux.p01[is.infinite(aux.p01)] <- min(aux.p01[is.finite(aux.p01)])
+    unos       <- aux.p11
+    unos[is.na(unos)] <- 1
+    unos[unos != 1]   <- NA
+    logit.P.max       <- stats::qlogis(pmin(2.5 / as.matrix(den_2011), 0.999))
+    logit.P.max[!is.na(aux.p11)] <- 100
+    
+    p01[[i]][is.nan(p01[[i]])] <- 1e-4
+    p01[[i]][p01[[i]] == 0]    <- 1e-4
+    p01[[i]][p01[[i]] == 1]    <- 1 - 1e-4
+
+    
+    # Conjunto de datos
+    datos <- list(
+      nsec        = dim(censo.2001[[i]])[1],
+      nvec.tot    = length(carto.wb$adj),
+      nvec        = carto.wb$num,
+      map         = carto.wb$adj,
+      indice      = c(0, cumsum(carto.wb$num)),
+      logit.p11   = aux.p11[, 1:5],
+      logit.p01   = aux.p01[, 1:5],
+      logit.P.max = logit.P.max[, 1:5],
+      n11         = as.matrix(censo.2011[[i]][, 11 + c(1, 2, 1, 3, 4, 5, 5, 5)][, 1:5]),
+      nvar        = 5,
+      ndim        = 5
+    )
+    
+    # Valores iniciales
+    inits <- function() {
+      list(
+        mu             = stats::runif(1, stats::qlogis(.02), stats::qlogis(.1)),
+        alfa           = stats::runif(datos$nvar, -2, 0),
+        beta           = stats::rnorm(datos$nvar, 0, 2),
+        sd.change      = stats::runif(1),
+        sd.theta       = stats::runif(1),
+        lambda.theta   = stats::runif(1),
+        lambda.epsilon = stats::runif(datos$ndim),
+        epsilon        = matrix(stats::rnorm(datos$ndim * datos$nsec), nrow = datos$nsec),
+        theta          = stats::rnorm(datos$nsec),
+        M              = matrix(stats::rnorm(datos$ndim * datos$nvar), ncol = datos$nvar)
+      )
+    }
+    
+    # Parámetros a monitorizar
+    param <- c("frac.mues", "mu", "alfa", "beta", "p11.pred", "sd.change",
+               "sd.theta", "M", "lambda.theta", "lambda.epsilon")
+    cat("\nModelo para", ciudad, "\n\n")
+    
+    # Ejecución en paralelo
+    mmodelos[[i]] <- paste0("resultado_privacion_", ciudad)
+    assign(
+      x     = mmodelos[[i]],
+      value = pbugs::pbugs(
+        data               = datos,
+        inits              = inits,
+        parameters.to.save = param,
+        model.file         = modelo_privacion_m3,
+        n.chains           = 3,
+        n.iter             = 100000,
+        n.burnin           = 25000,
+        save.history       = FALSE
+      )
+    )
+    save(
+      list = mmodelos[[i]],
+      file = paste0("resultados/resultado_privacion_", ciudad, ".RData")
+    )
+  }
+}
+carto[c(22, 23)] <- p01[c(22, 23)] <- mmodelos[c(22, 23)] <- NULL
+q11.pred     <- lapply(mmodelos, function(x) mi_escala(eval(as.name(x))$mean$p11.pred))
+q01          <- lapply(p01, mi_escala)
+numero_sc    <- unlist(lapply(p01, nrow))
+qmod.tot     <- rbind(do.call("rbind", q01), do.call("rbind", q11.pred))
+indice_model <- as.numeric(stats::princomp(qmod.tot)$scores[, 1])
+carto_unida  <- do.call("rbind", lapply(carto, function(x) x[, c(1:2, 6)]))
+indices      <- data.frame(
+  model_01 = indice_model[1:sum(numero_sc)],
+  model_11 = indice_model[(sum(numero_sc) + 1):(sum(numero_sc) * 2)],
+  muni     = carto_unida$CUMUN
+)
+```
+
+
+# Referencias bibliográficas
