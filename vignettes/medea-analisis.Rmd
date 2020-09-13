@@ -1,0 +1,748 @@
+---
+title: "Análisis espacial y espacio-temporal en el Proyecto MEDEA3"
+subtitle: "Versión 1"
+author: "Grupo MEDEA"
+date: "2020-03-06"
+output:
+  rmarkdown::html_vignette:
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{Análisis espacial y espacio-temporal en el Proyecto MEDEA3}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+<style type="text/css">
+.main-container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<style>
+body {
+  text-align: justify;
+  max-width: 100%
+}
+img {
+  border: 1px solid transparent;
+}
+</style>
+
+
+# Introducción
+
+El punto de partida de los análisis en MEDEA3 proviene de la información de cada uno de los nodos y que viene reflejada en la viñeta de formato de datos. A modo de resumen, los datos imprescindibles dentro de un archivo con el nombre de cada ciudad y con extensión `.RData` (ubicado en un directorio denominado `datos/brutos/`):
+
+- cartografía del seccionado censal unificado para el período MEDEA3,
+- cifras de población por año, edad, sexo y sección censal,
+- cifras de mortalidad por año, edad, sexo, causa y sección censal.
+
+Con esta información, y suponiendo que los datos de cada ciudad están almacenados en archivos diferenciados cuyo nombre es el normalizado de cada ciudad, se calcula el número de casos esperados para cada año, edad, sexo, causa y sección censal, empleando la función `medear::procesa_datos` del siguiente modo:
+
+```{r esperados, eval=FALSE}
+library(medear)
+ruta     <- "ruta_hasta_el_directorio_de_datos"
+ciudades <- list.files(
+  path       = file.path(ruta, "brutos"),
+  pattern    = "\\D+\\.RData$",
+  recursive  = FALSE,
+  full.names = FALSE
+)
+ciudades <- gsub("\\.RData", "", ciudades)
+for (i in seq_along(ciudades)) {
+  load(file.path(ruta, "brutos", paste0(ciudades[i], ".RData")))
+  ciudad    <- procesa_datos(eval(as.name(ciudades[i])))
+  carto     <- ciudad$carto
+  carto.nb  <- ciudad$carto.nb
+  carto.wb  <- ciudad$carto.wb
+  Obs       <- ciudad$Obs
+  Exp       <- ciudad$Exp
+  privacion <- ciudad$privacion
+  
+  if (!dir.exists(file.path(ruta, "procesados")))
+    dir.create(file.path(ruta, "procesados"))
+  
+  save(
+    carto, carto.wb, carto.nb, Obs, Exp, privacion,
+    file = file.path(
+      ruta, 
+      "procesados",
+      paste0(
+        "ObsExpCarto_",
+        ciudades[i],
+        "_",
+        dimnames(Obs)[[1]][1],
+        dimnames(Obs)[[1]][length(dimnames(Obs)[[1]])],
+        ".RData"
+      )
+    )
+  )
+}
+```
+
+
+
+# Modelización
+
+El proceso se divide en cinco etapas:
+
+0) Cargar los datos y adaptarlos al formato requerido.
+1) En la primera etapa se estima una ponderación de las vecindades entre las distintas áreas.
+2) En la segunda fase se utiliza la estimación previa en el contexto de una modelización multivariante con dependencia espacial.
+3) En la tercera fase también se utiliza la ponderación de vecindades, pero en este caso en el contexto de una modelización multivariante con dependencia espacial-temporal.
+4) En la cuarta y última etapa se realiza una regresión ecológica empleando el índice de privación MEDEA3 (datos para las ciudades MEDEA3 incluidos en el paquete. Para su cálculo, véase la viñeta asociada a este paquete denominada `medea-privacion`).
+
+Resulta imprescindible lanzar las dos primeras en orden para, posteriormente, poder lanzar cualquiera de las demás y que de una forma u otra emplearán sus datos. Toda la modelización se ejecuta con el software WinBUGS, el cual se lanza en paralelo empleando el paquete [`pbugs`](https://github.com/fisabio/pbugs).
+
+
+## Etapa 0: Carga de datos
+
+```{r carga, eval=FALSE}
+# Paquetes
+paquetes   <- c("sp", "pbugs", "medear", "remotes")
+a_instalar <- which(!paquetes[-c(3:4)] %in% installed.packages())
+if (length(a_instalar) > 0) install.packages(paquetes[a_instalar])
+suppressMessages(remotes::install_github("fisabio/pbugs"))
+suppressMessages(remotes::install_github("fisabio/medear"))
+invisible(sapply(paquetes[-4], require, character.only = TRUE))
+
+# Rutas
+dir_datos     <- "ruta_hasta_datos"
+dir_resultado <- "ruta_donde_alojar_resultado"
+ciudad        <- "ciudad_a_lanzar"
+
+# Cargo datos
+arch   <- list.files(
+  path       = file.path(dir_datos, tolower(ciudad), "/procesados"),
+  full.names = TRUE
+)
+load(arch)
+
+
+# EPSG
+if (is.na(proj4string(carto)) & any(bbox(carto) > 360))
+  proj4string(carto) <- CRS("+proj=utm +zone=30 +ellps=GRS80 +units=m +no_defs") # EPSG: 25830
+carto <- spTransform(carto, CRS("+proj=longlat +datum=WGS84 +no_defs")) # EPSG: 4326
+
+# Definir BBOX
+data("bboxm3")
+sel_bbox <- which(sapply(bboxm3$codigo, function(x) substr(carto$seccion[1], 1, 5) %in% x))
+if (length(sel_bbox) != 0) {
+  mi_bbox  <- bboxm3$bbox[[sel_bbox]]
+} else {
+  mi_bbox <- sp::bbox(carto)
+}
+
+# Periodos para análisis ET: hay dos ciudades sin datos en 1996 o 1997.
+
+bloques_periodos <- list()
+ini              <- substr(gsub("\\D+", "", basename(arch)), 1, 4)
+tmp              <- length(seq(ini, 2015, 1))
+
+if (tmp == 20) {               # 1996:2015
+  bloques_periodos[[1]]<-1:4
+  bloques_periodos[[2]]<-5:8
+  bloques_periodos[[3]]<-9:12
+  bloques_periodos[[4]]<-13:16
+  bloques_periodos[[5]]<-17:20
+} else if (tmp == 19) {        # 1997:2015
+  bloques_periodos[[1]]<-1:3
+  bloques_periodos[[2]]<-4:7
+  bloques_periodos[[3]]<-8:11
+  bloques_periodos[[4]]<-12:15
+  bloques_periodos[[5]]<-16:19
+} else {                       # 1998:2015
+  bloques_periodos[[1]]<-1:2
+  bloques_periodos[[2]]<-3:6
+  bloques_periodos[[3]]<-7:10
+  bloques_periodos[[4]]<-11:14
+  bloques_periodos[[5]]<-15:18
+}
+
+data("privacion")
+cod_muni <- unique(substr(carto$seccion, 1, 5))
+
+# Extraigo el IP para Valencia
+indices <- privacion[privacion$cod_municipio %in% cod_muni, ]
+ip_mean <- (indices$privacion_2011 + indices$privacion_2001) / 2
+```
+
+
+## Etapa 1: ponderación de las vecindades
+
+```{r est_vecinad, eval=FALSE}
+model <- function() {
+	
+	# Likelihood
+	for (i in 1:Nareas) {
+		for (k in 1:Ndiseases) {
+			O[i, k]            ~ dpois(lambda[i, k])
+			log(lambda[i, k]) <- log(E[i, k]) + mu[k] + Spatial[i, k]
+			SMR[i, k]         <- exp(mu[k] + Spatial[i, k])
+		}
+	}
+	
+	for (i in 1:Nareas) {
+	  for (k in 1:Ndiseases) {
+	    Spatial[i, k] ~ dnorm(media.Spatial[i, k], prec.Spatial[i, k])
+	  }
+	}
+	
+	# Mean and precision of conditioned distribution Spatial[i, j]
+	for (i in 1:n.adj) {
+	  sqrt.c.adj[i] <- sqrt(c[adj[i]])
+	  for (k in 1:Ndiseases) {
+      Spatial.adj[i, k] <- Spatial[adj[i], k]
+    }
+  }
+  
+  ## Precision
+  for (k in 1:Ndiseases) {
+    prec.Spatial[1, k] <- pow(sd[k], -2) * sqrt(c[1]) *
+      (rho[k] * sum(sqrt.c.adj[index[1]:index[2]]) + 1 - rho[k])
+    
+    for (i in 2:Nareas) {
+      prec.Spatial[i, k] <- pow(sd[k], -2) * sqrt(c[i]) * 
+        (rho[k] * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]]) + 1 - rho[k])
+    }
+  }
+  
+  ## Mean
+  for (k in 1:Ndiseases) {
+    media.Spatial[1, k] <- (rho[k] * inprod2(sqrt.c.adj[index[1]:index[2]], Spatial.adj[index[1]:index[2], k])) /
+      (rho[k] * sum(sqrt.c.adj[index[1]:index[2]]) + 1 - rho[k])
+    
+    for (i in 2:Nareas) {
+      media.Spatial[i, k] <- (rho[k] * inprod2(sqrt.c.adj[(index[i] + 1):index[i + 1]], Spatial.adj[(index[i] + 1):index[i + 1], k])) /
+        (rho[k] * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]]) + 1 - rho[k])
+    }
+    
+    ceros[k]       <- 0
+    ceros[k]        ~ dnorm(sum.Spatial[k], 10)
+    sum.Spatial[k] <- sum(Spatial[, k])
+  }
+  
+  ## Priors c[i]
+  for (i in 1:Nareas) {
+    c[i] ~ dgamma(tau, tau) %_%I (0.005, )
+  }
+  tau <- pow(sd.c, -2)
+  sd.c ~ dunif(0, 5)
+	
+  ## Other priors
+	for (k in 1:Ndiseases) {
+	  mu[k]  ~ dflat()
+	  sd[k]  ~ dunif(0.01, 5)
+	  rho[k] ~ dunif(0, 1)
+	}
+}
+
+# Causas del estudio en hombres (1) y mujeres (2)
+causas      <- list()
+causas[[1]] <- c(1:2, 5, 7, 9:12, 15:21)
+causas[[2]] <- c(2, 5, 7:8, 11:12, 15:19)
+
+# Lista donde se guardaran los resultados
+ponderacion <- list()
+
+# Lanzar modelo
+for (sexo in 1:2) {
+  datos <- list(
+    O         = apply(Obs[, sexo, , causas[[sexo]]], c(2, 3), sum), 
+    E         = apply(Exp[, sexo, , causas[[sexo]]], c(2, 3), sum), 
+    Nareas    = dim(Obs)[3],
+    Ndiseases = length(causas[[sexo]]), 
+    n.adj     = length(carto.wb$adj), 
+    adj       = carto.wb$adj, 
+    index     = c(1, cumsum(carto.wb$num))
+  )
+  iniciales <- function() {
+    list(
+      mu      = rnorm(datos$Ndiseases, 0, 1),
+      sd      = runif(datos$Ndiseases, 0, 1), 
+      rho     = runif(datos$Ndiseases, 0, 1),
+      Spatial = matrix(
+        data = rnorm(datos$Nareas * datos$Ndiseases),
+        nrow = datos$Nareas,
+        ncol = datos$Ndiseases
+      ),
+      c       = runif(datos$Nareas, 0.9, 1.1), 
+      sd.c    = runif(1, 0.5, 1.5) 
+    )
+  }
+  param <- c("mu", "lambda", "sd", "SMR", "c", "sd.c", "rho")
+  
+  ponderacion[[sexo]] <- pbugs(
+    data               = datos,
+    inits              = iniciales,
+    parameters.to.save = param,
+    model              = model,
+    n.iter             = 200000,
+    n.burnin           = 50000,
+    n.chains           = 3,
+    DIC                = FALSE
+  )
+}
+if (!dir.exists(dir_resultado)) dir.create(dir_resultado)
+save(ponderacion, file = file.path(dir_resultado, paste0("pond_vecindad_", tolower(ciudad), ".RData")))
+```
+
+
+## Etapa 2: Análisis espacial 
+
+```{r espacial, eval=FALSE}
+# Cargar ponderación de vecindades
+load(file.path(dir_resultado, paste0("pond_vecindad_", tolower(ciudad), ".RData")))
+
+model <- function() {
+  for (i in 1:Nareas) {
+    for (k in 1:Ndiseases) {
+      O[i, k]        ~ dpois(mu[i, k])
+      log(mu[i, k]) <- log(E[i, k]) + m[k] + Theta[i, k]
+      SMR[i, k]     <- exp(m[k] + Theta[i, k])
+      Theta[i, k]   <- inprod2(Spatial[i, ], M[, k])
+    }
+  }
+  
+  for (k in 1:Ndiseases) {
+    for (j in 1:Ndiseases) {
+      mat.varcov[k, j] <- inprod2(M[, k], M[, j])
+    }
+  }
+  
+  for (i in 1:Nareas) {
+    for (k in 1:Nsp) {
+      Spatial[i, k] ~ dnorm(m.Spatial[i, k], prec.Spatial[i, k])
+    }
+  }
+  
+  # Mean and precision of conditioned distribution Spatial[i, j]
+  for (i in 1:n.adj) {
+    sqrt.c.adj[i] <- sqrt(c[adj[i]])
+    for (j in 1:Nsp) {
+      Spatial.adj[i, j] <- Spatial[adj[i], j]
+    }
+  }
+  
+  ## Precision
+  for (k in 1:Nsp) {
+    prec.Spatial[1, k] <- 1 - lambda[k] + lambda[k] * sqrt(c[1]) * sum(sqrt.c.adj[index[1]:index[2]])
+    for (i in 2:Nareas) {
+      prec.Spatial[i, k] <- 1 - lambda[k] + lambda[k] * sqrt(c[i]) * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]])
+    }
+  }
+  
+  ## Mean
+  for (j in 1:Nsp) {
+    m.Spatial[1, j] <- (lambda[j] * inprod2(sqrt.c.adj[index[1]:index[2]], Spatial.adj[index[1]:index[2], j])) / 
+      (1 - lambda[j] + lambda[j] * sum( sqrt.c.adj[index[1]:index[2]]))
+    for (i in 2:Nareas) {
+      m.Spatial[i, j] <- (lambda[j] * inprod2(sqrt.c.adj[(index[i] + 1):index[i + 1]], Spatial.adj[(index[i] + 1):index[i + 1], j])) /
+        (1 - lambda[j] + lambda[j] * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]]))
+    }
+    
+    ceros[j]        <- 0
+    ceros[j]        ~ dnorm(sum.Spatial[j], 10)
+    sum.Spatial[j] <- sum(Spatial[, j])
+  }
+  
+  # M-matrix
+  for (i in 1:Nsp) {
+    for (j in 1:Ndiseases) {
+      M[i, j]    <- sd[i] * M.aux[i, j]
+      M.aux[i, j] ~ dnorm(0, 1)
+    }
+    
+    lambda[i] ~ dunif(0, 1)
+    sd[i]     ~ dunif(0, 5)
+  }
+  
+  # Other priors
+  for (k in 1:Ndiseases) {
+    m[k] ~ dflat()
+  }
+}
+
+# Causas del estudio en hombres (1) y mujeres (2)
+causas      <- list()
+causas[[1]] <- c(1:2, 5, 7, 9:12, 15:21)
+causas[[2]] <- c(2, 5, 7:8, 11:12, 15:19)
+
+# Lista donde se guardaran los resultados
+resul_esp   <- list()
+
+# Lanzar modelo
+for (sexo in 1:2) {
+  datos <- list(
+    O         = apply(Obs[, sexo, , causas[[sexo]]], c(2, 3), sum),
+    E         = apply(Exp[, sexo, , causas[[sexo]]], c(2, 3), sum),
+    Nareas    = dim(Obs)[3],
+    Ndiseases = length(causas[[sexo]]),
+    Nsp       = 5,
+    n.adj     = length(carto.wb$adj),
+    adj       = carto.wb$adj,
+    index     = c(1, cumsum(carto.wb$num)),
+    c         = c(ponderacion[[sexo]]$mean$c)
+  )
+  iniciales <- function() {
+    list(
+      m       = rnorm(datos$Ndiseases, 0, 1),
+      sd      = runif(datos$Nsp, 0, 1),
+      lambda  = runif(datos$Nsp, 0, 1),
+      Spatial = matrix(
+        data = rnorm(datos$Nareas * datos$Nsp),
+        nrow = datos$Nareas,
+        ncol = datos$Nsp
+      ),
+      M.aux = matrix(
+        data = rnorm(datos$Nsp * datos$Ndiseases, 0, .2),
+        nrow = datos$Nsp,
+        ncol = datos$Ndiseases
+      )
+    )
+  }
+  param <- c("m", "mu", "sd", "SMR", "Spatial", "lambda", "M", "mat.varcov")
+  
+  resul_esp[[sexo]] <- pbugs(
+    data               = datos,
+    inits              = iniciales,
+    parameters.to.save = param,
+    model              = model,
+    n.iter             = 50000,
+    n.burnin           = 10000,
+    n.chains           = 3,
+    DIC                = FALSE
+  )
+}
+save(resul_esp, file = file.path(dir_resultado, paste0("resul_esp_", tolower(ciudad), ".RData")))
+```
+
+
+## Etapa 3: Análisis espacio-temporal 
+
+```{r espacio_temporal, eval=FALSE}
+# Cargar ponderación de vecindades
+load(file.path(dir_resultado, paste0("pond_vecindad_", tolower(ciudad), ".RData")))
+
+model.ET1 <- function() {
+  for (i in 1:Nareas) {
+    for (k in 1:Ndiseases) {
+      for (j in 1:NPeriods) {
+        O[j, i, k]        ~ dpois(mu[i, j, k])
+        log(mu[i, j, k]) <- log(E[j, i, k]) + alpha[k,j] + Theta[i, k] + Theta.trend[i, k] * (j-(NPeriods+1)/2)
+        SMR[i, j, k]     <- exp(alpha[k,j] + Theta[i, k] + Theta.trend[i, k] * (j-(NPeriods+1)/2))
+      }
+      Theta[i, k]   <- inprod2(Spatial[i, ], M[, k])
+      Theta.trend[i, k]   <- inprod2(Spatial.trend[i, ], M.trend[, k])
+      SMR.mean[i, k] <- exp(Theta[i, k])
+      SMR.trend[i, k] <- exp(Theta.trend[i, k])
+    }
+  }
+  
+  for (k in 1:Ndiseases) {
+    for (j in 1:Ndiseases) {
+      mat.varcov[k, j] <- inprod2(M[, k], M[, j])
+      mat.varcov.trend[k, j] <- inprod2(M.trend[, k], M.trend[, j])
+    }
+  }
+  
+  for (i in 1:Nareas) {
+    for (k in 1:Nsp) { 
+      Spatial[i, k] ~ dnorm(m.Spatial[i, k], prec.Spatial[i, k])
+      Spatial.trend[i, k] ~ dnorm(m.Spatial.trend[i, k], prec.Spatial.trend[i, k])
+    }
+  }
+  
+  # Mean and precision of conditioned distribution Spatial[i, j]
+  for (i in 1:n.adj) {
+    sqrt.c.adj[i] <- sqrt(c[adj[i]])
+    for (j in 1:Nsp) {
+      Spatial.adj[i, j] <- Spatial[adj[i], j]
+      Spatial.adj.trend[i, j] <- Spatial.trend[adj[i], j]
+    }
+  }
+  
+  ## Precision
+  for (k in 1:Nsp) {
+    prec.Spatial[1, k] <- 1 - lambda[k] + lambda[k] * sqrt(c[1]) * sum(sqrt.c.adj[index[1]:index[2]])
+    prec.Spatial.trend[1, k] <- 1 - lambda.trend[k] + lambda.trend[k] * sqrt(c[1]) * sum(sqrt.c.adj[index[1]:index[2]])
+    for (i in 2:Nareas) {
+      prec.Spatial[i, k] <- 1 - lambda[k] + lambda[k] * sqrt(c[i]) * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]])
+      prec.Spatial.trend[i, k] <- 1 - lambda.trend[k] + lambda.trend[k] * sqrt(c[i]) * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]])
+    }
+  }
+  
+  ## Mean
+  for (j in 1:Nsp) {
+    m.Spatial[1, j] <- (lambda[j] * inprod2(sqrt.c.adj[index[1]:index[2]], Spatial.adj[index[1]:index[2], j])) / 
+      (1 - lambda[j] + lambda[j] * sum( sqrt.c.adj[index[1]:index[2]]))
+    m.Spatial.trend[1, j] <- (lambda.trend[j] * inprod2(sqrt.c.adj[index[1]:index[2]], Spatial.adj.trend[index[1]:index[2], j])) / 
+      (1 - lambda.trend[j] + lambda.trend[j] * sum( sqrt.c.adj[index[1]:index[2]]))
+    for (i in 2:Nareas) {
+      m.Spatial[i, j] <- (lambda[j] * inprod2(sqrt.c.adj[(index[i] + 1):index[i + 1]], Spatial.adj[(index[i] + 1):index[i + 1], j])) /
+        (1 - lambda[j] + lambda[j] * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]]))
+      m.Spatial.trend[i, j] <- (lambda.trend[j] * inprod2(sqrt.c.adj[(index[i] + 1):index[i + 1]], Spatial.adj.trend[(index[i] + 1):index[i + 1], j])) /
+        (1 - lambda.trend[j] + lambda.trend[j] * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]]))
+    }
+  }
+  
+  # M-matrix
+  for (i in 1:Nsp) {
+    for (j in 1:Ndiseases) {
+      M[i, j]    <- sd[i] * M.aux[i, j]
+      M.aux[i, j] ~ dnorm(0, 1)
+      M.trend[i, j]    <- sd.trend[i] * M.aux.trend[i, j]
+      M.aux.trend[i, j] ~ dnorm(0, 1)
+    }
+    
+    lambda[i] ~ dunif(0, 1)
+    sd[i]     ~ dunif(0, 5)
+    lambda.trend[i] ~ dunif(0, 1)
+    sd.trend[i]     ~ dunif(0, 5)
+  }
+  
+  for (k in 1:Ndiseases) {
+    for (j in 1:NPeriods) {
+      alpha[k,j] ~ dflat()
+    }
+  }
+}
+
+# Causas del estudio en hombres (1) y mujeres (2)
+causas      <- list()
+causas[[1]] <- c(1:2, 5, 7, 9:12, 15:21)
+causas[[2]] <- c(2, 5, 7:8, 11:12, 15:19)
+
+# Lista donde se guardaran los resultados
+resul_esp_tie <- list()
+
+for (sexo in 1:2) {
+  auxO <- array(dim = c(5, dim(Obs)[3], length(causas[[sexo]])))
+  auxE <- array(dim = c(5, dim(Obs)[3], length(causas[[sexo]])))
+  for (i in seq_len(5)) {
+    auxO[i,,] <- apply(Obs[bloques_periodos[[i]], sexo, , causas[[sexo]]], c(2, 3), sum)
+    auxE[i,,] <- apply(Exp[bloques_periodos[[i]], sexo, , causas[[sexo]]], c(2, 3), sum)
+  }
+  datos <- list(
+    O         = auxO,
+    E         = auxE,
+    Nareas    = dim(Obs)[3],
+    Ndiseases = length(causas[[sexo]]),
+    NPeriods  = 5,
+    Nsp       = 5,
+    n.adj     = length(carto.wb$adj),
+    adj       = carto.wb$adj,
+    index     = c(1, cumsum(carto.wb$num)),
+    c         = c(ponderacion[[sexo]]$mean$c)
+  )
+  datos$E[which(datos$E == 0)] <- 0.1 # Corregir esperados == 0
+
+  iniciales <- function() {
+    list(
+      alpha = matrix(
+        data = rnorm(datos$Ndiseases * datos$NPeriods,0,1),
+        nrow = datos$Ndiseases,
+        ncol = datos$NPeriods
+      ),
+      sd      = runif(datos$Nsp, 0, 0.3),
+      sd.trend      = runif(datos$Nsp, 0, 0.3),
+      lambda  = runif(datos$Nsp, 0, 1),
+      lambda.trend  = runif(datos$Nsp, 0, 1),
+      Spatial = matrix(
+        data = rnorm(datos$Nareas * datos$Nsp,0,0.5),
+        nrow = datos$Nareas,
+        ncol = datos$Nsp
+      ),
+      Spatial.trend = matrix(
+        data = rnorm(datos$Nareas * datos$Nsp,0,0.5),
+        nrow = datos$Nareas,
+        ncol = datos$Nsp
+      ),
+      M.aux = matrix(
+        data = rnorm(datos$Nsp * datos$Ndiseases, 0, 1),
+        nrow = datos$Nsp,
+        ncol = datos$Ndiseases
+      ),
+      M.aux.trend = matrix(
+        data = rnorm(datos$Nsp * datos$Ndiseases, 0, 1),
+        nrow = datos$Nsp,
+        ncol = datos$Ndiseases
+      )
+    )
+  }
+  param <- c(
+    "sd", "sd.trend", "alpha", "SMR.mean", "SMR.trend",
+    "mat.varcov", "mat.varcov.trend", "M", "M.trend"
+  )
+  
+  resul_esp_tie[[sexo]] <- pbugs(
+    data               = datos,
+    inits              = iniciales,
+    parameters.to.save = param,
+    model              = model.ET1,
+    n.iter             = 10000,
+    n.burnin           = 2000,
+    n.chains           = 3,
+    DIC                = FALSE
+  )
+}
+save(
+  resul_esp_tie,
+  file = file.path(dir_resultado, paste0("resul_esp_tie_", tolower(ciudad), ".RData"))
+)
+```
+  
+  
+## Etapa 4: Regresión ecológica
+
+Modelo de regresión ecológica espacial como función lineal de la privación media del periodo y restricción de ortogonalidad de los e.a. respecto al IP.
+
+```{r reg_eco, eval = FALSE}
+# Cargar ponderación de vecindades
+load(file.path(dir_resultado, paste0("pond_vecindad_", tolower(ciudad), ".RData")))
+
+
+model.reg.eco.spat.ortho1 <- function() {
+  
+  # Likelihood
+  for (i in 1:Nareas) {
+    for (k in 1:Ndiseases) {
+      O[i, k]        ~ dpois(mu[i, k])
+      log(mu[i, k]) <- log(E[i, k]) + m[k] + beta.priv[k] * Privacion[i] + Theta[i, k]
+      SMR[i, k]     <- exp(m[k] + beta.priv[k] * Privacion[i] + Theta[i, k])
+      SMR.sin[i, k] <- exp(m[k] + Theta[i, k])
+      Theta[i, k]   <- inprod2(Spatial[i, ], M[, k])
+    }
+    
+  }
+  
+  for (k in 1:Ndiseases) {
+    for (j in 1:Ndiseases) {
+      mat.varcov[k, j] <- inprod2(M[, k], M[, j])
+    }
+  }
+  
+  for (i in 1:Nareas) {
+    for (k in 1:Nsp) {
+      Spatial[i, k] ~ dnorm(m.Spatial[i, k], prec.Spatial[i, k])
+    }
+  }
+  
+  # Mean and precision of conditioned distribution Spatial[i, j]
+  for (i in 1:n.adj) {
+    sqrt.c.adj[i] <- sqrt(c[adj[i]])
+    for (j in 1:Nsp) {
+      Spatial.adj[i, j] <- Spatial[adj[i], j]
+    }
+  }
+  
+  ## Precision
+  for (k in 1:Nsp) {
+    prec.Spatial[1, k] <- 1 - lambda[k] + lambda[k] * sqrt(c[1]) * sum(sqrt.c.adj[index[1]:index[2]])
+    
+    for (i in 2:Nareas) {
+      prec.Spatial[i, k] <- 1 - lambda[k] + lambda[k] * sqrt(c[i]) * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]])
+    }
+  }
+  
+  ## Mean
+  for (j in 1:Nsp) {
+    m.Spatial[1, j] <- (lambda[j] * inprod2(sqrt.c.adj[index[1]:index[2]], Spatial.adj[index[1]:index[2], j])) / 
+      (1 - lambda[j] + lambda[j] * sum( sqrt.c.adj[index[1]:index[2]]))
+    
+    for (i in 2:Nareas) {
+      m.Spatial[i, j] <- (lambda[j] * inprod2(sqrt.c.adj[(index[i] + 1):index[i + 1]], Spatial.adj[(index[i] + 1):index[i + 1], j])) /
+        (1 - lambda[j] + lambda[j] * sum(sqrt.c.adj[(index[i] + 1):index[i + 1]]))
+    }
+    
+    ceros[j]        <- 0
+    ceros[j]        ~ dnorm(sum.Spatial[j], 10)
+    sum.Spatial[j] <- sum(Spatial[, j])
+    ceros2[j]        <- 0
+    ceros2[j]        ~ dnorm(sum.Spatial2[j], 10)
+    sum.Spatial2[j] <- inprod2(Spatial[, j], Privacion[])
+  }
+  
+  # M-matrix
+  for (i in 1:Nsp) {
+    for (j in 1:Ndiseases) {
+      M[i, j]    <- sd[i] * M.aux[i, j]
+      M.aux[i, j] ~ dnorm(0, 1)
+    }
+    
+    lambda[i] ~ dunif(0, 1)
+    sd[i]     ~ dunif(0, 5)
+  }
+  
+  # Other priors
+  for (k in 1:Ndiseases) {
+    m[k] ~ dflat()
+    beta.priv[k] ~ dflat()
+  }
+}
+
+# Causas del estudio en hombres (1) y mujeres (2)
+causas      <- list()
+causas[[1]] <- c(1:2, 5, 7, 9:12, 15:21)
+causas[[2]] <- c(2, 5, 7:8, 11:12, 15:19)
+
+# Lista donde se guardaran los resultados
+resul_reg_eco <- list()
+
+for (sexo in 1:2) {
+  datos <- list(
+    O         = apply(Obs[, sexo, , causas[[sexo]]], c(2, 3), sum),
+    E         = apply(Exp[, sexo, , causas[[sexo]]], c(2, 3), sum),
+    Privacion = ip_mean,
+    Nareas    = dim(Obs)[3],
+    Ndiseases = length(causas[[sexo]]),
+    Nsp       = 5,
+    n.adj     = length(carto.wb$adj),
+    adj       = carto.wb$adj,
+    index     = c(1, cumsum(carto.wb$num)),
+    c         = c(ponderacion[[sexo]]$mean$c)
+  )
+  iniciales <- function() {
+    list(
+      m         = rnorm(datos$Ndiseases),
+      beta.priv = rnorm(datos$Ndiseases),
+      sd        = runif(datos$Nsp, 0, 0.3),
+      lambda    = runif(datos$Nsp, 0, 1),
+      Spatial   = matrix(
+        data = rnorm(datos$Nareas * datos$Nsp),
+        nrow = datos$Nareas,
+        ncol = datos$Nsp
+      ),
+      M.aux     = matrix(
+        data = rnorm(datos$Nsp * datos$Ndiseases, 0, 1),
+        nrow = datos$Nsp,
+        ncol = datos$Ndiseases
+      )
+    )
+  }
+  param <- c(
+    "m", "mu", "sd", "SMR", "Spatial", "lambda",
+    "M", "mat.varcov","beta.priv", "SMR.sin"
+  )
+  
+  resul_reg_eco[[sexo]] <- pbugs(
+    data               = datos,
+    inits              = iniciales,
+    parameters.to.save = param,
+    model              = model.reg.eco.spat.ortho1,
+    n.iter             = 10000,
+    n.burnin           = 2000,
+    n.chains           = 3,
+    DIC                = FALSE
+  )
+}
+
+save(
+  resul_reg_eco,
+  file = file.path(dir_resultado, paste0("resul_reg_eco_", tolower(ciudad), ".RData"))
+)
+```
+
+
