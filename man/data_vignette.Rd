@@ -5,7 +5,9 @@
 \name{data_vignette}
 \alias{data_vignette}
 \title{Datos para construir las viñetas MEDEA3}
-\format{An object of class \code{list} of length 2.}
+\format{
+An object of class \code{list} of length 2.
+}
 \usage{
 data_vignette
 }

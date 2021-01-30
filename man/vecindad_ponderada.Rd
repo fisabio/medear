@@ -5,14 +5,16 @@
 \name{vecindad_ponderada}
 \alias{vecindad_ponderada}
 \title{Ponderación de las Vecindades de las Ciudades MEDEA3 (1996-2015)}
-\format{Un objeto de clase \code{data.frame}, donde cada
+\format{
+Un objeto de clase \code{data.frame}, donde cada
   fila es una sección censal, ofreciendo un valor \code{c} para hombres y mujeres:
   \describe{
     \item{seccion}{Cádena de 10 caracteres con el código INE de la sección censal.}
     \item{muni}{Cádena de 5 caracteres con el código INE del municipio.}
     \item{vecindad_hombres}{Valor de la vecindad en hombres.}
     \item{vecindad_mujeres}{Valor de la vecindad en mujeres.}
-  }}
+  }
+}
 \usage{
 vecindad_ponderada
 }

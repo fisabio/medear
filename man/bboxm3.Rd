@@ -5,9 +5,11 @@
 \name{bboxm3}
 \alias{bboxm3}
 \title{Límites (\code{bbox}) para los Mapas en MEDEA3}
-\format{Una lista donde el primer elemento es el código de municipio INE, el
+\format{
+Una lista donde el primer elemento es el código de municipio INE, el
   segundo es una lista con los bbox por ciudad y el tercero un vector
-  definiendo la posición de la leyenda.}
+  definiendo la posición de la leyenda.
+}
 \usage{
 bboxm3
 }

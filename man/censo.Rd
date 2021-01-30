@@ -5,7 +5,8 @@
 \name{censo}
 \alias{censo}
 \title{Censos de 2001 y 2011}
-\format{Un objeto de clase \code{data.frame} con los siguientes campos:
+\format{
+Un objeto de clase \code{data.frame} con los siguientes campos:
 
   \itemize{
     \item seccion Código de sección censal (10 caracteres).
@@ -27,7 +28,8 @@
     \item i03_d Denominador: Población de 16 o más años.
     \item i04_d Denominador: Población de 16 a 29  años.
     \item i05_d Denominador: Población total.
-  }}
+  }
+}
 \description{
 Datos de los censos de 2001 y 2011 necesarios para construir el
   índice de privación. Estos datos se cargan con la función

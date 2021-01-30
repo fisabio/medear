@@ -5,14 +5,16 @@
 \name{codigos_ine}
 \alias{codigos_ine}
 \title{Nombres de Municipios y Provincias según Terminología Oficial del INE}
-\format{Un objeto de clase \code{data.frame}, donde cada
+\format{
+Un objeto de clase \code{data.frame}, donde cada
   fila es un municipio y que cuenta con 7 columnas:
   \describe{
     \item{cod_provincia}{Cádena de 2 caracteres con el código de la provincia.}
     \item{CUMUN}{Cádena de 3 caracteres con el código del municipio.}
     \item{nombre_municipio}{Nombre del municipio.}
     \item{medea3}{Valor lógico: ¿participa en MEDEA3?}
-  }}
+  }
+}
 \usage{
 codigos_ine
 }

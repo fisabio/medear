@@ -6,7 +6,8 @@
 \alias{cambios_seccion}
 \title{Cambios Temporales de Seccionado para todas las Ciudades MEDEA3
   (período 1996-2015)}
-\format{Un objeto de clase \code{cambios_ine}, donde cada fila es un un
+\format{
+Un objeto de clase \code{cambios_ine}, donde cada fila es un un
   cambio de sección y que cuenta con 7 columnas: \describe{
   \item{sc_ref}{Cádena de 10 caracteres con el código de la sección 2011.}
   \item{sc_new}{Cádena de 10 caracteres con el código de la sección en año ==
@@ -16,7 +17,8 @@
   catastro, afectados por el cambio de sección, respecto al total de tramos
   que incluye la sección de 2011.} \item{codigo_postal}{¿La detección de los
   cambios se hizo usando el código postal?.}  \item{vias}{Lista con las vías
-  afectadas por el cambio de sección.} }}
+  afectadas por el cambio de sección.} }
+}
 \usage{
 cambios_seccion
 }

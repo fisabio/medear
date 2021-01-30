@@ -5,7 +5,8 @@
 \name{privacion}
 \alias{privacion}
 \title{Índices de Privación por Sección Censal para Ciudades MEDEA3}
-\format{Un objeto de clase \code{data.frame}, donde cada
+\format{
+Un objeto de clase \code{data.frame}, donde cada
   fila es una sección censal, ofreciendo un valor del índice de privación para 2001 y 2011:
   \describe{
     \item{seccion}{Cádena de 10 caracteres con el código INE de la sección censal.}
@@ -13,7 +14,8 @@
     \item{nom_municipio}{Cádena caracteres con el nombre del municipio.}
     \item{privacion_2001}{Valor del índice de privación MEDEA3 en 2001.}
     \item{privacion_2011}{Valor del índice de privación MEDEA3 en 2011.}
-  }}
+  }
+}
 \usage{
 privacion
 }

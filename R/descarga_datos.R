@@ -389,12 +389,12 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 
       for (j in seq_along(years)) {
         ruta_des <- paste0(
-          "http://www.ine.es/pcaxisdl/t20/e245/p07/a",
+          "https://www.ine.es/jaxi/files/_px/es/csv_bd/t20/e245/p07/a",
           years[j],
           "/l0/",
           ifelse(
             years[j] < 2006,
-            paste0("02_.", cod_provincia[i]),
+            paste0("02_", cod_provincia[i]),
             ifelse(
               years[j] < 2008,
               paste0("02", cod_provincia[i]),
@@ -405,31 +405,22 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
               )
             )
           ),
-          ".px"
+          ".csv_bd"
         )
         tmp <- tempfile()
         utils::download.file(ruta_des, tmp, quiet = TRUE)
-        bruto <- paste0(iconv(readLines(tmp, encoding = "latin1"), "latin1", to = "ascii//translit"), collapse = "\n")
-        bruto <- unlist(strsplit(bruto, ";"))
-        nombres <- sapply(strsplit(bruto, split = "="), `[`, 1)
-        valores <- sapply(strsplit(bruto, split = "="), `[`, 2)
-        corte_pars <- valores[grep("values", nombres, ignore.case = T)]
-        params <- lapply(corte_pars, function(x) trimws(strsplit(trimws(gsub("\\\"|\n", "", x)), ",")[[1]]))
-        datos <- valores[grep("data", nombres, ignore.case = T)]
-        datos <- as.integer(strsplit(trimws(gsub("\n|\\s+", " ", datos)), " ")[[1]])
-        conjunto    <- data.table(do.call(expand.grid, params[c(3:1)]))
-        conjunto <- conjunto[, lapply(.SD, as.character)]
-        datos <- data.table(conjunto, datos)
-        colnames(datos) <- c("edad", "seccion", "sexo", "pob")
-        datos$year    <- as.numeric(years[j])
-        datos <- datos[grep("\\d+", seccion)]
-        datos <- datos[grep("hombr|masc|varo|mujer|feme", sexo, ignore.case = TRUE)]
-        datos <- datos[grep("\\d+", edad)]
-        datos$edad <- paste0("q-", datos$edad)
-        datos$edad <- gsub(" y m.s", "-plus", datos$edad)
-        datos$edad <- gsub("05-09", "5-9", datos$edad)
-        datos$edad <- gsub("-", "_", datos$edad)
-        datos      <- dcast(datos, seccion + sexo + year ~ edad, value.var = "pob")
+        bruto <- data.table::fread(tmp, colClasses = "character")
+        bruto <- bruto[, lapply(.SD, tolower)]
+        data.table::setnames(bruto, c("sexo", "seccion", "edad", "pob"))
+        bruto$year    <- as.numeric(years[j])
+        bruto <- bruto[grep("\\d+", seccion)]
+        bruto <- bruto[grep("hombr|masc|varo|mujer|feme", sexo, ignore.case = TRUE)]
+        bruto <- bruto[grep("\\d+", edad)]
+        bruto$edad <- paste0("q-", bruto$edad)
+        bruto$edad <- gsub(" y m.s", "-plus", bruto$edad)
+        bruto$edad <- gsub("05-09", "5-9", bruto$edad)
+        bruto$edad <- gsub("-", "_", bruto$edad)
+        datos      <- dcast(bruto, seccion + sexo + year ~ edad, value.var = "pob")
         nombres    <- colnames(datos)
         nombres    <- c(nombres[1:3], nombres[grep("q_0", nombres)], nombres[grep("q_5_", nombres)],
                         nombres[grep("q_\\d{2}_[^p]", nombres)], nombres[grep("q_100|q_85_p", nombres)])
@@ -437,6 +428,8 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
         datos$sexo[grep("hombr|masc|varo", datos$sexo, ignore.case = TRUE)] <- "0"
         datos$sexo[grep("mujer|feme", datos$sexo, ignore.case = TRUE)] <- "1"
         datos$sexo <- as.numeric(datos$sexo)
+        nombres    <- colnames(datos)[grep("^q_", colnames(datos))]
+        datos[, c(nombres) := lapply(.SD, as.numeric), .SDcols = c(nombres)]
         poblaciones[[i]][[paste0("p", i, j)]] <- datos
         invisible(file.remove(tmp))
         if (conservar) {

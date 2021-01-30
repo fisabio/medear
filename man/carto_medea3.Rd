@@ -5,13 +5,15 @@
 \name{carto_medea3}
 \alias{carto_medea3}
 \title{Cartografía por Sección Censal para las Ciudades MEDEA3 (1996-2015)}
-\format{Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
+\format{
+Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
   (\code{carto_medea3@data}) tienen clase \code{data.frame}, donde cada fila
   es una sección censal y que cuenta con 3 columnas: \describe{
   \item{seccion}{Cádena de 10 caracteres con el código de sección censal
   (incluye provincia, municipio, distrito y sección).} \item{CUMUN}{Cádena de
   5 caracteres con el código INE del municipio.} \item{NMUN}{Nombre del
-  municipio.}}}
+  municipio.}}
+}
 \usage{
 carto_medea3
 }

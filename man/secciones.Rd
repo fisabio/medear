@@ -5,8 +5,10 @@
 \name{secciones}
 \alias{secciones}
 \title{Secciones Censales Únicas por Período (1996-2015)}
-\format{Un objeto de clase \code{data.frame} y \code{data.table}, donde cada
-  fila es una sección para un año determinado.}
+\format{
+Un objeto de clase \code{data.frame} y \code{data.table}, donde cada
+  fila es una sección para un año determinado.
+}
 \usage{
 secciones
 }

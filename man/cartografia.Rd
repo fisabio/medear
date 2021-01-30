@@ -5,7 +5,8 @@
 \name{cartografia}
 \alias{cartografia}
 \title{Cartografía por Sección Censal para las Ciudades MEDEA3 (INE 2011)}
-\format{Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
+\format{
+Un objeto de clase \code{SpatialPoligonsDataFrame}, donde los datos
   (\code{cartografia@data}) tienen clase \code{data.frame} y
   \code{cartografia_ine}, donde cada fila es una sección censal y que cuenta
   con 7 columnas: \describe{ \item{seccion}{Cádena de 10 caracteres con el
@@ -15,7 +16,8 @@
   comunidad autónoma} \item{NPRO}{Nombre de la provincia.} \item{NCA}{Nombre
   de la comunidad autónoma.} \item{NMUN}{Nombre del municipio.}
   \item{n_viv}{Número de viviendas por sección censal (datos cruzados con
-  Dirección General de Catastro).}}}
+  Dirección General de Catastro).}}
+}
 \usage{
 cartografia
 }
