@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Grupo MEDEA" />
+
+
+<title>Cálculo del Índice de Privación en el Proyecto MEDEA3</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">
+/* for pandoc --citeproc since 2.11 */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Cálculo del Índice de Privación en el Proyecto MEDEA3</h1>
+<h3 class="subtitle">Versión 1, 2020-03-06</h3>
+<h4 class="author">Grupo MEDEA</h4>
+
+
+
+<style type="text/css">
+.main-container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<style>
+body {
+  text-align: justify;
+  max-width: 100%
+}
+img {
+  border: 1px solid transparent;
+}
+</style>
+<div id="introducción" class="section level1">
+<h1>Introducción</h1>
+<p>La privación socioeconómica es un determinante de la salud bien conocido, cuya cuantificación puede aproximarse con medidas indirectas de variables que supuestamente dependen o tienen un efecto en la privación. En este sentido, el proyecto MEDEA construyó un índice de privación empleando como fuente de información el censo de población y viviendas de 2001 <span class="citation">(Domínguez-Berjón et al. 2008)</span>, siendo sus principales características:</p>
+<ol style="list-style-type: decimal">
+<li>Construido sobre datos del censo exhaustivo del 2001.</li>
+<li>Se realizó un análisis de componentes principales (ACP) sobre la matriz de correlaciones de 5 indicadores por sección censal.
+<ul>
+<li>trabajadores manuales entre los ocupados de 16 o más años,</li>
+<li>parados de 16 o más años entre los activos,</li>
+<li>asalariados eventuales entre los ocupados de 16 o más años.</li>
+<li>personas con instrucción insuficiente de 16 o más años.</li>
+<li>personas con instrucción insuficiente de 16 a 29 años.</li>
+</ul></li>
+<li>El índice de privación propuesto fue el resultado de estandarizar las puntuaciones de la primera dimensión del ACP.</li>
+</ol>
+<p>No obstante, desde la publicación del índice se publicaron los resultados del censo de 2011, de modo que uno de los objetivos de MEDEA3 era calcular un índice de privación, comparable al índice de 2001, usando el censo de 2011, el cual presenta notables diferencias respecto al de 2001:</p>
+<ol style="list-style-type: decimal">
+<li>No fue un censo exhaustivo: se combinó un muestreo clúster por hogar (fracción de muestreo de alrededor del 9 % de la población) con datos administrativos de varias fuentes para elevar la muestra,</li>
+<li>Las peticiones de datos sufren alteración respecto a los datos originales:
+<ul>
+<li>se redondean todas las cifras de las peticiones a 5 (p.ej., en lugar de indicar que en una sección hay 327 o 322 sujetos, se indica que hay 330 o 320, respectivamente),</li>
+<li>se suprime la información por un cero si no se alcanza un umbral de muestra.</li>
+</ul></li>
+<li>No se dispone de la fracción de muestreo para cada sección censal.</li>
+</ol>
+<p>Como es lógico, el primer abordaje para calcular un índice de privación para el censo de 2011 fue reutilizar el mismo proceso empleado en el cálculo del índice de 2001, lo cual dio lugar a los siguientes mapas de privación en Alcantarilla-Murcia, A Coruña, Barcelona, Gijón, Granada, Oviedo y Vigo.</p>
+<p>En todos estos mapas se aprecia un mayor ruido en el índice de 2011 que en el de 2001, y su procedencia no es otra que el propio censo de 2011, dado que este:</p>
+<ul>
+<li>realiza un muestreo clúster en variables muy clusterizadas (p. ej., inmigración reciente): aparecen ceros en algunas secciones como artefacto muestral, induciendo extravariabilidad en los indicadores del índice.
+<ul>
+<li>Un ejemplo: en el censo de 2011 en Valencia hubo 453 hogares con inmigrantes que llegaron en los 5 años previos al censo a Valencia, pero al existir 531 secciones censales, por diseño habrá (al menos) 78 secciones con cero inmigrantes (en los datos hay 259 secciones con 0 inmigrantes). En el censo 2001 solo hubo una sección censal con 0 inmigrantes en esas condiciones.</li>
+</ul></li>
+<li>no ofrece una medida del error al elevar los datos de una muestra a nivel de la población, como podrían ser las fracciones de muestreo por sección censal, lo que lleva a asumir que se trata de una muestra exhaustiva.</li>
+</ul>
+<p>Todo esto implica que aplicar la metodología MEDEA para el cálculo de un índice de privación con los datos del censo 2011 producirá una combinación lineal de variables ruidosas resultando en un índice ruidoso (p. ej., las variables con ceros recibirán más importancia de la debida en el ACP, lo cual encaja con las reducciones en el patrón espacial que se apreciaban en los mapas previos).</p>
+<p>Por otra parte, cabe recordar una de las críticas más fuertes al índice de privación MEDEA sobre el censo de 2001, que no es otra que la comparabilidad del mismo entre ciudades, puesto que cada ciudad calcula su propio índice. En este sentido, y ante la disyuntiva de agravar el problema al añadir una nueva fuente de datos (cada ciudad tendría dos índices no comparables entre sí), se ha decidido abordar el problema para poder comparar la desigualdad de las ciudades en términos de privación y conocer su evolución.</p>
+<p>Por todo ello, la confección de un índice de privación para el proyecto MEDEA3 se divide en dos apartados diferenciados:</p>
+<ol style="list-style-type: decimal">
+<li>Generar un modelo estadístico que aborde adecuadamente el ruido inherente a los datos del censo de 2011, estimando la fracción de muestreo por sección censal (permitiendo estimar a su vez la variabilidad de los indicadores en cada sección censal) así como la dependencia espacio-temporal y multivariante de los datos.</li>
+<li>Proponer una única combinación lineal de los indicadores para ofrecer estimaciones del índice de privación comparables por ciudad y período.</li>
+</ol>
+</div>
+<div id="propuesta-de-análisis-estadístico" class="section level1">
+<h1>Propuesta de análisis estadístico</h1>
+<div id="modelización-de-los-indicadores" class="section level2">
+<h2>Modelización de los indicadores</h2>
+<p>Dada una proporción poblacional <span class="math inline">\(\pi\)</span> y una muestra de tamaño <span class="math inline">\(n\)</span>, la proporción muestral correspondiente se distribuye como</p>
+<p><span class="math display">\[p \sim \mathcal{N}\left(\pi, \frac{\pi(1-\pi)}{n}\right)\]</span></p>
+<p>o, para poblaciones finitas, de tamaño <span class="math inline">\(N\)</span>:</p>
+<p><span class="math display">\[p \sim \mathcal{N}\left(\pi, \frac{\pi(1-\pi)}{n}\frac{N-n}{N-1}\right)\approx \mathcal{N}\left(\pi, \frac{\pi(1-\pi)}{N}\frac{1-f}{f}\right)\]</span></p>
+<p>donde <span class="math inline">\(f\)</span> es la fracción de muestreo. Sin embargo, y aunque es posible utilizar esta última expresión como verosimilitud para estimar <span class="math inline">\(\pi\)</span> como sustituto de <span class="math inline">\(p\)</span>, se sabe que no es conveniente si <span class="math inline">\(\pi\)</span> es próximo a 0 o a 1, siendo mejor asumir Normalidad sobre el logit de <span class="math inline">\(p\)</span> (incluyendo así el ruido implícito a su carácter muestral) de la siguiente forma <span class="citation">(Fleiss, Levin, and Paik 2003)</span></p>
+<p><span class="math display">\[logit(p) \sim \mathcal{N}\left(logit(\pi), \frac{1}{\pi(1-\pi)N} \frac{1-f}{f}\right)\]</span></p>
+<p>con lo que, y en base al trabajo de Mercer et al. <span class="citation">(2014)</span>, hemos considerado que la verosimilitud del modelo para la <span class="math inline">\(i\)</span>-ésima sección censal de cada ciudad (<span class="math inline">\(j=1,\ldots,I\)</span>) y el <span class="math inline">\(j\)</span>-ésimo indicador que compondría el índice (<span class="math inline">\(j=1,\ldots,5\)</span>) es</p>
+<p><span class="math display">\[logit(p^{2011}_{ij}) \sim \mathcal{N}\left(logit(\pi_{ij}),\frac{1}{\pi_{ij}(1-\pi_{ij})N_{ij}} \frac{1-f_i}{f_i} \right)\]</span></p>
+<p>siendo <span class="math inline">\(f_i\)</span> la fracción de muestreo para la <span class="math inline">\(i\)</span>-ésima sección censal (a estimar en el propio modelo), y <span class="math inline">\(N_{ij}\)</span> es el tamaño de la población por indicador y sección en 2011.</p>
+<p>Dicho esto, y dado que se desea modelar los <span class="math inline">\(\pi_{ij}\)</span> de forma que tengan dependencia temporal, espacial y multivariante, se utiliza como término lineal</p>
+<p><span class="math display">\[logit(\pi_{ij}) = \alpha_j + \beta_j \cdot logit(p^{2001}_{ij}) + \Theta_{ij}\]</span></p>
+<p>donde</p>
+<p><span class="math display">\[\Theta_{ij} = \mathbf{S_i}\cdot\mathbf{M_j}\]</span></p>
+<p>De este modo:</p>
+<ul>
+<li><span class="math inline">\(\alpha\)</span> indica un valor promedio para cada indicador,</li>
+<li><span class="math inline">\(\beta\)</span> introduce la dependencia temporal de cada indicador con respecto a 2001,</li>
+<li><span class="math inline">\(\Theta\)</span> combina la dependencia espacial <span class="math inline">\(\mathbf{S}\)</span> (distribución de Leroux <span class="citation">(Leroux, Lei, and Breslow 2000)</span>) con la multivariante entre indicadores expresada en la matriz <span class="math inline">\(\mathbf{M}\)</span> <span class="citation">(Botella-Rocamora, Martinez-Beneito, and Banerjee 2015; Martinez-Beneito 2013)</span>, que a su vez se estimará en el propio modelo.</li>
+</ul>
+<p>Finalmente, al modelar el vector de fracciones de muestreo por sección censal (<span class="math inline">\(f\)</span>) con una estructura espacial siguiendo la propuesta de <span class="citation">Leroux, Lei, and Breslow (2000)</span>, se consigue que cada una de estas tenga una cantidad de ruido distinta en función de los datos disponibles.</p>
+</div>
+<div id="acp-conjunto-sobre-los-indicadores-modelados" class="section level2">
+<h2>ACP conjunto sobre los indicadores modelados</h2>
+<p>Una vez que se ha realizado una estimación paralela de los indicadores de 2011, queda afrontar el segundo reto en la confección de un índice de privación para el proyecto MEDEA3, y es la propuesta de una única combinación lineal de los indicadores que permita realizar comparaciones del índice entre ciudades y períodos.</p>
+<p>El punto de partida es la matriz de indicadores para la ciudad <span class="math inline">\(k\)</span> y el período <span class="math inline">\(l\)</span>, a la que denominaremos <span class="math inline">\(\mathbf{X}_{kl}\)</span>. El ACP por separado para cada ciudad se plantea la búsqueda de <span class="math inline">\(\mathbf{\alpha}\)</span> de forma que se maximice <span class="math inline">\(Var(\mathbf{X}_{kl}\cdot \mathbf{\alpha})\)</span>. La primera opción de análisis conjunto podría ser <span class="math display">\[\mathbf{X}=[\mathbf{X}&#39;_{11}:\mathbf{X}_{12}:...:\mathbf{X}&#39;_{K2}]&#39;\]</span> buscando un <span class="math inline">\(\mathbf{\alpha}\)</span> que maximice <span class="math inline">\(Var(\mathbf{X}\mathbf{\alpha})\)</span>. No obstante, el principal problema de esta propuesta es que este procedimiento podría dar con la combinación lineal de variables que maximizara la varianza entre períodos, ciudades o una combinación de ambos.</p>
+<p>Para tratar de solventar este problema, si <span class="math inline">\(N_k\)</span> es el número de secciones de la ciudad <span class="math inline">\(k\)</span>, se plantea maximizar la varianza dentro de cada ciudad y período con <span class="math display">\[\frac{N_1}{\sum N_k}Var(\mathbf{X}_{11}\cdot \mathbf{\alpha})+\frac{N_1}{\sum N_k}Var(\mathbf{X}_{12}\cdot \mathbf{\alpha})+...+\frac{N_K}{\sum N_k}Var(\mathbf{X}_{K2}\cdot \mathbf{\alpha})\]</span></p>
+<p>pudiéndose demostrar que la solución a este problema equivale a la primera dimensión del ACP de <span class="math inline">\(\mathbf{X}=[\mathbf{X^*}&#39;_{11}:\mathbf{X^*}_{12}:...:\mathbf{X^*}&#39;_{K2}]&#39;\)</span>, donde <span class="math inline">\(\mathbf{X^*}\)</span> contiene las variables de <span class="math inline">\(\mathbf{X}\)</span> centradas para cada ciudad.</p>
+</div>
+</div>
+<div id="resultados" class="section level1">
+<h1>Resultados</h1>
+<p>Los valores de las I de Moran de la nueva propuesta de índice de privación en ciudades MEDEA3 es sistemáticamente superior a los del índice MEDEA 2011, acercándose a los valores del índice 2001 (se recupera el patrón espacial).</p>
+<p>Por otra parte, y gracias a realizar un ACP conjunto para ciudades y períodos, resulta posible (y muy fácil) comparar la varianza de los índices en 2001 y 2011, evaluando si esta aumenta o disminuye.</p>
+<p>En líneas generales, al comparar la varianza por ciudad del índice de 2001 con el de 2011, se aprecia que en 2011 esta es menor, lo que indicaría que en 2011 disminuye la desigualdad en la privación respecto a 2001.</p>
+</div>
+<div id="implementación-desde-r" class="section level1">
+<h1>Implementación desde R</h1>
+<p>Para poder ejecutar el siguiente código será necesario tener instalado el software <a href="https://www.mrc-bsu.cam.ac.uk/software/bugs/the-bugs-project-winbugs/">WinBUGS</a>, bien directamente en sistemas operativos Windows o a través de <a href="https://www.winehq.org">Wine</a> en sistemas Unix (Linux o Mac). Una vez instalado, bastará con ejecutar las siguientes líneas de código, si bien será necesario disponer e introducir las contraseñas del proyecto MEDEA3 que protegen algunos datos de difusión limitada (población y censos 2001 y 2011), las cuales se pueden obtener escribiendo un correo a <a href="mailto:vergara_car@gva.es">Carlos Vergara</a>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Introducción de las claves para los datos de población y de censo -------</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>clave_poblacion <span class="ot">&lt;-</span> <span class="st">&quot;UNA_CONTRASEÑA&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>clave_censo     <span class="ot">&lt;-</span> <span class="st">&quot;UNA_CONTRASEÑA&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Instalar y cargar los paquetes necesarios -------------------------------</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="st">&quot;remotes&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) <span class="fu">install.packages</span>(<span class="st">&quot;remotes&quot;</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;pbugs&quot;</span>, <span class="st">&quot;medear&quot;</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(pkgs, <span class="cf">function</span>(x) remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="fu">paste0</span>(<span class="st">&quot;fisabio/&quot;</span>, x), <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(medear)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Definir funciones propias y valores de uso común ------------------------</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>mi_corte       <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.numeric</span>(<span class="fu">cut</span>(x, stats<span class="sc">::</span><span class="fu">quantile</span>(x, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">length.out =</span> <span class="dv">8</span>)), <span class="at">include.lowest =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>mi_escala      <span class="ot">&lt;-</span> <span class="cf">function</span>(mat) {</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">apply</span>(mat, <span class="dv">2</span>, <span class="cf">function</span>(x) (x <span class="sc">-</span> <span class="fu">mean</span>(x)) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">mean</span>(x) <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> <span class="fu">mean</span>(x))))</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>vecindades     <span class="ot">&lt;-</span> <span class="cf">function</span>(carto_v) {</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  carto.vecinos        <span class="ot">&lt;-</span> rgeos<span class="sc">::</span><span class="fu">gTouches</span>(carto_v, <span class="at">byid =</span> <span class="cn">TRUE</span>, <span class="at">returnDense =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(carto.vecinos) <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  tmp                  <span class="ot">&lt;-</span> <span class="fu">sapply</span>(carto.vecinos, is.null)</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">any</span>(tmp)) {</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">warning</span>(</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Los pol\u00edgonos c(&quot;</span>, <span class="fu">paste</span>(<span class="fu">which</span>(tmp), <span class="at">collapse =</span> <span class="st">&quot;, &quot;</span>), <span class="st">&quot;) de la cartograf\u00eda son islas.</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;Se asigna como vecinos a los pol\u00edgonos m\u00e1s pr\u00f3ximos.&quot;</span>,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>      <span class="at">call. =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    carto_tmp <span class="ot">&lt;-</span> sp<span class="sc">::</span><span class="fu">spTransform</span>(carto_v, sp<span class="sc">::</span><span class="fu">CRS</span>(<span class="st">&quot;+init=epsg:23030&quot;</span>))</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    cual_isla <span class="ot">&lt;-</span> <span class="fu">which</span>(tmp)</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    distancia <span class="ot">&lt;-</span> rgeos<span class="sc">::</span><span class="fu">gDistance</span>(carto_tmp[cual_isla, ], carto_tmp, <span class="at">byid =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    nuevos_vecinos <span class="ot">&lt;-</span> <span class="fu">sapply</span>(<span class="fu">seq_along</span>(cual_isla), <span class="cf">function</span>(x) <span class="fu">which.min</span>(distancia[<span class="sc">-</span>cual_isla[x], x]))</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(cual_isla)) {</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>      carto.vecinos[[cual_isla[i]]] <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">c</span>(carto.vecinos[[cual_isla[i]]], <span class="fu">as.integer</span>(nuevos_vecinos[i])))</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>      carto.vecinos[[<span class="fu">as.integer</span>(nuevos_vecinos[i])]] <span class="ot">&lt;-</span> <span class="fu">sort</span>(<span class="fu">c</span>(cual_isla[i], carto.vecinos[[<span class="fu">as.integer</span>(nuevos_vecinos[i])]]))</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">attr</span>(carto.vecinos, <span class="st">&quot;class&quot;</span>) <span class="ot">&lt;-</span> <span class="st">&quot;nb&quot;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">attr</span>(carto.vecinos, <span class="st">&quot;region.id&quot;</span>) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="fu">seq_along</span>(carto.vecinos))</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">attr</span>(carto.vecinos, <span class="st">&quot;type&quot;</span>) <span class="ot">&lt;-</span> <span class="st">&quot;queen&quot;</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">attr</span>(carto.vecinos, <span class="st">&quot;sym&quot;</span>) <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(carto.vecinos)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar datos ------------------------------------------------------------</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;cartografia&quot;</span>)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;cambios_seccion&quot;</span>)</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">datos  =</span> cambios_seccion,</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc_ref =</span> <span class="fu">c</span>(</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;3003001009&quot;</span>, <span class="st">&quot;1101208017&quot;</span>, <span class="st">&quot;1402109024&quot;</span>, <span class="st">&quot;2104108001&quot;</span>, <span class="st">&quot;2906702006&quot;</span>, <span class="st">&quot;4109110012&quot;</span>,</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;1507802002&quot;</span>, <span class="st">&quot;3803807002&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;28079&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;12103&quot;</span>, <span class="st">&quot;06016&quot;</span>)), <span class="st">&quot;4802004038&quot;</span>,</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="st">&quot;35016&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;05033&quot;</span>, <span class="st">&quot;05020&quot;</span>, <span class="st">&quot;05006&quot;</span>,  <span class="st">&quot;02018&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;02032&quot;</span>, <span class="dv">2</span>),</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;02012&quot;</span>, <span class="st">&quot;02026&quot;</span>, <span class="st">&quot;04078&quot;</span>, <span class="st">&quot;02042&quot;</span>, <span class="st">&quot;02038&quot;</span>)),</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="st">&quot;07040&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;02017&quot;</span>, <span class="st">&quot;02057&quot;</span>, <span class="st">&quot;02049&quot;</span>, <span class="st">&quot;02062&quot;</span>, <span class="st">&quot;04053&quot;</span>)), <span class="st">&quot;1204009005&quot;</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc_new =</span> <span class="fu">c</span>(</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;3003001011&quot;</span>, <span class="st">&quot;1101209002&quot;</span>, <span class="st">&quot;1402109026&quot;</span>, <span class="st">&quot;2104102005&quot;</span>, <span class="st">&quot;2906710025&quot;</span>, <span class="st">&quot;4109105023&quot;</span>,</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;1507805009&quot;</span>, <span class="st">&quot;3803809020&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;28079&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;17044&quot;</span>, <span class="st">&quot;06012&quot;</span>)), <span class="st">&quot;4802003022&quot;</span>,</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="st">&quot;35016&quot;</span>, <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;08013&quot;</span>, <span class="dv">3</span>), <span class="st">&quot;02019&quot;</span>, <span class="st">&quot;02029&quot;</span>, <span class="st">&quot;02030&quot;</span>, <span class="st">&quot;02019&quot;</span>,</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;02024&quot;</span>, <span class="st">&quot;04058&quot;</span>, <span class="st">&quot;02038&quot;</span>, <span class="st">&quot;02042&quot;</span>)),</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(<span class="st">&quot;07040&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;02016&quot;</span>, <span class="st">&quot;02030&quot;</span>, <span class="st">&quot;02056&quot;</span>, <span class="st">&quot;02049&quot;</span>, <span class="st">&quot;04043&quot;</span>)), <span class="st">&quot;1204009011&quot;</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>codigos        <span class="ot">&lt;-</span> codigos_ine[(medea3), <span class="fu">paste0</span>(cod_provincia, cod_municipio)]</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>poblacion      <span class="ot">&lt;-</span> <span class="fu">carga_datos</span>(<span class="at">key =</span> clave_poblacion)</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>censo          <span class="ot">&lt;-</span> <span class="fu">carga_datos</span>(<span class="at">key =</span> clave_censo, <span class="at">tipo =</span> <span class="st">&quot;censo&quot;</span>)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>years_estudio  <span class="ot">&lt;-</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>mi_config      <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="fu">length</span>(codigos))</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> <span class="dv">2001</span><span class="sc">:</span><span class="dv">2011</span>,</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">1</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">1</span>],</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">1</span>], <span class="fu">c</span>(<span class="st">&quot;03002&quot;</span>, <span class="st">&quot;05027&quot;</span>, <span class="st">&quot;05028&quot;</span>, <span class="st">&quot;05029&quot;</span>, <span class="st">&quot;05030&quot;</span>)),</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">1</span>], <span class="fu">c</span>(<span class="st">&quot;03003&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;05010&quot;</span>, <span class="dv">4</span>))),</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;vitoria&quot;</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">2</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">2</span>],</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">2</span>], <span class="fu">c</span>(<span class="st">&quot;04035&quot;</span>, <span class="st">&quot;04041&quot;</span>, <span class="st">&quot;08022&quot;</span>)),</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">2</span>], <span class="fu">c</span>(<span class="st">&quot;04020&quot;</span>, <span class="st">&quot;04023&quot;</span>, <span class="st">&quot;08012&quot;</span>)),</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;alicante&quot;</span></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">3</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">3</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">3</span>],</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">3</span>], <span class="fu">c</span>(<span class="st">&quot;02005&quot;</span>, <span class="st">&quot;01017&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;07006&quot;</span>, <span class="dv">2</span>))),</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">3</span>], <span class="fu">c</span>(<span class="st">&quot;02006&quot;</span>, <span class="st">&quot;07019&quot;</span>, <span class="st">&quot;07017&quot;</span>, <span class="st">&quot;07020&quot;</span>)),</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;elche&quot;</span></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">4</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">4</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">4</span>],</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">4</span>], <span class="fu">c</span>(<span class="st">&quot;07040&quot;</span>, <span class="st">&quot;07040&quot;</span>)),</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">4</span>], <span class="fu">c</span>(<span class="st">&quot;07023&quot;</span>, <span class="st">&quot;07024&quot;</span>)),</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;almeria&quot;</span></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">5</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">5</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">5</span>],</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">5</span>], <span class="fu">c</span>(<span class="st">&quot;04021&quot;</span>, <span class="st">&quot;02015&quot;</span>)),</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">5</span>], <span class="fu">c</span>(<span class="st">&quot;04039&quot;</span>, <span class="st">&quot;02014&quot;</span>)),</span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;mallorca&quot;</span></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">6</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> <span class="dv">2001</span><span class="sc">:</span><span class="dv">2011</span>,</span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">6</span>], ],</span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">6</span>],</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;auto&quot;</span>,</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">10000</span>,</span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;barcelona&quot;</span></span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">7</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">7</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">7</span>],</span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">7</span>], <span class="fu">c</span>(<span class="st">&quot;05003&quot;</span>, <span class="st">&quot;10014&quot;</span>)),</span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">7</span>], <span class="fu">c</span>(<span class="st">&quot;04006&quot;</span>, <span class="st">&quot;10006&quot;</span>)),</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;cadiz&quot;</span></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">8</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">8</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">8</span>],</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">8</span>], <span class="fu">c</span>(<span class="st">&quot;06013&quot;</span>)),</span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">8</span>], <span class="fu">c</span>(<span class="st">&quot;01003&quot;</span>)),</span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;castellon&quot;</span></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">9</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">9</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">9</span>],</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">9</span>],<span class="fu">c</span>(<span class="st">&quot;06047&quot;</span>, <span class="st">&quot;09035&quot;</span>, <span class="st">&quot;10041&quot;</span>, <span class="st">&quot;09014&quot;</span>, <span class="st">&quot;09003&quot;</span>)),</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">9</span>], <span class="fu">c</span>(<span class="st">&quot;06024&quot;</span>, <span class="st">&quot;09003&quot;</span>, <span class="st">&quot;10045&quot;</span>, <span class="st">&quot;09020&quot;</span>, <span class="st">&quot;09032&quot;</span>)),</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;cordoba&quot;</span></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">10</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">10</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">10</span>],</span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">10</span>], <span class="fu">c</span>(<span class="st">&quot;05017&quot;</span>, <span class="st">&quot;05018&quot;</span>, <span class="st">&quot;05019&quot;</span>, <span class="st">&quot;07042&quot;</span>)),</span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">10</span>], <span class="fu">c</span>(<span class="st">&quot;05015&quot;</span>, <span class="st">&quot;05011&quot;</span>, <span class="st">&quot;05011&quot;</span>, <span class="st">&quot;07027&quot;</span>)),</span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;coruna&quot;</span></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">11</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">11</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">11</span>],</span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;auto&quot;</span>,</span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;ferrol&quot;</span></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">12</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">12</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-222"><a href="#cb1-222" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">12</span>],</span>
+<span id="cb1-223"><a href="#cb1-223" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-224"><a href="#cb1-224" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-225"><a href="#cb1-225" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-226"><a href="#cb1-226" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">12</span>], <span class="fu">c</span>(<span class="st">&quot;01005&quot;</span>)),</span>
+<span id="cb1-227"><a href="#cb1-227" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">12</span>], <span class="fu">c</span>(<span class="st">&quot;01008&quot;</span>)),</span>
+<span id="cb1-228"><a href="#cb1-228" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;santiago&quot;</span></span>
+<span id="cb1-229"><a href="#cb1-229" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-230"><a href="#cb1-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-231"><a href="#cb1-231" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">13</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-232"><a href="#cb1-232" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-233"><a href="#cb1-233" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-234"><a href="#cb1-234" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">13</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-235"><a href="#cb1-235" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">13</span>],</span>
+<span id="cb1-236"><a href="#cb1-236" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-237"><a href="#cb1-237" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-238"><a href="#cb1-238" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-239"><a href="#cb1-239" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-240"><a href="#cb1-240" aria-hidden="true" tabindex="-1"></a>    codigos[<span class="dv">13</span>],</span>
+<span id="cb1-241"><a href="#cb1-241" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(</span>
+<span id="cb1-242"><a href="#cb1-242" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;06024&quot;</span>, <span class="st">&quot;07026&quot;</span>, <span class="st">&quot;07020&quot;</span>, <span class="st">&quot;06011&quot;</span>, <span class="st">&quot;03013&quot;</span>, <span class="st">&quot;02039&quot;</span>,</span>
+<span id="cb1-243"><a href="#cb1-243" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;03004&quot;</span>, <span class="st">&quot;02021&quot;</span>, <span class="st">&quot;02038&quot;</span>, <span class="st">&quot;02038&quot;</span>, <span class="st">&quot;02006&quot;</span></span>
+<span id="cb1-244"><a href="#cb1-244" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-245"><a href="#cb1-245" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb1-246"><a href="#cb1-246" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-247"><a href="#cb1-247" aria-hidden="true" tabindex="-1"></a>    codigos[<span class="dv">13</span>],</span>
+<span id="cb1-248"><a href="#cb1-248" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(</span>
+<span id="cb1-249"><a href="#cb1-249" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;06021&quot;</span>, <span class="st">&quot;07019&quot;</span>, <span class="st">&quot;07018&quot;</span>, <span class="st">&quot;06018&quot;</span>, <span class="st">&quot;03010&quot;</span>, <span class="st">&quot;02031&quot;</span>,</span>
+<span id="cb1-250"><a href="#cb1-250" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;03006&quot;</span>, <span class="st">&quot;06015&quot;</span>, <span class="st">&quot;02048&quot;</span>, <span class="st">&quot;02022&quot;</span>, <span class="st">&quot;02013&quot;</span></span>
+<span id="cb1-251"><a href="#cb1-251" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-252"><a href="#cb1-252" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb1-253"><a href="#cb1-253" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;granada&quot;</span></span>
+<span id="cb1-254"><a href="#cb1-254" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-255"><a href="#cb1-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-256"><a href="#cb1-256" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">14</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-257"><a href="#cb1-257" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-258"><a href="#cb1-258" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> <span class="dv">2001</span><span class="sc">:</span><span class="dv">2011</span>,</span>
+<span id="cb1-259"><a href="#cb1-259" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">14</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-260"><a href="#cb1-260" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">14</span>],</span>
+<span id="cb1-261"><a href="#cb1-261" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-262"><a href="#cb1-262" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-263"><a href="#cb1-263" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-264"><a href="#cb1-264" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">14</span>], <span class="fu">c</span>(<span class="st">&quot;06017&quot;</span>, <span class="st">&quot;03031&quot;</span>, <span class="st">&quot;03032&quot;</span>, <span class="st">&quot;06026&quot;</span>)),</span>
+<span id="cb1-265"><a href="#cb1-265" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">14</span>], <span class="fu">c</span>(<span class="st">&quot;06011&quot;</span>, <span class="st">&quot;03019&quot;</span>, <span class="st">&quot;03019&quot;</span>, <span class="st">&quot;06006&quot;</span>)),</span>
+<span id="cb1-266"><a href="#cb1-266" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;donostia&quot;</span></span>
+<span id="cb1-267"><a href="#cb1-267" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-268"><a href="#cb1-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-269"><a href="#cb1-269" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">15</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-270"><a href="#cb1-270" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-271"><a href="#cb1-271" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-272"><a href="#cb1-272" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">15</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-273"><a href="#cb1-273" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">15</span>],</span>
+<span id="cb1-274"><a href="#cb1-274" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-275"><a href="#cb1-275" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-276"><a href="#cb1-276" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-277"><a href="#cb1-277" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">15</span>], <span class="fu">c</span>(<span class="st">&quot;07018&quot;</span>)),</span>
+<span id="cb1-278"><a href="#cb1-278" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">15</span>], <span class="fu">c</span>(<span class="st">&quot;07013&quot;</span>)),</span>
+<span id="cb1-279"><a href="#cb1-279" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;huelva&quot;</span></span>
+<span id="cb1-280"><a href="#cb1-280" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-281"><a href="#cb1-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-282"><a href="#cb1-282" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">16</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-283"><a href="#cb1-283" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-284"><a href="#cb1-284" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-285"><a href="#cb1-285" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">16</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-286"><a href="#cb1-286" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">16</span>],</span>
+<span id="cb1-287"><a href="#cb1-287" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-288"><a href="#cb1-288" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-289"><a href="#cb1-289" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-290"><a href="#cb1-290" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">16</span>], <span class="fu">c</span>(<span class="st">&quot;05011&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;03009&quot;</span>, <span class="dv">3</span>), <span class="st">&quot;04008&quot;</span>)),</span>
+<span id="cb1-291"><a href="#cb1-291" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">16</span>], <span class="fu">c</span>(<span class="st">&quot;05012&quot;</span>, <span class="st">&quot;03006&quot;</span>, <span class="st">&quot;03008&quot;</span>, <span class="st">&quot;03005&quot;</span>, <span class="st">&quot;04006&quot;</span>)),</span>
+<span id="cb1-292"><a href="#cb1-292" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;jaen&quot;</span></span>
+<span id="cb1-293"><a href="#cb1-293" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-294"><a href="#cb1-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-295"><a href="#cb1-295" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">17</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-296"><a href="#cb1-296" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-297"><a href="#cb1-297" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-298"><a href="#cb1-298" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">17</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-299"><a href="#cb1-299" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">17</span>],</span>
+<span id="cb1-300"><a href="#cb1-300" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-301"><a href="#cb1-301" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-302"><a href="#cb1-302" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-303"><a href="#cb1-303" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">17</span>], <span class="fu">c</span>(<span class="st">&quot;07001&quot;</span>)),</span>
+<span id="cb1-304"><a href="#cb1-304" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">17</span>], <span class="fu">c</span>(<span class="st">&quot;07003&quot;</span>)),</span>
+<span id="cb1-305"><a href="#cb1-305" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;lugo&quot;</span></span>
+<span id="cb1-306"><a href="#cb1-306" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-307"><a href="#cb1-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-308"><a href="#cb1-308" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">18</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-309"><a href="#cb1-309" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-310"><a href="#cb1-310" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-311"><a href="#cb1-311" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">18</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-312"><a href="#cb1-312" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">18</span>],</span>
+<span id="cb1-313"><a href="#cb1-313" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-314"><a href="#cb1-314" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-315"><a href="#cb1-315" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-316"><a href="#cb1-316" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">18</span>], <span class="fu">c</span>(<span class="st">&quot;05050&quot;</span>, <span class="st">&quot;19030&quot;</span>, <span class="st">&quot;19031&quot;</span>, <span class="st">&quot;20030&quot;</span>, <span class="st">&quot;20060&quot;</span>, <span class="st">&quot;02098&quot;</span>, <span class="st">&quot;02098&quot;</span>,</span>
+<span id="cb1-317"><a href="#cb1-317" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;03001&quot;</span>, <span class="st">&quot;08128&quot;</span>, <span class="st">&quot;08128&quot;</span>, <span class="st">&quot;09080&quot;</span>, <span class="st">&quot;09080&quot;</span>, <span class="st">&quot;11183&quot;</span>, <span class="st">&quot;12016&quot;</span>,</span>
+<span id="cb1-318"><a href="#cb1-318" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;13204&quot;</span>, <span class="st">&quot;13204&quot;</span>, <span class="st">&quot;13127&quot;</span>, <span class="st">&quot;14089&quot;</span>, <span class="st">&quot;16092&quot;</span>, <span class="st">&quot;16092&quot;</span>, <span class="st">&quot;16111&quot;</span>,</span>
+<span id="cb1-319"><a href="#cb1-319" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;17055&quot;</span>, <span class="st">&quot;18025&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;19029&quot;</span>, <span class="dv">7</span>), <span class="fu">rep</span>(<span class="st">&quot;20067&quot;</span>, <span class="dv">6</span>), <span class="st">&quot;14089&quot;</span>)),</span>
+<span id="cb1-320"><a href="#cb1-320" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">18</span>], <span class="fu">c</span>(<span class="st">&quot;05058&quot;</span>, <span class="st">&quot;19001&quot;</span>, <span class="st">&quot;19001&quot;</span>, <span class="st">&quot;20029&quot;</span>, <span class="st">&quot;20043&quot;</span>, <span class="st">&quot;02052&quot;</span>, <span class="st">&quot;02106&quot;</span>,</span>
+<span id="cb1-321"><a href="#cb1-321" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;03096&quot;</span>, <span class="st">&quot;08153&quot;</span>, <span class="st">&quot;08159&quot;</span>, <span class="st">&quot;09083&quot;</span>, <span class="st">&quot;09085&quot;</span>, <span class="st">&quot;11157&quot;</span>, <span class="st">&quot;12102&quot;</span>,</span>
+<span id="cb1-322"><a href="#cb1-322" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;13208&quot;</span>, <span class="st">&quot;13209&quot;</span>, <span class="st">&quot;13215&quot;</span>, <span class="st">&quot;14081&quot;</span>, <span class="st">&quot;16106&quot;</span>, <span class="st">&quot;16093&quot;</span>, <span class="st">&quot;16091&quot;</span>,</span>
+<span id="cb1-323"><a href="#cb1-323" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;17103&quot;</span>, <span class="st">&quot;18045&quot;</span>, <span class="fu">paste</span>(<span class="dv">19033</span><span class="sc">:</span><span class="dv">19039</span>),</span>
+<span id="cb1-324"><a href="#cb1-324" aria-hidden="true" tabindex="-1"></a>                                        <span class="fu">paste</span>(<span class="fu">c</span>(<span class="dv">20102</span><span class="sc">:</span><span class="dv">20104</span>, <span class="dv">20106</span><span class="sc">:</span><span class="dv">20107</span>, <span class="dv">20110</span>)), <span class="st">&quot;14090&quot;</span>)),</span>
+<span id="cb1-325"><a href="#cb1-325" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;madrid&quot;</span></span>
+<span id="cb1-326"><a href="#cb1-326" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-327"><a href="#cb1-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-328"><a href="#cb1-328" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">19</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-329"><a href="#cb1-329" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-330"><a href="#cb1-330" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-331"><a href="#cb1-331" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">19</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-332"><a href="#cb1-332" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">19</span>],</span>
+<span id="cb1-333"><a href="#cb1-333" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-334"><a href="#cb1-334" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-335"><a href="#cb1-335" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-336"><a href="#cb1-336" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">19</span>], <span class="fu">c</span>(<span class="st">&quot;08056&quot;</span>, <span class="st">&quot;09067&quot;</span>, <span class="st">&quot;11003&quot;</span>, <span class="st">&quot;08032&quot;</span>, <span class="st">&quot;10028&quot;</span>, <span class="st">&quot;06038&quot;</span>, <span class="st">&quot;07031&quot;</span>)),</span>
+<span id="cb1-337"><a href="#cb1-337" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">19</span>], <span class="fu">c</span>(<span class="st">&quot;08043&quot;</span>, <span class="st">&quot;09072&quot;</span>, <span class="st">&quot;11006&quot;</span>, <span class="st">&quot;08001&quot;</span>, <span class="st">&quot;10014&quot;</span>, <span class="st">&quot;06040&quot;</span>, <span class="st">&quot;07017&quot;</span>)),</span>
+<span id="cb1-338"><a href="#cb1-338" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;malaga&quot;</span></span>
+<span id="cb1-339"><a href="#cb1-339" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-340"><a href="#cb1-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-341"><a href="#cb1-341" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">20</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-342"><a href="#cb1-342" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-343"><a href="#cb1-343" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-344"><a href="#cb1-344" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">20</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-345"><a href="#cb1-345" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">20</span>],</span>
+<span id="cb1-346"><a href="#cb1-346" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;auto&quot;</span>,</span>
+<span id="cb1-347"><a href="#cb1-347" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-348"><a href="#cb1-348" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-349"><a href="#cb1-349" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-350"><a href="#cb1-350" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-351"><a href="#cb1-351" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;alcantarilla&quot;</span></span>
+<span id="cb1-352"><a href="#cb1-352" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-353"><a href="#cb1-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-354"><a href="#cb1-354" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">21</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-355"><a href="#cb1-355" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-356"><a href="#cb1-356" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-357"><a href="#cb1-357" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">21</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-358"><a href="#cb1-358" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">21</span>],</span>
+<span id="cb1-359"><a href="#cb1-359" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-360"><a href="#cb1-360" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-361"><a href="#cb1-361" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-362"><a href="#cb1-362" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">21</span>], <span class="fu">c</span>(<span class="st">&quot;06003&quot;</span>, <span class="st">&quot;10020&quot;</span>, <span class="st">&quot;08012&quot;</span>, <span class="st">&quot;06003&quot;</span>)),</span>
+<span id="cb1-363"><a href="#cb1-363" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">21</span>], <span class="fu">c</span>(<span class="st">&quot;06004&quot;</span>, <span class="st">&quot;10004&quot;</span>, <span class="st">&quot;08013&quot;</span>, <span class="st">&quot;06005&quot;</span>)),</span>
+<span id="cb1-364"><a href="#cb1-364" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;cartagena&quot;</span></span>
+<span id="cb1-365"><a href="#cb1-365" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-366"><a href="#cb1-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-367"><a href="#cb1-367" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">22</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-368"><a href="#cb1-368" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-369"><a href="#cb1-369" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-370"><a href="#cb1-370" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">22</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">TRUE</span>, ],</span>
+<span id="cb1-371"><a href="#cb1-371" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">22</span>],</span>
+<span id="cb1-372"><a href="#cb1-372" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-373"><a href="#cb1-373" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-374"><a href="#cb1-374" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-375"><a href="#cb1-375" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">22</span>], <span class="fu">c</span>(<span class="st">&quot;05024&quot;</span>, <span class="st">&quot;06015&quot;</span>, <span class="st">&quot;04021&quot;</span>, <span class="st">&quot;04022&quot;</span>, <span class="st">&quot;02024&quot;</span>,</span>
+<span id="cb1-376"><a href="#cb1-376" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;02026&quot;</span>, <span class="st">&quot;04001&quot;</span>, <span class="st">&quot;02054&quot;</span>, <span class="st">&quot;04044&quot;</span>, <span class="st">&quot;07039&quot;</span>,</span>
+<span id="cb1-377"><a href="#cb1-377" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;04033&quot;</span>, <span class="st">&quot;01041&quot;</span>, <span class="st">&quot;05018&quot;</span>)),</span>
+<span id="cb1-378"><a href="#cb1-378" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">22</span>], <span class="fu">c</span>(<span class="st">&quot;05023&quot;</span>, <span class="st">&quot;06017&quot;</span>, <span class="st">&quot;04022&quot;</span>, <span class="st">&quot;04025&quot;</span>, <span class="st">&quot;02023&quot;</span>,</span>
+<span id="cb1-379"><a href="#cb1-379" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;02024&quot;</span>, <span class="st">&quot;04073&quot;</span>, <span class="st">&quot;02053&quot;</span>, <span class="st">&quot;04062&quot;</span>, <span class="st">&quot;07040&quot;</span>,</span>
+<span id="cb1-380"><a href="#cb1-380" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;04035&quot;</span>, <span class="st">&quot;01042&quot;</span>, <span class="st">&quot;05019&quot;</span>)),</span>
+<span id="cb1-381"><a href="#cb1-381" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;murcia&quot;</span></span>
+<span id="cb1-382"><a href="#cb1-382" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-383"><a href="#cb1-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-384"><a href="#cb1-384" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">23</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-385"><a href="#cb1-385" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-386"><a href="#cb1-386" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-387"><a href="#cb1-387" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">23</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-388"><a href="#cb1-388" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">23</span>],</span>
+<span id="cb1-389"><a href="#cb1-389" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-390"><a href="#cb1-390" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-391"><a href="#cb1-391" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-392"><a href="#cb1-392" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">23</span>], <span class="st">&quot;03003&quot;</span>),</span>
+<span id="cb1-393"><a href="#cb1-393" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">23</span>], <span class="st">&quot;03001&quot;</span>),</span>
+<span id="cb1-394"><a href="#cb1-394" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;la_union&quot;</span></span>
+<span id="cb1-395"><a href="#cb1-395" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-396"><a href="#cb1-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-397"><a href="#cb1-397" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">24</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-398"><a href="#cb1-398" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-399"><a href="#cb1-399" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-400"><a href="#cb1-400" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">24</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-401"><a href="#cb1-401" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">24</span>],</span>
+<span id="cb1-402"><a href="#cb1-402" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-403"><a href="#cb1-403" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-404"><a href="#cb1-404" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-405"><a href="#cb1-405" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">24</span>], <span class="fu">c</span>(<span class="st">&quot;07005&quot;</span>, <span class="st">&quot;04026&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;05008&quot;</span>, <span class="dv">6</span>))),</span>
+<span id="cb1-406"><a href="#cb1-406" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">24</span>], <span class="fu">c</span>(<span class="st">&quot;07018&quot;</span>, <span class="st">&quot;04013&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;0800&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>))),</span>
+<span id="cb1-407"><a href="#cb1-407" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;pamplona&quot;</span></span>
+<span id="cb1-408"><a href="#cb1-408" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-409"><a href="#cb1-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-410"><a href="#cb1-410" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">25</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-411"><a href="#cb1-411" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-412"><a href="#cb1-412" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-413"><a href="#cb1-413" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">25</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-414"><a href="#cb1-414" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">25</span>],</span>
+<span id="cb1-415"><a href="#cb1-415" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-416"><a href="#cb1-416" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-417"><a href="#cb1-417" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-418"><a href="#cb1-418" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">25</span>], <span class="fu">c</span>(<span class="st">&quot;01016&quot;</span>)),</span>
+<span id="cb1-419"><a href="#cb1-419" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">25</span>], <span class="fu">c</span>(<span class="st">&quot;01008&quot;</span>)),</span>
+<span id="cb1-420"><a href="#cb1-420" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;ourense&quot;</span></span>
+<span id="cb1-421"><a href="#cb1-421" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-422"><a href="#cb1-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-423"><a href="#cb1-423" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">26</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-424"><a href="#cb1-424" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-425"><a href="#cb1-425" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-426"><a href="#cb1-426" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">26</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span> <span class="sc">&amp;</span> year2 <span class="sc">==</span> <span class="dv">2001</span>, ],</span>
+<span id="cb1-427"><a href="#cb1-427" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">26</span>],</span>
+<span id="cb1-428"><a href="#cb1-428" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;auto&quot;</span>,</span>
+<span id="cb1-429"><a href="#cb1-429" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-430"><a href="#cb1-430" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-431"><a href="#cb1-431" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-432"><a href="#cb1-432" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="cn">NULL</span>,</span>
+<span id="cb1-433"><a href="#cb1-433" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;aviles&quot;</span></span>
+<span id="cb1-434"><a href="#cb1-434" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-435"><a href="#cb1-435" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-436"><a href="#cb1-436" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">27</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-437"><a href="#cb1-437" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-438"><a href="#cb1-438" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-439"><a href="#cb1-439" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">27</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span> <span class="sc">&amp;</span> year2 <span class="sc">==</span> <span class="dv">2001</span>, ],</span>
+<span id="cb1-440"><a href="#cb1-440" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">27</span>],</span>
+<span id="cb1-441"><a href="#cb1-441" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-442"><a href="#cb1-442" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-443"><a href="#cb1-443" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-444"><a href="#cb1-444" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">27</span>], <span class="fu">c</span>(<span class="st">&quot;07016&quot;</span>, <span class="st">&quot;06021&quot;</span>, <span class="st">&quot;06021&quot;</span>, <span class="st">&quot;09016&quot;</span>)),</span>
+<span id="cb1-445"><a href="#cb1-445" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">27</span>], <span class="fu">c</span>(<span class="st">&quot;07048&quot;</span>, <span class="st">&quot;06022&quot;</span>, <span class="st">&quot;06012&quot;</span>, <span class="st">&quot;09012&quot;</span>)),</span>
+<span id="cb1-446"><a href="#cb1-446" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;gijon&quot;</span></span>
+<span id="cb1-447"><a href="#cb1-447" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-448"><a href="#cb1-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-449"><a href="#cb1-449" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">28</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-450"><a href="#cb1-450" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-451"><a href="#cb1-451" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-452"><a href="#cb1-452" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">28</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span> <span class="sc">&amp;</span> year2 <span class="sc">==</span> <span class="dv">2001</span>, ],</span>
+<span id="cb1-453"><a href="#cb1-453" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">28</span>],</span>
+<span id="cb1-454"><a href="#cb1-454" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-455"><a href="#cb1-455" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-456"><a href="#cb1-456" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-457"><a href="#cb1-457" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">28</span>], <span class="fu">c</span>(<span class="st">&quot;05015&quot;</span>, <span class="st">&quot;06020&quot;</span>, <span class="st">&quot;09015&quot;</span>, <span class="st">&quot;09017&quot;</span>)),</span>
+<span id="cb1-458"><a href="#cb1-458" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">28</span>], <span class="fu">c</span>(<span class="st">&quot;05014&quot;</span>, <span class="st">&quot;06017&quot;</span>, <span class="st">&quot;09011&quot;</span>, <span class="st">&quot;09011&quot;</span>)),</span>
+<span id="cb1-459"><a href="#cb1-459" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;oviedo&quot;</span></span>
+<span id="cb1-460"><a href="#cb1-460" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-461"><a href="#cb1-461" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-462"><a href="#cb1-462" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">29</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-463"><a href="#cb1-463" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-464"><a href="#cb1-464" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-465"><a href="#cb1-465" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">29</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-466"><a href="#cb1-466" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">29</span>],</span>
+<span id="cb1-467"><a href="#cb1-467" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-468"><a href="#cb1-468" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-469"><a href="#cb1-469" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-470"><a href="#cb1-470" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">29</span>], <span class="fu">c</span>(<span class="st">&quot;05023&quot;</span>, <span class="st">&quot;05019&quot;</span>, <span class="st">&quot;04074&quot;</span>, <span class="st">&quot;01062&quot;</span>, <span class="st">&quot;01063&quot;</span>, <span class="st">&quot;01011&quot;</span>, <span class="st">&quot;01011&quot;</span>, <span class="st">&quot;02013&quot;</span>)),</span>
+<span id="cb1-471"><a href="#cb1-471" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">29</span>], <span class="fu">c</span>(<span class="st">&quot;08013&quot;</span>, <span class="st">&quot;08018&quot;</span>, <span class="st">&quot;04062&quot;</span>, <span class="st">&quot;01061&quot;</span>, <span class="st">&quot;01061&quot;</span>, <span class="st">&quot;01013&quot;</span>, <span class="st">&quot;01014&quot;</span>, <span class="st">&quot;02014&quot;</span>)),</span>
+<span id="cb1-472"><a href="#cb1-472" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;las_palmas&quot;</span></span>
+<span id="cb1-473"><a href="#cb1-473" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-474"><a href="#cb1-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-475"><a href="#cb1-475" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">30</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-476"><a href="#cb1-476" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-477"><a href="#cb1-477" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-478"><a href="#cb1-478" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">30</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-479"><a href="#cb1-479" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">30</span>],</span>
+<span id="cb1-480"><a href="#cb1-480" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-481"><a href="#cb1-481" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-482"><a href="#cb1-482" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-483"><a href="#cb1-483" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">30</span>], <span class="fu">c</span>(<span class="st">&quot;03002&quot;</span>, <span class="st">&quot;04005&quot;</span>, <span class="st">&quot;04006&quot;</span>, <span class="st">&quot;05001&quot;</span>,</span>
+<span id="cb1-484"><a href="#cb1-484" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;05004&quot;</span>, <span class="st">&quot;06001&quot;</span>, <span class="st">&quot;06002&quot;</span>, <span class="st">&quot;06003&quot;</span>)),</span>
+<span id="cb1-485"><a href="#cb1-485" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">30</span>], <span class="fu">c</span>(<span class="st">&quot;03001&quot;</span>, <span class="st">&quot;04002&quot;</span>, <span class="st">&quot;04002&quot;</span>, <span class="st">&quot;05003&quot;</span>,</span>
+<span id="cb1-486"><a href="#cb1-486" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;05006&quot;</span>, <span class="st">&quot;05006&quot;</span>, <span class="st">&quot;04003&quot;</span>, <span class="st">&quot;04002&quot;</span>)),</span>
+<span id="cb1-487"><a href="#cb1-487" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;pontevedra&quot;</span></span>
+<span id="cb1-488"><a href="#cb1-488" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-489"><a href="#cb1-489" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-490"><a href="#cb1-490" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">31</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-491"><a href="#cb1-491" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-492"><a href="#cb1-492" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-493"><a href="#cb1-493" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">31</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-494"><a href="#cb1-494" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">31</span>],</span>
+<span id="cb1-495"><a href="#cb1-495" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-496"><a href="#cb1-496" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-497"><a href="#cb1-497" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-498"><a href="#cb1-498" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">31</span>], <span class="fu">c</span>(<span class="st">&quot;06023&quot;</span>, <span class="st">&quot;06023&quot;</span>)),</span>
+<span id="cb1-499"><a href="#cb1-499" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">31</span>], <span class="fu">c</span>(<span class="st">&quot;06003&quot;</span>, <span class="st">&quot;06022&quot;</span>)),</span>
+<span id="cb1-500"><a href="#cb1-500" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;vigo&quot;</span></span>
+<span id="cb1-501"><a href="#cb1-501" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-502"><a href="#cb1-502" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-503"><a href="#cb1-503" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">32</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-504"><a href="#cb1-504" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-505"><a href="#cb1-505" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-506"><a href="#cb1-506" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">32</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-507"><a href="#cb1-507" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">32</span>],</span>
+<span id="cb1-508"><a href="#cb1-508" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-509"><a href="#cb1-509" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-510"><a href="#cb1-510" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-511"><a href="#cb1-511" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">32</span>], <span class="fu">c</span>(<span class="st">&quot;03019&quot;</span>, <span class="st">&quot;03020&quot;</span>, <span class="st">&quot;09020&quot;</span>, <span class="st">&quot;07004&quot;</span>)),</span>
+<span id="cb1-512"><a href="#cb1-512" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">32</span>], <span class="fu">c</span>(<span class="st">&quot;03020&quot;</span>, <span class="st">&quot;03001&quot;</span>, <span class="st">&quot;09006&quot;</span>, <span class="st">&quot;07007&quot;</span>)),</span>
+<span id="cb1-513"><a href="#cb1-513" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;tenerife&quot;</span></span>
+<span id="cb1-514"><a href="#cb1-514" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-515"><a href="#cb1-515" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-516"><a href="#cb1-516" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">33</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-517"><a href="#cb1-517" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-518"><a href="#cb1-518" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-519"><a href="#cb1-519" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">33</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-520"><a href="#cb1-520" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">33</span>],</span>
+<span id="cb1-521"><a href="#cb1-521" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-522"><a href="#cb1-522" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-523"><a href="#cb1-523" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-524"><a href="#cb1-524" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">33</span>], <span class="fu">c</span>(<span class="st">&quot;02023&quot;</span>, <span class="st">&quot;08020&quot;</span>, <span class="st">&quot;08021&quot;</span>)),</span>
+<span id="cb1-525"><a href="#cb1-525" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">33</span>], <span class="fu">c</span>(<span class="st">&quot;02024&quot;</span>, <span class="st">&quot;08029&quot;</span>, <span class="st">&quot;08025&quot;</span>)),</span>
+<span id="cb1-526"><a href="#cb1-526" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;santander&quot;</span></span>
+<span id="cb1-527"><a href="#cb1-527" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-528"><a href="#cb1-528" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-529"><a href="#cb1-529" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">34</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-530"><a href="#cb1-530" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-531"><a href="#cb1-531" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-532"><a href="#cb1-532" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">34</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-533"><a href="#cb1-533" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">34</span>],</span>
+<span id="cb1-534"><a href="#cb1-534" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-535"><a href="#cb1-535" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-536"><a href="#cb1-536" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-537"><a href="#cb1-537" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">34</span>], <span class="fu">c</span>(<span class="st">&quot;05036&quot;</span>, <span class="st">&quot;08020&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;09028&quot;</span>, <span class="dv">4</span>),</span>
+<span id="cb1-538"><a href="#cb1-538" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;08017&quot;</span>, <span class="st">&quot;05047&quot;</span>, <span class="st">&quot;04016&quot;</span>, <span class="st">&quot;08046&quot;</span>, </span>
+<span id="cb1-539"><a href="#cb1-539" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;09050&quot;</span>, <span class="st">&quot;05032&quot;</span>, <span class="st">&quot;05018&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;07028&quot;</span>, <span class="dv">4</span>))),</span>
+<span id="cb1-540"><a href="#cb1-540" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">34</span>], <span class="fu">c</span>(<span class="st">&quot;05033&quot;</span>, <span class="st">&quot;08051&quot;</span>, <span class="st">&quot;09003&quot;</span>, <span class="st">&quot;09048&quot;</span>, <span class="st">&quot;09051&quot;</span>, <span class="st">&quot;09053&quot;</span>,</span>
+<span id="cb1-541"><a href="#cb1-541" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;08018&quot;</span>, <span class="st">&quot;05031&quot;</span>, <span class="st">&quot;04044&quot;</span>, <span class="st">&quot;08045&quot;</span>, <span class="st">&quot;09016&quot;</span>, <span class="st">&quot;05033&quot;</span>,</span>
+<span id="cb1-542"><a href="#cb1-542" aria-hidden="true" tabindex="-1"></a>                                        <span class="st">&quot;05013&quot;</span>, <span class="st">&quot;07027&quot;</span>, <span class="st">&quot;07008&quot;</span>, <span class="st">&quot;07007&quot;</span>, <span class="st">&quot;07006&quot;</span>)),</span>
+<span id="cb1-543"><a href="#cb1-543" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;sevilla&quot;</span></span>
+<span id="cb1-544"><a href="#cb1-544" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-545"><a href="#cb1-545" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-546"><a href="#cb1-546" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">35</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-547"><a href="#cb1-547" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-548"><a href="#cb1-548" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> years_estudio,</span>
+<span id="cb1-549"><a href="#cb1-549" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">35</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-550"><a href="#cb1-550" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">35</span>],</span>
+<span id="cb1-551"><a href="#cb1-551" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-552"><a href="#cb1-552" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-553"><a href="#cb1-553" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-554"><a href="#cb1-554" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">35</span>], <span class="fu">c</span>(<span class="st">&quot;12025&quot;</span>)),</span>
+<span id="cb1-555"><a href="#cb1-555" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">35</span>], <span class="fu">c</span>(<span class="st">&quot;12042&quot;</span>)),</span>
+<span id="cb1-556"><a href="#cb1-556" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;valencia&quot;</span></span>
+<span id="cb1-557"><a href="#cb1-557" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-558"><a href="#cb1-558" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-559"><a href="#cb1-559" aria-hidden="true" tabindex="-1"></a>mi_config[[<span class="dv">36</span>]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-560"><a href="#cb1-560" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> years_estudio,</span>
+<span id="cb1-561"><a href="#cb1-561" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> <span class="dv">2001</span><span class="sc">:</span><span class="dv">2011</span>,</span>
+<span id="cb1-562"><a href="#cb1-562" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigos[<span class="dv">36</span>] <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb1-563"><a href="#cb1-563" aria-hidden="true" tabindex="-1"></a>  <span class="at">codigo        =</span> codigos[<span class="dv">36</span>],</span>
+<span id="cb1-564"><a href="#cb1-564" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb1-565"><a href="#cb1-565" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-566"><a href="#cb1-566" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">100</span>,</span>
+<span id="cb1-567"><a href="#cb1-567" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">36</span>], <span class="fu">c</span>(<span class="st">&quot;08003&quot;</span>, <span class="st">&quot;04001&quot;</span>, <span class="st">&quot;04023&quot;</span>, <span class="st">&quot;06014&quot;</span>, <span class="st">&quot;08011&quot;</span>, <span class="st">&quot;05042&quot;</span>)),</span>
+<span id="cb1-568"><a href="#cb1-568" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigos[<span class="dv">36</span>], <span class="fu">c</span>(<span class="st">&quot;08004&quot;</span>, <span class="st">&quot;04002&quot;</span>, <span class="st">&quot;04024&quot;</span>, <span class="st">&quot;06015&quot;</span>, <span class="st">&quot;08010&quot;</span>, <span class="st">&quot;05030&quot;</span>)),</span>
+<span id="cb1-569"><a href="#cb1-569" aria-hidden="true" tabindex="-1"></a>  <span class="at">ciudad        =</span> <span class="st">&quot;bilbao&quot;</span></span>
+<span id="cb1-570"><a href="#cb1-570" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-571"><a href="#cb1-571" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-572"><a href="#cb1-572" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-573"><a href="#cb1-573" aria-hidden="true" tabindex="-1"></a><span class="co"># Definir el modelo -------------------------------------------------------</span></span>
+<span id="cb1-574"><a href="#cb1-574" aria-hidden="true" tabindex="-1"></a>modelo_privacion_m3 <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb1-575"><a href="#cb1-575" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Verosimilitud</span></span>
+<span id="cb1-576"><a href="#cb1-576" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nvar) {</span>
+<span id="cb1-577"><a href="#cb1-577" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nsec) {</span>
+<span id="cb1-578"><a href="#cb1-578" aria-hidden="true" tabindex="-1"></a>      logit.p11[i, j]       <span class="sc">~</span> <span class="fu">dnorm</span>(logit.p11.pred[i, j], prec.p11.pred[i, j])<span class="sc">%_%</span><span class="fu">I</span>(, logit.P.max[i,j])</span>
+<span id="cb1-579"><a href="#cb1-579" aria-hidden="true" tabindex="-1"></a>      logit.p11.pred[i, j] <span class="ot">&lt;-</span> alfa[j] <span class="sc">+</span> beta[j] <span class="sc">*</span> (logit.p01[i, j] <span class="sc">-</span> <span class="fu">mean</span>(logit.p01[, j])) <span class="sc">+</span> sd.change <span class="sc">*</span> change[i, j]</span>
+<span id="cb1-580"><a href="#cb1-580" aria-hidden="true" tabindex="-1"></a>      change[i, j]         <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(epsilon[i, ], M[, j])</span>
+<span id="cb1-581"><a href="#cb1-581" aria-hidden="true" tabindex="-1"></a>      p11.pred[i, j]       <span class="ot">&lt;-</span> <span class="fu">exp</span>(logit.p11.pred[i, j]) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(logit.p11.pred[i, j]))</span>
+<span id="cb1-582"><a href="#cb1-582" aria-hidden="true" tabindex="-1"></a>      prec.p11.pred[i, j]  <span class="ot">&lt;-</span> frac.mues[i] <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> frac.mues[i]) <span class="sc">*</span> n11[i, j] <span class="sc">*</span> p11.pred[i, j] <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> p11.pred[i, j])</span>
+<span id="cb1-583"><a href="#cb1-583" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-584"><a href="#cb1-584" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Matrix M</span></span>
+<span id="cb1-585"><a href="#cb1-585" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ndim) {</span>
+<span id="cb1-586"><a href="#cb1-586" aria-hidden="true" tabindex="-1"></a>      M[k, j] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-587"><a href="#cb1-587" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-588"><a href="#cb1-588" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-589"><a href="#cb1-589" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Previas</span></span>
+<span id="cb1-590"><a href="#cb1-590" aria-hidden="true" tabindex="-1"></a>    alfa[j] <span class="sc">~</span> <span class="fu">dflat</span>()</span>
+<span id="cb1-591"><a href="#cb1-591" aria-hidden="true" tabindex="-1"></a>    beta[j] <span class="sc">~</span> <span class="fu">dflat</span>()</span>
+<span id="cb1-592"><a href="#cb1-592" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-593"><a href="#cb1-593" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-594"><a href="#cb1-594" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Leroux para frac.mues</span></span>
+<span id="cb1-595"><a href="#cb1-595" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nsec) {</span>
+<span id="cb1-596"><a href="#cb1-596" aria-hidden="true" tabindex="-1"></a>    <span class="fu">logit</span>(frac.mues[i]) <span class="ot">&lt;-</span> mu <span class="sc">+</span> sd.theta <span class="sc">*</span> theta[i]</span>
+<span id="cb1-597"><a href="#cb1-597" aria-hidden="true" tabindex="-1"></a>    theta[i]             <span class="sc">~</span> <span class="fu">dnorm</span>(media.theta[i], prec.theta[i])</span>
+<span id="cb1-598"><a href="#cb1-598" aria-hidden="true" tabindex="-1"></a>    prec.theta[i]       <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda.theta <span class="sc">+</span> lambda.theta <span class="sc">*</span> nvec[i]</span>
+<span id="cb1-599"><a href="#cb1-599" aria-hidden="true" tabindex="-1"></a>    media.theta[i]      <span class="ot">&lt;-</span> (lambda.theta <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> lambda.theta <span class="sc">+</span> lambda.theta <span class="sc">*</span> nvec[i])) <span class="sc">*</span></span>
+<span id="cb1-600"><a href="#cb1-600" aria-hidden="true" tabindex="-1"></a>      <span class="fu">sum</span>(theta.map[(indice[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>indice[i <span class="sc">+</span> <span class="dv">1</span>]])</span>
+<span id="cb1-601"><a href="#cb1-601" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-602"><a href="#cb1-602" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Leroux para epsilon</span></span>
+<span id="cb1-603"><a href="#cb1-603" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ndim) {</span>
+<span id="cb1-604"><a href="#cb1-604" aria-hidden="true" tabindex="-1"></a>      epsilon[i, k]       <span class="sc">~</span> <span class="fu">dnorm</span>(media.epsilon[i, k], prec.epsilon[i, k])</span>
+<span id="cb1-605"><a href="#cb1-605" aria-hidden="true" tabindex="-1"></a>      prec.epsilon[i, k]  <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda.epsilon[k] <span class="sc">+</span> lambda.epsilon[k] <span class="sc">*</span> nvec[i]</span>
+<span id="cb1-606"><a href="#cb1-606" aria-hidden="true" tabindex="-1"></a>      media.epsilon[i, k] <span class="ot">&lt;-</span> (lambda.epsilon[k] <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> lambda.epsilon[k] <span class="sc">+</span> lambda.epsilon[k] <span class="sc">*</span> nvec[i])) <span class="sc">*</span></span>
+<span id="cb1-607"><a href="#cb1-607" aria-hidden="true" tabindex="-1"></a>        <span class="fu">sum</span>(epsilon.map[(indice[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>indice[i <span class="sc">+</span> <span class="dv">1</span>], k])</span>
+<span id="cb1-608"><a href="#cb1-608" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-609"><a href="#cb1-609" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-610"><a href="#cb1-610" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nvec.tot) {</span>
+<span id="cb1-611"><a href="#cb1-611" aria-hidden="true" tabindex="-1"></a>    theta.map[i]   <span class="ot">&lt;-</span> theta[map[i]]</span>
+<span id="cb1-612"><a href="#cb1-612" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ndim) {</span>
+<span id="cb1-613"><a href="#cb1-613" aria-hidden="true" tabindex="-1"></a>      epsilon.map[i, k] <span class="ot">&lt;-</span> epsilon[map[i], k]</span>
+<span id="cb1-614"><a href="#cb1-614" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-615"><a href="#cb1-615" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-616"><a href="#cb1-616" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ndim) {</span>
+<span id="cb1-617"><a href="#cb1-617" aria-hidden="true" tabindex="-1"></a>    lambda.epsilon[i] <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-618"><a href="#cb1-618" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>ndim) {</span>
+<span id="cb1-619"><a href="#cb1-619" aria-hidden="true" tabindex="-1"></a>      corr.m[i, j] <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(M[,i], M[,j])</span>
+<span id="cb1-620"><a href="#cb1-620" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-621"><a href="#cb1-621" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-622"><a href="#cb1-622" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-623"><a href="#cb1-623" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Previas</span></span>
+<span id="cb1-624"><a href="#cb1-624" aria-hidden="true" tabindex="-1"></a>  mu           <span class="sc">~</span> <span class="fu">dflat</span>()</span>
+<span id="cb1-625"><a href="#cb1-625" aria-hidden="true" tabindex="-1"></a>  sd.change    <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb1-626"><a href="#cb1-626" aria-hidden="true" tabindex="-1"></a>  sd.theta     <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb1-627"><a href="#cb1-627" aria-hidden="true" tabindex="-1"></a>  lambda.theta <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb1-628"><a href="#cb1-628" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-629"><a href="#cb1-629" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-630"><a href="#cb1-630" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-631"><a href="#cb1-631" aria-hidden="true" tabindex="-1"></a><span class="co"># Lanzar el modelo en bucle para todas las ciudades -----------------------</span></span>
+<span id="cb1-632"><a href="#cb1-632" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="st">&quot;resultados&quot;</span>)) <span class="fu">dir.create</span>(<span class="st">&quot;resultados&quot;</span>)</span>
+<span id="cb1-633"><a href="#cb1-633" aria-hidden="true" tabindex="-1"></a>uniones <span class="ot">&lt;-</span> carto <span class="ot">&lt;-</span> censo.tot <span class="ot">&lt;-</span> censo<span class="fl">.2001</span> <span class="ot">&lt;-</span> censo<span class="fl">.2011</span> <span class="ot">&lt;-</span> p01 <span class="ot">&lt;-</span> p11 <span class="ot">&lt;-</span></span>
+<span id="cb1-634"><a href="#cb1-634" aria-hidden="true" tabindex="-1"></a>  mmodelos <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="st">&quot;list&quot;</span>, <span class="fu">length</span>(mi_config))</span>
+<span id="cb1-635"><a href="#cb1-635" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(mi_config)) {</span>
+<span id="cb1-636"><a href="#cb1-636" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>i <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">23</span>)) {</span>
+<span id="cb1-637"><a href="#cb1-637" aria-hidden="true" tabindex="-1"></a>    seleccion    <span class="ot">&lt;-</span> <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">20</span>) <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">22</span>) <span class="cf">else</span> <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">21</span>) <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">23</span>) <span class="cf">else</span> i</span>
+<span id="cb1-638"><a href="#cb1-638" aria-hidden="true" tabindex="-1"></a>    ciudad       <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="fu">unlist</span>(<span class="fu">lapply</span>(mi_config[seleccion], <span class="st">`</span><span class="at">[</span><span class="st">`</span>, <span class="st">&quot;ciudad&quot;</span>)), <span class="at">collapse =</span> <span class="st">&quot;_&quot;</span>)</span>
+<span id="cb1-639"><a href="#cb1-639" aria-hidden="true" tabindex="-1"></a>    uniones[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb1-640"><a href="#cb1-640" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">length</span>(seleccion) <span class="sc">&gt;</span> <span class="dv">1</span>) {</span>
+<span id="cb1-641"><a href="#cb1-641" aria-hidden="true" tabindex="-1"></a>      uniones[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb1-642"><a href="#cb1-642" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_along</span>(seleccion)) {</span>
+<span id="cb1-643"><a href="#cb1-643" aria-hidden="true" tabindex="-1"></a>        uniones[[i]][[j]]     <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb1-644"><a href="#cb1-644" aria-hidden="true" tabindex="-1"></a>          <span class="at">cambios         =</span> mi_config[[seleccion[j]]]<span class="sc">$</span>cambios,</span>
+<span id="cb1-645"><a href="#cb1-645" aria-hidden="true" tabindex="-1"></a>          <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> mi_config[[seleccion[j]]]<span class="sc">$</span>codigo, ],</span>
+<span id="cb1-646"><a href="#cb1-646" aria-hidden="true" tabindex="-1"></a>          <span class="at">years_estudio   =</span> mi_config[[seleccion[j]]]<span class="sc">$</span>years_estudio,</span>
+<span id="cb1-647"><a href="#cb1-647" aria-hidden="true" tabindex="-1"></a>          <span class="at">years_union     =</span> mi_config[[seleccion[j]]]<span class="sc">$</span>years_union,</span>
+<span id="cb1-648"><a href="#cb1-648" aria-hidden="true" tabindex="-1"></a>          <span class="at">censo           =</span> censo,</span>
+<span id="cb1-649"><a href="#cb1-649" aria-hidden="true" tabindex="-1"></a>          <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> mi_config[[seleccion[j]]]<span class="sc">$</span>codigo, ],</span>
+<span id="cb1-650"><a href="#cb1-650" aria-hidden="true" tabindex="-1"></a>          <span class="at">catastro        =</span> mi_config[[seleccion[[j]]]]<span class="sc">$</span>catastro,</span>
+<span id="cb1-651"><a href="#cb1-651" aria-hidden="true" tabindex="-1"></a>          <span class="at">distancia       =</span> mi_config[[seleccion[j]]]<span class="sc">$</span>distancia,</span>
+<span id="cb1-652"><a href="#cb1-652" aria-hidden="true" tabindex="-1"></a>          <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb1-653"><a href="#cb1-653" aria-hidden="true" tabindex="-1"></a>          <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb1-654"><a href="#cb1-654" aria-hidden="true" tabindex="-1"></a>          <span class="at">modo            =</span> mi_config[[seleccion[j]]]<span class="sc">$</span>modo,</span>
+<span id="cb1-655"><a href="#cb1-655" aria-hidden="true" tabindex="-1"></a>          <span class="at">sc1             =</span> mi_config[[seleccion[j]]]<span class="sc">$</span>sc1,</span>
+<span id="cb1-656"><a href="#cb1-656" aria-hidden="true" tabindex="-1"></a>          <span class="at">sc2             =</span> mi_config[[seleccion[j]]]<span class="sc">$</span>sc2</span>
+<span id="cb1-657"><a href="#cb1-657" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-658"><a href="#cb1-658" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb1-659"><a href="#cb1-659" aria-hidden="true" tabindex="-1"></a>      tmp <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb1-660"><a href="#cb1-660" aria-hidden="true" tabindex="-1"></a>      tmp[[<span class="st">&quot;cartografia&quot;</span>]] <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="fu">unlist</span>(<span class="fu">lapply</span>(uniones[[i]], <span class="st">`</span><span class="at">[</span><span class="st">`</span>, <span class="dv">1</span>), <span class="at">recursive =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb1-661"><a href="#cb1-661" aria-hidden="true" tabindex="-1"></a>      tmp[[<span class="st">&quot;censo&quot;</span>]]       <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="fu">unlist</span>(<span class="fu">lapply</span>(uniones[[i]], <span class="st">`</span><span class="at">[</span><span class="st">`</span>, <span class="dv">3</span>), <span class="at">recursive =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb1-662"><a href="#cb1-662" aria-hidden="true" tabindex="-1"></a>      uniones[[i]]         <span class="ot">&lt;-</span> tmp</span>
+<span id="cb1-663"><a href="#cb1-663" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb1-664"><a href="#cb1-664" aria-hidden="true" tabindex="-1"></a>      uniones[[i]] <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb1-665"><a href="#cb1-665" aria-hidden="true" tabindex="-1"></a>        <span class="at">cambios         =</span> mi_config[[seleccion]]<span class="sc">$</span>cambios,</span>
+<span id="cb1-666"><a href="#cb1-666" aria-hidden="true" tabindex="-1"></a>        <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> mi_config[[seleccion]]<span class="sc">$</span>codigo, ],</span>
+<span id="cb1-667"><a href="#cb1-667" aria-hidden="true" tabindex="-1"></a>        <span class="at">years_estudio   =</span> mi_config[[seleccion]]<span class="sc">$</span>years_estudio,</span>
+<span id="cb1-668"><a href="#cb1-668" aria-hidden="true" tabindex="-1"></a>        <span class="at">years_union     =</span> mi_config[[seleccion]]<span class="sc">$</span>years_union,</span>
+<span id="cb1-669"><a href="#cb1-669" aria-hidden="true" tabindex="-1"></a>        <span class="at">censo           =</span> censo,</span>
+<span id="cb1-670"><a href="#cb1-670" aria-hidden="true" tabindex="-1"></a>        <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> mi_config[[seleccion]]<span class="sc">$</span>codigo, ],</span>
+<span id="cb1-671"><a href="#cb1-671" aria-hidden="true" tabindex="-1"></a>        <span class="at">catastro        =</span> mi_config[[seleccion]]<span class="sc">$</span>catastro,</span>
+<span id="cb1-672"><a href="#cb1-672" aria-hidden="true" tabindex="-1"></a>        <span class="at">distancia       =</span> mi_config[[seleccion]]<span class="sc">$</span>distancia,</span>
+<span id="cb1-673"><a href="#cb1-673" aria-hidden="true" tabindex="-1"></a>        <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb1-674"><a href="#cb1-674" aria-hidden="true" tabindex="-1"></a>        <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb1-675"><a href="#cb1-675" aria-hidden="true" tabindex="-1"></a>        <span class="at">modo            =</span> mi_config[[seleccion]]<span class="sc">$</span>modo,</span>
+<span id="cb1-676"><a href="#cb1-676" aria-hidden="true" tabindex="-1"></a>        <span class="at">sc1             =</span> mi_config[[seleccion]]<span class="sc">$</span>sc1,</span>
+<span id="cb1-677"><a href="#cb1-677" aria-hidden="true" tabindex="-1"></a>        <span class="at">sc2             =</span> mi_config[[seleccion]]<span class="sc">$</span>sc2</span>
+<span id="cb1-678"><a href="#cb1-678" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-679"><a href="#cb1-679" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-680"><a href="#cb1-680" aria-hidden="true" tabindex="-1"></a>    carto[[i]]    <span class="ot">&lt;-</span> uniones[[i]]<span class="sc">$</span>cartografia</span>
+<span id="cb1-681"><a href="#cb1-681" aria-hidden="true" tabindex="-1"></a>    carto.vecinos <span class="ot">&lt;-</span> <span class="fu">vecindades</span>(carto[[i]])</span>
+<span id="cb1-682"><a href="#cb1-682" aria-hidden="true" tabindex="-1"></a>    tmp           <span class="ot">&lt;-</span> <span class="fu">unlist</span>(carto.vecinos)</span>
+<span id="cb1-683"><a href="#cb1-683" aria-hidden="true" tabindex="-1"></a>    carto.wb      <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-684"><a href="#cb1-684" aria-hidden="true" tabindex="-1"></a>      <span class="at">adj     =</span> tmp,</span>
+<span id="cb1-685"><a href="#cb1-685" aria-hidden="true" tabindex="-1"></a>      <span class="at">weights =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(tmp)),</span>
+<span id="cb1-686"><a href="#cb1-686" aria-hidden="true" tabindex="-1"></a>      <span class="at">num     =</span> <span class="fu">sapply</span>(carto.vecinos, length)</span>
+<span id="cb1-687"><a href="#cb1-687" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-688"><a href="#cb1-688" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-689"><a href="#cb1-689" aria-hidden="true" tabindex="-1"></a>    censo.tot[[i]]  <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(uniones[[i]]<span class="sc">$</span>censo)</span>
+<span id="cb1-690"><a href="#cb1-690" aria-hidden="true" tabindex="-1"></a>    censo<span class="fl">.2001</span>[[i]] <span class="ot">&lt;-</span> censo.tot[[i]][censo.tot[[i]][[<span class="dv">2</span>]] <span class="sc">==</span> <span class="st">&quot;2001&quot;</span>, ]</span>
+<span id="cb1-691"><a href="#cb1-691" aria-hidden="true" tabindex="-1"></a>    censo<span class="fl">.2011</span>[[i]] <span class="ot">&lt;-</span> censo.tot[[i]][censo.tot[[i]][[<span class="dv">2</span>]] <span class="sc">==</span> <span class="st">&quot;2011&quot;</span>, ]</span>
+<span id="cb1-692"><a href="#cb1-692" aria-hidden="true" tabindex="-1"></a>    censo<span class="fl">.2011</span>[[i]][, <span class="dv">11</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>][censo<span class="fl">.2011</span>[[i]][, <span class="dv">11</span> <span class="sc">+</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="sc">==</span> <span class="dv">0</span>] <span class="ot">&lt;-</span> <span class="fl">1e-4</span></span>
+<span id="cb1-693"><a href="#cb1-693" aria-hidden="true" tabindex="-1"></a>    p01[[i]]        <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(</span>
+<span id="cb1-694"><a href="#cb1-694" aria-hidden="true" tabindex="-1"></a>      censo<span class="fl">.2001</span>[[i]][, <span class="dv">4</span><span class="sc">:</span><span class="dv">11</span>] <span class="sc">/</span> censo<span class="fl">.2001</span>[[i]][, <span class="dv">11</span> <span class="sc">+</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>)]</span>
+<span id="cb1-695"><a href="#cb1-695" aria-hidden="true" tabindex="-1"></a>    )[, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb1-696"><a href="#cb1-696" aria-hidden="true" tabindex="-1"></a>    den_2011        <span class="ot">&lt;-</span> censo<span class="fl">.2011</span>[[i]][, <span class="dv">11</span> <span class="sc">+</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>)]</span>
+<span id="cb1-697"><a href="#cb1-697" aria-hidden="true" tabindex="-1"></a>    p11[[i]]        <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(censo<span class="fl">.2011</span>[[i]][, <span class="dv">4</span><span class="sc">:</span><span class="dv">11</span>] <span class="sc">/</span> den_2011)[, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb1-698"><a href="#cb1-698" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-699"><a href="#cb1-699" aria-hidden="true" tabindex="-1"></a>    aux.p11    <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">qlogis</span>(p11[[i]])</span>
+<span id="cb1-700"><a href="#cb1-700" aria-hidden="true" tabindex="-1"></a>    aux.p11[<span class="fu">is.infinite</span>(aux.p11)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb1-701"><a href="#cb1-701" aria-hidden="true" tabindex="-1"></a>    aux.p01    <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">qlogis</span>(p01[[i]])</span>
+<span id="cb1-702"><a href="#cb1-702" aria-hidden="true" tabindex="-1"></a>    aux.p01[<span class="fu">is.infinite</span>(aux.p01)] <span class="ot">&lt;-</span> <span class="fu">min</span>(aux.p01[<span class="fu">is.finite</span>(aux.p01)])</span>
+<span id="cb1-703"><a href="#cb1-703" aria-hidden="true" tabindex="-1"></a>    unos       <span class="ot">&lt;-</span> aux.p11</span>
+<span id="cb1-704"><a href="#cb1-704" aria-hidden="true" tabindex="-1"></a>    unos[<span class="fu">is.na</span>(unos)] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-705"><a href="#cb1-705" aria-hidden="true" tabindex="-1"></a>    unos[unos <span class="sc">!=</span> <span class="dv">1</span>]   <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb1-706"><a href="#cb1-706" aria-hidden="true" tabindex="-1"></a>    logit.P.max       <span class="ot">&lt;-</span> stats<span class="sc">::</span><span class="fu">qlogis</span>(<span class="fu">pmin</span>(<span class="fl">2.5</span> <span class="sc">/</span> <span class="fu">as.matrix</span>(den_2011), <span class="fl">0.999</span>))</span>
+<span id="cb1-707"><a href="#cb1-707" aria-hidden="true" tabindex="-1"></a>    logit.P.max[<span class="sc">!</span><span class="fu">is.na</span>(aux.p11)] <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb1-708"><a href="#cb1-708" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-709"><a href="#cb1-709" aria-hidden="true" tabindex="-1"></a>    p01[[i]][<span class="fu">is.nan</span>(p01[[i]])] <span class="ot">&lt;-</span> <span class="fl">1e-4</span></span>
+<span id="cb1-710"><a href="#cb1-710" aria-hidden="true" tabindex="-1"></a>    p01[[i]][p01[[i]] <span class="sc">==</span> <span class="dv">0</span>]    <span class="ot">&lt;-</span> <span class="fl">1e-4</span></span>
+<span id="cb1-711"><a href="#cb1-711" aria-hidden="true" tabindex="-1"></a>    p01[[i]][p01[[i]] <span class="sc">==</span> <span class="dv">1</span>]    <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fl">1e-4</span></span>
+<span id="cb1-712"><a href="#cb1-712" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-713"><a href="#cb1-713" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-714"><a href="#cb1-714" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Conjunto de datos</span></span>
+<span id="cb1-715"><a href="#cb1-715" aria-hidden="true" tabindex="-1"></a>    datos <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb1-716"><a href="#cb1-716" aria-hidden="true" tabindex="-1"></a>      <span class="at">nsec        =</span> <span class="fu">dim</span>(censo<span class="fl">.2001</span>[[i]])[<span class="dv">1</span>],</span>
+<span id="cb1-717"><a href="#cb1-717" aria-hidden="true" tabindex="-1"></a>      <span class="at">nvec.tot    =</span> <span class="fu">length</span>(carto.wb<span class="sc">$</span>adj),</span>
+<span id="cb1-718"><a href="#cb1-718" aria-hidden="true" tabindex="-1"></a>      <span class="at">nvec        =</span> carto.wb<span class="sc">$</span>num,</span>
+<span id="cb1-719"><a href="#cb1-719" aria-hidden="true" tabindex="-1"></a>      <span class="at">map         =</span> carto.wb<span class="sc">$</span>adj,</span>
+<span id="cb1-720"><a href="#cb1-720" aria-hidden="true" tabindex="-1"></a>      <span class="at">indice      =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">cumsum</span>(carto.wb<span class="sc">$</span>num)),</span>
+<span id="cb1-721"><a href="#cb1-721" aria-hidden="true" tabindex="-1"></a>      <span class="at">logit.p11   =</span> aux.p11[, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
+<span id="cb1-722"><a href="#cb1-722" aria-hidden="true" tabindex="-1"></a>      <span class="at">logit.p01   =</span> aux.p01[, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
+<span id="cb1-723"><a href="#cb1-723" aria-hidden="true" tabindex="-1"></a>      <span class="at">logit.P.max =</span> logit.P.max[, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>],</span>
+<span id="cb1-724"><a href="#cb1-724" aria-hidden="true" tabindex="-1"></a>      <span class="at">n11         =</span> <span class="fu">as.matrix</span>(censo<span class="fl">.2011</span>[[i]][, <span class="dv">11</span> <span class="sc">+</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>)][, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]),</span>
+<span id="cb1-725"><a href="#cb1-725" aria-hidden="true" tabindex="-1"></a>      <span class="at">nvar        =</span> <span class="dv">5</span>,</span>
+<span id="cb1-726"><a href="#cb1-726" aria-hidden="true" tabindex="-1"></a>      <span class="at">ndim        =</span> <span class="dv">5</span></span>
+<span id="cb1-727"><a href="#cb1-727" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-728"><a href="#cb1-728" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-729"><a href="#cb1-729" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Valores iniciales</span></span>
+<span id="cb1-730"><a href="#cb1-730" aria-hidden="true" tabindex="-1"></a>    inits <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb1-731"><a href="#cb1-731" aria-hidden="true" tabindex="-1"></a>      <span class="fu">list</span>(</span>
+<span id="cb1-732"><a href="#cb1-732" aria-hidden="true" tabindex="-1"></a>        <span class="at">mu             =</span> stats<span class="sc">::</span><span class="fu">runif</span>(<span class="dv">1</span>, stats<span class="sc">::</span><span class="fu">qlogis</span>(.<span class="dv">02</span>), stats<span class="sc">::</span><span class="fu">qlogis</span>(.<span class="dv">1</span>)),</span>
+<span id="cb1-733"><a href="#cb1-733" aria-hidden="true" tabindex="-1"></a>        <span class="at">alfa           =</span> stats<span class="sc">::</span><span class="fu">runif</span>(datos<span class="sc">$</span>nvar, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>),</span>
+<span id="cb1-734"><a href="#cb1-734" aria-hidden="true" tabindex="-1"></a>        <span class="at">beta           =</span> stats<span class="sc">::</span><span class="fu">rnorm</span>(datos<span class="sc">$</span>nvar, <span class="dv">0</span>, <span class="dv">2</span>),</span>
+<span id="cb1-735"><a href="#cb1-735" aria-hidden="true" tabindex="-1"></a>        <span class="at">sd.change      =</span> stats<span class="sc">::</span><span class="fu">runif</span>(<span class="dv">1</span>),</span>
+<span id="cb1-736"><a href="#cb1-736" aria-hidden="true" tabindex="-1"></a>        <span class="at">sd.theta       =</span> stats<span class="sc">::</span><span class="fu">runif</span>(<span class="dv">1</span>),</span>
+<span id="cb1-737"><a href="#cb1-737" aria-hidden="true" tabindex="-1"></a>        <span class="at">lambda.theta   =</span> stats<span class="sc">::</span><span class="fu">runif</span>(<span class="dv">1</span>),</span>
+<span id="cb1-738"><a href="#cb1-738" aria-hidden="true" tabindex="-1"></a>        <span class="at">lambda.epsilon =</span> stats<span class="sc">::</span><span class="fu">runif</span>(datos<span class="sc">$</span>ndim),</span>
+<span id="cb1-739"><a href="#cb1-739" aria-hidden="true" tabindex="-1"></a>        <span class="at">epsilon        =</span> <span class="fu">matrix</span>(stats<span class="sc">::</span><span class="fu">rnorm</span>(datos<span class="sc">$</span>ndim <span class="sc">*</span> datos<span class="sc">$</span>nsec), <span class="at">nrow =</span> datos<span class="sc">$</span>nsec),</span>
+<span id="cb1-740"><a href="#cb1-740" aria-hidden="true" tabindex="-1"></a>        <span class="at">theta          =</span> stats<span class="sc">::</span><span class="fu">rnorm</span>(datos<span class="sc">$</span>nsec),</span>
+<span id="cb1-741"><a href="#cb1-741" aria-hidden="true" tabindex="-1"></a>        <span class="at">M              =</span> <span class="fu">matrix</span>(stats<span class="sc">::</span><span class="fu">rnorm</span>(datos<span class="sc">$</span>ndim <span class="sc">*</span> datos<span class="sc">$</span>nvar), <span class="at">ncol =</span> datos<span class="sc">$</span>nvar)</span>
+<span id="cb1-742"><a href="#cb1-742" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-743"><a href="#cb1-743" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb1-744"><a href="#cb1-744" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-745"><a href="#cb1-745" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Parámetros a monitorizar</span></span>
+<span id="cb1-746"><a href="#cb1-746" aria-hidden="true" tabindex="-1"></a>    param <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;frac.mues&quot;</span>, <span class="st">&quot;mu&quot;</span>, <span class="st">&quot;alfa&quot;</span>, <span class="st">&quot;beta&quot;</span>, <span class="st">&quot;p11.pred&quot;</span>, <span class="st">&quot;sd.change&quot;</span>,</span>
+<span id="cb1-747"><a href="#cb1-747" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;sd.theta&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="st">&quot;lambda.theta&quot;</span>, <span class="st">&quot;lambda.epsilon&quot;</span>)</span>
+<span id="cb1-748"><a href="#cb1-748" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Modelo para&quot;</span>, ciudad, <span class="st">&quot;</span><span class="sc">\n\n</span><span class="st">&quot;</span>)</span>
+<span id="cb1-749"><a href="#cb1-749" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-750"><a href="#cb1-750" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ejecución en paralelo</span></span>
+<span id="cb1-751"><a href="#cb1-751" aria-hidden="true" tabindex="-1"></a>    mmodelos[[i]] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;resultado_privacion_&quot;</span>, ciudad)</span>
+<span id="cb1-752"><a href="#cb1-752" aria-hidden="true" tabindex="-1"></a>    <span class="fu">assign</span>(</span>
+<span id="cb1-753"><a href="#cb1-753" aria-hidden="true" tabindex="-1"></a>      <span class="at">x     =</span> mmodelos[[i]],</span>
+<span id="cb1-754"><a href="#cb1-754" aria-hidden="true" tabindex="-1"></a>      <span class="at">value =</span> pbugs<span class="sc">::</span><span class="fu">pbugs</span>(</span>
+<span id="cb1-755"><a href="#cb1-755" aria-hidden="true" tabindex="-1"></a>        <span class="at">data               =</span> datos,</span>
+<span id="cb1-756"><a href="#cb1-756" aria-hidden="true" tabindex="-1"></a>        <span class="at">inits              =</span> inits,</span>
+<span id="cb1-757"><a href="#cb1-757" aria-hidden="true" tabindex="-1"></a>        <span class="at">parameters.to.save =</span> param,</span>
+<span id="cb1-758"><a href="#cb1-758" aria-hidden="true" tabindex="-1"></a>        <span class="at">model.file         =</span> modelo_privacion_m3,</span>
+<span id="cb1-759"><a href="#cb1-759" aria-hidden="true" tabindex="-1"></a>        <span class="at">n.chains           =</span> <span class="dv">3</span>,</span>
+<span id="cb1-760"><a href="#cb1-760" aria-hidden="true" tabindex="-1"></a>        <span class="at">n.iter             =</span> <span class="dv">100000</span>,</span>
+<span id="cb1-761"><a href="#cb1-761" aria-hidden="true" tabindex="-1"></a>        <span class="at">n.burnin           =</span> <span class="dv">25000</span>,</span>
+<span id="cb1-762"><a href="#cb1-762" aria-hidden="true" tabindex="-1"></a>        <span class="at">save.history       =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-763"><a href="#cb1-763" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-764"><a href="#cb1-764" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-765"><a href="#cb1-765" aria-hidden="true" tabindex="-1"></a>    <span class="fu">save</span>(</span>
+<span id="cb1-766"><a href="#cb1-766" aria-hidden="true" tabindex="-1"></a>      <span class="at">list =</span> mmodelos[[i]],</span>
+<span id="cb1-767"><a href="#cb1-767" aria-hidden="true" tabindex="-1"></a>      <span class="at">file =</span> <span class="fu">paste0</span>(<span class="st">&quot;resultados/resultado_privacion_&quot;</span>, ciudad, <span class="st">&quot;.RData&quot;</span>)</span>
+<span id="cb1-768"><a href="#cb1-768" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-769"><a href="#cb1-769" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-770"><a href="#cb1-770" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-771"><a href="#cb1-771" aria-hidden="true" tabindex="-1"></a>carto[<span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">23</span>)] <span class="ot">&lt;-</span> p01[<span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">23</span>)] <span class="ot">&lt;-</span> mmodelos[<span class="fu">c</span>(<span class="dv">22</span>, <span class="dv">23</span>)] <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb1-772"><a href="#cb1-772" aria-hidden="true" tabindex="-1"></a>q11.pred     <span class="ot">&lt;-</span> <span class="fu">lapply</span>(mmodelos, <span class="cf">function</span>(x) <span class="fu">mi_escala</span>(<span class="fu">eval</span>(<span class="fu">as.name</span>(x))<span class="sc">$</span>mean<span class="sc">$</span>p11.pred))</span>
+<span id="cb1-773"><a href="#cb1-773" aria-hidden="true" tabindex="-1"></a>q01          <span class="ot">&lt;-</span> <span class="fu">lapply</span>(p01, mi_escala)</span>
+<span id="cb1-774"><a href="#cb1-774" aria-hidden="true" tabindex="-1"></a>numero_sc    <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">lapply</span>(p01, nrow))</span>
+<span id="cb1-775"><a href="#cb1-775" aria-hidden="true" tabindex="-1"></a>qmod.tot     <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, q01), <span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, q11.pred))</span>
+<span id="cb1-776"><a href="#cb1-776" aria-hidden="true" tabindex="-1"></a>indice_model <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(stats<span class="sc">::</span><span class="fu">princomp</span>(qmod.tot)<span class="sc">$</span>scores[, <span class="dv">1</span>])</span>
+<span id="cb1-777"><a href="#cb1-777" aria-hidden="true" tabindex="-1"></a>carto_unida  <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="fu">lapply</span>(carto, <span class="cf">function</span>(x) x[, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">6</span>)]))</span>
+<span id="cb1-778"><a href="#cb1-778" aria-hidden="true" tabindex="-1"></a>indices      <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-779"><a href="#cb1-779" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_01 =</span> indice_model[<span class="dv">1</span><span class="sc">:</span><span class="fu">sum</span>(numero_sc)],</span>
+<span id="cb1-780"><a href="#cb1-780" aria-hidden="true" tabindex="-1"></a>  <span class="at">model_11 =</span> indice_model[(<span class="fu">sum</span>(numero_sc) <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>(<span class="fu">sum</span>(numero_sc) <span class="sc">*</span> <span class="dv">2</span>)],</span>
+<span id="cb1-781"><a href="#cb1-781" aria-hidden="true" tabindex="-1"></a>  <span class="at">muni     =</span> carto_unida<span class="sc">$</span>CUMUN</span>
+<span id="cb1-782"><a href="#cb1-782" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="referencias-bibliográficas" class="section level1 unnumbered">
+<h1 class="unnumbered">Referencias bibliográficas</h1>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Botella-Rocamora2015" class="csl-entry">
+<p>Botella-Rocamora, P., M. A. Martinez-Beneito, and S. Banerjee. 2015. <span>“<span class="nocase">A unifying modeling framework for highly multivariate disease mapping</span>.”</span> <em>Statistics in Medicine</em> 34 (9): 1548–59. <a href="https://doi.org/10.1002/sim.6423">https://doi.org/10.1002/sim.6423</a>.</p>
+</div>
+<div id="ref-Dominguez-Berjon2008" class="csl-entry">
+<p>Domínguez-Berjón, M. Felícitas, Carme Borrell, Gemma Cano-Serral, Santiago Esnaola, Andreu Nolasco, M. Isabel Pasarín, Rebeca Ramis, Carme Saurina, and Antonio Escolar-Pujolar. 2008. <span>“<span class="nocase">Construcci<span class="nocase">ó</span>n de un <span class="nocase">í</span>ndice de privaci<span class="nocase">ó</span>n a partir de datos censales en grandes ciudades espa<span class="nocase">ñ</span>olas (Proyecto MEDEA)</span>.”</span> <em>Gaceta Sanitaria</em> 22 (3): 179–87. <a href="https://doi.org/10.1157/13123961">https://doi.org/10.1157/13123961</a>.</p>
+</div>
+<div id="ref-Fleiss2003" class="csl-entry">
+<p>Fleiss, Joseph L., Bruce Levin, and Myunghee Cho Paik. 2003. <em><span class="nocase">Statistical Methods for Rates and Proportions</span></em>. Hoboken, NJ: John Wiley <span>&amp;</span> Sons. <a href="https://doi.org/10.1002/0471445428">https://doi.org/10.1002/0471445428</a>.</p>
+</div>
+<div id="ref-Leroux2000" class="csl-entry">
+<p>Leroux, Brian G, Xingye Lei, and Norman Breslow. 2000. <span>“<span class="nocase">Estimation of Disease Rates in Small Areas: A new Mixed Model for Spatial Dependence</span>.”</span> In <em>Statistical Models in Epidemiology, the Environment and Clinical Trials</em>, edited by M. Elizabeth Halloran and Donald Berry, 179–91. New York, NY: Springer. <a href="https://doi.org/10.1007/978-1-4612-1284-3_4">https://doi.org/10.1007/978-1-4612-1284-3_4</a>.</p>
+</div>
+<div id="ref-Martinez-Beneito2013" class="csl-entry">
+<p>Martinez-Beneito, M. A. 2013. <span>“<span class="nocase">A general modelling framework for multivariate disease mapping</span>.”</span> <em>Biometrika</em> 100 (3): 539–53. <a href="https://doi.org/10.1093/biomet/ast023">https://doi.org/10.1093/biomet/ast023</a>.</p>
+</div>
+<div id="ref-Mercer2014" class="csl-entry">
+<p>Mercer, Laina, Jon Wakefield, Cici Chen, and Thomas Lumley. 2014. <span>“<span class="nocase">A comparison of spatial smoothing methods for small area estimation with sampling weights</span>.”</span> <em>Spatial Statistics</em> 8 (C): 69–85. <a href="https://doi.org/10.1016/j.spasta.2013.12.001">https://doi.org/10.1016/j.spasta.2013.12.001</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -7,7 +7,7 @@ output:
   rmarkdown::html_vignette:
     number_sections: true
 vignette: >
-  %\VignetteIndexEntry{Protocolo de geocodificacion MEDEA 3}
+  %\VignetteIndexEntry{Protocolo de geocodificación MEDEA 3}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---

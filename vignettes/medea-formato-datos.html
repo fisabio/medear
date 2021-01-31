@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Grupo MEDEA" />
+
+<meta name="date" content="2019-09-25" />
+
+<title>Formato de las bases de datos en el Proyecto MEDEA3</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Formato de las bases de datos en el Proyecto MEDEA3</h1>
+<h3 class="subtitle">Versión 1.4</h3>
+<h4 class="author">Grupo MEDEA</h4>
+<h4 class="date">2019-09-25</h4>
+
+
+
+<div id="introducción" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Introducción</h1>
+<p>Este documento describe el formato en el que cada uno de los grupos debería estructurar la información del proyecto MEDEA3 para su transmisión al nodo coordinador. De esta forma se pretende que el formato de la información manejada, y transmitida, por todos los grupos sea completamente equivalente y por tanto el tratamiento estadístico que se le habría de dar.</p>
+<p>Cabe mencionar que el paquete <code>medear</code>, creado para dar cobertura al proyecto MEDEA3 en el entorno estadístico <code>R</code>, dispone de forma interna de:</p>
+<ul>
+<li><p>Los datos de poblaciones por edad, sexo, año y sección censal para todas las ciudades MEDEA3 en todo el período de estudio (1996-2015). Cabe señalar que para cada año y ciudad el número de secciones censales puede cambiar por redefinición del seccionado censal. Como veremos, las utilidades del paquete MEDEA unificarán dichas secciones a un entramado común y modificarán los datos de poblaciones adecuándolos a dicho entramado.</p></li>
+<li><p>La cartografía del seccionado censal para el año 2011 para cada ciudad del proyecto (Fuente INE). Hemos considerado 2011 como año de referencia dada su coincidencia con uno de los censos que manejamos. La función de modificación del seccionado censal propondrá una serie de uniones de esta cartografía, siendo la cartografía final una modificación (agregación) de la del año 2011.</p></li>
+<li><p>La información socioeconómica de los censos de 2001 y 2011. Al igual que antes, el número de secciones censales de ambos censos no coincidirá, por lo que habrá que emplear las utilidades del paquete para unificar el seccionado de ambos años.</p></li>
+</ul>
+<p>Asimismo, el paquete también incorpora la función <code>une_secciones</code>, que se encarga de realizar las uniones de seccionado de las que hemos estado hablando. La base de información de esa función son los callejeros que proporciona el INE para los distintos años de estudio. Para el año 1996 ha sido necesario adquirir dicho archivo. Estos callejeros proporcionan la sección censal de cada tramo de vía para cada año de estudio y así, cruzando la información de los distintos años, podremos identificar qué tramos han cambiado de sección y entre qué secciones. De esta forma identificamos las secciones censales que se solapan en el tiempo. Adicionalmente, además de determinar qué secciones censales habrían de ser unidas para garantizar la estabilidad temporal de estas agrupaciones, <code>une_secciones</code> también prepara la cartografía unificada, los datos de población y mortalidad (y en un futuro la información socioeconómica) según el formato común requerido. Por tanto, aconsejamos el uso de <code>une_secciones</code> para generar la información en el formato unificado del proyecto, se haya seguido o no su protocolo de geocodificación.</p>
+<p>En este sentido, el documento de aquí en adelante se divide en dos secciones adicionales. La segunda sección describe con cierto detalle el formato que deberían tener los datos para ser transmitidos al nodo coordinador. Esta sección será de utilidad para aquellos nodos que no hayan seguido el protocolo de geocodificación del proyecto y quizá tengan que adaptar su información a la del resto del proyecto de forma más manual. Aquellos nodos que han seguido el protocolo de geocodificación del proyecto para geocodificar las defunciones de sus ciudades, pueden pasar directamente a la tercera sección de este documento, en la que se describe, ciudad por ciudad, la sintaxis que se debería ejecutar para obtener la información de sus ciudades según los requerimientos unificados del proyecto. Para aquellos nodos que no hayan seguido el protocolo de geocodificación la tercera parte del documento describe cómo creemos, desde el nodo coordinador, que deberían proceder para estructurar sus datos de acuerdo con el resto del proyecto.</p>
+</div>
+<div id="formato-de-las-bases-de-datos" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Formato de las bases de datos</h1>
+<p>A continuación detallamos el formato en el que se debería estructurar la información para transmitirla al nodo coordinador. Notar que el presente documento lleva adjunto, a modo de ejemplo, la información estructurada, tal y como se describe a continuación, para la ciudad de Castellón (archivo <code>castellon.RData</code>), con la información de mortalidad censurada (todos los datos son valores perdidos). De esta forma cualquier grupo interesado podrá consultar con detalle el formato exacto que se espera de cada ciudad y adaptar su información a dicho formato.</p>
+<p>En resumen, para cada ciudad los datos se guardarán en un objeto de clase lista dentro de un archivo <code>.RData</code> (propio de <code>R</code>) cuyo contenido será:</p>
+<ul>
+<li><p>Objeto <code>cartografia</code>: contiene la cartografía correspondiente a la unión de secciones censales que conducen a una agrupación de secciones temporalmente estable. En caso de no agregar ninguna sección censal (p. ej., al disponer de información de poblaciones a nivel puntual), la cartografía de 2011 sin ninguna modificación sería perfectamente válida. En ese caso se podría hacer uso de la función <code>une_secciones</code>, limitando el número de años para realizar la unión del seccionado a simplemente el año 2011 (argumento: <code>years_union = 2011</code>), con lo que no se llevará a cabo ninguna unión sobre el seccionado de 2011.</p></li>
+<li><p>Objeto <code>poblacion</code>: <code>array</code> 4-dimensional de dimensiones (en este orden): Año (20 niveles), Sexo (2 niveles), Edad (18 niveles) y Secciones (número de niveles depende de la ciudad). Cada una de las celdas contiene la población correspondiente a cada una de estas combinaciones de factores. En el archivo <code>castellon.RData</code> adjunto se puede consultar las etiquetas de las dimensiones del <code>array</code> generadas por <code>une_secciones</code>. El <code>array</code> de poblaciones para todas las ciudades debería tener esas mismas etiquetas, salvo obviamente las relativas a las secciones censales que variarán de ciudad en ciudad. Notar que el <code>array</code> de poblaciones, incluye las secciones censales resultantes del proceso de agregación que se ha llevado a cabo en la cartografía. Por tanto, cartografía y poblaciones (para todos los años del periodo de estudio) serán coherentes en este sentido.</p></li>
+<li><p>Objeto <code>mortalidad</code>: <code>array</code> 5-dimensional. Las cuatro primeras dimensiones de este <code>array</code> serían las mismas que las del <code>array</code> de poblaciones. La quinta dimensión identifica las causas de mortalidad que se acordaron como objetivos generales del proyecto. Dichas causas de mortalidad, así como su definición, vienen reflejadas en la Tabla 1. Nuevamente, las etiquetas de las causas de muerte se pueden consultar en el objeto correspondiente al <code>array</code> de mortalidad del archivo <code>castellon.RData</code>.</p></li>
+<li><p>Objeto <code>censo</code>: <code>data.frame</code> con el valor de los indicadores (numeradores y denominadores) por sección censal para los años 2001 y 2011.</p></li>
+</ul>
+<p>Para aquellos nodos que no vayan a agregar ninguna sección censal para el periodo de estudio, aconsejamos lo siguiente:</p>
+<ol style="list-style-type: decimal">
+<li><p>Ejecutar la función <code>une_secciones</code> delimitando el periodo de unión de cartografía al año 2011 como hemos sugerido anteriormente (argumento: <code>years_union = 2011</code>). Esto generará la lista correspondiente con la cartografía adecuada (año 2011 sin ninguna unión entre secciones) y el <code>array</code> de mortalidad correspondiente a dicho seccionado. Además, el resto de elementos de la lista que hemos generado ya tendrán el formato final adecuado para su transmisión al nodo coordinador.</p></li>
+<li><p>La información sobre población (y en un futuro sobre la información socioeconómica) generada en el paso anterior estará vacía si el periodo de extracción de la información es distinto al periodo de agregación de secciones censales. En ese caso, esa información debería ser completada con la información disponible por cada nodo en la que se convierte la información puntual de cada año para poblaciones (y socioeconómica) al entramado censal del año 2011. Es muy aconsejable que se mantenga el formato del <code>array</code> de población (y en su caso socioeconómico) generado en el paso anterior.</p></li>
+</ol>
+<p>El primer paso de estos dos será descrito para cada ciudad en el siguiente apartado mientras que el segundo será labor propia de cada nodo que tenga que llevarlo a cabo. Los grupos que hayan seguido el protocolo de geocodificación en ningún caso será necesario que ejecuten el segundo paso.</p>
+<p>Agradeceríamos que nos hicierais llegar la información de vuestras ciudades exactamente en el formato descrito al inicio de este apartado. Si por algún motivo encontrarais problemático generar la información en ese formato poneros por favor en contacto con Carlos Vergara (<a href="mailto:vergara_car@gva.es" class="email">vergara_car@gva.es</a>) para que valoremos, si es posible, algún formato paralelo para transmitirnos la información.</p>
+<table class="table table-striped table-hover table-condensed table-responsive" style="font-size: 11px; margin-left: auto; margin-right: auto;">
+<caption style="font-size: initial !important;">
+Tabla 1: Causas de defunción consideradas en MEDEA3 (criterios de selección de causas tal y como fueron definidos, y transmitidos al nodo coordinador, por Lluis Cirera).
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;font-weight: bold;font-size: 14px;">
+Causa
+</th>
+<th style="text-align:left;font-weight: bold;font-size: 14px;">
+Causa abreviada
+</th>
+<th style="text-align:left;font-weight: bold;font-size: 14px;">
+Short term
+</th>
+<th style="text-align:center;font-weight: bold;font-size: 14px;">
+Códigos CIE-9
+</th>
+<th style="text-align:center;font-weight: bold;font-size: 14px;">
+Códigos CIE-10
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<span style="     ">SIDA</span>
+</td>
+<td style="text-align:left;">
+SIDA
+</td>
+<td style="text-align:left;">
+AIDS
+</td>
+<td style="text-align:center;">
+279(.5.6)
+</td>
+<td style="text-align:center;">
+B20-B24
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumor maligno del estómago</span>
+</td>
+<td style="text-align:left;">
+Cáncer del estómago
+</td>
+<td style="text-align:left;">
+Gastric cancer
+</td>
+<td style="text-align:center;">
+151
+</td>
+<td style="text-align:center;">
+C16
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumor maligno del colon</span>
+</td>
+<td style="text-align:left;">
+Cáncer de colon
+</td>
+<td style="text-align:left;">
+Colon cancer
+</td>
+<td style="text-align:center;">
+153
+</td>
+<td style="text-align:center;">
+C18
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumor maligno de recto, sigmoide y ano</span>
+</td>
+<td style="text-align:left;">
+Cáncer de recto
+</td>
+<td style="text-align:left;">
+Rectal cancer
+</td>
+<td style="text-align:center;">
+154
+</td>
+<td style="text-align:center;">
+C19-21
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<span style=" font-weight: bold;    ">Agrupación</span>
+</td>
+<td style="text-align:left;">
+Cáncer colorrectal
+</td>
+<td style="text-align:left;">
+Colorectal cancer
+</td>
+<td style="text-align:center;">
+153-154
+</td>
+<td style="text-align:center;">
+C18-C21
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumor maligno de laringe</span>
+</td>
+<td style="text-align:left;">
+Cáncer de laringe
+</td>
+<td style="text-align:left;">
+Laryngeal cancer
+</td>
+<td style="text-align:center;">
+161
+</td>
+<td style="text-align:center;">
+C32
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumor maligno de tráquea, bronquios y pulmón</span>
+</td>
+<td style="text-align:left;">
+Cáncer de pulmón
+</td>
+<td style="text-align:left;">
+Lung cancer
+</td>
+<td style="text-align:center;">
+162
+</td>
+<td style="text-align:center;">
+C33-34
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumor maligno de mama femenino</span>
+</td>
+<td style="text-align:left;">
+Cáncer de mama (mujer)
+</td>
+<td style="text-align:left;">
+Brest cancer (woman)
+</td>
+<td style="text-align:center;">
+174
+</td>
+<td style="text-align:center;">
+C50
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumor maligno de próstata</span>
+</td>
+<td style="text-align:left;">
+Cáncer de próstata
+</td>
+<td style="text-align:left;">
+Prostate cancer
+</td>
+<td style="text-align:center;">
+185
+</td>
+<td style="text-align:center;">
+C61
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumor maligno de vejiga</span>
+</td>
+<td style="text-align:left;">
+Cáncer de vejiga
+</td>
+<td style="text-align:left;">
+Bladder cancer
+</td>
+<td style="text-align:center;">
+188
+</td>
+<td style="text-align:center;">
+C67
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Tumores hematológicos malignos</span>
+</td>
+<td style="text-align:left;">
+Cáncer hematológico
+</td>
+<td style="text-align:left;">
+Hematologic cancer<sup>*</sup>
+</td>
+<td style="text-align:center;">
+200-208, 273.3
+</td>
+<td style="text-align:center;">
+C81-C96
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Diabetes Mellitus</span>
+</td>
+<td style="text-align:left;">
+Diabetes Mellitus
+</td>
+<td style="text-align:left;">
+Diabetes Mellitus
+</td>
+<td style="text-align:center;">
+250
+</td>
+<td style="text-align:center;">
+E10-E14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Trastornos mentales orgánicos, senil y presenil</span>
+</td>
+<td style="text-align:left;">
+Trastornos mentales orgánicos
+</td>
+<td style="text-align:left;">
+Organic mental disorders
+</td>
+<td style="text-align:center;">
+290 (excepto 290.1)
+</td>
+<td style="text-align:center;">
+F00-F09
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Enfermedad de Alzheimer</span>
+</td>
+<td style="text-align:left;">
+Enfermedad de Alzheimer
+</td>
+<td style="text-align:left;">
+Alzheimer’s disease
+</td>
+<td style="text-align:center;">
+290.1, 331.0
+</td>
+<td style="text-align:center;">
+G30
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<span style=" font-weight: bold;    ">Agrupación</span>
+</td>
+<td style="text-align:left;">
+Demencia
+</td>
+<td style="text-align:left;">
+Dementia
+</td>
+<td style="text-align:center;">
+290, 331.0
+</td>
+<td style="text-align:center;">
+F00-F09, G30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Enfermedad isquémica del corazón</span>
+</td>
+<td style="text-align:left;">
+Enfermedad isquémica del corazón
+</td>
+<td style="text-align:left;">
+Ischemic heart disease<sup>†</sup>
+</td>
+<td style="text-align:center;">
+410-414
+</td>
+<td style="text-align:center;">
+I20-I25
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Enfermedad cerebrovascular</span>
+</td>
+<td style="text-align:left;">
+Ictus
+</td>
+<td style="text-align:left;">
+Ictus
+</td>
+<td style="text-align:center;">
+430-434, 436-438
+</td>
+<td style="text-align:center;">
+I60-I69
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Enfermedad pulmonar obstructiva crónica</span>
+</td>
+<td style="text-align:left;">
+EPOC
+</td>
+<td style="text-align:left;">
+COPD
+</td>
+<td style="text-align:center;">
+490-492, 494-496
+</td>
+<td style="text-align:center;">
+J40-J44, J47
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Cirrosis y enfermedades crónicas del hígado</span>
+</td>
+<td style="text-align:left;">
+Cirrosis del hígado
+</td>
+<td style="text-align:left;">
+Liver cirrhosis
+</td>
+<td style="text-align:center;">
+571
+</td>
+<td style="text-align:center;">
+K70, K72.1, K73, K74, K76.1.9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Suicidios y lesiones autoinflingidas</span>
+</td>
+<td style="text-align:left;">
+Suicidios
+</td>
+<td style="text-align:left;">
+Suicide
+</td>
+<td style="text-align:center;">
+E950-E959
+</td>
+<td style="text-align:center;">
+X60-X84
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="     ">Lesiones por accidentes de tráfico de vehículos de motor</span>
+</td>
+<td style="text-align:left;">
+Accidentes de tráfico
+</td>
+<td style="text-align:left;">
+Traffic accident
+</td>
+<td style="text-align:center;">
+<sup>‡</sup>
+</td>
+<td style="text-align:center;">
+E810-E819
+</td>
+</tr>
+<tr>
+<td style="text-align:left; padding-left: 2em;" indentlevel="1">
+<span style=" font-weight: bold;    ">Agrupación</span>
+</td>
+<td style="text-align:left;">
+Todas las causas
+</td>
+<td style="text-align:left;">
+All causes
+</td>
+<td style="text-align:center;">
+000-E999
+</td>
+<td style="text-align:center;">
+A00-Z99
+</td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td style="padding: 0; border: 0;" colspan="100%">
+<sup>*</sup> Haematologic in Br. English.
+</td>
+</tr>
+<tr>
+<td style="padding: 0; border: 0;" colspan="100%">
+<sup>†</sup> Ischaemic heart disease in Br. English.
+</td>
+</tr>
+<tr>
+<td style="padding: 0; border: 0;" colspan="100%">
+<sup>‡</sup> Códigos: V02-V04(.1.9), V09(.2.3), V12-V14.(3.4.5.9), V19(.4.5.6.9), V20-V28(.3.4.5.9), V29(.4.5.6.9), V20-V28(.3.4.5.7.9), V29(.4.5.6.9), V30-V38(.3.4.5.7.9), V39(.4.5.6.9), V40-V48(.3.4.5.7.9), V49(.4.5.6.9), V50-V58(.3.4.5.7.9), V59(.4.5.6.9), V60-V68(.3.4.5.7.9), V69(.4.5.6.9), V70-V78(.3.4.5.7.9), V79(.4.5.6.9), V80(.3.4.5), V81-V82(.1), V83-V86(.0.1.2.3), V87(.0.1.2.3.4.5.6.7.8), V89(.2.9).
+</td>
+</tr>
+</tfoot>
+</table>
+</div>
+<div id="generación-de-la-información-del-proyecto-mediante-medear" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Generación de la información del proyecto mediante <code>medear</code></h1>
+<div id="común-a-todos-los-grupos" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Común a todos los grupos</h2>
+<p>En primer lugar deberíamos asegurarnos de disponer de la última versión del paquete <code>medear</code>, y cargarla. Para ello deberíamos hacer:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="st">&quot;devtools&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>()) <span class="fu">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;fisabio/medear&quot;</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(medear)</span></code></pre></div>
+<p>Adicionalmente, deberíamos cargar los datos de cambios de secciones censales, la cartografía que viene junto con el paquete y los datos de poblaciones. Estos últimos se cargarán con la función <code>carga_datos</code>. Esta función debe llevar como argumento la contraseña que da acceso a los datos de poblaciones (de los años 1996-2003), si no no podremos disponer de dicha información (parcialmente de pago y por tanto protegida). Cabe mencionar que <code>carga_datos</code> también da acceso a la información (protegida) socioeconómica del proyecto.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;cambios_seccion&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;cartografia&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>key_pobla <span class="ot">&lt;-</span> <span class="st">&quot;clave_poblacion&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>key_censo <span class="ot">&lt;-</span> <span class="st">&quot;clave_censo&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>poblacion <span class="ot">&lt;-</span> <span class="fu">carga_datos</span>(key_pobla, <span class="at">tipo =</span> <span class="st">&quot;poblacion&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>censo     <span class="ot">&lt;-</span> <span class="fu">carga_datos</span>(key_censo, <span class="at">tipo =</span> <span class="st">&quot;censo&quot;</span>)</span></code></pre></div>
+<p>Para poder emplear los datos de población y los indicadores del censo para el cálculo del índice de privación, es necesario disponer de dos contraseñas, las cuales podéis obtener poniéndoos en contacto con Carlos Vergara (<a href="mailto:vergara_car@gva.es" class="email">vergara_car@gva.es</a>).</p>
+<p>Finalmente, habrá que cargar la información individual de mortalidad geocodificada que, en caso de haber seguido el protocolo de geocodificación, se encontrará en el directorio de trabajo en un archivo denominado <code>mortalidad_geocodificada.RData</code> (habrá que ajustar su nombre en caso contrario).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;mortalidad_geocodificada.RData&quot;</span>)</span></code></pre></div>
+<p>En principio, este archivo debería contener la información de todas las ciudades MEDEA3 correspondientes a cada grupo, o incluso más defunciones si se hubiera geocodificado la mortalidad de toda la comunidad autónoma correspondiente (esto no sería problema). Si tuviéramos la información de mortalidad de cada ciudad geocodificada en archivos distintos tampoco sería problema: simplemente habríamos de cargar la información de mortalidad de la ciudad para la que queramos generar la información.</p>
+<p>Aquellos grupos que no siguieran el protocolo de geocodificación de MEDEA3 y por tanto no tengan un archivo <code>mortalidad_geocodificada.RData</code>, deberían tener en su sustitución un <code>data.frame</code> en <code>R</code>, llamado <code>datosmort</code>, con registros individuales y al menos las siguientes columnas con exactamente estos nombres (<strong>importante</strong>), codificadas exactamente de la forma que se describe:</p>
+<ul>
+<li><code>year_defuncion</code>: año de defunción (clase numérica).</li>
+<li><code>sexo</code>: 0 = masculino, 1 = femenino (clase numérica).</li>
+<li><code>edad</code>: edad en años a la fecha de defunción (clase numérica).</li>
+<li><code>lat</code>: latitud según la geocodificación llevada a cabo (clase numérica).</li>
+<li><code>lng</code>: longitud según la geocodificación llevada a cabo (clase numérica).</li>
+<li><code>causa_defuncion</code>: campo de tipo carácter con el código CIE 9 o 10, según el año, de la defunción correspondiente. Todo registro de este campo debe tener al menos 3 caracteres. En los registros que tuvieran menos, probablemente haya que añadir ceros a la izquierda.</li>
+</ul>
+<p>A continuación se describe la llamada a la sentencia <code>une_secciones</code> tal y como debería ejecutarse para cada ciudad (a juicio del nodo coordinador), una vez ejecutadas las sentencias anteriores (y adaptado el formato de las bases de datos si así fuera el caso). Estas llamadas asumen que se han dado por buenas las uniones de seccionado propuestas en su día por el nodo coordinador a cada uno de los grupos del proyecto.</p>
+</div>
+<div id="andalucia" class="section level2" number="3.2">
+<h2 number="3.2"><span class="header-section-number">3.2</span> Andalucia</h2>
+<div id="almería" class="section level3" number="3.2.1">
+<h3 number="3.2.1"><span class="header-section-number">3.2.1</span> Almería</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>codigo  <span class="ot">&lt;-</span> <span class="st">&quot;04013&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>almeria <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;07040&quot;</span>, <span class="st">&quot;07040&quot;</span>)),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;07023&quot;</span>, <span class="st">&quot;07024&quot;</span>))</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(almeria, <span class="at">file =</span> <span class="st">&quot;almeria.RData&quot;</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="cádiz" class="section level3" number="3.2.2">
+<h3 number="3.2.2"><span class="header-section-number">3.2.2</span> Cádiz</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;11012&quot;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,  <span class="st">&quot;1101208017&quot;</span>, <span class="st">&quot;1101209002&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>cadiz           <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05003&quot;</span>, <span class="st">&quot;10014&quot;</span>)),</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;04006&quot;</span>, <span class="st">&quot;10006&quot;</span>))</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(cadiz, <span class="at">file =</span> <span class="st">&quot;cadiz.RData&quot;</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="córdoba" class="section level3" number="3.2.3">
+<h3 number="3.2.3"><span class="header-section-number">3.2.3</span> Córdoba</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;14021&quot;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,  <span class="st">&quot;1402109024&quot;</span>, <span class="st">&quot;1402109026&quot;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>cordoba         <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06047&quot;</span>, <span class="st">&quot;09035&quot;</span>, <span class="st">&quot;10041&quot;</span>, <span class="st">&quot;09014&quot;</span>, <span class="st">&quot;09003&quot;</span>)),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06024&quot;</span>, <span class="st">&quot;09003&quot;</span>, <span class="st">&quot;10045&quot;</span>, <span class="st">&quot;09020&quot;</span>, <span class="st">&quot;09032&quot;</span>))</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(cordoba, <span class="at">file =</span> <span class="st">&quot;cordoba.RData&quot;</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="granada" class="section level3" number="3.2.4">
+<h3 number="3.2.4"><span class="header-section-number">3.2.4</span> Granada</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>codigo  <span class="ot">&lt;-</span> <span class="st">&quot;18087&quot;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>granada <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06024&quot;</span>, <span class="st">&quot;07026&quot;</span>, <span class="st">&quot;07020&quot;</span>, <span class="st">&quot;06011&quot;</span>, <span class="st">&quot;03013&quot;</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;02039&quot;</span>, <span class="st">&quot;03004&quot;</span>, <span class="st">&quot;02021&quot;</span>, <span class="st">&quot;02038&quot;</span>, <span class="st">&quot;02038&quot;</span>, <span class="st">&quot;02006&quot;</span>)),</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06021&quot;</span>, <span class="st">&quot;07019&quot;</span>, <span class="st">&quot;07018&quot;</span>, <span class="st">&quot;06018&quot;</span>, <span class="st">&quot;03010&quot;</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;02031&quot;</span>, <span class="st">&quot;03006&quot;</span>, <span class="st">&quot;06015&quot;</span>, <span class="st">&quot;02048&quot;</span>, <span class="st">&quot;02022&quot;</span>, <span class="st">&quot;02013&quot;</span>))</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(granada, <span class="at">file =</span> <span class="st">&quot;granada.RData&quot;</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="huelva" class="section level3" number="3.2.5">
+<h3 number="3.2.5"><span class="header-section-number">3.2.5</span> Huelva</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;21041&quot;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,  <span class="st">&quot;2104108001&quot;</span>, <span class="st">&quot;2104102005&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>huelva          <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;07018&quot;</span>)),</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;07013&quot;</span>))</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(huelva, <span class="at">file =</span> <span class="st">&quot;huelva.RData&quot;</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="jaén" class="section level3" number="3.2.6">
+<h3 number="3.2.6"><span class="header-section-number">3.2.6</span> Jaén</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>codigo <span class="ot">&lt;-</span> <span class="st">&quot;23050&quot;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>jaen   <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05011&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;03009&quot;</span>, <span class="dv">3</span>), <span class="st">&quot;04008&quot;</span>)),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05012&quot;</span>, <span class="st">&quot;03006&quot;</span>, <span class="st">&quot;03008&quot;</span>, <span class="st">&quot;03005&quot;</span>, <span class="st">&quot;04006&quot;</span>))</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(jaen, <span class="at">file =</span> <span class="st">&quot;jaen.RData&quot;</span>)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="málaga" class="section level3" number="3.2.7">
+<h3 number="3.2.7"><span class="header-section-number">3.2.7</span> Málaga</h3>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;29067&quot;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,  <span class="st">&quot;2906702006&quot;</span>, <span class="st">&quot;2906710025&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>malaga          <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;08056&quot;</span>, <span class="st">&quot;09067&quot;</span>, <span class="st">&quot;11003&quot;</span>, <span class="st">&quot;08032&quot;</span>, <span class="st">&quot;10028&quot;</span>, <span class="st">&quot;06038&quot;</span>, <span class="st">&quot;07031&quot;</span>)),</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;08043&quot;</span>, <span class="st">&quot;09072&quot;</span>, <span class="st">&quot;11006&quot;</span>, <span class="st">&quot;08001&quot;</span>, <span class="st">&quot;10014&quot;</span>, <span class="st">&quot;06040&quot;</span>, <span class="st">&quot;07017&quot;</span>))</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(malaga, <span class="at">file =</span> <span class="st">&quot;malaga.RData&quot;</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="sevilla" class="section level3" number="3.2.8">
+<h3 number="3.2.8"><span class="header-section-number">3.2.8</span> Sevilla</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>codigo <span class="ot">&lt;-</span> <span class="st">&quot;41091&quot;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,  <span class="st">&quot;4109110012&quot;</span>, <span class="st">&quot;4109105023&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>sevilla <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05036&quot;</span>, <span class="st">&quot;08020&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;09028&quot;</span>, <span class="dv">4</span>),</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;08017&quot;</span>, <span class="st">&quot;05047&quot;</span>, <span class="st">&quot;04016&quot;</span>, <span class="st">&quot;08046&quot;</span>, </span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;09050&quot;</span>, <span class="st">&quot;05032&quot;</span>, <span class="st">&quot;05018&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;07028&quot;</span>, <span class="dv">4</span>))),</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05033&quot;</span>, <span class="st">&quot;08051&quot;</span>, <span class="st">&quot;09003&quot;</span>, <span class="st">&quot;09048&quot;</span>, <span class="st">&quot;09051&quot;</span>, <span class="st">&quot;09053&quot;</span>,</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;08018&quot;</span>, <span class="st">&quot;05031&quot;</span>, <span class="st">&quot;04044&quot;</span>, <span class="st">&quot;08045&quot;</span>, <span class="st">&quot;09016&quot;</span>, <span class="st">&quot;05033&quot;</span>,</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;05013&quot;</span>, <span class="st">&quot;07027&quot;</span>, <span class="st">&quot;07008&quot;</span>, <span class="st">&quot;07007&quot;</span>, <span class="st">&quot;07006&quot;</span>))</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(sevilla, <span class="at">file =</span> <span class="st">&quot;sevilla.RData&quot;</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="asturias" class="section level2" number="3.3">
+<h2 number="3.3"><span class="header-section-number">3.3</span> Asturias</h2>
+<div id="avilés" class="section level3" number="3.3.1">
+<h3 number="3.3.1"><span class="header-section-number">3.3.1</span> Avilés</h3>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>codigo <span class="ot">&lt;-</span> <span class="st">&quot;33004&quot;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>aviles <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                                      codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span> <span class="sc">&amp;</span> year2 <span class="sc">==</span> <span class="dv">2001</span>, ],</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(aviles, <span class="at">file =</span> <span class="st">&quot;aviles.RData&quot;</span>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="gijón" class="section level3" number="3.3.2">
+<h3 number="3.3.2"><span class="header-section-number">3.3.2</span> Gijón</h3>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;33024&quot;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>gijon           <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                                      codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span> <span class="sc">&amp;</span> year2 <span class="sc">==</span> <span class="dv">2001</span>, ],</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;07016&quot;</span>, <span class="st">&quot;06021&quot;</span>, <span class="st">&quot;06021&quot;</span>, <span class="st">&quot;09016&quot;</span>)),</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;07048&quot;</span>, <span class="st">&quot;06022&quot;</span>, <span class="st">&quot;06012&quot;</span>, <span class="st">&quot;09012&quot;</span>))</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(gijon, <span class="at">file =</span> <span class="st">&quot;gijon.RData&quot;</span>)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="oviedo" class="section level3" number="3.3.3">
+<h3 number="3.3.3"><span class="header-section-number">3.3.3</span> Oviedo</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>codigo <span class="ot">&lt;-</span> <span class="st">&quot;33044&quot;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>oviedo <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                                      codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span> <span class="sc">&amp;</span> year2 <span class="sc">==</span> <span class="dv">2001</span>, ],</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05015&quot;</span>, <span class="st">&quot;06020&quot;</span>, <span class="st">&quot;09015&quot;</span>, <span class="st">&quot;09017&quot;</span>)),</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05014&quot;</span>, <span class="st">&quot;06017&quot;</span>, <span class="st">&quot;09011&quot;</span>, <span class="st">&quot;09011&quot;</span>))</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(oviedo, <span class="at">file =</span> <span class="st">&quot;oviedo.RData&quot;</span>)</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="cantabria" class="section level2" number="3.4">
+<h2 number="3.4"><span class="header-section-number">3.4</span> Cantabria</h2>
+<div id="santander" class="section level3" number="3.4.1">
+<h3 number="3.4.1"><span class="header-section-number">3.4.1</span> Santander</h3>
+<p>Solo se realizan uniones desde 2011 a 2015. El resto de la información la disponen a nivel puntual. Esta circunstancia les obliga a adaptar la información de poblaciones al seccionado resultante de la llamada a <code>une_secciones</code> que se describe a continuación.</p>
+<p>Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un <code>array</code> de población vacío (todos los valores son <code>NA</code>’s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado unido –objeto <code>santander$cartografia</code> tras haber ejecutado la función <code>une_secciones</code>–).</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>codigo    <span class="ot">&lt;-</span> <span class="st">&quot;39075&quot;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>santander <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;02023&quot;</span>, <span class="st">&quot;08020&quot;</span>, <span class="st">&quot;08021&quot;</span>)),</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;02024&quot;</span>, <span class="st">&quot;08029&quot;</span>, <span class="st">&quot;08025&quot;</span>))</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(santander, <span class="at">file =</span> <span class="st">&quot;santander.RData&quot;</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="cataluña" class="section level2" number="3.5">
+<h2 number="3.5"><span class="header-section-number">3.5</span> Cataluña</h2>
+<p>Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un <code>array</code> de población vacío (todos los valores son <code>NA</code>’s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).</p>
+<div id="barcelona" class="section level3" number="3.5.1">
+<h3 number="3.5.1"><span class="header-section-number">3.5.1</span> Barcelona</h3>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>codigo    <span class="ot">&lt;-</span> <span class="st">&quot;08019&quot;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>barcelona <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia   =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> <span class="dv">2001</span><span class="sc">:</span><span class="dv">2011</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion     =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad    =</span> datosmort,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad    =</span> <span class="dv">85</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">distancia     =</span> <span class="dv">10000</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;auto&quot;</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(barcelona, <span class="at">file =</span> <span class="st">&quot;barcelona.RData&quot;</span>)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="comunidad-de-madrid" class="section level2" number="3.6">
+<h2 number="3.6"><span class="header-section-number">3.6</span> Comunidad de Madrid</h2>
+<p>Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado.</p>
+<div id="madrid" class="section level3" number="3.6.1">
+<h3 number="3.6.1"><span class="header-section-number">3.6.1</span> Madrid</h3>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;28079&quot;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">paste0</span>(<span class="st">&quot;28079&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;12103&quot;</span>, <span class="st">&quot;06016&quot;</span>)),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                  <span class="fu">paste0</span>(<span class="st">&quot;28079&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;17044&quot;</span>, <span class="st">&quot;06012&quot;</span>)))</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>madrid   <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;28079&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;05050&quot;</span>, <span class="st">&quot;19030&quot;</span>, <span class="st">&quot;19031&quot;</span>, <span class="st">&quot;20030&quot;</span>, <span class="st">&quot;20060&quot;</span>, <span class="st">&quot;02098&quot;</span>, <span class="st">&quot;02098&quot;</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;03001&quot;</span>, <span class="st">&quot;08128&quot;</span>, <span class="st">&quot;08128&quot;</span>, <span class="st">&quot;09080&quot;</span>, <span class="st">&quot;09080&quot;</span>, <span class="st">&quot;11183&quot;</span>, <span class="st">&quot;12016&quot;</span>,</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;13204&quot;</span>, <span class="st">&quot;13204&quot;</span>, <span class="st">&quot;13127&quot;</span>, <span class="st">&quot;14089&quot;</span>, <span class="st">&quot;16092&quot;</span>, <span class="st">&quot;16092&quot;</span>, <span class="st">&quot;16111&quot;</span>,</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;17055&quot;</span>, <span class="st">&quot;18025&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;19029&quot;</span>, <span class="dv">7</span>), <span class="fu">rep</span>(<span class="st">&quot;20067&quot;</span>, <span class="dv">6</span>), <span class="st">&quot;14089&quot;</span>)</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;28079&quot;</span>, <span class="fu">c</span>(<span class="st">&quot;05058&quot;</span>, <span class="st">&quot;19001&quot;</span>, <span class="st">&quot;19001&quot;</span>, <span class="st">&quot;20029&quot;</span>, <span class="st">&quot;20043&quot;</span>, <span class="st">&quot;02052&quot;</span>, <span class="st">&quot;02106&quot;</span>,</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;03096&quot;</span>, <span class="st">&quot;08153&quot;</span>, <span class="st">&quot;08159&quot;</span>, <span class="st">&quot;09083&quot;</span>, <span class="st">&quot;09085&quot;</span>, <span class="st">&quot;11157&quot;</span>, <span class="st">&quot;12102&quot;</span>,</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;13208&quot;</span>, <span class="st">&quot;13209&quot;</span>, <span class="st">&quot;13215&quot;</span>, <span class="st">&quot;14081&quot;</span>, <span class="st">&quot;16106&quot;</span>, <span class="st">&quot;16093&quot;</span>, <span class="st">&quot;16091&quot;</span>,</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>               <span class="st">&quot;17103&quot;</span>, <span class="st">&quot;18045&quot;</span>, <span class="fu">paste</span>(<span class="dv">19033</span><span class="sc">:</span><span class="dv">19039</span>),</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>               <span class="fu">paste</span>(<span class="fu">c</span>(<span class="dv">20102</span><span class="sc">:</span><span class="dv">20104</span>, <span class="dv">20106</span><span class="sc">:</span><span class="dv">20107</span>, <span class="dv">20110</span>)), <span class="st">&quot;14090&quot;</span>)</span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(madrid, <span class="at">file =</span> <span class="st">&quot;madrid.RData&quot;</span>)</span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="comunidad-valenciana" class="section level2" number="3.7">
+<h2 number="3.7"><span class="header-section-number">3.7</span> Comunidad Valenciana</h2>
+<div id="alicante" class="section level3" number="3.7.1">
+<h3 number="3.7.1"><span class="header-section-number">3.7.1</span> Alicante</h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;03014&quot;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>alicante        <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;04035&quot;</span>, <span class="st">&quot;04041&quot;</span>, <span class="st">&quot;08022&quot;</span>)),</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;04020&quot;</span>, <span class="st">&quot;04023&quot;</span>, <span class="st">&quot;08012&quot;</span>))</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(alicante, <span class="at">file =</span> <span class="st">&quot;alicante.RData&quot;</span>)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="elche" class="section level3" number="3.7.2">
+<h3 number="3.7.2"><span class="header-section-number">3.7.2</span> Elche</h3>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;03065&quot;</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>elche        <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;02005&quot;</span>, <span class="st">&quot;01017&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;07006&quot;</span>, <span class="dv">2</span>))),</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;02006&quot;</span>, <span class="st">&quot;07019&quot;</span>, <span class="st">&quot;07017&quot;</span>, <span class="st">&quot;07020&quot;</span>))</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(elche, <span class="at">file =</span> <span class="st">&quot;elche.RData&quot;</span>)</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="castellón" class="section level3" number="3.7.3">
+<h3 number="3.7.3"><span class="header-section-number">3.7.3</span> Castellón</h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;12040&quot;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion, <span class="st">&quot;1204009005&quot;</span>, <span class="st">&quot;1204009011&quot;</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>castellon       <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06013&quot;</span>)),</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;01003&quot;</span>))</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(castellon, <span class="at">file =</span> <span class="st">&quot;castellon.RData&quot;</span>)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="valencia" class="section level3" number="3.7.4">
+<h3 number="3.7.4"><span class="header-section-number">3.7.4</span> Valencia</h3>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>codigo   <span class="ot">&lt;-</span> <span class="st">&quot;46250&quot;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>valencia <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;12025&quot;</span>)),</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;12042&quot;</span>))</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(valencia, <span class="at">file =</span> <span class="st">&quot;valencia.RData&quot;</span>)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="galicia" class="section level2" number="3.8">
+<h2 number="3.8"><span class="header-section-number">3.8</span> Galicia</h2>
+<p>Para Galicia prescindimos de los años 1996 y 1997 dado el bajo nivel de geocodificación de la mortalidad para estos dos años. En fases anteriores de MEDEA también se excluyeron estos dos años del periodo de estudio.</p>
+<div id="a-coruña" class="section level3" number="3.8.1">
+<h3 number="3.8.1"><span class="header-section-number">3.8.1</span> A coruña</h3>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>codigo <span class="ot">&lt;-</span> <span class="st">&quot;15030&quot;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>coruna <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1998</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union     =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05017&quot;</span>, <span class="st">&quot;05018&quot;</span>, <span class="st">&quot;05019&quot;</span>, <span class="st">&quot;07042&quot;</span>)),</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05015&quot;</span>, <span class="st">&quot;05011&quot;</span>, <span class="st">&quot;05011&quot;</span>, <span class="st">&quot;07027&quot;</span>))</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(coruna, <span class="at">file =</span> <span class="st">&quot;coruna.RData&quot;</span>)</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="ferrol" class="section level3" number="3.8.2">
+<h3 number="3.8.2"><span class="header-section-number">3.8.2</span> Ferrol</h3>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>codigo <span class="ot">&lt;-</span> <span class="st">&quot;15036&quot;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>ferrol <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1998</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union     =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ferrol, <span class="at">file =</span> <span class="st">&quot;ferrol.RData&quot;</span>)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="santiago-de-compostela" class="section level3" number="3.8.3">
+<h3 number="3.8.3"><span class="header-section-number">3.8.3</span> Santiago de Compostela</h3>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;15078&quot;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,  <span class="st">&quot;1507802002&quot;</span>, <span class="st">&quot;1507805009&quot;</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>santiago        <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1998</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union     =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;01005&quot;</span>)),</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;01008&quot;</span>))</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(santiago, <span class="at">file =</span> <span class="st">&quot;santiago.RData&quot;</span>)</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="lugo" class="section level3" number="3.8.4">
+<h3 number="3.8.4"><span class="header-section-number">3.8.4</span> Lugo</h3>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>codigo <span class="ot">&lt;-</span> <span class="st">&quot;27028&quot;</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>lugo   <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1998</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union     =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;07001&quot;</span>)),</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;07003&quot;</span>))</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(lugo, <span class="at">file =</span> <span class="st">&quot;lugo.RData&quot;</span>)</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="ourense" class="section level3" number="3.8.5">
+<h3 number="3.8.5"><span class="header-section-number">3.8.5</span> Ourense</h3>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>codigo  <span class="ot">&lt;-</span> <span class="st">&quot;32054&quot;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>ourense <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1998</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union     =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;01016&quot;</span>)),</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;01008&quot;</span>))</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ourense, <span class="at">file =</span> <span class="st">&quot;ourense.RData&quot;</span>)</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="pontevedra" class="section level3" number="3.8.6">
+<h3 number="3.8.6"><span class="header-section-number">3.8.6</span> Pontevedra</h3>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>codigo     <span class="ot">&lt;-</span> <span class="st">&quot;36038&quot;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>pontevedra <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1998</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union     =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;03002&quot;</span>, <span class="st">&quot;04005&quot;</span>, <span class="st">&quot;04006&quot;</span>, <span class="st">&quot;05001&quot;</span>,</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;05004&quot;</span>, <span class="st">&quot;06001&quot;</span>, <span class="st">&quot;06002&quot;</span>, <span class="st">&quot;06003&quot;</span>)), </span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;03001&quot;</span>, <span class="st">&quot;04002&quot;</span>, <span class="st">&quot;04002&quot;</span>, <span class="st">&quot;05003&quot;</span>,</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;05006&quot;</span>, <span class="st">&quot;05006&quot;</span>, <span class="st">&quot;04003&quot;</span>, <span class="st">&quot;04003&quot;</span>))</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(pontevedra, <span class="at">file =</span> <span class="st">&quot;pontevedra.RData&quot;</span>)</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="vigo" class="section level3" number="3.8.7">
+<h3 number="3.8.7"><span class="header-section-number">3.8.7</span> Vigo</h3>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>codigo <span class="ot">&lt;-</span> <span class="st">&quot;36057&quot;</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>vigo   <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1998</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union     =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06023&quot;</span>, <span class="st">&quot;06023&quot;</span>)),</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06003&quot;</span>, <span class="st">&quot;06022&quot;</span>))</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(vigo, <span class="at">file =</span> <span class="st">&quot;vigo.RData&quot;</span>)</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="islas-baleares" class="section level2" number="3.9">
+<h2 number="3.9"><span class="header-section-number">3.9</span> Islas Baleares</h2>
+<div id="palma-de-mallorca" class="section level3" number="3.9.1">
+<h3 number="3.9.1"><span class="header-section-number">3.9.1</span> Palma de Mallorca</h3>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;07040&quot;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  cambios_seccion,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;02017&quot;</span>, <span class="st">&quot;02057&quot;</span>, <span class="st">&quot;02049&quot;</span>, <span class="st">&quot;02062&quot;</span>, <span class="st">&quot;04053&quot;</span>)),</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;02016&quot;</span>, <span class="st">&quot;02030&quot;</span>, <span class="st">&quot;02056&quot;</span>, <span class="st">&quot;02049&quot;</span>, <span class="st">&quot;04043&quot;</span>))</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>mallorca <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1998</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union     =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">c</span>(<span class="st">&quot;0704004021&quot;</span>, <span class="st">&quot;0704002015&quot;</span>),</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">c</span>(<span class="st">&quot;0704004039&quot;</span>, <span class="st">&quot;0704002014&quot;</span>)</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(mallorca, <span class="at">file =</span> <span class="st">&quot;mallorca.RData&quot;</span>)</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="islas-canarias" class="section level2" number="3.10">
+<h2 number="3.10"><span class="header-section-number">3.10</span> Islas Canarias</h2>
+<p>Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo según se describe al inicio de este apartado.</p>
+<div id="las-palmas-de-gran-canaria" class="section level3" number="3.10.1">
+<h3 number="3.10.1"><span class="header-section-number">3.10.1</span> Las Palmas de Gran Canaria</h3>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;35016&quot;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  cambios_seccion,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;3501605033&quot;</span>, <span class="st">&quot;3501605020&quot;</span>, <span class="st">&quot;3501605006&quot;</span>,  <span class="st">&quot;3501602018&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;3501602032&quot;</span>, <span class="dv">2</span>),</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;3501602012&quot;</span>, <span class="st">&quot;3501602026&quot;</span>, <span class="st">&quot;3501604078&quot;</span>, <span class="st">&quot;3501602042&quot;</span>, <span class="st">&quot;3501602038&quot;</span>),</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;3501608013&quot;</span>, <span class="dv">3</span>), <span class="st">&quot;3501602019&quot;</span>, <span class="st">&quot;3501602029&quot;</span>, <span class="st">&quot;3501602030&quot;</span>, <span class="st">&quot;3501602019&quot;</span>,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;3501602024&quot;</span>, <span class="st">&quot;3501604058&quot;</span>, <span class="st">&quot;3501602038&quot;</span>, <span class="st">&quot;3501602042&quot;</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>palmas_gc       <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05023&quot;</span>, <span class="st">&quot;05019&quot;</span>, <span class="st">&quot;04074&quot;</span>, <span class="st">&quot;01062&quot;</span>, <span class="st">&quot;01063&quot;</span>, <span class="st">&quot;01011&quot;</span>, <span class="st">&quot;01011&quot;</span>, <span class="st">&quot;02013&quot;</span>)),</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;08013&quot;</span>, <span class="st">&quot;08018&quot;</span>, <span class="st">&quot;04062&quot;</span>, <span class="st">&quot;01061&quot;</span>, <span class="st">&quot;01061&quot;</span>, <span class="st">&quot;01013&quot;</span>, <span class="st">&quot;01014&quot;</span>, <span class="st">&quot;02014&quot;</span>))</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(palmas_gc, <span class="at">file =</span> <span class="st">&quot;palmas_gc.RData&quot;</span>)</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="santa-cruz-de-tenerife" class="section level3" number="3.10.2">
+<h3 number="3.10.2"><span class="header-section-number">3.10.2</span> Santa Cruz de Tenerife</h3>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;38038&quot;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,  <span class="st">&quot;3803807002&quot;</span>, <span class="st">&quot;3803809020&quot;</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>tenerife        <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;03019&quot;</span>, <span class="st">&quot;03020&quot;</span>, <span class="st">&quot;09020&quot;</span>, <span class="st">&quot;07004&quot;</span>)),</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;03020&quot;</span>, <span class="st">&quot;03001&quot;</span>, <span class="st">&quot;09006&quot;</span>, <span class="st">&quot;07007&quot;</span>))</span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(tenerife, <span class="at">file =</span> <span class="st">&quot;tenerife.RData&quot;</span>)</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="navarra" class="section level2" number="3.11">
+<h2 number="3.11"><span class="header-section-number">3.11</span> Navarra</h2>
+<p>Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al no disponer de información catastral no se puede hacer uso de dicho filtro.</p>
+<div id="pamplona" class="section level3" number="3.11.1">
+<h3 number="3.11.1"><span class="header-section-number">3.11.1</span> Pamplona</h3>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>codigo   <span class="ot">&lt;-</span> <span class="st">&quot;31201&quot;</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>pamplona <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">c</span>(<span class="st">&quot;3120107005&quot;</span>, <span class="st">&quot;3120104026&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;3120105008&quot;</span>, <span class="dv">6</span>)),</span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">c</span>(<span class="st">&quot;3120107018&quot;</span>, <span class="st">&quot;3120104013&quot;</span>, <span class="fu">paste0</span>(<span class="st">&quot;312010800&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>))</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(pamplona, <span class="at">file =</span> <span class="st">&quot;pamplona.RData&quot;</span>)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="país-vasco" class="section level2" number="3.12">
+<h2 number="3.12"><span class="header-section-number">3.12</span> País Vasco</h2>
+<p>Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo, según se describe al inicio de este apartado. Asimismo, al disponer de las cifras de población a nivel puntual, la siguiente rutina generará un <code>array</code> de población vacío (todos los valores son <code>NA</code>’s) que el nodo tendrá que rellenar con la información correspondiente (proyección de poblaciones de cada año sobre el seccionado de 2011).</p>
+<div id="bilbao" class="section level3" number="3.12.1">
+<h3 number="3.12.1"><span class="header-section-number">3.12.1</span> Bilbao</h3>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>codigo   <span class="ot">&lt;-</span> <span class="st">&quot;48020&quot;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>bilbao   <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia   =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> <span class="dv">2001</span><span class="sc">:</span><span class="dv">2011</span>,</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion     =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad    =</span> datosmort,</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;08003&quot;</span>, <span class="st">&quot;04001&quot;</span>, <span class="st">&quot;04023&quot;</span>, <span class="st">&quot;06014&quot;</span>, <span class="st">&quot;08011&quot;</span>, <span class="st">&quot;05042&quot;</span>)),</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;08004&quot;</span>, <span class="st">&quot;04002&quot;</span>, <span class="st">&quot;04024&quot;</span>, <span class="st">&quot;06015&quot;</span>, <span class="st">&quot;08010&quot;</span>, <span class="st">&quot;05030&quot;</span>))</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(bilbao, <span class="at">file =</span> <span class="st">&quot;bilbao.RData&quot;</span>)</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="vitoria" class="section level3" number="3.12.2">
+<h3 number="3.12.2"><span class="header-section-number">3.12.2</span> Vitoria</h3>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>codigo   <span class="ot">&lt;-</span> <span class="st">&quot;01059&quot;</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>vitoria  <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia   =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> <span class="dv">2001</span><span class="sc">:</span><span class="dv">2011</span>,</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion     =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad    =</span> datosmort,</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro      =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>, </span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;03002&quot;</span>, <span class="st">&quot;05027&quot;</span>, <span class="st">&quot;05028&quot;</span>, <span class="st">&quot;05029&quot;</span>, <span class="st">&quot;05030&quot;</span>)),</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;03003&quot;</span>, <span class="fu">rep</span>(<span class="st">&quot;05010&quot;</span>, <span class="dv">4</span>)))</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(vitoria, <span class="at">file =</span> <span class="st">&quot;vitoria.RData&quot;</span>)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="san-sebastián" class="section level3" number="3.12.3">
+<h3 number="3.12.3"><span class="header-section-number">3.12.3</span> San Sebastián</h3>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>codigo   <span class="ot">&lt;-</span> <span class="st">&quot;20069&quot;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>donostia <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios       =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia   =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_union   =</span> <span class="dv">2001</span><span class="sc">:</span><span class="dv">2011</span>,</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion     =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad    =</span> datosmort,</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="at">catastro      =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo          =</span> <span class="st">&quot;manual&quot;</span>, </span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1           =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06017&quot;</span>, <span class="st">&quot;03031&quot;</span>, <span class="st">&quot;03032&quot;</span>, <span class="st">&quot;06026&quot;</span>)),</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2           =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06011&quot;</span>, <span class="st">&quot;03019&quot;</span>, <span class="st">&quot;03019&quot;</span>, <span class="st">&quot;06006&quot;</span>))</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(donostia, <span class="at">file =</span> <span class="st">&quot;donostia.RData&quot;</span>)</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+<div id="región-de-murcia" class="section level2" number="3.13">
+<h2 number="3.13"><span class="header-section-number">3.13</span> Región de Murcia</h2>
+<p>Al no haber seguido el protocolo de geocodificación tendrán que adaptar su base de datos individual de defunciones al formato de salida de dicho protocolo según se describe al inicio de este apartado.</p>
+<div id="alcantarilla" class="section level3" number="3.13.1">
+<h3 number="3.13.1"><span class="header-section-number">3.13.1</span> Alcantarilla</h3>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>codigo       <span class="ot">&lt;-</span> <span class="st">&quot;30005&quot;</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>alcantarilla <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(alcantarilla, <span class="at">file =</span> <span class="st">&quot;alcantarilla.RData&quot;</span>)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="cartagena" class="section level3" number="3.13.2">
+<h3 number="3.13.2"><span class="header-section-number">3.13.2</span> Cartagena</h3>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>codigo    <span class="ot">&lt;-</span> <span class="st">&quot;30016&quot;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>cartagena <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06003&quot;</span>, <span class="st">&quot;10020&quot;</span>, <span class="st">&quot;08012&quot;</span>, <span class="st">&quot;06003&quot;</span>)),</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;06004&quot;</span>, <span class="st">&quot;10004&quot;</span>, <span class="st">&quot;08013&quot;</span>, <span class="st">&quot;06005&quot;</span>))</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(cartagena, <span class="at">file =</span> <span class="st">&quot;cartagena.RData&quot;</span>)</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="murcia" class="section level3" number="3.13.3">
+<h3 number="3.13.3"><span class="header-section-number">3.13.3</span> Murcia</h3>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>codigo          <span class="ot">&lt;-</span> <span class="st">&quot;30030&quot;</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>cambios_seccion <span class="ot">&lt;-</span> <span class="fu">elimina_cambios</span>(cambios_seccion,  <span class="st">&quot;3003001009&quot;</span>, <span class="st">&quot;3003001011&quot;</span>)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>murcia          <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">TRUE</span>, ],</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05024&quot;</span>, <span class="st">&quot;06015&quot;</span>, <span class="st">&quot;04021&quot;</span>, <span class="st">&quot;04022&quot;</span>, <span class="st">&quot;02024&quot;</span>,</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;02026&quot;</span>, <span class="st">&quot;04001&quot;</span>, <span class="st">&quot;02054&quot;</span>, <span class="st">&quot;04044&quot;</span>, <span class="st">&quot;07039&quot;</span>,</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;04033&quot;</span>, <span class="st">&quot;01041&quot;</span>, <span class="st">&quot;05018&quot;</span>)),</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;05023&quot;</span>, <span class="st">&quot;06017&quot;</span>, <span class="st">&quot;04022&quot;</span>, <span class="st">&quot;04025&quot;</span>, <span class="st">&quot;02023&quot;</span>,</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;02024&quot;</span>, <span class="st">&quot;04073&quot;</span>, <span class="st">&quot;02053&quot;</span>, <span class="st">&quot;04062&quot;</span>, <span class="st">&quot;07040&quot;</span>,</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>                                     <span class="st">&quot;04035&quot;</span>, <span class="st">&quot;01042&quot;</span>, <span class="st">&quot;05019&quot;</span>))</span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(murcia, <span class="at">file =</span> <span class="st">&quot;murcia.RData&quot;</span>)</span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+<div id="la-unión" class="section level3" number="3.13.4">
+<h3 number="3.13.4"><span class="header-section-number">3.13.4</span> La Unión</h3>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>codigo   <span class="ot">&lt;-</span> <span class="st">&quot;30041&quot;</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>la_union <span class="ot">&lt;-</span> <span class="fu">une_secciones</span>(</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cambios         =</span> cambios_seccion[<span class="fu">substr</span>(sc_ref, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo <span class="sc">&amp;</span> codigo_postal <span class="sc">==</span> <span class="cn">FALSE</span>, ],</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cartografia     =</span> cartografia[cartografia<span class="sc">$</span>CUMUN <span class="sc">==</span> codigo, ],</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">years_estudio   =</span> <span class="dv">1996</span><span class="sc">:</span><span class="dv">2015</span>,</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">poblacion       =</span> poblacion[<span class="fu">substr</span>(seccion, <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">==</span> codigo, ],</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">mortalidad      =</span> datosmort,</span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">catastro        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">corte_edad      =</span> <span class="dv">85</span>,</span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">umbral_vivienda =</span> <span class="dv">5</span>,</span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">modo            =</span> <span class="st">&quot;manual&quot;</span>,</span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc1             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;03003&quot;</span>)),</span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sc2             =</span> <span class="fu">paste0</span>(codigo, <span class="fu">c</span>(<span class="st">&quot;03001&quot;</span>))</span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(la_union, <span class="at">file =</span> <span class="st">&quot;la_union.RData&quot;</span>)</span>
+<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a><span class="co"># En el argumento &#39;file&#39; se puede escoger otra ruta para guardar el archivo.</span></span></code></pre></div>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

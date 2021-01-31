@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Grupo MEDEA" />
+
+<meta name="date" content="2020-03-06" />
+
+<title>Análisis espacial y espacio-temporal en el Proyecto MEDEA3</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Análisis espacial y espacio-temporal en el Proyecto MEDEA3</h1>
+<h3 class="subtitle">Versión 1</h3>
+<h4 class="author">Grupo MEDEA</h4>
+<h4 class="date">2020-03-06</h4>
+
+
+
+<style type="text/css">
+.main-container {
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+<style>
+body {
+  text-align: justify;
+  max-width: 100%
+}
+img {
+  border: 1px solid transparent;
+}
+</style>
+<div id="introducción" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Introducción</h1>
+<p>El punto de partida de los análisis en MEDEA3 proviene de la información de cada uno de los nodos y que viene reflejada en la viñeta de formato de datos. A modo de resumen, los datos imprescindibles dentro de un archivo con el nombre de cada ciudad y con extensión <code>.RData</code> (ubicado en un directorio denominado <code>datos/brutos/</code>):</p>
+<ul>
+<li>cartografía del seccionado censal unificado para el período MEDEA3,</li>
+<li>cifras de población por año, edad, sexo y sección censal,</li>
+<li>cifras de mortalidad por año, edad, sexo, causa y sección censal.</li>
+</ul>
+<p>Con esta información, y suponiendo que los datos de cada ciudad están almacenados en archivos diferenciados cuyo nombre es el normalizado de cada ciudad, se calcula el número de casos esperados para cada año, edad, sexo, causa y sección censal, empleando la función <code>medear::procesa_datos</code> del siguiente modo:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(medear)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ruta     <span class="ot">&lt;-</span> <span class="st">&quot;ruta_hasta_el_directorio_de_datos&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>ciudades <span class="ot">&lt;-</span> <span class="fu">list.files</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">path       =</span> <span class="fu">file.path</span>(ruta, <span class="st">&quot;brutos&quot;</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pattern    =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">D+</span><span class="sc">\\</span><span class="st">.RData$&quot;</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">recursive  =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">full.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>ciudades <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">.RData&quot;</span>, <span class="st">&quot;&quot;</span>, ciudades)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(ciudades)) {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">load</span>(<span class="fu">file.path</span>(ruta, <span class="st">&quot;brutos&quot;</span>, <span class="fu">paste0</span>(ciudades[i], <span class="st">&quot;.RData&quot;</span>)))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  ciudad    <span class="ot">&lt;-</span> <span class="fu">procesa_datos</span>(<span class="fu">eval</span>(<span class="fu">as.name</span>(ciudades[i])))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  carto     <span class="ot">&lt;-</span> ciudad<span class="sc">$</span>carto</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  carto.nb  <span class="ot">&lt;-</span> ciudad<span class="sc">$</span>carto.nb</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  carto.wb  <span class="ot">&lt;-</span> ciudad<span class="sc">$</span>carto.wb</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  Obs       <span class="ot">&lt;-</span> ciudad<span class="sc">$</span>Obs</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  Exp       <span class="ot">&lt;-</span> ciudad<span class="sc">$</span>Exp</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  privacion <span class="ot">&lt;-</span> ciudad<span class="sc">$</span>privacion</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="fu">file.path</span>(ruta, <span class="st">&quot;procesados&quot;</span>)))</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">dir.create</span>(<span class="fu">file.path</span>(ruta, <span class="st">&quot;procesados&quot;</span>))</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save</span>(</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    carto, carto.wb, carto.nb, Obs, Exp, privacion,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">file =</span> <span class="fu">file.path</span>(</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>      ruta, </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;procesados&quot;</span>,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste0</span>(</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;ObsExpCarto_&quot;</span>,</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        ciudades[i],</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;_&quot;</span>,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="fu">dimnames</span>(Obs)[[<span class="dv">1</span>]][<span class="dv">1</span>],</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="fu">dimnames</span>(Obs)[[<span class="dv">1</span>]][<span class="fu">length</span>(<span class="fu">dimnames</span>(Obs)[[<span class="dv">1</span>]])],</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;.RData&quot;</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+</div>
+<div id="modelización" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Modelización</h1>
+<p>El proceso se divide en cinco etapas:</p>
+<ol start="0" style="list-style-type: decimal">
+<li>Cargar los datos y adaptarlos al formato requerido.</li>
+<li>En la primera etapa se estima una ponderación de las vecindades entre las distintas áreas.</li>
+<li>En la segunda fase se utiliza la estimación previa en el contexto de una modelización multivariante con dependencia espacial.</li>
+<li>En la tercera fase también se utiliza la ponderación de vecindades, pero en este caso en el contexto de una modelización multivariante con dependencia espacial-temporal.</li>
+<li>En la cuarta y última etapa se realiza una regresión ecológica empleando el índice de privación MEDEA3 (datos para las ciudades MEDEA3 incluidos en el paquete. Para su cálculo, véase la viñeta asociada a este paquete denominada <code>medea-privacion</code>).</li>
+</ol>
+<p>Resulta imprescindible lanzar las dos primeras en orden para, posteriormente, poder lanzar cualquiera de las demás y que de una forma u otra emplearán sus datos. Toda la modelización se ejecuta con el software WinBUGS, el cual se lanza en paralelo empleando el paquete <a href="https://github.com/fisabio/pbugs"><code>pbugs</code></a>.</p>
+<div id="etapa-0-carga-de-datos" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> Etapa 0: Carga de datos</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Paquetes</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>paquetes   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;sp&quot;</span>, <span class="st">&quot;pbugs&quot;</span>, <span class="st">&quot;medear&quot;</span>, <span class="st">&quot;remotes&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>a_instalar <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="sc">!</span>paquetes[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>)] <span class="sc">%in%</span> <span class="fu">installed.packages</span>())</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(a_instalar) <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="fu">install.packages</span>(paquetes[a_instalar])</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;fisabio/pbugs&quot;</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">suppressMessages</span>(remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;fisabio/medear&quot;</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">sapply</span>(paquetes[<span class="sc">-</span><span class="dv">4</span>], require, <span class="at">character.only =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Rutas</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>dir_datos     <span class="ot">&lt;-</span> <span class="st">&quot;ruta_hasta_datos&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>dir_resultado <span class="ot">&lt;-</span> <span class="st">&quot;ruta_donde_alojar_resultado&quot;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>ciudad        <span class="ot">&lt;-</span> <span class="st">&quot;ciudad_a_lanzar&quot;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargo datos</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>arch   <span class="ot">&lt;-</span> <span class="fu">list.files</span>(</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">path       =</span> <span class="fu">file.path</span>(dir_datos, <span class="fu">tolower</span>(ciudad), <span class="st">&quot;/procesados&quot;</span>),</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">full.names =</span> <span class="cn">TRUE</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(arch)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># EPSG</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">is.na</span>(<span class="fu">proj4string</span>(carto)) <span class="sc">&amp;</span> <span class="fu">any</span>(<span class="fu">bbox</span>(carto) <span class="sc">&gt;</span> <span class="dv">360</span>))</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">proj4string</span>(carto) <span class="ot">&lt;-</span> <span class="fu">CRS</span>(<span class="st">&quot;+proj=utm +zone=30 +ellps=GRS80 +units=m +no_defs&quot;</span>) <span class="co"># EPSG: 25830</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>carto <span class="ot">&lt;-</span> <span class="fu">spTransform</span>(carto, <span class="fu">CRS</span>(<span class="st">&quot;+proj=longlat +datum=WGS84 +no_defs&quot;</span>)) <span class="co"># EPSG: 4326</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Definir BBOX</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;bboxm3&quot;</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>sel_bbox <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">sapply</span>(bboxm3<span class="sc">$</span>codigo, <span class="cf">function</span>(x) <span class="fu">substr</span>(carto<span class="sc">$</span>seccion[<span class="dv">1</span>], <span class="dv">1</span>, <span class="dv">5</span>) <span class="sc">%in%</span> x))</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(sel_bbox) <span class="sc">!=</span> <span class="dv">0</span>) {</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  mi_bbox  <span class="ot">&lt;-</span> bboxm3<span class="sc">$</span>bbox[[sel_bbox]]</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  mi_bbox <span class="ot">&lt;-</span> sp<span class="sc">::</span><span class="fu">bbox</span>(carto)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Periodos para análisis ET: hay dos ciudades sin datos en 1996 o 1997.</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>bloques_periodos <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>ini              <span class="ot">&lt;-</span> <span class="fu">substr</span>(<span class="fu">gsub</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">D+&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="fu">basename</span>(arch)), <span class="dv">1</span>, <span class="dv">4</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>tmp              <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">seq</span>(ini, <span class="dv">2015</span>, <span class="dv">1</span>))</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (tmp <span class="sc">==</span> <span class="dv">20</span>) {               <span class="co"># 1996:2015</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">1</span>]]<span class="ot">&lt;-</span><span class="dv">1</span><span class="sc">:</span><span class="dv">4</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">2</span>]]<span class="ot">&lt;-</span><span class="dv">5</span><span class="sc">:</span><span class="dv">8</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">3</span>]]<span class="ot">&lt;-</span><span class="dv">9</span><span class="sc">:</span><span class="dv">12</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">4</span>]]<span class="ot">&lt;-</span><span class="dv">13</span><span class="sc">:</span><span class="dv">16</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">5</span>]]<span class="ot">&lt;-</span><span class="dv">17</span><span class="sc">:</span><span class="dv">20</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> <span class="cf">if</span> (tmp <span class="sc">==</span> <span class="dv">19</span>) {        <span class="co"># 1997:2015</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">1</span>]]<span class="ot">&lt;-</span><span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">2</span>]]<span class="ot">&lt;-</span><span class="dv">4</span><span class="sc">:</span><span class="dv">7</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">3</span>]]<span class="ot">&lt;-</span><span class="dv">8</span><span class="sc">:</span><span class="dv">11</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">4</span>]]<span class="ot">&lt;-</span><span class="dv">12</span><span class="sc">:</span><span class="dv">15</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">5</span>]]<span class="ot">&lt;-</span><span class="dv">16</span><span class="sc">:</span><span class="dv">19</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {                       <span class="co"># 1998:2015</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">1</span>]]<span class="ot">&lt;-</span><span class="dv">1</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">2</span>]]<span class="ot">&lt;-</span><span class="dv">3</span><span class="sc">:</span><span class="dv">6</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">3</span>]]<span class="ot">&lt;-</span><span class="dv">7</span><span class="sc">:</span><span class="dv">10</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">4</span>]]<span class="ot">&lt;-</span><span class="dv">11</span><span class="sc">:</span><span class="dv">14</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>  bloques_periodos[[<span class="dv">5</span>]]<span class="ot">&lt;-</span><span class="dv">15</span><span class="sc">:</span><span class="dv">18</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;privacion&quot;</span>)</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>cod_muni <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">substr</span>(carto<span class="sc">$</span>seccion, <span class="dv">1</span>, <span class="dv">5</span>))</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraigo el IP para Valencia</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>indices <span class="ot">&lt;-</span> privacion[privacion<span class="sc">$</span>cod_municipio <span class="sc">%in%</span> cod_muni, ]</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>ip_mean <span class="ot">&lt;-</span> (indices<span class="sc">$</span>privacion_2011 <span class="sc">+</span> indices<span class="sc">$</span>privacion_2001) <span class="sc">/</span> <span class="dv">2</span></span></code></pre></div>
+</div>
+<div id="etapa-1-ponderación-de-las-vecindades" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> Etapa 1: ponderación de las vecindades</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Likelihood</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>            O[i, k]            <span class="sc">~</span> <span class="fu">dpois</span>(lambda[i, k])</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            <span class="fu">log</span>(lambda[i, k]) <span class="ot">&lt;-</span> <span class="fu">log</span>(E[i, k]) <span class="sc">+</span> mu[k] <span class="sc">+</span> Spatial[i, k]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>            SMR[i, k]         <span class="ot">&lt;-</span> <span class="fu">exp</span>(mu[k] <span class="sc">+</span> Spatial[i, k])</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        Spatial[i, k] <span class="sc">~</span> <span class="fu">dnorm</span>(media.Spatial[i, k], prec.Spatial[i, k])</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Mean and precision of conditioned distribution Spatial[i, j]</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n.adj) {</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      sqrt.c.adj[i] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(c[adj[i]])</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>      Spatial.adj[i, k] <span class="ot">&lt;-</span> Spatial[adj[i], k]</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Precision</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    prec.Spatial[<span class="dv">1</span>, k] <span class="ot">&lt;-</span> <span class="fu">pow</span>(sd[k], <span class="sc">-</span><span class="dv">2</span>) <span class="sc">*</span> <span class="fu">sqrt</span>(c[<span class="dv">1</span>]) <span class="sc">*</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>      (rho[k] <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]]) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">-</span> rho[k])</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>      prec.Spatial[i, k] <span class="ot">&lt;-</span> <span class="fu">pow</span>(sd[k], <span class="sc">-</span><span class="dv">2</span>) <span class="sc">*</span> <span class="fu">sqrt</span>(c[i]) <span class="sc">*</span> </span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        (rho[k] <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]]) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">-</span> rho[k])</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Mean</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    media.Spatial[<span class="dv">1</span>, k] <span class="ot">&lt;-</span> (rho[k] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]], Spatial.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>], k])) <span class="sc">/</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>      (rho[k] <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]]) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">-</span> rho[k])</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>      media.Spatial[i, k] <span class="ot">&lt;-</span> (rho[k] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]], Spatial.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>], k])) <span class="sc">/</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        (rho[k] <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]]) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">-</span> rho[k])</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    ceros[k]       <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    ceros[k]        <span class="sc">~</span> <span class="fu">dnorm</span>(sum.Spatial[k], <span class="dv">10</span>)</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    sum.Spatial[k] <span class="ot">&lt;-</span> <span class="fu">sum</span>(Spatial[, k])</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Priors c[i]</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    c[i] <span class="sc">~</span> <span class="fu">dgamma</span>(tau, tau) <span class="sc">%_%</span><span class="fu">I</span> (<span class="fl">0.005</span>, )</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>  tau <span class="ot">&lt;-</span> <span class="fu">pow</span>(sd.c, <span class="sc">-</span><span class="dv">2</span>)</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>  sd.c <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Other priors</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>      mu[k]  <span class="sc">~</span> <span class="fu">dflat</span>()</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>      sd[k]  <span class="sc">~</span> <span class="fu">dunif</span>(<span class="fl">0.01</span>, <span class="dv">5</span>)</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>      rho[k] <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="co"># Causas del estudio en hombres (1) y mujeres (2)</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>causas      <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>causas[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">15</span><span class="sc">:</span><span class="dv">21</span>)</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>causas[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>, <span class="dv">11</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">15</span><span class="sc">:</span><span class="dv">19</span>)</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista donde se guardaran los resultados</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>ponderacion <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="co"># Lanzar modelo</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (sexo <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>  datos <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">O         =</span> <span class="fu">apply</span>(Obs[, sexo, , causas[[sexo]]], <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), sum), </span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="at">E         =</span> <span class="fu">apply</span>(Exp[, sexo, , causas[[sexo]]], <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), sum), </span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nareas    =</span> <span class="fu">dim</span>(Obs)[<span class="dv">3</span>],</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>    <span class="at">Ndiseases =</span> <span class="fu">length</span>(causas[[sexo]]), </span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.adj     =</span> <span class="fu">length</span>(carto.wb<span class="sc">$</span>adj), </span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>    <span class="at">adj       =</span> carto.wb<span class="sc">$</span>adj, </span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">index     =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">cumsum</span>(carto.wb<span class="sc">$</span>num))</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>  iniciales <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>      <span class="at">mu      =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Ndiseases, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd      =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Ndiseases, <span class="dv">0</span>, <span class="dv">1</span>), </span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>      <span class="at">rho     =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Ndiseases, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>      <span class="at">Spatial =</span> <span class="fu">matrix</span>(</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nareas <span class="sc">*</span> datos<span class="sc">$</span>Ndiseases),</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nareas,</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Ndiseases</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>      <span class="at">c       =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nareas, <span class="fl">0.9</span>, <span class="fl">1.1</span>), </span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd.c    =</span> <span class="fu">runif</span>(<span class="dv">1</span>, <span class="fl">0.5</span>, <span class="fl">1.5</span>) </span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>  param <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;mu&quot;</span>, <span class="st">&quot;lambda&quot;</span>, <span class="st">&quot;sd&quot;</span>, <span class="st">&quot;SMR&quot;</span>, <span class="st">&quot;c&quot;</span>, <span class="st">&quot;sd.c&quot;</span>, <span class="st">&quot;rho&quot;</span>)</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>  ponderacion[[sexo]] <span class="ot">&lt;-</span> <span class="fu">pbugs</span>(</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">data               =</span> datos,</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>    <span class="at">inits              =</span> iniciales,</span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>    <span class="at">parameters.to.save =</span> param,</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>    <span class="at">model              =</span> model,</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.iter             =</span> <span class="dv">200000</span>,</span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.burnin           =</span> <span class="dv">50000</span>,</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.chains           =</span> <span class="dv">3</span>,</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">DIC                =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(dir_resultado)) <span class="fu">dir.create</span>(dir_resultado)</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ponderacion, <span class="at">file =</span> <span class="fu">file.path</span>(dir_resultado, <span class="fu">paste0</span>(<span class="st">&quot;pond_vecindad_&quot;</span>, <span class="fu">tolower</span>(ciudad), <span class="st">&quot;.RData&quot;</span>)))</span></code></pre></div>
+</div>
+<div id="etapa-2-análisis-espacial" class="section level2" number="2.3">
+<h2 number="2.3"><span class="header-section-number">2.3</span> Etapa 2: Análisis espacial</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar ponderación de vecindades</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">file.path</span>(dir_resultado, <span class="fu">paste0</span>(<span class="st">&quot;pond_vecindad_&quot;</span>, <span class="fu">tolower</span>(ciudad), <span class="st">&quot;.RData&quot;</span>)))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>      O[i, k]        <span class="sc">~</span> <span class="fu">dpois</span>(mu[i, k])</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">log</span>(mu[i, k]) <span class="ot">&lt;-</span> <span class="fu">log</span>(E[i, k]) <span class="sc">+</span> m[k] <span class="sc">+</span> Theta[i, k]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>      SMR[i, k]     <span class="ot">&lt;-</span> <span class="fu">exp</span>(m[k] <span class="sc">+</span> Theta[i, k])</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      Theta[i, k]   <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(Spatial[i, ], M[, k])</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>      mat.varcov[k, j] <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(M[, k], M[, j])</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      Spatial[i, k] <span class="sc">~</span> <span class="fu">dnorm</span>(m.Spatial[i, k], prec.Spatial[i, k])</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Mean and precision of conditioned distribution Spatial[i, j]</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n.adj) {</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    sqrt.c.adj[i] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(c[adj[i]])</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>      Spatial.adj[i, j] <span class="ot">&lt;-</span> Spatial[adj[i], j]</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Precision</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    prec.Spatial[<span class="dv">1</span>, k] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda[k] <span class="sc">+</span> lambda[k] <span class="sc">*</span> <span class="fu">sqrt</span>(c[<span class="dv">1</span>]) <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]])</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>      prec.Spatial[i, k] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda[k] <span class="sc">+</span> lambda[k] <span class="sc">*</span> <span class="fu">sqrt</span>(c[i]) <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]])</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Mean</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    m.Spatial[<span class="dv">1</span>, j] <span class="ot">&lt;-</span> (lambda[j] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]], Spatial.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>], j])) <span class="sc">/</span> </span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">-</span> lambda[j] <span class="sc">+</span> lambda[j] <span class="sc">*</span> <span class="fu">sum</span>( sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]]))</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>      m.Spatial[i, j] <span class="ot">&lt;-</span> (lambda[j] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]], Spatial.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>], j])) <span class="sc">/</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>        (<span class="dv">1</span> <span class="sc">-</span> lambda[j] <span class="sc">+</span> lambda[j] <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]]))</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>    ceros[j]        <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>    ceros[j]        <span class="sc">~</span> <span class="fu">dnorm</span>(sum.Spatial[j], <span class="dv">10</span>)</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    sum.Spatial[j] <span class="ot">&lt;-</span> <span class="fu">sum</span>(Spatial[, j])</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># M-matrix</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>      M[i, j]    <span class="ot">&lt;-</span> sd[i] <span class="sc">*</span> M.aux[i, j]</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>      M.aux[i, j] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>    lambda[i] <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    sd[i]     <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Other priors</span></span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>    m[k] <span class="sc">~</span> <span class="fu">dflat</span>()</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Causas del estudio en hombres (1) y mujeres (2)</span></span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>causas      <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>causas[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">15</span><span class="sc">:</span><span class="dv">21</span>)</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>causas[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>, <span class="dv">11</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">15</span><span class="sc">:</span><span class="dv">19</span>)</span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista donde se guardaran los resultados</span></span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>resul_esp   <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a><span class="co"># Lanzar modelo</span></span>
+<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (sexo <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>  datos <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>    <span class="at">O         =</span> <span class="fu">apply</span>(Obs[, sexo, , causas[[sexo]]], <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), sum),</span>
+<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>    <span class="at">E         =</span> <span class="fu">apply</span>(Exp[, sexo, , causas[[sexo]]], <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), sum),</span>
+<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nareas    =</span> <span class="fu">dim</span>(Obs)[<span class="dv">3</span>],</span>
+<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>    <span class="at">Ndiseases =</span> <span class="fu">length</span>(causas[[sexo]]),</span>
+<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nsp       =</span> <span class="dv">5</span>,</span>
+<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.adj     =</span> <span class="fu">length</span>(carto.wb<span class="sc">$</span>adj),</span>
+<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>    <span class="at">adj       =</span> carto.wb<span class="sc">$</span>adj,</span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">index     =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">cumsum</span>(carto.wb<span class="sc">$</span>num)),</span>
+<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>    <span class="at">c         =</span> <span class="fu">c</span>(ponderacion[[sexo]]<span class="sc">$</span>mean<span class="sc">$</span>c)</span>
+<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>  iniciales <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>      <span class="at">m       =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Ndiseases, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd      =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nsp, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>      <span class="at">lambda  =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nsp, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>      <span class="at">Spatial =</span> <span class="fu">matrix</span>(</span>
+<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nareas <span class="sc">*</span> datos<span class="sc">$</span>Nsp),</span>
+<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nareas,</span>
+<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Nsp</span>
+<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>      <span class="at">M.aux =</span> <span class="fu">matrix</span>(</span>
+<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nsp <span class="sc">*</span> datos<span class="sc">$</span>Ndiseases, <span class="dv">0</span>, .<span class="dv">2</span>),</span>
+<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nsp,</span>
+<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Ndiseases</span>
+<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>  param <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;m&quot;</span>, <span class="st">&quot;mu&quot;</span>, <span class="st">&quot;sd&quot;</span>, <span class="st">&quot;SMR&quot;</span>, <span class="st">&quot;Spatial&quot;</span>, <span class="st">&quot;lambda&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="st">&quot;mat.varcov&quot;</span>)</span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>  resul_esp[[sexo]] <span class="ot">&lt;-</span> <span class="fu">pbugs</span>(</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>    <span class="at">data               =</span> datos,</span>
+<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>    <span class="at">inits              =</span> iniciales,</span>
+<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>    <span class="at">parameters.to.save =</span> param,</span>
+<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>    <span class="at">model              =</span> model,</span>
+<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.iter             =</span> <span class="dv">50000</span>,</span>
+<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.burnin           =</span> <span class="dv">10000</span>,</span>
+<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.chains           =</span> <span class="dv">3</span>,</span>
+<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>    <span class="at">DIC                =</span> <span class="cn">FALSE</span></span>
+<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(resul_esp, <span class="at">file =</span> <span class="fu">file.path</span>(dir_resultado, <span class="fu">paste0</span>(<span class="st">&quot;resul_esp_&quot;</span>, <span class="fu">tolower</span>(ciudad), <span class="st">&quot;.RData&quot;</span>)))</span></code></pre></div>
+</div>
+<div id="etapa-3-análisis-espacio-temporal" class="section level2" number="2.4">
+<h2 number="2.4"><span class="header-section-number">2.4</span> Etapa 3: Análisis espacio-temporal</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar ponderación de vecindades</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">file.path</span>(dir_resultado, <span class="fu">paste0</span>(<span class="st">&quot;pond_vecindad_&quot;</span>, <span class="fu">tolower</span>(ciudad), <span class="st">&quot;.RData&quot;</span>)))</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>model.ET1 <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>NPeriods) {</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        O[j, i, k]        <span class="sc">~</span> <span class="fu">dpois</span>(mu[i, j, k])</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">log</span>(mu[i, j, k]) <span class="ot">&lt;-</span> <span class="fu">log</span>(E[j, i, k]) <span class="sc">+</span> alpha[k,j] <span class="sc">+</span> Theta[i, k] <span class="sc">+</span> Theta.trend[i, k] <span class="sc">*</span> (j<span class="sc">-</span>(NPeriods<span class="sc">+</span><span class="dv">1</span>)<span class="sc">/</span><span class="dv">2</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        SMR[i, j, k]     <span class="ot">&lt;-</span> <span class="fu">exp</span>(alpha[k,j] <span class="sc">+</span> Theta[i, k] <span class="sc">+</span> Theta.trend[i, k] <span class="sc">*</span> (j<span class="sc">-</span>(NPeriods<span class="sc">+</span><span class="dv">1</span>)<span class="sc">/</span><span class="dv">2</span>))</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      Theta[i, k]   <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(Spatial[i, ], M[, k])</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      Theta.trend[i, k]   <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(Spatial.trend[i, ], M.trend[, k])</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>      SMR.mean[i, k] <span class="ot">&lt;-</span> <span class="fu">exp</span>(Theta[i, k])</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>      SMR.trend[i, k] <span class="ot">&lt;-</span> <span class="fu">exp</span>(Theta.trend[i, k])</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      mat.varcov[k, j] <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(M[, k], M[, j])</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      mat.varcov.trend[k, j] <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(M.trend[, k], M.trend[, j])</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) { </span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>      Spatial[i, k] <span class="sc">~</span> <span class="fu">dnorm</span>(m.Spatial[i, k], prec.Spatial[i, k])</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>      Spatial.trend[i, k] <span class="sc">~</span> <span class="fu">dnorm</span>(m.Spatial.trend[i, k], prec.Spatial.trend[i, k])</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Mean and precision of conditioned distribution Spatial[i, j]</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n.adj) {</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    sqrt.c.adj[i] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(c[adj[i]])</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>      Spatial.adj[i, j] <span class="ot">&lt;-</span> Spatial[adj[i], j]</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>      Spatial.adj.trend[i, j] <span class="ot">&lt;-</span> Spatial.trend[adj[i], j]</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Precision</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    prec.Spatial[<span class="dv">1</span>, k] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda[k] <span class="sc">+</span> lambda[k] <span class="sc">*</span> <span class="fu">sqrt</span>(c[<span class="dv">1</span>]) <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]])</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    prec.Spatial.trend[<span class="dv">1</span>, k] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda.trend[k] <span class="sc">+</span> lambda.trend[k] <span class="sc">*</span> <span class="fu">sqrt</span>(c[<span class="dv">1</span>]) <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]])</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>      prec.Spatial[i, k] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda[k] <span class="sc">+</span> lambda[k] <span class="sc">*</span> <span class="fu">sqrt</span>(c[i]) <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]])</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>      prec.Spatial.trend[i, k] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda.trend[k] <span class="sc">+</span> lambda.trend[k] <span class="sc">*</span> <span class="fu">sqrt</span>(c[i]) <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]])</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Mean</span></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    m.Spatial[<span class="dv">1</span>, j] <span class="ot">&lt;-</span> (lambda[j] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]], Spatial.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>], j])) <span class="sc">/</span> </span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">-</span> lambda[j] <span class="sc">+</span> lambda[j] <span class="sc">*</span> <span class="fu">sum</span>( sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]]))</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    m.Spatial.trend[<span class="dv">1</span>, j] <span class="ot">&lt;-</span> (lambda.trend[j] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]], Spatial.adj.trend[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>], j])) <span class="sc">/</span> </span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">-</span> lambda.trend[j] <span class="sc">+</span> lambda.trend[j] <span class="sc">*</span> <span class="fu">sum</span>( sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]]))</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>      m.Spatial[i, j] <span class="ot">&lt;-</span> (lambda[j] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]], Spatial.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>], j])) <span class="sc">/</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>        (<span class="dv">1</span> <span class="sc">-</span> lambda[j] <span class="sc">+</span> lambda[j] <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]]))</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>      m.Spatial.trend[i, j] <span class="ot">&lt;-</span> (lambda.trend[j] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]], Spatial.adj.trend[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>], j])) <span class="sc">/</span></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>        (<span class="dv">1</span> <span class="sc">-</span> lambda.trend[j] <span class="sc">+</span> lambda.trend[j] <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]]))</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>  <span class="co"># M-matrix</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>      M[i, j]    <span class="ot">&lt;-</span> sd[i] <span class="sc">*</span> M.aux[i, j]</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>      M.aux[i, j] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>      M.trend[i, j]    <span class="ot">&lt;-</span> sd.trend[i] <span class="sc">*</span> M.aux.trend[i, j]</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>      M.aux.trend[i, j] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>    lambda[i] <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>    sd[i]     <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>    lambda.trend[i] <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>    sd.trend[i]     <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>NPeriods) {</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>      alpha[k,j] <span class="sc">~</span> <span class="fu">dflat</span>()</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a><span class="co"># Causas del estudio en hombres (1) y mujeres (2)</span></span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>causas      <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>causas[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">15</span><span class="sc">:</span><span class="dv">21</span>)</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>causas[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>, <span class="dv">11</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">15</span><span class="sc">:</span><span class="dv">19</span>)</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista donde se guardaran los resultados</span></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>resul_esp_tie <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (sexo <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>  auxO <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="fu">dim</span>(Obs)[<span class="dv">3</span>], <span class="fu">length</span>(causas[[sexo]])))</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>  auxE <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="at">dim =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="fu">dim</span>(Obs)[<span class="dv">3</span>], <span class="fu">length</span>(causas[[sexo]])))</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_len</span>(<span class="dv">5</span>)) {</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>    auxO[i,,] <span class="ot">&lt;-</span> <span class="fu">apply</span>(Obs[bloques_periodos[[i]], sexo, , causas[[sexo]]], <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), sum)</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>    auxE[i,,] <span class="ot">&lt;-</span> <span class="fu">apply</span>(Exp[bloques_periodos[[i]], sexo, , causas[[sexo]]], <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), sum)</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>  datos <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>    <span class="at">O         =</span> auxO,</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>    <span class="at">E         =</span> auxE,</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nareas    =</span> <span class="fu">dim</span>(Obs)[<span class="dv">3</span>],</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>    <span class="at">Ndiseases =</span> <span class="fu">length</span>(causas[[sexo]]),</span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">NPeriods  =</span> <span class="dv">5</span>,</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nsp       =</span> <span class="dv">5</span>,</span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.adj     =</span> <span class="fu">length</span>(carto.wb<span class="sc">$</span>adj),</span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>    <span class="at">adj       =</span> carto.wb<span class="sc">$</span>adj,</span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>    <span class="at">index     =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">cumsum</span>(carto.wb<span class="sc">$</span>num)),</span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>    <span class="at">c         =</span> <span class="fu">c</span>(ponderacion[[sexo]]<span class="sc">$</span>mean<span class="sc">$</span>c)</span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>  datos<span class="sc">$</span>E[<span class="fu">which</span>(datos<span class="sc">$</span>E <span class="sc">==</span> <span class="dv">0</span>)] <span class="ot">&lt;-</span> <span class="fl">0.1</span> <span class="co"># Corregir esperados == 0</span></span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a>  iniciales <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a>      <span class="at">alpha =</span> <span class="fu">matrix</span>(</span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Ndiseases <span class="sc">*</span> datos<span class="sc">$</span>NPeriods,<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Ndiseases,</span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>NPeriods</span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd      =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nsp, <span class="dv">0</span>, <span class="fl">0.3</span>),</span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd.trend      =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nsp, <span class="dv">0</span>, <span class="fl">0.3</span>),</span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a>      <span class="at">lambda  =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nsp, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a>      <span class="at">lambda.trend  =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nsp, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a>      <span class="at">Spatial =</span> <span class="fu">matrix</span>(</span>
+<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nareas <span class="sc">*</span> datos<span class="sc">$</span>Nsp,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nareas,</span>
+<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Nsp</span>
+<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a>      <span class="at">Spatial.trend =</span> <span class="fu">matrix</span>(</span>
+<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nareas <span class="sc">*</span> datos<span class="sc">$</span>Nsp,<span class="dv">0</span>,<span class="fl">0.5</span>),</span>
+<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nareas,</span>
+<span id="cb5-136"><a href="#cb5-136" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Nsp</span>
+<span id="cb5-137"><a href="#cb5-137" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb5-138"><a href="#cb5-138" aria-hidden="true" tabindex="-1"></a>      <span class="at">M.aux =</span> <span class="fu">matrix</span>(</span>
+<span id="cb5-139"><a href="#cb5-139" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nsp <span class="sc">*</span> datos<span class="sc">$</span>Ndiseases, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nsp,</span>
+<span id="cb5-141"><a href="#cb5-141" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Ndiseases</span>
+<span id="cb5-142"><a href="#cb5-142" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb5-143"><a href="#cb5-143" aria-hidden="true" tabindex="-1"></a>      <span class="at">M.aux.trend =</span> <span class="fu">matrix</span>(</span>
+<span id="cb5-144"><a href="#cb5-144" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nsp <span class="sc">*</span> datos<span class="sc">$</span>Ndiseases, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb5-145"><a href="#cb5-145" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nsp,</span>
+<span id="cb5-146"><a href="#cb5-146" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Ndiseases</span>
+<span id="cb5-147"><a href="#cb5-147" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb5-148"><a href="#cb5-148" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-149"><a href="#cb5-149" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-150"><a href="#cb5-150" aria-hidden="true" tabindex="-1"></a>  param <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb5-151"><a href="#cb5-151" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;sd&quot;</span>, <span class="st">&quot;sd.trend&quot;</span>, <span class="st">&quot;alpha&quot;</span>, <span class="st">&quot;SMR.mean&quot;</span>, <span class="st">&quot;SMR.trend&quot;</span>,</span>
+<span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;mat.varcov&quot;</span>, <span class="st">&quot;mat.varcov.trend&quot;</span>, <span class="st">&quot;M&quot;</span>, <span class="st">&quot;M.trend&quot;</span></span>
+<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-154"><a href="#cb5-154" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-155"><a href="#cb5-155" aria-hidden="true" tabindex="-1"></a>  resul_esp_tie[[sexo]] <span class="ot">&lt;-</span> <span class="fu">pbugs</span>(</span>
+<span id="cb5-156"><a href="#cb5-156" aria-hidden="true" tabindex="-1"></a>    <span class="at">data               =</span> datos,</span>
+<span id="cb5-157"><a href="#cb5-157" aria-hidden="true" tabindex="-1"></a>    <span class="at">inits              =</span> iniciales,</span>
+<span id="cb5-158"><a href="#cb5-158" aria-hidden="true" tabindex="-1"></a>    <span class="at">parameters.to.save =</span> param,</span>
+<span id="cb5-159"><a href="#cb5-159" aria-hidden="true" tabindex="-1"></a>    <span class="at">model              =</span> model.ET1,</span>
+<span id="cb5-160"><a href="#cb5-160" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.iter             =</span> <span class="dv">10000</span>,</span>
+<span id="cb5-161"><a href="#cb5-161" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.burnin           =</span> <span class="dv">2000</span>,</span>
+<span id="cb5-162"><a href="#cb5-162" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.chains           =</span> <span class="dv">3</span>,</span>
+<span id="cb5-163"><a href="#cb5-163" aria-hidden="true" tabindex="-1"></a>    <span class="at">DIC                =</span> <span class="cn">FALSE</span></span>
+<span id="cb5-164"><a href="#cb5-164" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-165"><a href="#cb5-165" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-166"><a href="#cb5-166" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(</span>
+<span id="cb5-167"><a href="#cb5-167" aria-hidden="true" tabindex="-1"></a>  resul_esp_tie,</span>
+<span id="cb5-168"><a href="#cb5-168" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="fu">file.path</span>(dir_resultado, <span class="fu">paste0</span>(<span class="st">&quot;resul_esp_tie_&quot;</span>, <span class="fu">tolower</span>(ciudad), <span class="st">&quot;.RData&quot;</span>))</span>
+<span id="cb5-169"><a href="#cb5-169" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="etapa-4-regresión-ecológica" class="section level2" number="2.5">
+<h2 number="2.5"><span class="header-section-number">2.5</span> Etapa 4: Regresión ecológica</h2>
+<p>Modelo de regresión ecológica espacial como función lineal de la privación media del periodo y restricción de ortogonalidad de los e.a. respecto al IP.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar ponderación de vecindades</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">file.path</span>(dir_resultado, <span class="fu">paste0</span>(<span class="st">&quot;pond_vecindad_&quot;</span>, <span class="fu">tolower</span>(ciudad), <span class="st">&quot;.RData&quot;</span>)))</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>model.reg.eco.spat.ortho1 <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Likelihood</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>      O[i, k]        <span class="sc">~</span> <span class="fu">dpois</span>(mu[i, k])</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">log</span>(mu[i, k]) <span class="ot">&lt;-</span> <span class="fu">log</span>(E[i, k]) <span class="sc">+</span> m[k] <span class="sc">+</span> beta.priv[k] <span class="sc">*</span> Privacion[i] <span class="sc">+</span> Theta[i, k]</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>      SMR[i, k]     <span class="ot">&lt;-</span> <span class="fu">exp</span>(m[k] <span class="sc">+</span> beta.priv[k] <span class="sc">*</span> Privacion[i] <span class="sc">+</span> Theta[i, k])</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>      SMR.sin[i, k] <span class="ot">&lt;-</span> <span class="fu">exp</span>(m[k] <span class="sc">+</span> Theta[i, k])</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>      Theta[i, k]   <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(Spatial[i, ], M[, k])</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>      mat.varcov[k, j] <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(M[, k], M[, j])</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>      Spatial[i, k] <span class="sc">~</span> <span class="fu">dnorm</span>(m.Spatial[i, k], prec.Spatial[i, k])</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Mean and precision of conditioned distribution Spatial[i, j]</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n.adj) {</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    sqrt.c.adj[i] <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(c[adj[i]])</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>      Spatial.adj[i, j] <span class="ot">&lt;-</span> Spatial[adj[i], j]</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Precision</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>    prec.Spatial[<span class="dv">1</span>, k] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda[k] <span class="sc">+</span> lambda[k] <span class="sc">*</span> <span class="fu">sqrt</span>(c[<span class="dv">1</span>]) <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]])</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>      prec.Spatial[i, k] <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">-</span> lambda[k] <span class="sc">+</span> lambda[k] <span class="sc">*</span> <span class="fu">sqrt</span>(c[i]) <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]])</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Mean</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    m.Spatial[<span class="dv">1</span>, j] <span class="ot">&lt;-</span> (lambda[j] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]], Spatial.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>], j])) <span class="sc">/</span> </span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>      (<span class="dv">1</span> <span class="sc">-</span> lambda[j] <span class="sc">+</span> lambda[j] <span class="sc">*</span> <span class="fu">sum</span>( sqrt.c.adj[index[<span class="dv">1</span>]<span class="sc">:</span>index[<span class="dv">2</span>]]))</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>Nareas) {</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>      m.Spatial[i, j] <span class="ot">&lt;-</span> (lambda[j] <span class="sc">*</span> <span class="fu">inprod2</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]], Spatial.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>], j])) <span class="sc">/</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>        (<span class="dv">1</span> <span class="sc">-</span> lambda[j] <span class="sc">+</span> lambda[j] <span class="sc">*</span> <span class="fu">sum</span>(sqrt.c.adj[(index[i] <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span>index[i <span class="sc">+</span> <span class="dv">1</span>]]))</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>    ceros[j]        <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    ceros[j]        <span class="sc">~</span> <span class="fu">dnorm</span>(sum.Spatial[j], <span class="dv">10</span>)</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>    sum.Spatial[j] <span class="ot">&lt;-</span> <span class="fu">sum</span>(Spatial[, j])</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>    ceros2[j]        <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>    ceros2[j]        <span class="sc">~</span> <span class="fu">dnorm</span>(sum.Spatial2[j], <span class="dv">10</span>)</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>    sum.Spatial2[j] <span class="ot">&lt;-</span> <span class="fu">inprod2</span>(Spatial[, j], Privacion[])</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>  <span class="co"># M-matrix</span></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Nsp) {</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>      M[i, j]    <span class="ot">&lt;-</span> sd[i] <span class="sc">*</span> M.aux[i, j]</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>      M.aux[i, j] <span class="sc">~</span> <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>    lambda[i] <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>    sd[i]     <span class="sc">~</span> <span class="fu">dunif</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Other priors</span></span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>Ndiseases) {</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>    m[k] <span class="sc">~</span> <span class="fu">dflat</span>()</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>    beta.priv[k] <span class="sc">~</span> <span class="fu">dflat</span>()</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a><span class="co"># Causas del estudio en hombres (1) y mujeres (2)</span></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>causas      <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>causas[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">15</span><span class="sc">:</span><span class="dv">21</span>)</span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>causas[[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>, <span class="dv">11</span><span class="sc">:</span><span class="dv">12</span>, <span class="dv">15</span><span class="sc">:</span><span class="dv">19</span>)</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a><span class="co"># Lista donde se guardaran los resultados</span></span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>resul_reg_eco <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (sexo <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>  datos <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>    <span class="at">O         =</span> <span class="fu">apply</span>(Obs[, sexo, , causas[[sexo]]], <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), sum),</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>    <span class="at">E         =</span> <span class="fu">apply</span>(Exp[, sexo, , causas[[sexo]]], <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), sum),</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">Privacion =</span> ip_mean,</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nareas    =</span> <span class="fu">dim</span>(Obs)[<span class="dv">3</span>],</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>    <span class="at">Ndiseases =</span> <span class="fu">length</span>(causas[[sexo]]),</span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>    <span class="at">Nsp       =</span> <span class="dv">5</span>,</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.adj     =</span> <span class="fu">length</span>(carto.wb<span class="sc">$</span>adj),</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>    <span class="at">adj       =</span> carto.wb<span class="sc">$</span>adj,</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>    <span class="at">index     =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fu">cumsum</span>(carto.wb<span class="sc">$</span>num)),</span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">c         =</span> <span class="fu">c</span>(ponderacion[[sexo]]<span class="sc">$</span>mean<span class="sc">$</span>c)</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>  iniciales <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>      <span class="at">m         =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Ndiseases),</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>      <span class="at">beta.priv =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Ndiseases),</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>      <span class="at">sd        =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nsp, <span class="dv">0</span>, <span class="fl">0.3</span>),</span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>      <span class="at">lambda    =</span> <span class="fu">runif</span>(datos<span class="sc">$</span>Nsp, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>      <span class="at">Spatial   =</span> <span class="fu">matrix</span>(</span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nareas <span class="sc">*</span> datos<span class="sc">$</span>Nsp),</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nareas,</span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Nsp</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>      <span class="at">M.aux     =</span> <span class="fu">matrix</span>(</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> <span class="fu">rnorm</span>(datos<span class="sc">$</span>Nsp <span class="sc">*</span> datos<span class="sc">$</span>Ndiseases, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>        <span class="at">nrow =</span> datos<span class="sc">$</span>Nsp,</span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> datos<span class="sc">$</span>Ndiseases</span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>  param <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;m&quot;</span>, <span class="st">&quot;mu&quot;</span>, <span class="st">&quot;sd&quot;</span>, <span class="st">&quot;SMR&quot;</span>, <span class="st">&quot;Spatial&quot;</span>, <span class="st">&quot;lambda&quot;</span>,</span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;M&quot;</span>, <span class="st">&quot;mat.varcov&quot;</span>,<span class="st">&quot;beta.priv&quot;</span>, <span class="st">&quot;SMR.sin&quot;</span></span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>  resul_reg_eco[[sexo]] <span class="ot">&lt;-</span> <span class="fu">pbugs</span>(</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>    <span class="at">data               =</span> datos,</span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>    <span class="at">inits              =</span> iniciales,</span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>    <span class="at">parameters.to.save =</span> param,</span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>    <span class="at">model              =</span> model.reg.eco.spat.ortho1,</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.iter             =</span> <span class="dv">10000</span>,</span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.burnin           =</span> <span class="dv">2000</span>,</span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a>    <span class="at">n.chains           =</span> <span class="dv">3</span>,</span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a>    <span class="at">DIC                =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(</span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>  resul_reg_eco,</span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>  <span class="at">file =</span> <span class="fu">file.path</span>(dir_resultado, <span class="fu">paste0</span>(<span class="st">&quot;resul_reg_eco_&quot;</span>, <span class="fu">tolower</span>(ciudad), <span class="st">&quot;.RData&quot;</span>))</span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

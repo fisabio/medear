@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Grupo MEDEA" />
+
+<meta name="date" content="2018-10-25" />
+
+<title>Protocolo de geocodificación MEDEA 3</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Protocolo de geocodificación MEDEA 3</h1>
+<h3 class="subtitle">Versión 2.2</h3>
+<h4 class="author">Grupo MEDEA</h4>
+<h4 class="date">2018-10-25</h4>
+
+
+
+<p>Todo el protocolo se vertebra alrededor del uso de herramientas gratuitas y que pueden funcionar en cualquier sistema operativo (de ahí la elección de <code>R</code> como software de referencia). Concretamente, y para el proceso de geocodificación, el protocolo se ha estructurado en 4 fases:</p>
+<ol style="list-style-type: decimal">
+<li>Instalación y carga de paquetes de <code>R</code>.</li>
+<li>Importación de datos y adaptación de su formato.</li>
+<li>Geocodificación de direcciones con <code>CartoCiudad</code>.</li>
+<li>Geocodificación de las direcciones restantes con <code>Google</code>.</li>
+</ol>
+<p>Como puede verse, en el protocolo se contemplan dos servicios de geocodificación distintos: esto se debe a que ambos son completamente independientes, con lo que una dirección que no pueda ser geocodificada por uno de ellos sí podría serlo por el otro. No obstante, en nuestra experiencia el servicio de geocodificación de <code>CartoCiudad</code> ha resultado ser más fiable que el de <code>Google</code>, y es por ello que se ha propuesto como servicio primario. En este sentido, y según hemos podido comprobar, <code>Google</code> parece más aventurado a la hora de asignar unas coordenadas a cada dirección; además, en algunos casos las coordenadas devueltas por <code>Google</code> son menos precisas que las que ofrece <code>CartoCiudad</code> (lo cual se traduce en un mayor error alrededor del punto que debería haberse asignado, incluyendo la posibilidad de un cambio de sección censal) y, por último, la versión gratuita tiene un límite en el número de consultas por día (lo cual es muy molesto dado el volumen de datos que manejamos). Sin embargo, el servicio de <code>Google</code> tiene una gran ventaja respecto al de <code>CartoCiudad</code>, y es que es capaz de geocodificar puntos de interés (como residencias de ancianos) además de direcciones, siendo capaz de resolver direcciones del tipo <code>Residencia Costablanca, Alicante</code>, lo que aporta un matiz complementario para ubicar esa clase de direcciones que <code>CartoCiudad</code> no es capaz de ubicar, justificando su uso.</p>
+<p>Así pues, en líneas generales la combinación de servicios funciona de la siguiente manera: en primer lugar se intenta geocodificar todas las direcciones mediante <code>CartoCiudad</code> y, una vez terminado ese proceso (en el que nos habremos quitado de encima buena parte de las direcciones que teníamos que geocodificar), se intentará la geocodificación de las direcciones restantes a través de <code>Google</code>.</p>
+<div id="instalación-y-carga-de-paquetes-de-r" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Instalación y carga de paquetes de <code>R</code></h1>
+<p>El primer paso es asegurar que se tiene instalado <code>R</code>. El protocolo se ha probado con varias versiones de este software, y aunque es posible ejecutarlo con versiones a partir de la 3.1.0, es recomendable utilizar la última, que es la <a href="https://cran.r-project.org/">3.5.1</a>.</p>
+<p>Existen varios paquetes de <code>R</code> que permiten establecer una conexión con los servicios de geocodificación. Para facilitar este proceso, se ha creado el paquete <a href="https://github.com/fisabio/medear"><code>medear</code></a>, el cual aglutina las funcionalidades de otros paquetes adaptándolas a nuestras necesidades. Para instalar este paquete y sus dependencias basta con ejecutar el siguiente código en la consola de <code>R</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># El paquete devtools facilita la instalación de medear</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="st">&quot;devtools&quot;</span> <span class="sc">%in%</span> <span class="fu">installed.packages</span>())</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;fisabio/medear&quot;</span>, <span class="at">build_vignettes =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Puede tardar unos minutos...</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(medear) <span class="co"># Carga del paquete medear</span></span></code></pre></div>
+<p>Al instalar el paquete <code>medear</code> también se instalan todas sus dependencias, incluyendo una función propia para llamar al servicio de <code>CartoCiudad</code> (adaptada del paquete <a href="https://github.com/cjgb/caRtociudad"><code>caRtociudad</code></a> para este proyecto). Esta versión propia permite, a diferencia de la original, llamar a ambas versiones (antigua y nueva) del servicio de geocodificado de <code>CartoCiudad</code>. Las versiones de los paquetes implicados en este protocolo son:</p>
+<ul>
+<li><code>devtools</code>: versión <code>&gt;= 1.13.6</code>.</li>
+<li><code>medear</code>: versión <code>&gt;= 0.4.3</code>.</li>
+</ul>
+<p>Si así se desea, es posible consultar este protocolo desde la ayuda del paquete (útil si estás utilizando una interfaz tipo <a href="https://www.rstudio.com/">RStudio</a>), pues está incorporado dentro del mismo como una viñeta, siendo accesible con la sentencia <code>vignette(&quot;medear-geocodificacion&quot;)</code>.</p>
+</div>
+<div id="carga-o-importación-de-datos-y-adaptación-de-su-formato" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Carga o importación de datos y adaptación de su formato</h1>
+<div id="carga-y-preparación-de-la-cartografía" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> Carga y preparación de la cartografía</h2>
+<p>El proceso de geocodificación hace uso de la cartografía de cada municipio con el propósito de asegurar que cada una de las coordenadas obtenidas cae dentro del límite territorial de la ciudad correspondiente. En caso contrario, la geocodificación se desecha por considerarse errónea (la dirección se ha asignado a otro municipio).</p>
+<p>Dentro del paquete <code>medear</code> se dispone de una cartografía (descargada de la <a href="http://www.ine.es/censos2011_datos/cartografia_censo2011_nacional.zip">web del INE</a>) a nivel de sección censal para el año 2011 para todas las ciudades del proyecto MEDEA, la cual es accesible tras haber cargado el paquete. Concretamente, para poder acceder a dicha cartografía bastaría con ejecutar <code>data(&quot;cartografia&quot;)</code>, lo cual adjunta al entorno de trabajo un objeto con ese mismo nombre. El <code>data.frame</code> asociado a <code>cartografia</code> tiene como columnas: <code>seccion</code>, <code>CUMUN</code> (código INE para cada municipio), <code>CCA</code> (código INE para cada comunidad autónoma), y las variables <code>NPRO</code>, <code>NCA</code> y <code>NMUN</code>, que hacen referencia a los nombres estandarizados de cada provincia, comunidad autónoma y municipio (respectivamente). Por otra parte, también se dispone de una función para descargar la cartografía completa de toda España de la web del INE (si así se quisiera): <code>descarga_cartografia()</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;cartografia&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Si quisiéramos descargar la cartografía completa, usaríamos:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># cartografia &lt;- descarga_cartografia()</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Filtramos la cartografía, en nuestro caso nos quedamos sólo con las ciudades de la </span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Comunidad Valenciana, cuyo código INE es &quot;10&quot; (adaptar en caso de otras CCAA)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>carto.munis <span class="ot">&lt;-</span> cartografia[cartografia<span class="sc">$</span>CCA <span class="sc">==</span> <span class="st">&quot;10&quot;</span>, ]</span></code></pre></div>
+<p>Dentro del paquete hay un conjunto de datos con los códigos INE de todas las comunidades, provincias y municipios de España, incluyendo una variable que indica si estos últimos participan en MEDEA3. Por ejemplo, podríamos consultar las ciudades participantes en MEDEA3 con</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">&quot;codigos_ine&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>codigos_ine[codigos_ine<span class="sc">$</span>medea3, ]</span></code></pre></div>
+<p>obteniendo como resultado los códigos que pudieran interesarnos.</p>
+<p><strong>Solo en caso de querer cargar otro archivo de cartografía</strong></p>
+<p>Es posible cargar otra cartografía que no sea la incluida dentro del paquete <code>medear</code>. Si la cartografía estuviera en formato <em>ESRI Shapefile</em> (archivo con extensión <code>.shp</code>) sería necesario que anexo a dicho archivo hubiera otro con la proyección empleada (archivo con extensión <code>.prj</code>) con el mismo nombre que el archivo con la cartografía. Como decíamos, el archivo con extensión <code>.prj</code> contendrá la información sobre la proyección utilizada para geocodificar la cartografía y por tanto para referenciar sus elementos exactamente dentro del globo terráqueo. Esta información resulta necesaria para ciertas fases del proceso de geocodificación. Para ello, ejecutaríamos las siguientes líneas</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># No ejecutar este comando a menos que se quiera importar un archivo de cartografía</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># El paquete rgdal se instala como dependencia del paquete medear</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rgdal)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Cambiar CartografiaDeseada por la ruta hasta el archivo oportuno</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>carto.munis <span class="ot">&lt;-</span> <span class="fu">readOGR</span>(<span class="at">dsn =</span> <span class="st">&quot;CartografiaDeseada.shp&quot;</span>, <span class="at">layer =</span> <span class="st">&quot;CapaDeseada&quot;</span>)</span></code></pre></div>
+</div>
+<div id="carga-y-preparación-de-los-datos-de-mortalidad" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> Carga y preparación de los datos de mortalidad</h2>
+<p>En esta sección se cargará y preparará (para su análisis posterior) la información de mortalidad con las direcciones a geocodificar. Los datos de la Comunidad Valenciana se encuentran en una base de datos llamada <code>datosmort</code>. El archivo <code>datosmort</code> se cargará mediante alguna sentencia del tipo <code>load(&quot;datos/datosmort.RData&quot;)</code> o <code>read.csv(&quot;datos/datosmort.csv&quot;)</code> donde <code>datos/</code> hace referencia al directorio en el que tengamos el archivo correspondiente (en el caso de datos en formato CSV, quizá se necesite algún argumento extra). Si deseas ejecutar este protocolo de forma secuencial (sin cambiar nada), es importante que, una vez hayas importado tus datos en <code>R</code> uses el mismo nombre que nosotros (<code>datosmort</code>). Esto puedes hacerlo con la sentencia:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">&quot;datos/datosmort.RData&quot;</span>) <span class="co"># Sustituir el entrecomillado por la ruta oportuna</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># En caso de que tu base de datos se llamase de otra forma:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>datosmort <span class="ot">&lt;-</span> el_nombre_de_tu_base_de_datos_de_mortalidad</span></code></pre></div>
+<p>En el caso de la Comunidad Valenciana el <code>data.frame</code> con la mortalidad tiene la siguiente estructura:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(datosmort)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [1] &quot;NID&quot;        &quot;SEXO&quot;       &quot;ANODEFUN&quot;   &quot;MESDEFUN&quot;   &quot;DIADEFUN&quot;   &quot;ANONAC&quot;    </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># [7] &quot;MESNAC&quot;     &quot;DIANAC&quot;     &quot;TVIA&quot;       &quot;NVIA&quot;       &quot;NPOLI&quot;      &quot;CODMUNIRES&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># [13]&quot;NMUNIRES&quot;   &quot;NPROVRES&quot;   &quot;CODPST&quot;     &quot;CAUSABASIC&quot;</span></span></code></pre></div>
+<p>De esos campos los únicos que vamos a utilizar de aquí en adelante son:</p>
+<ul>
+<li><code>TVIA</code>, tipo de vía.</li>
+<li><code>NVIA</code>, nombre de la vía.</li>
+<li><code>NPOLI</code>, número de policía del domicilio.</li>
+<li><code>CODMUNIRES</code>, código INE del municipio.</li>
+<li><code>NMUNIRES</code>, nombre del municipio de residencia.</li>
+<li><code>NPROVRES</code>, nombre de la provincia de residencia.</li>
+<li><code>CODPST</code>, código postal (si se tiene, si no contendrá un texto en blanco: &quot;&quot;).</li>
+</ul>
+<p>Para que el resto de instrucciones contenidas en este protocolo funcionen sin ninguna modificación adicional, tu base de datos con la información de mortalidad deberá tener (al menos) estos campos con <strong>exactamente estos nombres</strong>. Si los nombres de esos campos fueran distintos en tu base de datos, te aconsejamos que los renombres. Respecto al resto de columnas, si faltase o tuvieras alguna de más o con distinto nombre, y dado que no van a necesitarse, no tendrá ninguna importancia para el correcto funcionamiento del protocolo.</p>
+<p>Una vez que te hayas asegurado que tu <code>data.frame</code> tenga la información que acabamos de comentar y con ese formato exactamente, las siguientes sentencias completan dicho <code>data.frame</code>, creando nuevas columnas que serán utilizadas más adelante. Asimismo, se requiere que los campos que nos interesan sean cadenas de carácteres, y como es probable que durante la importación <code>R</code> haya interpretado que algunos de ellos (o todos) son de clase factor, es necesario asegurar que la clase es correcta.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Asegurar el tratamiento correcto de los datos como cadenas de carácteres</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>datosmort <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">sapply</span>(datosmort, as.character), <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear nuevas columnas</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>BOD.direccion <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span>    <span class="co"># Dirección tal cual ha sido intentada geocodificar</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>georef        <span class="ot">&lt;-</span> <span class="st">&quot;NO&quot;</span>  <span class="co"># Status del proceso de geocodificado</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>id            <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>province      <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>muni          <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>tip_via       <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>address       <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>portalNumber  <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>refCatastral  <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>postalCode    <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>lat           <span class="ot">&lt;-</span> <span class="cn">NA_real_</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>lng           <span class="ot">&lt;-</span> <span class="cn">NA_real_</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>stateMsg      <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>state         <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>datosmort<span class="sc">$</span>type          <span class="ot">&lt;-</span> <span class="st">&quot;&quot;</span></span></code></pre></div>
+</div>
+</div>
+<div id="geocodificación-de-direcciones-con-cartociudad" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Geocodificación de direcciones con <code>CartoCiudad</code></h1>
+<p>Una vez disponemos de la base de datos de mortalidad en el formato adecuado, pasamos a intentar geocodificar todas las direcciones utilizando el servicio de <code>CartoCiudad</code>. Para ello haremos un uso intensivo de la función <code>geocodificar_cartociudad</code> de <code>medear</code>, la cual intenta geocodificar cada dirección atendiendo a las dos versiones de <code>CartoCiudad</code> disponibles a día de hoy. Para más información del funcionamiento interno de dicha función se puede recurrir a la ayuda específica de la misma (<code>?geocodificar_cartociudad</code>). Además, en caso de que una dirección no pueda ser geocodificada se prueba si distintas variantes de la dirección pudieran dar algún resultado positivo. Las variantes contempladas son 5, aunque en este protocolo solo vamos a aplicar las dos siguientes:</p>
+<ol style="list-style-type: decimal">
+<li>eliminar duplicidad de tipos de vía (ejemplo: calle camino …-&gt; camino …).</li>
+<li>eliminar descripciones de vía (ejemplo: “Avenida rosa (Edificio azul)” -&gt; “Avenida rosa”).</li>
+</ol>
+<p>La función <code>geocodificar_cartociudad</code> manda al servicio de geocodificación las direcciones de las defunciones una a una. Como resultado de estas consultas, se obtendrá una base de datos donde uno de los campos se llama <code>state</code>, haciendo referencia a la exactitud de la geocodificación que proporciona <code>CartoCiudad</code>. En este sentido, solo se retendrán aquellas coordenadas cuyo campo <code>state</code> sea igual a</p>
+<ol style="list-style-type: decimal">
+<li>geolocalización exacta,</li>
+<li>gelocalización aproximada: el portal par consultado no existe en la base de datos de <code>CartoCiudad</code>, se devuelve el par más cercano,</li>
+<li>gelocalización aproximada: el portal impar consultado no existe en la base de datos de <code>CartoCiudad</code>, se devuelve el impar más cercano,</li>
+<li>gelocalización aproximada: el portal o punto kilométrico consultado no existe en la base de datos de <code>CartoCiudad</code>, se devuelve el más cercano.</li>
+</ol>
+<p>En caso de que la geocodificación llevada a cabo sea exitosa, completaremos los campos que hemos añadido a <code>datosmort</code> con la información obtenida. En caso contrario simplemente actualizaremos el campo <code>georef</code> con información que podría ser de interés en relación al motivo por el que dicha defunción no ha podido ser geocodificada.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionamos individuos a geocodificar, si se quisiera hacer una segunda </span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ronda de geocodificación (como luego haremos con Google) una sentencia de selección </span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># de este tipo hará que sólo se aplique la nueva geocodificación a los registros </span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># que nos parezca oportuno.</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>no.geo    <span class="ot">&lt;-</span> <span class="fu">which</span>(datosmort<span class="sc">$</span>georef <span class="sc">==</span> <span class="st">&quot;NO&quot;</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>totno.geo <span class="ot">&lt;-</span> <span class="fu">length</span>(no.geo)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Comenzamos bucle de geocodificación para los registros seleccionados</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>totno.geo) {</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  cont <span class="ot">&lt;-</span> no.geo[i]</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Preparamos la dirección (normalización y limpieza), gracias a la función limpia_dir</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  aux.direc <span class="ot">&lt;-</span> <span class="fu">limpia_dir</span>(</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">tvia    =</span> datosmort<span class="sc">$</span>TVIA[cont],</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">nvia    =</span> datosmort<span class="sc">$</span>NVIA[cont],</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">npoli   =</span> datosmort<span class="sc">$</span>NPOLI[cont],</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">muni    =</span> datosmort<span class="sc">$</span>NMUNIRES[cont],</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">prov    =</span> datosmort<span class="sc">$</span>NPROVRES[cont],</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">codpost =</span> datosmort<span class="sc">$</span>CODPST[cont]</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (aux.direc<span class="sc">$</span>nvia <span class="sc">==</span> <span class="st">&quot;&quot;</span>) {</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    datosmort<span class="sc">$</span>georef[cont] <span class="ot">&lt;-</span> <span class="st">&quot;DIREC VACIA&quot;</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Guardamos en &quot;BOD.direccion&quot; la dirección normalizada que vamos </span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># a mandar a CartoCiudad.</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    datosmort<span class="sc">$</span>BOD.direccion[cont] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>tvia, <span class="st">&quot; &quot;</span>,</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>nvia, <span class="st">&quot; &quot;</span>,</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>npoli, <span class="st">&quot;, &quot;</span>,</span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>muni, <span class="st">&quot; , &quot;</span>,</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>prov, <span class="st">&quot; , &quot;</span>,</span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>codpost</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>    direc <span class="ot">&lt;-</span> datosmort<span class="sc">$</span>BOD.direccion[cont]</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Georreferenciación con CartoCiudad con comprobación de que la </span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># geocodificación que hemos obtenido recae geográficamente dentro del </span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># límite geográfico correspondiente a la ciudad.</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>    poli <span class="ot">&lt;-</span> <span class="fu">all</span>(<span class="fu">is.na</span>(carto.munis<span class="sc">$</span>CUMUN <span class="sc">==</span> datosmort<span class="sc">$</span>CODMUNIRES[cont]))</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>    poli <span class="ot">&lt;-</span> <span class="cf">if</span> (poli) <span class="cn">NULL</span> <span class="cf">else</span> carto.munis[carto.munis<span class="sc">$</span>CUMUN <span class="sc">==</span> datosmort<span class="sc">$</span>CODMUNIRES[cont], ]</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>    aux  <span class="ot">&lt;-</span> <span class="fu">geocodificar_cartociudad</span>(</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>      <span class="at">direc    =</span> direc,</span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>      <span class="at">poligono =</span> poli</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># En caso de que quisiéramos geocodificar con CartoCiudad sin más, </span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>    <span class="co"># sin comprobar que el punto que obtenemos está incluido en una región </span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>    <span class="co"># geográfica concreta, ejecutaríamos simplemente: </span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># aux &lt;- geocodificar_cartociudad(direc = direc)</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>    columnas_elegidas <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;id&quot;</span>, <span class="st">&quot;province&quot;</span>, <span class="st">&quot;muni&quot;</span>, <span class="st">&quot;tip_via&quot;</span>, <span class="st">&quot;address&quot;</span>, <span class="st">&quot;portalNumber&quot;</span>, <span class="st">&quot;refCatastral&quot;</span>,</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;postalCode&quot;</span>, <span class="st">&quot;lat&quot;</span>, <span class="st">&quot;lng&quot;</span>, <span class="st">&quot;stateMsg&quot;</span>, <span class="st">&quot;state&quot;</span>, <span class="st">&quot;type&quot;</span>, <span class="st">&quot;georef&quot;</span></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">substr</span>(aux<span class="sc">$</span>georef, <span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">!=</span> <span class="st">&quot;NO&quot;</span>) {</span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>      datosmort[cont, columnas_elegidas] <span class="ot">&lt;-</span> aux</span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>      datosmort<span class="sc">$</span>georef[cont] <span class="ot">&lt;-</span> <span class="fu">as.character</span>(aux<span class="sc">$</span>georef)</span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>      <span class="co"># El resultado de la geocodificación puede ser NO.XXX además de un simple NO </span></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>      <span class="co"># (donde XXX nos puede aportar información adicional), ese es el motivo por </span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>      <span class="co"># el que actualizamos el valor de la columna georef del registro correspondiente. </span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>      <span class="co"># En caso de que la geocodificación de la dirección no haya tenido éxito,</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>      <span class="co">#  probamos la geocodificación de algunas variantes de dicha dirección.</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (filtro <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="fu">substr</span>(aux<span class="sc">$</span>georef, <span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">==</span> <span class="st">&quot;NO&quot;</span>) {</span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>          <span class="co"># Si alguno de los filtros ha funcionado no se reintentaría la geocodificación.</span></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>          <span class="co"># Función que aplica los filtros:</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>          aux.direcf <span class="ot">&lt;-</span> <span class="fu">filtra_dir</span>(<span class="at">vias =</span> aux.direc, filtro) </span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span> (aux.direcf <span class="sc">!=</span> <span class="st">&quot;&quot;</span>) {</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>            direcf <span class="ot">&lt;-</span> aux.direcf</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>            aux    <span class="ot">&lt;-</span> <span class="fu">geocodificar_cartociudad</span>(</span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>              <span class="at">direc    =</span> direcf,</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a>              <span class="at">poligono =</span> poli</span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>          <span class="cf">if</span>(<span class="fu">substr</span>(aux<span class="sc">$</span>georef, <span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">!=</span> <span class="st">&quot;NO&quot;</span>) {</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>            datosmort[cont, columnas_elegidas] <span class="ot">&lt;-</span> aux</span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>            datosmort<span class="sc">$</span>georef[cont] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(datosmort<span class="sc">$</span>georef[cont], filtro)</span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Contador</span></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste</span>(i, <span class="st">&quot;de&quot;</span>, totno.geo, <span class="st">&quot;georef&quot;</span>, datosmort<span class="sc">$</span>georef[cont], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>))</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="co"># Una vez finalizado el proceso guardamos una copia de los datos geocodificados por </span></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="co"># CartoCiudad antes de pasar a google</span></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="do">###### Creamos el directorio (en caso de no existir) donde se guardarán los datos</span></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(<span class="st">&quot;datos/mortalidad&quot;</span>))</span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="st">&quot;datos/mortalidad&quot;</span>, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(datosmort, <span class="at">file =</span> <span class="st">&quot;datos/mortalidad/mortalidad_geocodificada.RData&quot;</span>)</span></code></pre></div>
+</div>
+<div id="geocodificación-de-las-direcciones-restantes-con-google" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Geocodificación de las direcciones restantes con <code>Google</code></h1>
+<p>En el apartado anterior se debería haber geocodificado una gran proporción de las direcciones (en nuestras pruebas, la cifra varía entre un 85 y 95 %), y ahora se hará uso del servicio de geocodificación de <code>Google</code> para tratar de geocodificar todos los registros que no hayan podido ser geocodificados con <code>CartoCiudad</code>.</p>
+<p>Debido al límite de consultas diarias que impone la versión gratuita del servicio de <code>Google</code> (teóricamente de 2500, aunque hemos observado que esta cifra puede variar mucho), es muy probable que tengamos que enviar algunas direcciones varias veces a este servicio, en días distintos, para poder completar el proceso. Para entender mejor el proceso que sigue a continuación, se debe tener en cuenta la respuesta que devuelve el servicio de <code>Google</code> al tratar de geocodificar un registro:</p>
+<ul>
+<li><code>state</code> igual a <code>&quot;OK&quot;</code> : registro geocodificado.</li>
+<li><code>state</code> distinto de <code>&quot;OK&quot;</code>:
+<ul>
+<li><code>state</code> igual a <code>&quot;ZERO_RESULTS&quot;</code> indica que el registro no ha podido ser geocodificado por Google.</li>
+<li><code>state</code> igual a <code>&quot;OVER_QUERY_LIMIT&quot;</code> indica que por algún motivo (puede ser exceso de número de consultas diarias, o fallo de conexión con el servidor de <code>Google</code> en un momento determinado, la dirección no ha podido ser geocodificada. Estas direcciones son susceptibles de volver a ser enviadas a <code>Google</code> para lograr una geocodificación exitosa.</li>
+</ul></li>
+</ul>
+<p>Por este motivo, cuando no tenemos éxito al geocodificar con <code>Google</code> (<code>state != &quot;OK&quot;</code>) se guardará, además del campo <code>georef == &quot;NO&quot;</code>, el valor del campo <code>state</code> con el fin de volver a enviar aquellas direcciones en las que sea necesario una ejecución posterior (en días posteriores) de esta parte del protocolo, seleccionando las direcciones cuyo estado de la variable <code>georef</code> sea <code>&quot;NO&quot;</code> o <code>&quot;NO punto...&quot;</code>, y cualquier estado de <code>Google</code> que indique que el individuo no está geocodificado. En este sentido, es importante hacer hincapié en este aspecto y distinguir entre los distintos tipos de direcciones no geocodificadas:</p>
+<ol style="list-style-type: decimal">
+<li>Enviados a <code>Google</code> con éxito y que no han podido ser geocodificados: estos registros mantendrán un valor de la variable <code>georef</code> que empieza por <code>&quot;NO&quot;</code> y un valor en <code>state</code> que indica <code>&quot;ZERO_RESULTS&quot;</code>. <em>Estos puntos NO deben volver a ser enviados a <code>Google</code> en una nueva ronda de geocodificación</em>, en caso de volver a ser mandados el resultado será exactamente el mismo.</li>
+<li>Enviados a <code>Google</code> con éxito, geocodificados, pero con resultado de un punto que no está en el polígono (límite municipal) requerido: estos registros mantendrán un valor de la variable <code>georef</code> que empieza por <code>&quot;NO&quot;</code> y un valor en <code>state</code> que indica <code>&quot;NO punto google&quot;</code>. <em>Estos puntos NO deben volver a ser enviados a <code>Google</code> en una nueva ronda de geocodificación</em>, en caso de volver a ser mandados el resultado que obtendremos será exactamente el mismo, resultado que no consideramos válido.</li>
+<li>Enviados a <code>Google</code> sin éxito debido a algún fallo, como por ejemplo que se ha excedido el límite diario de geocodificaciones: estos registros mantendrán un valor de la variable <code>georef</code> que empieza por <code>&quot;NO&quot;</code> y un valor en <code>state</code> que indica <code>&quot;OVER_QUERY_LIMIT&quot;</code> o cualquier otra circunstancia. <em>Estas direcciones SÍ deben volver a ser enviadas a <code>Google</code> en una nueva ronda de geocodificación</em> ya que en esa nueva ronda podrían ser geocodificadas.</li>
+</ol>
+<p>El proceso de geocodificación mediante <code>Google</code> se puede llevar a cabo mediante el siguiente código. A partir del momento en que el proceso comience a devolver de forma repetida <code>&quot;OVER_QUERY_LIMIT&quot;</code> para, digamos 100 registros, podremos parar el proceso y reanudarlo otro día, ya que habríamos alcanzado el límite máximo diario de geocodificaciones permitidas. En ese caso, no olvides ejecutar la sentencia <code>save</code> del final del código para guardar las geocodificaciones efectuadas durante dicha jornada. Al retomar el código durante el día siguiente, las sentencias iniciales seleccionan los registros que quedan por geocodificar o hayan tenido una geocodificación defectuosa previa y solo intenta la geocodificación de las direcciones correspondientes.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">&quot;datos/mortalidad/mortalidad_geocodificada.RData&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>columnas_elegidas <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;id&quot;</span>, <span class="st">&quot;province&quot;</span>, <span class="st">&quot;muni&quot;</span>, <span class="st">&quot;tip_via&quot;</span>, <span class="st">&quot;address&quot;</span>, <span class="st">&quot;portalNumber&quot;</span>, <span class="st">&quot;refCatastral&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>      <span class="st">&quot;postalCode&quot;</span>, <span class="st">&quot;lat&quot;</span>, <span class="st">&quot;lng&quot;</span>, <span class="st">&quot;stateMsg&quot;</span>, <span class="st">&quot;state&quot;</span>, <span class="st">&quot;type&quot;</span>, <span class="st">&quot;georef&quot;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Seleccionamos aquellos individuos a geocodificar que no lo hayan sido antes </span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># o hayan sido geocodificados por Google de forma defectuosa.</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>no.geo <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">substr</span>(datosmort<span class="sc">$</span>georef, <span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">==</span> <span class="st">&quot;NO&quot;</span> <span class="sc">&amp;</span> </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                  datosmort<span class="sc">$</span>state <span class="sc">!=</span> <span class="st">&quot;ZERO_RESULTS&quot;</span> <span class="sc">&amp;</span> </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                  datosmort<span class="sc">$</span>georef <span class="sc">!=</span> <span class="st">&quot;NO punto google&quot;</span>)  </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>totno.geo    <span class="ot">&lt;-</span> <span class="fu">length</span>(no.geo)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Desde junio de 2018 debe proporcionarse una clave de los servicios de Google.</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Véase https://developers.google.com/maps/documentation/geocoding/get-api-key?hl=es-419</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>clave_google <span class="ot">&lt;-</span> <span class="st">&quot;CLAVE_DE_GOOGLE&quot;</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>totno.geo) {</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  cont  <span class="ot">&lt;-</span> no.geo[i]</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Preparación las direcciones, eliminando caracteres extraños que Google no reconoce</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># gracias a la función limpiadirecGoogle</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  aux.direc <span class="ot">&lt;-</span> <span class="fu">limpia_dir</span>(</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">tvia    =</span> datosmort<span class="sc">$</span>TVIA[cont],</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">nvia    =</span> datosmort<span class="sc">$</span>NVIA[cont],</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">npoli   =</span> datosmort<span class="sc">$</span>NPOLI[cont],</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">muni    =</span> datosmort<span class="sc">$</span>NMUNIRES[cont],</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">prov    =</span> datosmort<span class="sc">$</span>NPROVRES[cont],</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">codpost =</span> datosmort<span class="sc">$</span>CODPST[cont]</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  datosmort<span class="sc">$</span>BOD.direccion[cont] <span class="ot">&lt;-</span> direc <span class="ot">&lt;-</span> <span class="fu">limpiadirecGoogle</span>(</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste0</span>(</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>tvia, <span class="st">&quot; &quot;</span>,</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>nvia, <span class="st">&quot; &quot;</span>,</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>npoli, <span class="st">&quot;, &quot;</span>,</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>muni, <span class="st">&quot; , &quot;</span>,</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>prov, <span class="st">&quot; , &quot;</span>,</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>      aux.direc<span class="sc">$</span>codpost</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (aux.direc<span class="sc">$</span>nvia <span class="sc">==</span> <span class="st">&quot;&quot;</span>) {</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    datosmort<span class="sc">$</span>georef[cont] <span class="ot">&lt;-</span> <span class="st">&quot;DIREC VACIA&quot;</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Georreferencia con Google con comprobación de que es asignado al interior del polígono</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="co"># correspondiente a la ciudad.</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    poli <span class="ot">&lt;-</span> <span class="fu">all</span>(<span class="fu">is.na</span>(carto.munis<span class="sc">$</span>CUMUN <span class="sc">==</span> datosmort<span class="sc">$</span>CODMUNIRES[cont]))</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    poli <span class="ot">&lt;-</span> <span class="cf">if</span> (poli) <span class="cn">NULL</span> <span class="cf">else</span> carto.munis[carto.munis<span class="sc">$</span>CUMUN <span class="sc">==</span> datosmort<span class="sc">$</span>CODMUNIRES[cont], ]</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    aux <span class="ot">&lt;-</span> <span class="fu">geocodificar_google</span>(</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>      <span class="at">direc        =</span> direc,</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>      <span class="at">clave_google =</span> clave_google,</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>      <span class="at">aux.direc    =</span> aux.direc,</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>      <span class="at">poligono     =</span> poli</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (aux<span class="sc">$</span>georef <span class="sc">==</span> <span class="st">&quot;NO punto&quot;</span>) {</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>      datosmort<span class="sc">$</span>georef[cont] <span class="ot">&lt;-</span> <span class="st">&quot;NO punto google&quot;</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (aux<span class="sc">$</span>georef <span class="sc">==</span> <span class="st">&quot;NO&quot;</span>) {<span class="co"># Cuando NO se ha podido geocodificar con google </span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>      <span class="co"># recogemos el motivo: &quot;ZERO_RESULTS&quot;, &quot;OVER_QUERY_LIMIT&quot;, ...</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>      datosmort<span class="sc">$</span>state[cont] <span class="ot">&lt;-</span> <span class="fu">as.character</span>(aux<span class="sc">$</span>state)</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(<span class="sc">!</span>aux<span class="sc">$</span>georef <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;NO&quot;</span>, <span class="st">&quot;NO punto&quot;</span>)) {</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>      datosmort[cont, columnas_elegidas] <span class="ot">&lt;-</span> aux</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste</span>(i, <span class="st">&quot;de&quot;</span>, totno.geo, <span class="st">&quot;georef&quot;</span>, datosmort<span class="sc">$</span>georef[cont], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>))</span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(datosmort, <span class="at">file =</span> <span class="st">&quot;datos/mortalidad/mortalidad_geocodificada.RData&quot;</span>)</span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
