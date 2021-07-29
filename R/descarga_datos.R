@@ -65,7 +65,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
 
   stopifnot(is.character(cod_provincia))
   stopifnot(is.numeric(years))
-  stopifnot(length(years) > 0 & years %in% c(2001, 2004:(as.numeric(format(Sys.time(), "%Y")) - 1)))
+  stopifnot(length(years) > 0 & years %in% c(2001, 2004:(as.numeric(format(Sys.time(), "%Y")))))
   stopifnot(is.logical(conservar))
   n_cores <- data.table::getDTthreads(verbose = FALSE)
   data.table::setDTthreads(threads = min(n_cores, 4L))
