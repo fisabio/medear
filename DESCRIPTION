@@ -25,13 +25,13 @@ Imports:
     leaflet,
     leaflet.extras,
     nabor,
-    rgdal,
+    sf,
     rgeos,
     sodium,
     stringi,
     utils,
     stats
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.1
 ByteCompile: yes
 Suggests:
     knitr,

@@ -566,11 +566,18 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
         setnames(nviv_sum, names(nviv_sum), c("seccion", "n_viv"))
       }
 
-      cartografia <- stats::aggregate(
-        x   = cartografia,
-        by  = list(cartografia$cluster_id),
+
+
+      # MOD carto: sp to sf
+      carto_tmp <- sf::st_as_sf(cartografia)
+
+      carto_tmp <- stats::aggregate(
+        x   = carto_tmp,
+        by  = list(carto_tmp$cluster_id),
         FUN = function(x) x[[1]]
       )
+      cartografia <- sf::as_Spatial(carto_tmp)
+
       cartografia$seccion    <- cartografia$cluster_id
       cartografia$cluster_id <- NA_character_
       for (i in seq_along(sc_ini)) {

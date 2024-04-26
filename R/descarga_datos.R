@@ -275,10 +275,8 @@ descarga_cartografia <- function(epsg = 4326, conservar = TRUE, ntries = 10) {
       exdir = dir_dest
     )
   }
-
-  carto <- rgdal::readOGR(
+  carto <- sf::st_read(
     dsn              = paste0(dir_dest, "/SECC_CPV_E_20111101_01_R_INE.shp"),
-    verbose          = FALSE,
     stringsAsFactors = FALSE
   )
   if (!conservar)
