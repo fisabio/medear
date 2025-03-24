@@ -472,10 +472,16 @@ une_secciones <- function(cambios = NULL, cartografia, poblacion = NULL, mortali
       cambios$no_11 <- FALSE
       cambios$dista <- NA_real_
       for (i in seq_len(nrow(cambios))) {
-        carto1 <- carto_metro[carto_metro$seccion == cambios$sc_ref[i], ]
-        carto2 <- carto_metro[carto_metro$seccion == cambios$sc_new[i], ]
-        if (all(nrow(carto1) > 0, nrow(carto2) > 0)) {
-          cambios$dista[i] <- rgeos::gDistance(carto1, carto2)
+        carto1    <- carto_metro[carto_metro$seccion == cambios$sc_ref[i], ]
+        carto2    <- carto_metro[carto_metro$seccion == cambios$sc_new[i], ]
+        carto1_sf <- sf::st_as_sf(carto1)
+        carto2_sf <- sf::st_as_sf(carto2)
+        if (all(nrow(carto1_sf) > 0, nrow(carto2_sf) > 0)) {
+          cambios$dista[i] <- sf::st_distance(
+            x          = carto1_sf,
+            y          = carto2_sf,
+            by_element = TRUE
+          )
         } else {
           cambios$no_11[i] <- TRUE
         }

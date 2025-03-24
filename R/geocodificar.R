@@ -294,7 +294,7 @@ comprueba_punto_poligono <- function(punto, poligono) {
 
   # Transformamos los puntos a la misma proyeccion que la cartografia
   puntos.fin <- try(sp::spTransform(punto.lonlat, CRScarto), silent = TRUE)
-  if (class(puntos.fin) != "try-error") {
+  if (!inherits(puntos.fin, "try-error")) {
     auxiliar <- sp::over(puntos.fin, poligono)$CUMUN
   } else {
     auxiliar <- NA

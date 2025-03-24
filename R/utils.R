@@ -813,8 +813,12 @@ detecta_cluster <- function(datos, epsg = 4326, vecinos = 10, cartografia = NULL
              pegote[[i]][[2]], "</i>", "</p>", collapse = "")
     )
   }
+  grupo_sp_sf <- sf::st_as_sf(grupo_sp)
+  carto_cl_sf <- sf::st_as_sf(carto_cl)
 
-  xx       <- suppressWarnings(rgeos::gWithin(grupo_sp, carto_cl, byid = T))
+  xx       <- suppressWarnings(
+    sf::st_within(x = grupo_sp_sf, y = carto_cl_sf, sparse = FALSE)
+  )
   yy       <- apply(xx, 1, sum)
   zz       <- unique(carto_cl$CUMUN[which(yy != 0)])
   carto_cl <- carto_cl[carto_cl$CUMUN %in% zz, ]
@@ -1641,9 +1645,9 @@ procesa_datos <- function(datos) {
   if (sum(Obs) != sum(Exp))
     stop("Algo ha ido mal al generar el cubo de esperados. Revisa los datos.")
 
-  carto.nb        <- rgeos::gTouches(carto, byid = T, returnDense = F)
-  names(carto.nb) <- NULL
-  tmp             <- sapply(carto.nb, is.null)
+  carto_sf <- sf::st_as_sf(carto)
+  carto.nb <- sf::st_touches(sf::st_make_valid(carto_sf))
+  tmp      <- sapply(carto.nb, length) == 0
 
   if (any(tmp)) {
     warning(
@@ -1651,10 +1655,11 @@ procesa_datos <- function(datos) {
       "Se asigna como vecinos a los pol\u00edgonos m\u00e1s pr\u00f3ximos.",
       call. = FALSE
     )
-    carto_tmp <- sp::spTransform(carto, sp::CRS("+init=epsg:23030"))
-    cual_isla <- which(tmp)
-    distancia <- rgeos::gDistance(carto_tmp[cual_isla, ], carto_tmp, byid = TRUE)
-    nuevos_vecinos <- sapply(seq_along(cual_isla), function(x) which.min(distancia[-cual_isla[x], x]))
+    carto_tmp       <- sf::st_transform(carto_sf, crs = 23030)
+    carto_tmp$nfila <- seq_len(nrow(carto_tmp))
+    cual_isla       <- which(tmp)
+    vecinos_filtro  <- sf::st_nearest_feature(carto_tmp[cual_isla, ], carto_tmp[-cual_isla, ])
+    nuevos_vecinos  <- carto_tmp$nfila[-cual_isla][vecinos_filtro]
 
     for (i in seq_along(cual_isla)) {
       carto.nb[[cual_isla[i]]] <- sort(c(carto.nb[[cual_isla[i]]], as.integer(nuevos_vecinos[i])))
