@@ -202,7 +202,7 @@ descarga_trameros <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   trameros <- rbindlist(trameros)[order(year, seccion)]
   setkeyv(trameros, c("via", "CPOS", "seccion", "year", "CMUM"))
   setattr(trameros, "fuente", "Fuente: Sitio web del INE: www.ine.es")
-  class(trameros)             <- c(class(trameros), "tramero_ine")
+  class(trameros)             <- c("tramero_ine", class(trameros))
 
   return(trameros)
 }
@@ -287,7 +287,7 @@ descarga_cartografia <- function(epsg = 4326, conservar = TRUE, ntries = 10) {
   carto <- sp::spTransform(carto, CRSobj = sp::CRS(paste0("+init=epsg:", epsg)))
 
   attributes(carto@data)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
-  attributes(carto@data)$class  <-  c(attributes(carto@data)$class, "cartografia_ine")
+  attributes(carto@data)$class  <-  c("cartografia_ine", attributes(carto@data)$class)
   return(carto)
 }
 
@@ -441,7 +441,7 @@ descarga_poblaciones <- function(cod_provincia = c(paste0("0", 1:9), 10:52),
   poblaciones[, seccion := trimws(seccion)]
   setkey(poblaciones, seccion, sexo, year)
   setattr(poblaciones, "fuente", "Fuente: Sitio web del INE: www.ine.es")
-  class(poblaciones) <- c(class(poblaciones), "poblaciones_ine")
+  class(poblaciones) <- c("poblaciones_ine", class(poblaciones))
 
   return(poblaciones)
 }

@@ -202,7 +202,7 @@ detecta_cambios <- function(datos, years = c(1996, 2001, 2004:2015),
       }
     )
   )
-  class(cambios) <- c(class(cambios), "cambios_ine")
+  class(cambios) <- c("cambios_ine", class(cambios))
 
   if (!is.null(catastro)) {
     tramero_cambios <- filtra_tramero(datos, cambios)
@@ -266,14 +266,14 @@ carga_datos <- function(key, tipo = c("poblacion", "censo")) {
       list(poblacion, cifrado), fill = TRUE
     )[order(year, sexo, seccion)]
     attributes(datos)$fuente <- "Fuente: Sitio web del INE: www.ine.es"
-    class(datos) <- c(class(datos), "poblaciones_ine")
+    class(datos) <- c("poblaciones_ine", class(datos))
   } else {
     cifrado <- system.file("data_encrypted", "censo.rds",
                            package = "medear", mustWork = TRUE)
     datos <- unserialize(
       sodium::data_decrypt(readRDS(cifrado), key)
     )
-    class(datos) <- c(class(datos), "censos_ine")
+    class(datos) <- c("censos_ine", class(datos))
   }
   return(datos)
 
@@ -415,7 +415,7 @@ lee_catastro <- function(archivo) {
   attributes(catastro_finca)$epsg <- max(unique(catastro_finca$epsg))
   catastro_finca[, c("epsg") := NULL]
 
-  class(catastro_finca) <- c(class(catastro_finca), "catastro")
+  class(catastro_finca) <- c("catastro", class(catastro_finca))
 
   return(catastro_finca)
 }

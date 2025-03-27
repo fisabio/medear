@@ -1,7 +1,7 @@
 Package: medear
 Title: Poblaciones y Cartografia por Seccion Censal INE
-Version: 0.9.0
-Date: 2025-03-24
+Version: 0.9.1
+Date: 2025-03-27
 Authors@R: c(
     person("Grupo MEDEA 3",  role = "aut"),
     person("Carlos", "Vergara-Hernandez", email = "vergara_car@gva.es", role = c("aut", "cre"))
@@ -11,7 +11,6 @@ Description: Descarga, manipulación y extracción de poblaciones desde 1996 a 2
     por sección censal, de acuerdo con los datos del INE, incluyendo la cartografía 
     asociada a 2011. Incluye rutinas de geocodificado, unión de secciones 
     censales a lo largo del período de estudio, y otras funcionalidades del proyecto.
-Depends: R (>= 3.3.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
